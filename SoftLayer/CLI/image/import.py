@@ -22,17 +22,17 @@ from SoftLayer.CLI import formatting
               default=None,
               help="The IBM Cloud API Key with access to IBM Cloud Object "
                    "Storage instance and IBM KeyProtect instance. For help "
-                   "creating this key see https://console.bluemix.net/docs/"
-                   "services/cloud-object-storage/iam/users-serviceids.html"
-                   "#serviceidapikeys")
+                   "creating this key see https://cloud.ibm.com/docs/"
+                   "cloud-object-storage?topic=cloud-object-storage"
+                   "-iam-overview#iam-overview-service-id-api-key")
 @click.option('--root-key-crn',
               default=None,
               help="CRN of the root key in your KMS instance")
 @click.option('--wrapped-dek',
               default=None,
               help="Wrapped Data Encryption Key provided by IBM KeyProtect. "
-                   "For more info see https://console.bluemix.net/docs/"
-                   "services/key-protect/wrap-keys.html#wrap-keys")
+                   "For more info see "
+                   "https://cloud.ibm.com/docs/key-protect?topic=key-protect-wrap-keys")
 @click.option('--cloud-init',
               is_flag=True,
               help="Specifies if image is cloud-init")

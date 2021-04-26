@@ -3,12 +3,14 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :license: MIT, see LICENSE for more details.
+
+    A lot of these tests will use junk data because the manager just passes
+    them directly to the API.
 """
 import SoftLayer
+from SoftLayer import exceptions
+from SoftLayer.fixtures import SoftLayer_Network_LBaaS_LoadBalancer
 from SoftLayer import testing
-
-VIRT_IP_SERVICE = ('SoftLayer_Network_Application_Delivery_Controller_'
-                   'LoadBalancer_VirtualIpAddress')
 
 
 class LoadBalancerTests(testing.TestCase):
@@ -16,195 +18,184 @@ class LoadBalancerTests(testing.TestCase):
     def set_up(self):
         self.lb_mgr = SoftLayer.LoadBalancerManager(self.client)
 
-    def test_get_lb_pkgs(self):
-        result = self.lb_mgr.get_lb_pkgs()
+    def test_get_adcs(self):
+        self.lb_mgr.get_adcs()
+        self.assert_called_with('SoftLayer_Account', 'getApplicationDeliveryControllers')
 
-        self.assertEqual(len(result), 13)
-        _filter = {
-            'items': {
-                'description': {
-                    'operation': '*= Load Balancer'
-                }
-            }
-        }
-        self.assert_called_with('SoftLayer_Product_Package', 'getItems',
-                                identifier=0,
-                                filter=_filter)
+    def test_get_adc_masks(self):
+        self.lb_mgr.get_adcs(mask="mask[id]")
+        self.assert_called_with('SoftLayer_Account', 'getApplicationDeliveryControllers', mask="mask[id]")
 
-    def test_get_hc_types(self):
-        result = self.lb_mgr.get_hc_types()
+    def test_get_adc(self):
+        self.lb_mgr.get_adc(1234)
+        self.assert_called_with('SoftLayer_Network_Application_Delivery_Controller', 'getObject', identifier=1234)
 
-        self.assertEqual(len(result), 6)
-        service = ('SoftLayer_Network_Application_Delivery_Controller_'
-                   'LoadBalancer_Health_Check_Type')
-        self.assert_called_with(service, 'getAllObjects')
+    def test_get_adc_mask(self):
+        self.lb_mgr.get_adc(1234, mask="mask[id]")
+        self.assert_called_with('SoftLayer_Network_Application_Delivery_Controller', 'getObject', identifier=1234,
+                                mask="mask[id]")
 
-    def test_get_routing_methods(self):
-        result = self.lb_mgr.get_routing_methods()
+    def test_get_lbaas(self):
+        self.lb_mgr.get_lbaas()
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
 
-        self.assertEqual(len(result), 12)
-        service = ('SoftLayer_Network_Application_Delivery_Controller_'
-                   'LoadBalancer_Routing_Method')
-        self.assert_called_with(service, 'getAllObjects')
+    def test_get_lbaas_mask(self):
+        self.lb_mgr.get_lbaas(mask="mask[id]")
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects', mask="mask[id]")
 
-    def test_get_location(self):
-        id1 = self.lb_mgr._get_location('sjc01')
-        self.assertEqual(id1, 168642)
+    def test_get_lb(self):
+        lb = self.lb_mgr.get_lb(1234)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getObject', identifier=1234)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getLoadBalancerMemberHealth',
+                                args=(lb.get('uuid'),))
+        self.assertIsNotNone(lb['health'])
 
-        id2 = self.lb_mgr._get_location('dal05')
-        self.assertEqual(id2, 'FIRST_AVAILABLE')
+    def test_get_lb_mask(self):
+        lb = self.lb_mgr.get_lb(1234, mask="mask[id]")
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getObject', identifier=1234, mask="mask[id]")
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getLoadBalancerMemberHealth',
+                                args=(lb.get('uuid'),))
+        self.assertIsNotNone(lb['health'])
 
-    def test_get_routing_types(self):
-        result = self.lb_mgr.get_routing_types()
+    def test_updated_lb_health(self):
+        uuid = '1234'
+        check = {'backendPort': '80'}
+        self.lb_mgr.update_lb_health_monitors(uuid, check)
+        self.assert_called_with('SoftLayer_Network_LBaaS_HealthMonitor', 'updateLoadBalancerHealthMonitors',
+                                args=(uuid, check))
 
-        self.assertEqual(len(result), 6)
-        service = ('SoftLayer_Network_Application_Delivery_Controller_'
-                   'LoadBalancer_Routing_Type')
-        self.assert_called_with(service, 'getAllObjects')
+    def test_get_lbaas_uuid_id_uuid(self):
+        uuid = '1a1aa111-4474-4e16-9f02-4de959229b85'
+        my_id = 1111111
+        lb_uuid, lb_id = self.lb_mgr.get_lbaas_uuid_id(uuid)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getLoadBalancer', args=(uuid,))
+        self.assertEqual(lb_uuid, uuid)
+        self.assertEqual(lb_id, my_id)
 
-    def test_cancel_lb(self):
-        result = self.lb_mgr.cancel_lb(6327)
+    def test_get_lbaas_uuid_id_id(self):
+        uuid = '1a1aa111-4474-4e16-9f02-4de959229b85'
+        my_id = 1111111
+        lb_uuid, lb_id = self.lb_mgr.get_lbaas_uuid_id(my_id)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getObject', identifier=my_id)
+        self.assertEqual(lb_uuid, uuid)
+        self.assertEqual(lb_id, my_id)
 
-        self.assertEqual(result, True)
-        self.assert_called_with('SoftLayer_Billing_Item', 'cancelService',
-                                identifier=21370814)
+    def test_get_lbaas_uuid_id_name(self):
+        uuid = '1a1aa111-4474-4e16-9f02-4de959229b85'
+        my_id = 1111111
+        name = 'test-01'
+        lb_uuid, lb_id = self.lb_mgr.get_lbaas_uuid_id(name)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
+        self.assertEqual(lb_uuid, uuid)
+        self.assertEqual(lb_id, my_id)
 
-    def test_add_local_lb(self):
-        self.lb_mgr.add_local_lb(6327, 'sjc01')
+    def test_delete_lb_member(self):
+        uuid = 'aa-bb-cc'
+        member_id = 'dd-ee-ff'
+        self.lb_mgr.delete_lb_member(uuid, member_id)
+        self.assert_called_with('SoftLayer_Network_LBaaS_Member', 'deleteLoadBalancerMembers',
+                                args=(uuid, [member_id]))
 
-        args = ({
-            'complexType': 'SoftLayer_Container_Product_Order_Network_'
-                           'LoadBalancer',
-            'quantity': 1,
-            'packageId': 0,
-            "location": 168642,
-            'prices': [{'id': 6327}]
-        },)
-        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder',
-                                args=args)
+    def test_add_lb_member(self):
+        uuid = 'aa-bb-cc'
+        member = {'privateIpAddress': '1.2.3.4'}
+        self.lb_mgr.add_lb_member(uuid, member)
+        self.assert_called_with('SoftLayer_Network_LBaaS_Member', 'addLoadBalancerMembers',
+                                args=(uuid, [member]))
 
-    def test_get_local_lbs(self):
-        result = self.lb_mgr.get_local_lbs()
+    def test_add_lb_listener(self):
+        uuid = 'aa-bb-cc'
+        listener = {'id': 1}
+        self.lb_mgr.add_lb_listener(uuid, listener)
+        self.assert_called_with('SoftLayer_Network_LBaaS_Listener', 'updateLoadBalancerProtocols',
+                                args=(uuid, [listener]))
 
-        self.assertEqual(len(result), 0)
-        mask = 'mask[loadBalancerHardware[datacenter],ipAddress]'
-        self.assert_called_with('SoftLayer_Account', 'getAdcLoadBalancers',
-                                mask=mask)
+    def test_add_lb_l7_pool(self):
+        uuid = 'aa-bb-cc'
+        pool = {'id': 1}
+        members = {'id': 1}
+        health = {'id': 1}
+        session = {'id': 1}
+        self.lb_mgr.add_lb_l7_pool(uuid, pool, members, health, session)
+        self.assert_called_with('SoftLayer_Network_LBaaS_L7Pool', 'createL7Pool',
+                                args=(uuid, pool, members, health, session))
 
-    def test_get_local_lb(self):
-        result = self.lb_mgr.get_local_lb(22348)
+    def test_del_lb_l7_pool(self):
+        uuid = 'aa-bb-cc'
+        self.lb_mgr.del_lb_l7_pool(uuid)
+        self.assert_called_with('SoftLayer_Network_LBaaS_L7Pool', 'deleteObject', identifier=uuid)
 
-        self.assertEqual(result['id'], 22348)
-        mask = ('mask['
-                'loadBalancerHardware[datacenter], '
-                'ipAddress, virtualServers[serviceGroups'
-                '[routingMethod,routingType,services'
-                '[healthChecks[type], groupReferences,'
-                ' ipAddress]]]]')
-        self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
-                                identifier=22348,
-                                mask=mask)
+    def test_remove_lb_listener(self):
+        uuid = 'aa-bb-cc'
+        listener = 'dd-ee-ff'
+        self.lb_mgr.remove_lb_listener(uuid, listener)
+        self.assert_called_with('SoftLayer_Network_LBaaS_Listener', 'deleteLoadBalancerProtocols',
+                                args=(uuid, [listener]))
 
-    def test_delete_service(self):
-        result = self.lb_mgr.delete_service(1234)
-
-        self.assertEqual(result, True)
-        service = ('SoftLayer_Network_Application_Delivery_Controller_'
-                   'LoadBalancer_Service')
-        self.assert_called_with(service, 'deleteObject', identifier=1234)
-
-    def test_delete_service_group(self):
-        result = self.lb_mgr.delete_service_group(1234)
-
-        self.assertEqual(result, True)
-        service = ('SoftLayer_Network_Application_Delivery_Controller_'
-                   'LoadBalancer_VirtualServer')
-        self.assert_called_with(service, 'deleteObject', identifier=1234)
-
-    def test_toggle_service_status(self):
-        result = self.lb_mgr.toggle_service_status(1234)
-
-        self.assertEqual(result, True)
-        service = ('SoftLayer_Network_Application_Delivery_Controller_'
-                   'LoadBalancer_Service')
-        self.assert_called_with(service, 'toggleStatus', identifier=1234)
-
-    def test_edit_service(self):
-        self.lb_mgr.edit_service(12345, 1234, '9.9.9.9', 80, True, 21, 1)
-
-        _filter = {
-            'virtualServers': {
-                'serviceGroups': {
-                    'services': {
-                        'id': {
-                            'operation': 1234
-                        }
+    def test_order_lbaas(self):
+        datacenter = 'tes01'
+        name = 'test-lb'
+        desc = 'my lb'
+        protocols = {'frontendPort': 80, 'frontendProtocol': 'HTTP'}
+        subnet_id = 12345
+        public = True
+        verify = False
+        package = [
+            {
+                'id': 805,
+                'keyNake': 'LBAAS',
+                'itemPrices': [
+                    {
+                        'id': 1,
+                        'name': 'A test price',
+                        'locationGroupId': None
+                    },
+                    {
+                        'id': 2,
+                        'name': 'A test price 2',
+                        'locationGroupId': 123
                     }
-                }
+                ]
             }
+        ]
+        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
+        mock.return_value = package
+        order_data = {
+            'complexType': 'SoftLayer_Container_Product_Order_Network_LoadBalancer_AsAService',
+            'name': name,
+            'description': desc,
+            'location': datacenter,
+            'packageId': package[0]['id'],
+            'useHourlyPricing': True,  # Required since LBaaS is an hourly service
+            'prices': [{'id': package[0]['itemPrices'][0]['id']}],
+            'protocolConfigurations': protocols,
+            'subnets': [{'id': subnet_id}],
+            'isPublic': public
         }
-        mask = 'mask[serviceGroups[services[groupReferences,healthChecks]]]'
-        self.assert_called_with(VIRT_IP_SERVICE, 'getVirtualServers',
-                                identifier=12345,
-                                filter=_filter,
-                                mask=mask)
+        self.lb_mgr.order_lbaas(datacenter, name, desc, protocols, subnet_id, public, verify)
+        self.assert_called_with('SoftLayer_Product_Order', 'placeOrder', args=(order_data,))
+        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
+        verify = True
+        self.lb_mgr.order_lbaas(datacenter, name, desc, protocols, subnet_id, public, verify)
+        self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
 
-        self.assert_called_with(VIRT_IP_SERVICE, 'editObject')
+    def test_lbaas_order_options(self):
+        self.lb_mgr.lbaas_order_options()
+        self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects')
 
-    def test_add_service(self):
-        self.lb_mgr.add_service(12345, 50718, 123, 80, True, 21, 1)
+    def test_cancel_lbaas(self):
+        uuid = 'aa-bb-cc'
+        self.lb_mgr.cancel_lbaas(uuid)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'cancelLoadBalancer', args=(uuid,))
 
-        mask = 'mask[virtualServers[serviceGroups[services[groupReferences]]]]'
-        self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
-                                mask=mask,
-                                identifier=12345)
+    def test_get_lbaas_by_name(self):
+        name = SoftLayer_Network_LBaaS_LoadBalancer.getObject.get('name')
+        load_bal = self.lb_mgr.get_lbaas_by_name(name)
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
+        self.assertIsNotNone(load_bal)
 
-        self.assert_called_with(VIRT_IP_SERVICE, 'editObject',
-                                identifier=12345)
-        arg = self.calls(VIRT_IP_SERVICE, 'editObject')[0].args[0]
-        self.assertEqual(
-            len(arg['virtualServers'][0]['serviceGroups'][0]['services']),
-            2)
-
-    def test_edit_service_group(self):
-        self.lb_mgr.edit_service_group(12345,
-                                       group_id=50718,
-                                       allocation=100,
-                                       port=80,
-                                       routing_type=2,
-                                       routing_method=10)
-
-        mask = 'mask[virtualServers[serviceGroups[services[groupReferences]]]]'
-        self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
-                                identifier=12345,
-                                mask=mask)
-
-        self.assert_called_with(VIRT_IP_SERVICE, 'getObject', identifier=12345)
-
-    def test_add_service_group(self):
-        self.lb_mgr.add_service_group(12345, 100, 80, 2, 10)
-
-        mask = 'mask[virtualServers[serviceGroups[services[groupReferences]]]]'
-        self.assert_called_with(VIRT_IP_SERVICE, 'getObject',
-                                mask=mask,
-                                identifier=12345)
-
-        self.assert_called_with(VIRT_IP_SERVICE, 'editObject',
-                                identifier=12345)
-        arg = self.calls(VIRT_IP_SERVICE, 'editObject')[0].args[0]
-        self.assertEqual(len(arg['virtualServers']), 2)
-
-    def test_reset_service_group(self):
-        result = self.lb_mgr.reset_service_group(12345, group_id=50718)
-
-        self.assertEqual(result, True)
-        _filter = {'virtualServers': {'id': {'operation': 50718}}}
-        self.assert_called_with(VIRT_IP_SERVICE, 'getVirtualServers',
-                                identifier=12345,
-                                filter=_filter,
-                                mask='mask[serviceGroups]')
-
-        service = ('SoftLayer_Network_Application_Delivery_Controller_'
-                   'LoadBalancer_Service_Group')
-        self.assert_called_with(service, 'kickAllConnections',
-                                identifier=51758)
+    def test_get_lbaas_by_name_fails(self):
+        load_bal_mock = self.set_mock('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
+        load_bal_mock.return_value = []
+        name = 'test'
+        self.assertRaises(exceptions.SoftLayerError, self.lb_mgr.get_lbaas_by_name, name)

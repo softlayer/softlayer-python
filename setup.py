@@ -4,6 +4,8 @@ import os
 
 from setuptools import setup, find_packages
 
+# pylint: disable=inconsistent-return-statements
+
 DESCRIPTION = "A library for SoftLayer's API"
 
 if os.path.exists('README.rst'):
@@ -14,11 +16,11 @@ else:
 
 setup(
     name='SoftLayer',
-    version='5.7.1',
+    version='5.9.3',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
-    author='SoftLayer Technologies, Inc.',
-    author_email='sldn@softlayer.com',
+    author='SoftLayer, Inc., an IBM Company',
+    author_email='SLDNDeveloperRelations@wwpdl.vnet.ibm.com',
     packages=find_packages(exclude=['tests']),
     license='MIT',
     zip_safe=False,
@@ -29,12 +31,12 @@ setup(
             'sl = SoftLayer.CLI.deprecated:main',
         ],
     },
+    python_requires='>=3.5',
     install_requires=[
-        'six >= 1.7.0',
         'ptable >= 0.9.2',
         'click >= 7',
         'requests >= 2.20.0',
-        'prompt_toolkit >= 0.53',
+        'prompt_toolkit >= 2',
         'pygments >= 2.0.0',
         'urllib3 >= 1.24'
     ],
@@ -48,11 +50,10 @@ setup(
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],

@@ -46,14 +46,20 @@ class Environment(object):
         """Outputs an error string to the console (stderr)."""
         click.echo(output, nl=newline, err=True)
 
-    def fmt(self, output):
+    def fmt(self, output, fmt=None):
         """Format output based on current the environment format."""
-        return formatting.format_output(output, fmt=self.format)
+        if fmt is None:
+            fmt = self.format
+        return formatting.format_output(output, fmt)
 
     def fout(self, output, newline=True):
         """Format the input and output to the console (stdout)."""
         if output is not None:
-            self.out(self.fmt(output), newline=newline)
+            try:
+                self.out(self.fmt(output), newline=newline)
+            except UnicodeEncodeError:
+                # If we hit an undecodeable entry, just try outputting as json.
+                self.out(self.fmt(output, 'json'), newline=newline)
 
     def input(self, prompt, default=None, show_default=True):
         """Provide a command prompt."""
@@ -61,7 +67,23 @@ class Environment(object):
 
     def getpass(self, prompt, default=None):
         """Provide a password prompt."""
-        return click.prompt(prompt, hide_input=True, default=default)
+        password = click.prompt(prompt, hide_input=True, default=default)
+
+        # https://github.com/softlayer/softlayer-python/issues/1436
+        # click.prompt uses python's getpass() in the background
+        # https://github.com/python/cpython/blob/3.9/Lib/getpass.py#L97
+        # In windows, shift+insert actually inputs the below 2 characters
+        # If we detect those 2 characters, need to manually read from the clipbaord instead
+        # https://stackoverflow.com/questions/101128/how-do-i-read-text-from-the-clipboard
+        if password == 'àR':
+            # tkinter is a built in python gui, but it has clipboard reading functions.
+            # pylint: disable=import-outside-toplevel
+            from tkinter import Tk
+            tk_manager = Tk()
+            password = tk_manager.clipboard_get()
+            # keep the window from showing
+            tk_manager.withdraw()
+        return password
 
     # Command loading methods
     def list_commands(self, *path):

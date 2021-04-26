@@ -10,10 +10,8 @@ import os
 import sys
 import tempfile
 
-
 import click
-import mock
-import six
+from unittest import mock as mock
 
 from SoftLayer.CLI import core
 from SoftLayer.CLI import exceptions
@@ -98,13 +96,6 @@ class FormattedItemTests(testing.TestCase):
         self.assertEqual('test', item.formatted)
         self.assertEqual('test', str(item))
 
-    def test_unicode(self):
-        if six.PY2:
-            item = formatting.FormattedItem(u'\u32423', u'\u32423')
-            self.assertEqual(u'\u32423', item.original)
-            self.assertEqual(u'\u32423', item.formatted)
-            self.assertEqual('invalid', str(item))
-
     def test_mb_to_gb(self):
         item = formatting.mb_to_gb(1024)
         self.assertEqual(1024, item.original)
@@ -163,29 +154,29 @@ class FormattedItemTests(testing.TestCase):
 
 class FormattedListTests(testing.TestCase):
     def test_init(self):
-        l = formatting.listing([1, 'two'], separator=':')
-        self.assertEqual([1, 'two'], list(l))
-        self.assertEqual(':', l.separator)
+        listing = formatting.listing([1, 'two'], separator=':')
+        self.assertEqual([1, 'two'], list(listing))
+        self.assertEqual(':', listing.separator)
 
-        l = formatting.listing([])
-        self.assertEqual(',', l.separator)
+        listing = formatting.listing([])
+        self.assertEqual(',', listing.separator)
 
     def test_to_python(self):
-        l = formatting.listing([1, 'two'])
-        result = l.to_python()
+        listing = formatting.listing([1, 'two'])
+        result = listing.to_python()
         self.assertEqual([1, 'two'], result)
 
-        l = formatting.listing(x for x in [1, 'two'])
-        result = l.to_python()
+        listing = formatting.listing(x for x in [1, 'two'])
+        result = listing.to_python()
         self.assertEqual([1, 'two'], result)
 
     def test_str(self):
-        l = formatting.listing([1, 'two'])
-        result = str(l)
+        listing = formatting.listing([1, 'two'])
+        result = str(listing)
         self.assertEqual('1,two', result)
 
-        l = formatting.listing((x for x in [1, 'two']), separator=':')
-        result = str(l)
+        listing = formatting.listing((x for x in [1, 'two']), separator=':')
+        result = str(listing)
         self.assertEqual('1:two', result)
 
 
@@ -448,11 +439,10 @@ class TestTemplateArgs(testing.TestCase):
 class TestExportToTemplate(testing.TestCase):
 
     def test_export_to_template(self):
-        if(sys.platform.startswith("win")):
+        if (sys.platform.startswith("win")):
             self.skipTest("Test doesn't work in Windows")
         # Tempfile creation is wonky on windows
         with tempfile.NamedTemporaryFile() as tmp:
-
             template.export_to_template(tmp.name, {
                 'os': None,
                 'datacenter': 'ams01',
@@ -496,3 +486,9 @@ class IterToTableTests(testing.TestCase):
         self.assertIsInstance(result, formatting.Table)
         self.assertEqual(result.columns, ['value'])
         self.assertEqual(result.rows, [['a'], ['b'], ['c']])
+
+    def test_format_api_list_with_none_value(self):
+        result = formatting._format_list([{'key': [None, 'value']}, None])
+
+        self.assertIsInstance(result, formatting.Table)
+        self.assertEqual(result.columns, ['key'])

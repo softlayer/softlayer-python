@@ -9,12 +9,16 @@ from SoftLayer.CLI import formatting
 
 
 @click.command()
+@click.option('--limit',
+              type=int,
+              default=10,
+              help="Result limit")
 @environment.pass_env
-def cli(env):
+def cli(env, limit):
     """List object storage accounts."""
 
     mgr = SoftLayer.ObjectStorageManager(env.client)
-    accounts = mgr.list_accounts()
+    accounts = mgr.list_accounts(limit=limit)
     table = formatting.Table(['id', 'name', 'apiType'])
     table.sortby = 'id'
     api_type = None

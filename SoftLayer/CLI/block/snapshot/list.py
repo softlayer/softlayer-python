@@ -6,6 +6,7 @@ import SoftLayer
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
 COLUMNS = [
@@ -38,8 +39,9 @@ DEFAULT_COLUMNS = [
 def cli(env, volume_id, sortby, columns):
     """List block storage snapshots."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
+    resolved_id = helpers.resolve_id(block_manager.resolve_ids, volume_id, 'Volume Id')
     snapshots = block_manager.get_block_volume_snapshot_list(
-        volume_id,
+        resolved_id,
         mask=columns.mask()
     )
 

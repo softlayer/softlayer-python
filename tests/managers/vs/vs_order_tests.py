@@ -6,9 +6,10 @@
     :license: MIT, see LICENSE for more details.
 
 """
-import mock
+from unittest import mock as mock
 
 import SoftLayer
+from SoftLayer import exceptions
 from SoftLayer import fixtures
 from SoftLayer import testing
 
@@ -45,16 +46,11 @@ class VSOrderTests(testing.TestCase):
         result = self.vs.upgrade(1)
 
         self.assertEqual(result, False)
-        self.assertEqual(self.calls('SoftLayer_Product_Order', 'placeOrder'),
-                         [])
+        self.assertEqual(self.calls('SoftLayer_Product_Order', 'placeOrder'), [])
 
     def test_upgrade_full(self):
         # Testing all parameters Upgrade
-        result = self.vs.upgrade(1,
-                                 cpus=4,
-                                 memory=2,
-                                 nic_speed=1000,
-                                 public=True)
+        result = self.vs.upgrade(1, cpus=4, memory=2, nic_speed=1000, public=True)
 
         self.assertEqual(result, True)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
@@ -67,10 +63,7 @@ class VSOrderTests(testing.TestCase):
 
     def test_upgrade_with_flavor(self):
         # Testing Upgrade with parameter preset
-        result = self.vs.upgrade(1,
-                                 preset="M1_64X512X100",
-                                 nic_speed=1000,
-                                 public=True)
+        result = self.vs.upgrade(1, preset="M1_64X512X100", nic_speed=1000, public=True)
 
         self.assertEqual(result, True)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
@@ -141,6 +134,42 @@ class VSOrderTests(testing.TestCase):
                                                      value='1000')
         self.assertEqual(1122, price_id)
 
+    def test__get_price_id_for_upgrade_find_private_price(self):
+        package_items = self.vs._get_package_items()
+        price_id = self.vs._get_price_id_for_upgrade(package_items=package_items,
+                                                     option='cpus',
+                                                     value='4',
+                                                     public=False)
+        self.assertEqual(1007, price_id)
+
+    def test_upgrade_mem_and_preset_exception(self):
+        self.assertRaises(
+            ValueError,
+            self.vs.upgrade,
+            1234,
+            memory=10,
+            preset="M1_64X512X100"
+        )
+
+    def test_upgrade_cpu_and_preset_exception(self):
+        self.assertRaises(
+            ValueError,
+            self.vs.upgrade,
+            1234,
+            cpus=10,
+            preset="M1_64X512X100"
+        )
+
+    @mock.patch('SoftLayer.managers.vs.VSManager._get_price_id_for_upgrade_option')
+    def test_upgrade_no_price_exception(self, get_price):
+        get_price.return_value = None
+        self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs.upgrade,
+            1234,
+            memory=1,
+        )
+
     @mock.patch('SoftLayer.managers.vs.VSManager._generate_create_dict')
     def test_order_guest(self, create_dict):
         create_dict.return_value = {'test': 1, 'verify': 1}
@@ -173,3 +202,42 @@ class VSOrderTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate')
         self.assert_called_with('SoftLayer_Product_Package', 'getItems', identifier=200)
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
+
+    @mock.patch('SoftLayer.managers.vs.VSManager._generate_create_dict')
+    def test_order_guest_placement_group(self, create_dict):
+        create_dict.return_value = {'test': 1, 'verify': 1}
+        guest = {'test': 1, 'verify': 1, 'placement_id': 5}
+        result = self.vs.order_guest(guest, test=True)
+
+        call = self.calls('SoftLayer_Product_Order', 'verifyOrder')[0]
+        order_container = call.args[0]
+
+        self.assertEqual(1234, result['orderId'])
+        self.assertEqual(5, order_container['virtualGuests'][0]['placementGroupId'])
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate')
+        self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
+
+    def test_get_price_id_empty(self):
+        upgrade_prices = [
+            {'categories': None, 'item': None},
+            {'categories': [{'categoryCode': 'ram'}], 'item': None},
+            {'categories': None, 'item': {'capacity': 1}},
+        ]
+        result = self.vs._get_price_id_for_upgrade_option(upgrade_prices, 'memory', 1)
+        self.assertEqual(None, result)
+
+    def test_get_price_id_memory_capacity(self):
+        upgrade_prices = [
+            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity': 1}, 'id': 99}
+        ]
+        result = self.vs._get_price_id_for_upgrade_option(upgrade_prices, 'memory', 1)
+        self.assertEqual(99, result)
+
+    def test_get_price_id_mismatch_capacity(self):
+        upgrade_prices = [
+            {'categories': [{'categoryCode': 'ram1'}], 'item': {'capacity': 1}, 'id': 90},
+            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity': 2}, 'id': 91},
+            {'categories': [{'categoryCode': 'ram'}], 'item': {'capacity': 1}, 'id': 92},
+        ]
+        result = self.vs._get_price_id_for_upgrade_option(upgrade_prices, 'memory', 1)
+        self.assertEqual(92, result)

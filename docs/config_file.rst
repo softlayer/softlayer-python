@@ -25,3 +25,13 @@ automatically by the `slcli setup` command detailed here:
   api_key = oyVmeipYQCNrjVS4rF9bHWV7D75S6pa1fghFl384v7mwRCbHTfuJ8qRORIqoVnha
   endpoint_url = https://api.softlayer.com/xmlrpc/v3/
   timeout = 40
+
+
+*Cloud.ibm.com Config Example*
+::
+
+  [softlayer]
+  username = apikey
+  api_key = 123cNyhzg45Ab6789ADyzwR_2LAagNVbySgY73tAQOz1
+  endpoint_url = https://api.softlayer.com/rest/v3.1/
+  timeout = 40

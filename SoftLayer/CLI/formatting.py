@@ -30,7 +30,7 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
                  SequentialOutput
     :param string fmt (optional): One of: table, raw, json, python
     """
-    if isinstance(data, utils.string_types):
+    if isinstance(data, str):
         if fmt in ('json', 'jsonraw'):
             return json.dumps(data)
         return data
@@ -235,7 +235,7 @@ class SequentialOutput(list):
 
     def __init__(self, separator=os.linesep, *args, **kwargs):
         self.separator = separator
-        super(SequentialOutput, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_python(self):
         """returns itself, since it itself is a list."""
@@ -252,7 +252,7 @@ class CLIJSONEncoder(json.JSONEncoder):
         """Encode object if it implements to_python()."""
         if hasattr(obj, 'to_python'):
             return obj.to_python()
-        return super(CLIJSONEncoder, self).default(obj)
+        return super().default(obj)
 
 
 class Table(object):
@@ -301,8 +301,13 @@ class Table(object):
             else:
                 msg = "Column (%s) doesn't exist to sort by" % self.sortby
                 raise exceptions.CLIAbort(msg)
-        for a_col, alignment in self.align.items():
-            table.align[a_col] = alignment
+
+        if isinstance(self.align, str):
+            table.align = self.align
+        else:
+            # Required because PrettyTable has a strict setter function for alignment
+            for a_col, alignment in self.align.items():
+                table.align[a_col] = alignment
 
         if self.title:
             table.title = self.title
@@ -416,11 +421,13 @@ def _format_list(result):
     if not result:
         return result
 
-    if isinstance(result[0], dict):
-        return _format_list_objects(result)
+    new_result = [item for item in result if item]
+
+    if isinstance(new_result[0], dict):
+        return _format_list_objects(new_result)
 
     table = Table(['value'])
-    for item in result:
+    for item in new_result:
         table.add_row([iter_to_table(item)])
     return table
 
@@ -430,12 +437,15 @@ def _format_list_objects(result):
 
     all_keys = set()
     for item in result:
-        all_keys = all_keys.union(item.keys())
+        if isinstance(item, dict):
+            all_keys = all_keys.union(item.keys())
 
     all_keys = sorted(all_keys)
     table = Table(all_keys)
 
     for item in result:
+        if not item:
+            continue
         values = []
         for key in all_keys:
             value = iter_to_table(item.get(key))

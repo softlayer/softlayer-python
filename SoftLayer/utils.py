@@ -5,20 +5,15 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import collections
 import datetime
 import re
-
-import six
+import time
 
 # pylint: disable=no-member, invalid-name
 
-UUID_RE = re.compile(r'^[0-9a-f\-]{36}$', re.I)
+UUID_RE = re.compile(r'^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$', re.I)
 KNOWN_OPERATIONS = ['<=', '>=', '<', '>', '~', '!~', '*=', '^=', '$=', '_=']
-
-configparser = six.moves.configparser
-string_types = six.string_types
-StringIO = six.StringIO
-xmlrpc_client = six.moves.xmlrpc_client
 
 
 def lookup(dic, key, *keys):
@@ -63,6 +58,23 @@ class NestedDict(dict):
                 for key, val in self.items()}
 
 
+def dict_merge(dct1, dct2):
+    """Recursively merges dct2 and dct1, ideal for merging objectFilter together.
+
+    :param dct1: A dictionary
+    :param dct2: A dictionary
+    :return: dct1 + dct2
+    """
+
+    dct = dct1.copy()
+    for k, _ in dct2.items():
+        if (k in dct1 and isinstance(dct1[k], dict) and isinstance(dct2[k], collections.Mapping)):
+            dct[k] = dict_merge(dct1[k], dct2[k])
+        else:
+            dct[k] = dct2[k]
+    return dct
+
+
 def query_filter(query):
     """Translate a query-style string to a 'filter'.
 
@@ -90,7 +102,7 @@ def query_filter(query):
     except ValueError:
         pass
 
-    if isinstance(query, string_types):
+    if isinstance(query, str):
         query = query.strip()
         for operation in KNOWN_OPERATIONS:
             if query.startswith(operation):
@@ -125,6 +137,21 @@ def query_filter_date(start, end):
             {'name': 'endDate', 'value': [enddate + ' 0:0:0']}
         ]
     }
+
+
+def query_filter_orderby(sort="ASC"):
+    """Returns an object filter operation for sorting
+
+    :param string sort: either ASC or DESC
+    """
+    _filter = {
+        "operation": "orderBy",
+        "options": [{
+            "name": "sort",
+            "value": [sort]
+        }]
+    }
+    return _filter
 
 
 def format_event_log_date(date_string, utc):
@@ -305,9 +332,57 @@ def clean_time(sltime, in_format='%Y-%m-%dT%H:%M:%S%z', out_format='%Y-%m-%d %H:
     :param string in_format: Datetime format for strptime
     :param string out_format: Datetime format for strftime
     """
+    if sltime is None:
+        return None
     try:
         clean = datetime.datetime.strptime(sltime, in_format)
         return clean.strftime(out_format)
     # The %z option only exists with py3.6+
-    except ValueError:
+    except ValueError as e:
+        # Just ignore data that in_format didn't process.
+        ulr = len(e.args[0].partition('unconverted data remains: ')[2])
+        if ulr:
+            clean = datetime.datetime.strptime(sltime[:-ulr], in_format)
+            return clean.strftime(out_format)
         return sltime
+
+
+def timestamp(date):
+    """Converts a datetime to timestamp
+
+    :param datetime date:
+    :returns int: The timestamp of date.
+    """
+
+    _timestamp = time.mktime(date.timetuple())
+
+    return int(_timestamp)
+
+
+def days_to_datetime(days):
+    """Returns the datetime value of last N days.
+
+    :param int days: From 0 to N days
+    :returns int: The datetime of last N days or datetime.now() if days <= 0.
+    """
+
+    date = datetime.datetime.now()
+
+    if days > 0:
+        date -= datetime.timedelta(days=days)
+
+    return date
+
+
+def trim_to(string, length=80, tail="..."):
+    """Returns a string that is length long. tail added if trimmed
+
+    :param string string: String you want to trim
+    :param int length: max length for the string
+    :param string tail: appended to strings that were trimmed.
+    """
+
+    if len(string) > length:
+        return string[:length] + tail
+    else:
+        return string

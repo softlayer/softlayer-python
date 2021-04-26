@@ -23,3 +23,19 @@ Account Commands
 .. click:: SoftLayer.CLI.account.invoice_detail:cli
     :prog: account invoice-detail
     :show-nested:
+
+.. click:: SoftLayer.CLI.account.billing_items:cli
+    :prog: account billing-items
+    :show-nested:
+
+.. click:: SoftLayer.CLI.account.item_detail:cli
+    :prog: account item-detail
+    :show-nested:
+
+.. click:: SoftLayer.CLI.account.cancel_item:cli
+    :prog: account cancel-item
+    :show-nested:
+
+.. click:: SoftLayer.CLI.account.orders:cli
+    :prog: account orders
+    :show-nested:

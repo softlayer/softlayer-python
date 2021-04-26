@@ -111,7 +111,6 @@ order place <Virtual Server>
         NOTIFICATION_EMAIL_AND_TICKET \
         AUTOMATED_NOTIFICATION \
         UNLIMITED_SSL_VPN_USERS_1_PPTP_VPN_USER_PER_ACCOUNT \
-        NESSUS_VULNERABILITY_ASSESSMENT_REPORTING \
         --extras '{"virtualGuests": [{"hostname": "test", "domain": "softlayer.com"}]}' \
         --complex-type SoftLayer_Container_Product_Order_Virtual_Guest
 
@@ -132,6 +131,16 @@ Quotes
     :prog: order quote-detail
     :show-nested:
 
+.. click:: SoftLayer.CLI.order.quote_save:cli
+    :prog: order quote-save
+    :show-nested:
+
 .. click:: SoftLayer.CLI.order.place_quote:cli
     :prog: order place-quote
+    :show-nested:
+
+Lookup
+======
+.. click:: SoftLayer.CLI.order.lookup:cli
+    :prog: order lookup
     :show-nested:

@@ -4,11 +4,12 @@
 
 """
 import datetime
-import mock
+
+from unittest import mock as mock
+
 import SoftLayer
 from SoftLayer import exceptions
 from SoftLayer import testing
-
 
 real_datetime_class = datetime.datetime
 
@@ -18,6 +19,7 @@ def mock_datetime(target, datetime_module):
 
     https://solidgeargroup.com/mocking-the-time
     """
+
     class DatetimeSubclassMeta(type):
         @classmethod
         def __instancecheck__(mcs, obj):
@@ -106,7 +108,6 @@ class UserManagerTests(testing.TestCase):
     def test_get_events_default(self):
         target = datetime.datetime(2018, 5, 15)
         with mock_datetime(target, datetime):
-
             self.manager.get_events(1234)
             expected_filter = {
                 'userId': {
@@ -221,3 +222,75 @@ class UserManagerTests(testing.TestCase):
             self.assertEqual(ex.args[0], "Your request for a new user was received, but it needs to be processed by "
                                          "the Platform Services API first. Barring any errors on the Platform Services "
                                          "side, your new user should be created shortly.")
+
+    def test_vpn_manual(self):
+        user_id = 1234
+        self.manager.vpn_manual(user_id, True)
+        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=user_id)
+
+    def test_vpn_subnet_add(self):
+        user_id = 1234
+        subnet_id = 1234
+        expected_args = (
+            [{"userId": user_id, "subnetId": subnet_id}],
+        )
+        self.manager.vpn_subnet_add(user_id, [subnet_id])
+        self.assert_called_with('SoftLayer_Network_Service_Vpn_Overrides', 'createObjects', args=expected_args)
+        self.assert_called_with('SoftLayer_User_Customer', 'updateVpnUser', identifier=user_id)
+
+    def test_vpn_subnet_remove(self):
+        user_id = 1234
+        subnet_id = 1234
+        overrides = [{'id': 3661234, 'subnetId': subnet_id}]
+        expected_args = (
+            overrides,
+        )
+        self.manager.vpn_subnet_remove(user_id, [subnet_id])
+        self.assert_called_with('SoftLayer_Network_Service_Vpn_Overrides', 'deleteObjects', args=expected_args)
+        self.assert_called_with('SoftLayer_User_Customer', 'updateVpnUser', identifier=user_id)
+
+    def test_get_all_notifications(self):
+        self.manager.get_all_notifications()
+        self.assert_called_with('SoftLayer_Email_Subscription', 'getAllObjects')
+
+    def test_enable_notifications(self):
+        self.manager.enable_notifications(['Test notification'])
+        self.assert_called_with('SoftLayer_Email_Subscription', 'enable', identifier=111)
+
+    def test_disable_notifications(self):
+        self.manager.disable_notifications(['Test notification'])
+        self.assert_called_with('SoftLayer_Email_Subscription', 'disable', identifier=111)
+
+    def test_enable_notifications_fail(self):
+        notification = self.set_mock('SoftLayer_Email_Subscription', 'enable')
+        notification.return_value = False
+        result = self.manager.enable_notifications(['Test notification'])
+        self.assert_called_with('SoftLayer_Email_Subscription', 'enable', identifier=111)
+        self.assertFalse(result)
+
+    def test_disable_notifications_fail(self):
+        notification = self.set_mock('SoftLayer_Email_Subscription', 'disable')
+        notification.return_value = False
+        result = self.manager.disable_notifications(['Test notification'])
+        self.assert_called_with('SoftLayer_Email_Subscription', 'disable', identifier=111)
+        self.assertFalse(result)
+
+    def test_gather_notifications(self):
+        expected_result = [
+            {'description': 'Testing description.',
+             'enabled': True,
+             'id': 111,
+             'name': 'Test notification'
+             }
+        ]
+        result = self.manager.gather_notifications(['Test notification'])
+        self.assert_called_with('SoftLayer_Email_Subscription',
+                                'getAllObjects',
+                                mask='mask[enabled]')
+        self.assertEqual(result, expected_result)
+
+    def test_gather_notifications_fail(self):
+        ex = self.assertRaises(SoftLayer.SoftLayerError,
+                               self.manager.gather_notifications,
+                               ['Test not exit'])
+        self.assertEqual("Test not exit is not a valid notification name", str(ex))

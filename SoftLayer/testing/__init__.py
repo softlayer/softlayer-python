@@ -6,13 +6,12 @@
 """
 # Disable pylint import error and too many methods error
 # pylint: disable=invalid-name
-from __future__ import print_function
 import logging
 import os.path
+import unittest
+from unittest import mock as mock
 
 from click import testing
-import mock
-import testtools
 
 import SoftLayer
 from SoftLayer.CLI import core
@@ -69,8 +68,7 @@ class MockableTransport(object):
                      'offset']:
             details.append('%s=%r' % (prop, getattr(call, prop)))
 
-        logging.info('%s::%s called; %s',
-                     call.service, call.method, '; '.join(details))
+        logging.info('%s::%s called; %s', call.service, call.method, '; '.join(details))
 
 
 def _mock_key(service, method):
@@ -78,8 +76,8 @@ def _mock_key(service, method):
     return '%s::%s' % (service, method)
 
 
-class TestCase(testtools.TestCase):
-    """Testcase class with PEP-8 compatable method names."""
+class TestCase(unittest.TestCase):
+    """Testcase class with PEP-8 compatible method names."""
 
     @classmethod
     def setUpClass(cls):
@@ -101,7 +99,7 @@ class TestCase(testtools.TestCase):
         """Aliased from tearDown."""
 
     def setUp(self):  # NOQA
-        testtools.TestCase.setUp(self)
+        unittest.TestCase.setUp(self)
 
         self.mocks.clear()
 
@@ -115,7 +113,7 @@ class TestCase(testtools.TestCase):
         self.set_up()
 
     def tearDown(self):  # NOQA
-        testtools.TestCase.tearDown(self)
+        super().tearDown()
         self.tear_down()
         self.mocks.clear()
 
@@ -142,13 +140,21 @@ class TestCase(testtools.TestCase):
         if self.calls(service, method, **props):
             return
 
-        raise AssertionError('%s::%s was not called with given properties: %s'
-                             % (service, method, props))
+        raise AssertionError('%s::%s was not called with given properties: %s' % (service, method, props))
+
+    def assert_not_called_with(self, service, method, **props):
+        """Used to assert that API calls were NOT called with given properties.
+
+        Props are properties of the given transport.Request object.
+        """
+
+        if self.calls(service, method, **props):
+            raise AssertionError('%s::%s was called with given properties: %s' % (service, method, props))
 
     def assert_no_fail(self, result):
         """Fail when a failing click result has an error"""
         if result.exception:
-            print(result.output)
+            print(result.exception)
             raise result.exception
 
         self.assertEqual(result.exit_code, 0)
@@ -157,7 +163,7 @@ class TestCase(testtools.TestCase):
         """Set and return mock on the current client."""
         return self.mocks.set_mock(service, method)
 
-    def run_command(self, args=None, env=None, fixtures=True, fmt='json'):
+    def run_command(self, args=None, env=None, fixtures=True, fmt='json', stdin=None):
         """A helper that runs a SoftLayer CLI command.
 
         This returns a click.testing.Result object.
@@ -169,7 +175,18 @@ class TestCase(testtools.TestCase):
         args.insert(0, '--format=%s' % fmt)
 
         runner = testing.CliRunner()
-        return runner.invoke(core.cli, args=args, obj=env or self.env)
+        return runner.invoke(core.cli, args=args, input=stdin, obj=env or self.env)
+
+    def assertRaises(self, exception, function_callable, *args, **kwds):  # pylint: disable=arguments-differ
+        """Converts testtools.assertRaises to unittest.assertRaises calls.
+
+        testtools==2.4.0 require unittest2, which breaks pytest>=5.4.1 on skipTest.
+        But switching to just using unittest breaks assertRaises because the format is slightly different.
+        This basically just reformats the call so I don't have to re-write a bunch of tests.
+        """
+        with super().assertRaises(exception) as cm:
+            function_callable(*args, **kwds)
+        return cm.exception
 
 
 def call_has_props(call, props):

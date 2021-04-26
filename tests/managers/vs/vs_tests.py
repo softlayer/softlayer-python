@@ -5,7 +5,7 @@
     :license: MIT, see LICENSE for more details.
 
 """
-import mock
+from unittest import mock as mock
 
 import SoftLayer
 from SoftLayer import exceptions
@@ -60,6 +60,7 @@ class VSTests(testing.TestCase):
             nic_speed=100,
             public_ip='1.2.3.4',
             private_ip='4.3.2.1',
+            transient=False,
         )
 
         _filter = {
@@ -78,7 +79,8 @@ class VSTests(testing.TestCase):
                 'hostname': {'operation': '_= hostname'},
                 'networkComponents': {'maxSpeed': {'operation': 100}},
                 'primaryIpAddress': {'operation': '_= 1.2.3.4'},
-                'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}
+                'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'},
+                'transientGuestFlag': {'operation': False},
             }
         }
         self.assert_called_with('SoftLayer_Account', 'getVirtualGuests',
@@ -114,10 +116,88 @@ class VSTests(testing.TestCase):
                                 identifier=100)
 
     def test_get_create_options(self):
-        results = self.vs.get_create_options()
+        options = self.vs.get_create_options()
 
-        self.assertEqual(
-            fixtures.SoftLayer_Virtual_Guest.getCreateObjectOptions, results)
+        extras = {'key': '1_IPV6_ADDRESS', 'name': '1 IPv6 Address'}
+        locations = {'key': 'wdc07', 'name': 'Washington 7'}
+        operating_systems = {
+            'key': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+            'name': 'Ubuntu / 14.04-64',
+            'referenceCode': 'UBUNTU_14_64'
+        }
+
+        port_speeds = {
+            'key': '10',
+            'name': '10 Mbps Public & Private Network Uplinks'
+        }
+        sizes = {
+            'key': 'M1_64X512X25',
+            'name': 'M1.64x512x25',
+            'hourlyRecurringFee': 0.0,
+            'recurringFee': 0.0
+        }
+
+        self.assertEqual(options['extras'][0]['key'], extras['key'])
+        self.assertEqual(options['locations'][0], locations)
+        self.assertEqual(options['operating_systems'][0]['referenceCode'],
+                         operating_systems['referenceCode'])
+        self.assertEqual(options['port_speed'][0]['name'], port_speeds['name'])
+        self.assertEqual(options['sizes'][0], sizes)
+
+    def test_get_create_options_prices_by_location(self):
+        options = self.vs.get_create_options('wdc07')
+
+        extras = {'key': '1_IPV6_ADDRESS', 'name': '1 IPv6 Address',
+                  'prices': [
+                      {
+                          'hourlyRecurringFee': '0',
+                          'id': 272,
+                          'locationGroupId': '',
+                          'recurringFee': '0',
+                      }
+                  ]
+                  }
+        locations = {'key': 'wdc07', 'name': 'Washington 7'}
+        operating_systems = {
+            'key': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+            'name': 'Ubuntu / 14.04-64',
+            'referenceCode': 'UBUNTU_14_64',
+            'prices': [
+                {
+                    'hourlyRecurringFee': '0',
+                    'id': 272,
+                    'locationGroupId': '',
+                    'recurringFee': '0',
+                }
+            ]
+        }
+
+        port_speeds = {
+            'key': '10',
+            'name': '10 Mbps Public & Private Network Uplinks',
+            'prices': [
+                {
+                    'hourlyRecurringFee': '0',
+                    'id': 272,
+                    'locationGroupId': '',
+                    'recurringFee': '0',
+                }
+            ]
+        }
+        sizes = {
+            'key': 'M1_64X512X25',
+            'name': 'M1.64x512x25',
+            'hourlyRecurringFee': 0.0,
+            'recurringFee': 0.0
+        }
+
+        self.assertEqual(options['extras'][0]['prices'][0]['hourlyRecurringFee'],
+                         extras['prices'][0]['hourlyRecurringFee'])
+        self.assertEqual(options['locations'][0], locations)
+        self.assertEqual(options['operating_systems'][0]['prices'][0]['locationGroupId'],
+                         operating_systems['prices'][0]['locationGroupId'])
+        self.assertEqual(options['port_speed'][0]['prices'][0]['id'], port_speeds['prices'][0]['id'])
+        self.assertEqual(options['sizes'][0], sizes)
 
     def test_cancel_instance(self):
         result = self.vs.cancel_instance(1)
@@ -477,6 +557,60 @@ class VSTests(testing.TestCase):
 
         self.assertEqual(data, assert_data)
 
+    def test_generate_by_router_and_vlan(self):
+        actual = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs._generate_create_dict,
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            private_router=1,
+            private_vlan=1
+        )
+
+        self.assertEqual(str(actual), "You have to select network vlan or network vlan with a subnet or only router, "
+                                      "not all options")
+
+    def test_generate_by_router_and_subnet(self):
+        actual = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs._generate_create_dict,
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='example.com',
+            os_code="STRING",
+            private_router=1,
+            private_subnet=1
+        )
+
+        self.assertEqual(str(actual), "You have to select network vlan or network vlan with a subnet or only router, "
+                                      "not all options")
+
+    def test_generate_sec_group(self):
+        data = self.vs._generate_create_dict(
+            cpus=1,
+            memory=1,
+            hostname='test',
+            domain='test.com',
+            os_code="OS",
+            public_security_groups=[1, 2, 3],
+            private_security_groups=[4, 5, 6]
+        )
+
+        pub_sec_binding = data['primaryNetworkComponent']['securityGroupBindings']
+        prv_sec_binding = data['primaryBackendNetworkComponent']['securityGroupBindings']
+        # Public
+        self.assertEqual(pub_sec_binding[0]['securityGroup']['id'], 1)
+        self.assertEqual(pub_sec_binding[1]['securityGroup']['id'], 2)
+        self.assertEqual(pub_sec_binding[2]['securityGroup']['id'], 3)
+        # Private
+        self.assertEqual(prv_sec_binding[0]['securityGroup']['id'], 4)
+        self.assertEqual(prv_sec_binding[1]['securityGroup']['id'], 5)
+        self.assertEqual(prv_sec_binding[2]['securityGroup']['id'], 6)
+
     def test_create_network_components_vlan_subnet_private_vlan_subnet_public(self):
         data = self.vs._create_network_components(
             private_vlan=1,
@@ -493,6 +627,31 @@ class VSTests(testing.TestCase):
         }
 
         self.assertEqual(data, assert_data)
+
+    def test_create_network_components_by_routers(self):
+        data = self.vs._create_network_components(
+            private_router=1,
+            public_router=1
+        )
+
+        assert_data = {
+            'primaryBackendNetworkComponent': {'router': {'id': 1}},
+            'primaryNetworkComponent': {'router': {'id': 1}},
+        }
+
+        self.assertEqual(data, assert_data)
+
+    def test_create_network_components_by_routers_and_vlan(self):
+        actual = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.vs._create_network_components,
+            private_router=1,
+            public_router=1,
+            private_vlan=1
+        )
+
+        self.assertEqual(str(actual), "You have to select network vlan or network vlan with a subnet or only router, "
+                                      "not all options")
 
     def test_create_network_components_vlan_subnet_private(self):
         data = self.vs._create_network_components(
@@ -830,3 +989,339 @@ class VSTests(testing.TestCase):
                                 'createArchiveTransaction',
                                 args=args,
                                 identifier=1)
+
+    def test_usage_vs_cpu(self):
+        result = self.vs.get_summary_data_usage('100',
+                                                start_date='2019-3-4',
+                                                end_date='2019-4-2',
+                                                valid_type='CPU0',
+                                                summary_period=300)
+
+        expected = fixtures.SoftLayer_Metric_Tracking_Object.getSummaryData
+        self.assertEqual(result, expected)
+
+        args = ('2019-3-4', '2019-4-2', [{"keyName": "CPU0", "summaryType": "max"}], 300)
+
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object',
+                                'getSummaryData', args=args, identifier=1000)
+
+    def test_usage_vs_memory(self):
+        result = self.vs.get_summary_data_usage('100',
+                                                start_date='2019-3-4',
+                                                end_date='2019-4-2',
+                                                valid_type='MEMORY_USAGE',
+                                                summary_period=300)
+
+        expected = fixtures.SoftLayer_Metric_Tracking_Object.getSummaryData
+        self.assertEqual(result, expected)
+
+        args = ('2019-3-4', '2019-4-2', [{"keyName": "MEMORY_USAGE", "summaryType": "max"}], 300)
+
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', args=args, identifier=1000)
+
+    def test_get_tracking_id(self):
+        result = self.vs.get_tracking_id(1234)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'getMetricTrackingObjectId')
+        self.assertEqual(result, 1000)
+
+    def test_get_bandwidth_data(self):
+        result = self.vs.get_bandwidth_data(1234, '2019-01-01', '2019-02-01', 'public', 1000)
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object',
+                                'getBandwidthData',
+                                args=('2019-01-01', '2019-02-01', 'public', 1000),
+                                identifier=1000)
+        self.assertEqual(result[0]['type'], 'cpu0')
+
+    def test_get_bandwidth_allocation(self):
+        result = self.vs.get_bandwidth_allocation(1234)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'getBandwidthAllotmentDetail', identifier=1234)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'getBillingCycleBandwidthUsage', identifier=1234)
+        self.assertEqual(result['allotment']['amount'], '250')
+        self.assertEqual(result['usage'][0]['amountIn'], '.448')
+
+    def test_get_bandwidth_allocation_no_allotment(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBandwidthAllotmentDetail')
+        mock.return_value = None
+
+        result = self.vs.get_bandwidth_allocation(1234)
+
+        self.assertEqual(None, result['allotment'])
+
+    def test_get_bandwidth_allocation_with_allotment(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBandwidthAllotmentDetail')
+        mock.return_value = {
+            "allocationId": 11111,
+            "id": 22222,
+            "allocation": {
+                "amount": "2000"
+            }
+        }
+
+        result = self.vs.get_bandwidth_allocation(1234)
+
+        self.assertEqual(2000, int(result['allotment']['amount']))
+
+    def test_get_storage_iscsi_details(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAttachedNetworkStorages')
+        mock.return_value = [
+            {
+                "accountId": 11111,
+                "capacityGb": 12000,
+                "id": 3777123,
+                "nasType": "ISCSI",
+                "username": "SL02SEL31111-9",
+            }
+        ]
+
+        result = self.vs.get_storage_details(1234, 'ISCSI')
+
+        self.assertEqual([{
+            "accountId": 11111,
+            "capacityGb": 12000,
+            "id": 3777123,
+            "nasType": "ISCSI",
+            "username": "SL02SEL31111-9",
+        }], result)
+
+    def test_get_storage_iscsi_empty_details(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAttachedNetworkStorages')
+        mock.return_value = []
+
+        result = self.vs.get_storage_details(1234, 'ISCSI')
+
+        self.assertEqual([], result)
+
+    def test_get_storage_nas_details(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAttachedNetworkStorages')
+        mock.return_value = [
+            {
+                "accountId": 11111,
+                "capacityGb": 12000,
+                "id": 3777111,
+                "nasType": "NAS",
+                "username": "SL02SEL32222-9",
+            }
+        ]
+
+        result = self.vs.get_storage_details(1234, 'NAS')
+
+        self.assertEqual([{
+            "accountId": 11111,
+            "capacityGb": 12000,
+            "id": 3777111,
+            "nasType": "NAS",
+            "username": "SL02SEL32222-9",
+        }], result)
+
+    def test_get_storage_nas_empty_details(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAttachedNetworkStorages')
+        mock.return_value = []
+
+        result = self.vs.get_storage_details(1234, 'NAS')
+
+        self.assertEqual([], result)
+
+    def test_get_storage_credentials(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAllowedHost')
+        mock.return_value = {
+            "accountId": 11111,
+            "id": 33333,
+            "name": "iqn.2020-03.com.ibm:sl02su11111-v62941551",
+            "resourceTableName": "VIRTUAL_GUEST",
+            "credential": {
+                "accountId": "11111",
+                "id": 44444,
+                "password": "SjFDCpHrjskfj",
+                "username": "SL02SU11111-V62941551"
+            }
+        }
+
+        result = self.vs.get_storage_credentials(1234)
+
+        self.assertEqual({
+            "accountId": 11111,
+            "id": 33333,
+            "name": "iqn.2020-03.com.ibm:sl02su11111-v62941551",
+            "resourceTableName": "VIRTUAL_GUEST",
+            "credential": {
+                "accountId": "11111",
+                "id": 44444,
+                "password": "SjFDCpHrjskfj",
+                "username": "SL02SU11111-V62941551"
+            }
+        }, result)
+
+    def test_get_none_storage_credentials(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getAllowedHost')
+        mock.return_value = None
+
+        result = self.vs.get_storage_credentials(1234)
+
+        self.assertEqual(None, result)
+
+    def test_get_portable_storage(self):
+        result = self.vs.get_portable_storage(1234)
+        self.assert_called_with('SoftLayer_Account',
+                                'getPortableStorageVolumes')
+
+        self.assertEqual([
+            {
+                "capacity": 200,
+                "createDate": "2018-10-06T04:27:59-06:00",
+                "description": "Disk 2",
+                "id": 11111,
+                "modifyDate": "",
+                "name": "Disk 2",
+                "parentId": "",
+                "storageRepositoryId": 22222,
+                "typeId": 241,
+                "units": "GB",
+                "uuid": "fd477feb-bf32-408e-882f-02540gghgh111"
+            }
+        ], result)
+
+    def test_get_portable_storage_empty(self):
+        mock = self.set_mock('SoftLayer_Account', 'getPortableStorageVolumes')
+        mock.return_value = []
+
+        result = self.vs.get_portable_storage(1234)
+
+        self.assertEqual([], result)
+
+    def test_get_local_disks_system(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBlockDevices')
+        mock.return_value = [
+            {
+                "createDate": "2018-10-06T04:27:35-06:00",
+                "device": "0",
+                "id": 11111,
+                "mountType": "Disk",
+                "diskImage": {
+                    "capacity": 100,
+                    "description": "adns.vmware.com",
+                    "id": 72222,
+                    "name": "adns.vmware.com",
+                    "units": "GB",
+                }
+            }
+        ]
+
+        result = self.vs.get_local_disks(1234)
+
+        self.assertEqual([
+            {
+                "createDate": "2018-10-06T04:27:35-06:00",
+                "device": "0",
+                "id": 11111,
+                "mountType": "Disk",
+                "diskImage": {
+                    "capacity": 100,
+                    "description": "adns.vmware.com",
+                    "id": 72222,
+                    "name": "adns.vmware.com",
+                    "units": "GB",
+                }
+            }
+        ], result)
+
+    def test_get_local_disks_empty(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBlockDevices')
+        mock.return_value = []
+
+        result = self.vs.get_local_disks(1234)
+
+        self.assertEqual([], result)
+
+    def test_get_local_disks_swap(self):
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getBlockDevices')
+        mock.return_value = [
+            {
+                "device": "1",
+                "id": 22222,
+                "mountType": "Disk",
+                "statusId": 1,
+                "diskImage": {
+                    "capacity": 2,
+                    "description": "6211111-SWAP",
+                    "id": 33333,
+                    "name": "6211111-SWAP",
+                    "units": "GB",
+                }
+            }
+        ]
+
+        result = self.vs.get_local_disks(1234)
+
+        self.assertEqual([
+            {
+                "device": "1",
+                "id": 22222,
+                "mountType": "Disk",
+                "statusId": 1,
+                "diskImage": {
+                    "capacity": 2,
+                    "description": "6211111-SWAP",
+                    "id": 33333,
+                    "name": "6211111-SWAP",
+                    "units": "GB",
+                }
+            }
+        ], result)
+
+    def test_migrate(self):
+        result = self.vs.migrate(1234)
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'migrate', identifier=1234)
+
+    def test_migrate_dedicated(self):
+        result = self.vs.migrate_dedicated(1234, 5555)
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'migrateDedicatedHost', args=(5555,), identifier=1234)
+
+    def test_get_hardware_guests(self):
+        mock = self.set_mock('SoftLayer_Account', 'getHardware')
+        mock.return_value = [{
+            "accountId": 11111,
+            "domain": "vmware.chechu.com",
+            "hostname": "host14",
+            "id": 22222,
+            "virtualHost": {
+                "accountId": 11111,
+                "id": 33333,
+                "name": "host14.vmware.chechu.com",
+                "guests": [
+                    {
+                        "accountId": 11111,
+                        "hostname": "NSX-T Manager",
+                        "id": 44444,
+                        "maxCpu": 16,
+                        "maxCpuUnits": "CORE",
+                        "maxMemory": 49152,
+                        "powerState": {
+                            "keyName": "RUNNING",
+                            "name": "Running"
+                        },
+                        "status": {
+                            "keyName": "ACTIVE",
+                            "name": "Active"
+                        }
+                    }]}}]
+
+        result = self.vs.get_hardware_guests()
+        self.assertEqual("NSX-T Manager", result[0]['virtualHost']['guests'][0]['hostname'])
+
+    def test_authorize_storage(self):
+        options = self.vs.authorize_storage(1234, "SL01SEL301234-11")
+
+        self.assertEqual(True, options)
+
+    def test_authorize_storage_empty(self):
+        mock = self.set_mock('SoftLayer_Account', 'getNetworkStorage')
+        mock.return_value = []
+        self.assertRaises(SoftLayer.exceptions.SoftLayerError,
+                          self.vs.authorize_storage,
+                          1234, "#")
+
+    def test_authorize_portable_storage(self):
+        options = self.vs.attach_portable_storage(1234, 1234567)
+        self.assertEqual(1234567, options['id'])

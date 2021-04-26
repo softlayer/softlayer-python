@@ -8,11 +8,16 @@ getObject = {
         'id': 6327,
         'nextInvoiceTotalRecurringAmount': 1.54,
         'children': [
-            {'nextInvoiceTotalRecurringAmount': 1},
-            {'nextInvoiceTotalRecurringAmount': 1},
-            {'nextInvoiceTotalRecurringAmount': 1},
-            {'nextInvoiceTotalRecurringAmount': 1},
-            {'nextInvoiceTotalRecurringAmount': 1},
+            {'categoryCode': 'port_speed',
+             'nextInvoiceTotalRecurringAmount': 1},
+            {'categoryCode': 'guest_core',
+             'nextInvoiceTotalRecurringAmount': 1},
+            {'categoryCode': 'ram',
+             'nextInvoiceTotalRecurringAmount': 1},
+            {'categoryCode': 'guest_core',
+             'nextInvoiceTotalRecurringAmount': 1},
+            {'categoryCode': 'guest_disk1',
+             'nextInvoiceTotalRecurringAmount': 1},
         ],
         'package': {
             "id": 835,
@@ -23,7 +28,8 @@ getObject = {
                 'userRecord': {
                     'username': 'chechu',
                 }
-            }
+            },
+            'preset': {'keyName': 'B1_8X16X100'}
         }
     },
     'datacenter': {'id': 50, 'name': 'TEST00',
@@ -49,6 +55,7 @@ getObject = {
                       'vlanNumber': 23,
                       'id': 1}],
     'dedicatedHost': {'id': 37401},
+    'transientGuestFlag': False,
     'operatingSystem': {
         'passwords': [{'username': 'user', 'password': 'pass'}],
         'softwareLicense': {
@@ -62,12 +69,12 @@ getObject = {
     }],
     'tagReferences': [{'tag': {'name': 'production'}}],
 }
-
 getCreateObjectOptions = {
     'flavors': [
         {
             'flavor': {
-                'keyName': 'B1_1X2X25'
+                'keyName': 'B1_1X2X25',
+                'name': 'B1-1X2X25'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -77,7 +84,20 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'B1_1X2X100'
+                'keyName': 'B1_1X2X25_TRANSIENT',
+                'name': 'B1-1X2X25_TRANSIENT'
+            },
+            'template': {
+                'supplementalCreateObjectOptions': {
+                    'flavorKeyName': 'B1_1X2X25_TRANSIENT'
+                },
+                'transientGuestFlag': True
+            }
+        },
+        {
+            'flavor': {
+                'keyName': 'B1_1X2X100',
+                'name': 'B1-1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -87,7 +107,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'BL1_1X2X100'
+                'keyName': 'BL1_1X2X100',
+                'name': 'BL1_1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -97,7 +118,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'BL2_1X2X100'
+                'keyName': 'BL2_1X2X100',
+                'name': 'BL2-1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -107,7 +129,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'C1_1X2X25'
+                'keyName': 'C1_1X2X25',
+                'name': 'C1-1X2X25'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -117,7 +140,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'M1_1X2X100'
+                'keyName': 'M1_1X2X100',
+                'name': 'M1_1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -127,7 +151,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'AC1_1X2X100'
+                'keyName': 'AC1_1X2X100',
+                'name': 'AC1_1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -137,7 +162,8 @@ getCreateObjectOptions = {
         },
         {
             'flavor': {
-                'keyName': 'ACL1_1X2X100'
+                'keyName': 'ACL1_1X2X100',
+                'name': 'ACL1_1X2X100'
             },
             'template': {
                 'supplementalCreateObjectOptions': {
@@ -228,6 +254,12 @@ getCreateObjectOptions = {
     ],
     'memory': [
         {
+            "description": "1 GB ",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 4
+            },
             'itemPrice': {
                 'item': {'description': '1 GB'},
                 'hourlyRecurringFee': '.03',
@@ -236,14 +268,27 @@ getCreateObjectOptions = {
             'template': {'maxMemory': 1024}
         },
         {
-            'itemPrice': {
-                'item': {'description': '2 GB'},
-                'hourlyRecurringFee': '.06',
-                'recurringFee': '42'
+            "description": "2 GB ",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 5
             },
+            'itemPrice':
+                {
+                    'item': {'description': '2 GB'},
+                    'hourlyRecurringFee': '.06',
+                    'recurringFee': '42'
+                },
             'template': {'maxMemory': 2048}
         },
         {
+            "description": "3 GB",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 65
+            },
             'itemPrice': {
                 'item': {'description': '3 GB'},
                 'hourlyRecurringFee': '.085',
@@ -251,6 +296,12 @@ getCreateObjectOptions = {
             'template': {'maxMemory': 3072}
         },
         {
+            "description": "4 GB",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 35
+            },
             'itemPrice': {
                 'item': {'description': '4 GB'},
                 'hourlyRecurringFee': '.11',
@@ -259,6 +310,12 @@ getCreateObjectOptions = {
             'template': {'maxMemory': 4096}
         },
         {
+            "description": "64 GB (Dedicated Host)",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 3
+            },
             'itemPrice': {
                 'hourlyRecurringFee': '0',
                 'recurringFee': '0',
@@ -272,6 +329,12 @@ getCreateObjectOptions = {
             }
         },
         {
+            "description": "8 GB (Dedicated Host)",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "ram",
+                "id": 36
+            },
             'itemPrice': {
                 'hourlyRecurringFee': '0',
                 'recurringFee': '0',
@@ -406,6 +469,42 @@ getCreateObjectOptions = {
         {'template': {'datacenter': {'name': 'ams01'}}},
         {'template': {'datacenter': {'name': 'dal05'}}},
     ],
+    'guest_disk': [{
+        "description": "25 GB (SAN)",
+        "attributes": [
+            {
+                "id": 197,
+                "attributeTypeKeyName": "SAN_DISK"
+            }
+        ],
+        "itemCategory": {
+            "categoryCode": "guest_disk0",
+            "id": 81
+        }}, {
+        "description": "250 GB (SAN)",
+        "attributes": [
+            {
+                "id": 198,
+                "attributeTypeKeyName": "SAN_DISK"
+            }],
+        "itemCategory": {
+            "categoryCode": "guest_disk0",
+            "id": 89
+        }}],
+    'guest_core': [{
+        "description": "4 x 2.0 GHz or higher Cores (Dedicated)",
+        "attributes": [],
+        "itemCategory": {
+            "categoryCode": "guest_core",
+            "id": 80
+        }},
+        {
+            "description": "8 x 2.0 GHz or higher Cores",
+            "attributes": [],
+            "itemCategory": {
+                "categoryCode": "guest_core",
+                "id": 90
+            }}]
 }
 
 getReverseDomainRecords = [{
@@ -508,14 +607,6 @@ generateOrderTemplate = {
                 "description": "Unlimited SSL VPN Users & 1 PPTP VPN User per account"
             }
         },
-        {
-            "hourlyRecurringFee": "0",
-            "id": 418,
-            "recurringFee": "0",
-            "item": {
-                "description": "Nessus Vulnerability Assessment & Reporting"
-            }
-        }
     ],
     "quantity": 1,
     "sourceVirtualGuestId": None,
@@ -610,7 +701,35 @@ getUpgradeItemPrices = [
             'capacity': '2',
             'description': 'RAM',
         }
-    },
+    }, {
+        "id": 2255,
+        "categories": [
+            {
+                "categoryCode": "guest_disk1",
+                "id": 82,
+                "name": "Second Disk"
+            },
+            {
+                "categoryCode": "guest_disk2",
+                "id": 92,
+                "name": "Third Disk"
+            },
+            {
+                "categoryCode": "guest_disk3",
+                "id": 93,
+                "name": "Fourth Disk"
+            },
+            {
+                "categoryCode": "guest_disk4",
+                "id": 116,
+                "name": "Fifth Disk"
+            }
+        ],
+        "item": {
+            "capacity": "10",
+            "description": "10 GB (SAN)"
+        }
+    }
 ]
 
 DEDICATED_GET_UPGRADE_ITEM_PRICES = [
@@ -626,3 +745,140 @@ DEDICATED_GET_UPGRADE_ITEM_PRICES = [
         }
     },
 ]
+
+getMetricTrackingObjectId = 1000
+
+getBandwidthAllotmentDetail = {
+    'allocationId': 25465663,
+    'bandwidthAllotmentId': 138442,
+    'effectiveDate': '2019-04-03T23:00:00-06:00',
+    'endEffectiveDate': None,
+    'id': 25888247,
+    'serviceProviderId': 1,
+    'allocation': {
+        'amount': '250'
+    }
+}
+
+getBillingCycleBandwidthUsage = [
+    {
+        'amountIn': '.448',
+        'amountOut': '.52157',
+        'type': {
+            'alias': 'PUBLIC_SERVER_BW'
+        }
+    },
+    {
+        'amountIn': '.03842',
+        'amountOut': '.01822',
+        'type': {
+            'alias': 'PRIVATE_SERVER_BW'
+        }
+    }
+]
+
+getAttachedNetworkStorages = [
+    {
+        "accountId": 11111,
+        "capacityGb": 20,
+        "createDate": "2018-04-05T05:15:49-06:00",
+        "id": 22222,
+        "nasType": "NAS",
+        "serviceProviderId": 1,
+        "storageTypeId": "13",
+        "username": "SL02SEV311111_11",
+        "allowedVirtualGuests": [
+            {
+                "id": 12345,
+                "datacenter": {
+                    "id": 449506,
+                    "longName": "Frankfurt 2",
+                    "name": "fra02",
+                    "statusId": 2
+                }
+            }
+        ],
+        "serviceResourceBackendIpAddress": "fsn-fra0201a-fz.service.softlayer.com",
+        "serviceResourceName": "Storage Type 02 File Aggregate stfm-fra0201a"
+    },
+    {
+        "accountId": 11111,
+        "capacityGb": 12000,
+        "createDate": "2018-01-28T04:57:30-06:00",
+        "id": 3777111,
+        "nasType": "ISCSI",
+        "notes": "BlockStorage12T",
+        "password": "",
+        "serviceProviderId": 1,
+        "storageTypeId": "7",
+        "username": "SL02SEL32222-9",
+        "allowedVirtualGuests": [
+            {
+                "id": 629222,
+                "datacenter": {
+                    "id": 449506,
+                    "longName": "Frankfurt 2",
+                    "name": "fra02",
+                    "statusId": 2
+                }
+            }
+        ],
+        "serviceResourceBackendIpAddress": "10.31.95.152",
+        "serviceResourceName": "Storage Type 02 Block Aggregate stbm-fra0201a"
+    }
+]
+
+getAllowedHost = {
+    "accountId": 11111,
+    "credentialId": 22222,
+    "id": 33333,
+    "name": "iqn.2020-03.com.ibm:sl02su11111-v62941551",
+    "resourceTableId": 6291111,
+    "resourceTableName": "VIRTUAL_GUEST",
+    "credential": {
+        "accountId": "11111",
+        "createDate": "2020-03-20T13:35:47-06:00",
+        "id": 44444,
+        "nasCredentialTypeId": 2,
+        "password": "SjFDCpHrjskfj",
+        "username": "SL02SU11111-V62941551"
+    }
+}
+
+getBlockDevices = [
+    {
+        "createDate": "2018-10-06T04:27:35-06:00",
+        "device": "0",
+        "id": 11111,
+        "mountType": "Disk",
+        "diskImage": {
+            "capacity": 100,
+            "description": "adns.vmware.com",
+            "id": 72222,
+            "name": "adns.vmware.com",
+            "units": "GB",
+        }
+    },
+    {
+        "device": "1",
+        "id": 22222,
+        "mountType": "Disk",
+        "statusId": 1,
+        "diskImage": {
+            "capacity": 2,
+            "description": "6211111-SWAP",
+            "id": 33333,
+            "name": "6211111-SWAP",
+            "units": "GB",
+        }
+    }
+]
+
+migrate = True
+migrateDedicatedHost = True
+allowAccessToNetworkStorageList = True
+
+attachDiskImage = {
+            "createDate": "2021-03-22T13:15:31-06:00",
+            "id": 1234567
+        }

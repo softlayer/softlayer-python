@@ -72,7 +72,6 @@ class TicketTests(testing.TestCase):
             subject=1004)
 
         args = ({"assignedUserId": 12345,
-                 "contents": "body",
                  "subjectId": 1004,
                  "title": "Cloud Instance Cancellation - 08/01/13"},
                 "body")

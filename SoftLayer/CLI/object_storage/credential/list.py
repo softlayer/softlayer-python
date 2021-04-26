@@ -6,6 +6,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
 @click.command()
@@ -15,15 +16,17 @@ def cli(env, identifier):
     """Retrieve credentials used for generating an AWS signature. Max of 2."""
 
     mgr = SoftLayer.ObjectStorageManager(env.client)
-    credential_list = mgr.list_credential(identifier)
+    storage_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'Object Storage')
+    credential_list = mgr.list_credential(storage_id)
+
     table = formatting.Table(['id', 'password', 'username', 'type_name'])
 
     for credential in credential_list:
         table.add_row([
-            credential['id'],
-            credential['password'],
-            credential['username'],
-            credential['type']['name']
+            credential.get('id'),
+            credential.get('password'),
+            credential.get('username'),
+            credential.get('type', {}).get('name')
         ])
 
     env.fout(table)

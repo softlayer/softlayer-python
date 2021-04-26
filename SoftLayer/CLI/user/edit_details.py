@@ -22,7 +22,10 @@ def cli(env, user, template):
 
     JSON strings should be enclosed in '' and each item should be enclosed in ""
 
-    :Example: slcli user edit-details testUser -t '{"firstName": "Test", "lastName": "Testerson"}'
+    Example::
+
+        slcli user edit-details testUser -t '{"firstName": "Test", "lastName": "Testerson"}'
+
     """
     mgr = SoftLayer.UserManager(env.client)
     user_id = helpers.resolve_id(mgr.resolve_ids, user, 'username')

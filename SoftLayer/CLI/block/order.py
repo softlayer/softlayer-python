@@ -6,7 +6,6 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 
-
 CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 
 
@@ -63,7 +62,7 @@ def cli(env, storage_type, size, iops, tier, os_type,
     """Order a block storage volume.
 
     Valid size and iops options can be found here:
-    https://console.bluemix.net/docs/infrastructure/BlockStorage/index.html#provisioning
+    https://cloud.ibm.com/docs/BlockStorage/index.html#provisioning-considerations
     """
     block_manager = SoftLayer.BlockStorageManager(env.client)
     storage_type = storage_type.lower()
@@ -128,5 +127,8 @@ def cli(env, storage_type, size, iops, tier, os_type,
             order['placedOrder']['id']))
         for item in order['placedOrder']['items']:
             click.echo(" > %s" % item['description'])
+        click.echo(
+            '\nYou may run "slcli block volume-list --order {0}" to find this block volume after it '
+            'is ready.'.format(order['placedOrder']['id']))
     else:
         click.echo("Order could not be placed! Please verify your options and try again.")

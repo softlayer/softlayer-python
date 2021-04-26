@@ -1,3 +1,4 @@
+# pylint: skip-file
 HARDWARE_ITEMS = [
     {'attributes': [],
      'capacity': '999',
@@ -8,6 +9,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 1245172,
+                 "locationGroupId": '',
                  'itemId': 935954,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -26,6 +28,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 17129,
+                 "locationGroupId": '',
                  'itemId': 4097,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -43,6 +46,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 272,
+                 "locationGroupId": '',
                  'itemId': 186,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -60,6 +64,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 37650,
+                 "locationGroupId": '',
                  'itemId': 4702,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -80,6 +85,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 21,
+                 "locationGroupId": '',
                  'itemId': 15,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -97,6 +103,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 420,
+                 "locationGroupId": '',
                  'itemId': 309,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -114,6 +121,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 906,
+                 "locationGroupId": '',
                  'itemId': 504,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -130,6 +138,7 @@ HARDWARE_ITEMS = [
      'prices': [{'accountRestrictions': [],
                  'currentPriceFlag': '',
                  'id': 22505,
+                 "locationGroupId": '',
                  'itemId': 4481,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -147,6 +156,7 @@ HARDWARE_ITEMS = [
                  'currentPriceFlag': '',
                  'hourlyRecurringFee': '0',
                  'id': 1800,
+                 "locationGroupId": '',
                  'itemId': 439,
                  'laborFee': '0',
                  'onSaleFlag': '',
@@ -755,7 +765,15 @@ activePreset1 = {
     'isActive': '1',
     'keyName': 'S1270_8GB_2X1TBSATA_NORAID',
     'name': 'S1270 8GB 2X1TBSATA NORAID',
-    'packageId': 200
+    'packageId': 200,
+    'prices': [
+        {
+            "hourlyRecurringFee": "1.18",
+            "id": 165711,
+            "locationGroupId": '',
+            "recurringFee": "780",
+        }
+    ]
 }
 
 activePreset2 = {
@@ -764,7 +782,15 @@ activePreset2 = {
     'isActive': '1',
     'keyName': 'DGOLD_6140_384GB_4X960GB_SSD_SED_RAID_10',
     'name': 'DGOLD 6140 384GB 4X960GB SSD SED RAID 10',
-    'packageId': 200
+    'packageId': 200,
+    'prices': [
+        {
+            "hourlyRecurringFee": "1.18",
+            "id": 165711,
+            "locationGroupId": '',
+            "recurringFee": "780",
+        }
+    ]
 }
 
 getAllObjects = [{
@@ -784,6 +810,47 @@ getAllObjects = [{
                  'sortOrder': 10}],
     'subDescription': 'Bare Metal Server',
     'unitSize': 1,
+    "itemPrices": [
+        {
+            "hourlyRecurringFee": ".027",
+            "id": 205911,
+            "laborFee": "0",
+            "locationGroupId": 505,
+            "capacityRestrictionMaximum": "40",
+            "capacityRestrictionMinimum": "40",
+            "capacityRestrictionType": "CORE",
+            "item": {
+                "capacity": "0",
+                "description": "Load Balancer Uptime",
+                "id": 10785,
+                "keyName": "LOAD_BALANCER_UPTIME",
+            }
+        },
+        {
+            "hourlyRecurringFee": "0",
+            "id": 199467,
+            "laborFee": "0",
+            "locationGroupId": '',
+            "recurringFee": "0",
+            "item": {
+                "capacity": "0",
+                "description": "Load Balancer Bandwidth",
+                "id": 10051,
+                "keyName": "LOAD_BALANCER_BANDWIDTH",
+            }
+        },
+        {
+            "hourlyRecurringFee": ".028",
+            "id": 205913,
+            "laborFee": "0",
+            "locationGroupId": 507,
+            "item": {
+                "capacity": "0",
+                "description": "Load Balancer Uptime",
+                "id": 10785,
+                "keyName": "LOAD_BALANCER_UPTIME",
+            }
+        }]
 }]
 
 getItems = [
@@ -793,8 +860,14 @@ getItems = [
         'capacity': '1000',
         'description': 'Public & Private Networks',
         'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
+        'softwareDescription': {
+            'id': 1228,
+            'longDescription': 'Redhat EL 5.10-64',
+            'referenceCode': 'REDHAT_5_64'
+        },
         'prices': [{'id': 1122,
-                    'hourlyRecurringFee': 0.0,
+                    'hourlyRecurringFee': 0.10,
+                    'recurringFee': 0.10,
                     'categories': [{'id': 26,
                                     'name': 'Uplink Port Speeds',
                                     'categoryCode': 'port_speed'}]}],
@@ -806,7 +879,8 @@ getItems = [
         'description': 'Public & Private Networks',
         'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
         'prices': [{'id': 4477,
-                    'hourlyRecurringFee': 0.0,
+                    'hourlyRecurringFee': 0.10,
+                    'recurringFee': 0.10,
                     'categories': [{'id': 26,
                                     'name': 'Uplink Port Speeds',
                                     'categoryCode': 'port_speed'}]}],
@@ -819,6 +893,7 @@ getItems = [
         'itemCategory': {'categoryCode': 'RAM'},
         'prices': [{'id': 1133,
                     'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
                     'categories': [{'id': 3,
                                     'name': 'RAM',
                                     'categoryCode': 'ram'}]}],
@@ -832,6 +907,7 @@ getItems = [
         'itemCategory': {'categoryCode': 'Computing Instance'},
         'prices': [{'id': 1007,
                     'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
                     'categories': [{'id': 80,
                                     'name': 'Computing Instance',
                                     'categoryCode': 'guest_core'}]}],
@@ -845,7 +921,8 @@ getItems = [
         'itemCategory': {'categoryCode': 'Computing Instance'},
         'prices': [{'id': 1144,
                     'locationGroupId': None,
-                    'hourlyRecurringFee': 0.0,
+                    'hourlyRecurringFee': 0.10,
+                    'recurringFee': 0.10,
                     'categories': [{'id': 80,
                                     'name': 'Computing Instance',
                                     'categoryCode': 'guest_core'}]}],
@@ -860,6 +937,7 @@ getItems = [
         'prices': [{'id': 332211,
                     'locationGroupId': 1,
                     'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
                     'categories': [{'id': 80,
                                     'name': 'Computing Instance',
                                     'categoryCode': 'guest_core'}]}],
@@ -870,7 +948,7 @@ getItems = [
         'capacity': '1',
         'description': '1 GB iSCSI Storage',
         'itemCategory': {'categoryCode': 'iscsi'},
-        'prices': [{'id': 2222, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 2222, 'hourlyRecurringFee': 0.10, 'recurringFee': 0.10}],
     },
     {
         'id': 1121,
@@ -878,7 +956,7 @@ getItems = [
         'capacity': '20',
         'description': '20 GB iSCSI snapshot',
         'itemCategory': {'categoryCode': 'iscsi_snapshot_space'},
-        'prices': [{'id': 2014, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 2014, 'hourlyRecurringFee': 0.10}],
     },
     {
         'id': 4440,
@@ -886,7 +964,7 @@ getItems = [
         'capacity': '4',
         'description': '4 Portable Public IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_pub'},
-        'prices': [{'id': 4444, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 4444, 'hourlyRecurringFee': 0.10, 'recurringFee': 0.10}],
     },
     {
         'id': 8880,
@@ -894,7 +972,7 @@ getItems = [
         'capacity': '8',
         'description': '8 Portable Public IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_pub'},
-        'prices': [{'id': 8888, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 8888, 'hourlyRecurringFee': 0.10, 'recurringFee': 0.10}],
     },
     {
         'id': 44400,
@@ -902,7 +980,7 @@ getItems = [
         'capacity': '4',
         'description': '4 Portable Private IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_priv'},
-        'prices': [{'id': 44441, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 44441, 'hourlyRecurringFee': 0.10, 'recurringFee': 0.10}],
     },
     {
         'id': 88800,
@@ -910,7 +988,7 @@ getItems = [
         'capacity': '8',
         'description': '8 Portable Private IP Addresses',
         'itemCategory': {'categoryCode': 'sov_sec_ip_addresses_priv'},
-        'prices': [{'id': 88881, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 88881, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
     },
     {
         'id': 10,
@@ -918,15 +996,15 @@ getItems = [
         'capacity': '0',
         'description': 'Global IPv4',
         'itemCategory': {'categoryCode': 'global_ipv4'},
-        'prices': [{'id': 11, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 11, 'hourlyRecurringFee': 0.0, 'recurringFee': 0.0}],
     },
     {
         'id': 66464,
-        'keyName': 'KeyName0211',
+        'keyName': '1_IPV6_ADDRESS',
         'capacity': '64',
         'description': '/64 Block Portable Public IPv6 Addresses',
         'itemCategory': {'categoryCode': 'static_ipv6_addresses'},
-        'prices': [{'id': 664641, 'hourlyRecurringFee': 0.0}],
+        'prices': [{'id': 664641, 'hourlyRecurringFee': '0', 'locationGroupId': '', 'recurringFee': '0'}],
     },
     {
         'id': 610,
@@ -934,8 +1012,65 @@ getItems = [
         'capacity': '0',
         'description': 'Global IPv6',
         'itemCategory': {'categoryCode': 'global_ipv6'},
-        'prices': [{'id': 611, 'hourlyRecurringFee': 0.0}],
-    }]
+        'prices': [{'id': 611, 'hourlyRecurringFee': 0.10, 'recurringFee': 0.10}],
+    },
+    {'attributes': [],
+     'capacity': '0',
+     'description': '0 GB Bandwidth',
+     'itemCategory': {'categoryCode': 'bandwidth', 'id': 10},
+     'keyName': 'BANDWIDTH_0_GB_2',
+     'prices': [{'accountRestrictions': [],
+                 'currentPriceFlag': '',
+                 'hourlyRecurringFee': '0',
+                 'id': 1800,
+                 "locationGroupId": '',
+                 'itemId': 439,
+                 'laborFee': '0',
+                 'onSaleFlag': '',
+                 'oneTimeFee': '0',
+                 'quantity': '',
+                 'setupFee': '0',
+                 'sort': 99}]},
+    {'attributes': [],
+     'capacity': '10',
+     'description': '10 Mbps Public & Private Network Uplinks',
+     'itemCategory': {'categoryCode': 'port_speed', 'id': 26},
+     'keyName': '10_MBPS_PUBLIC_PRIVATE_NETWORK_UPLINKS',
+     'prices': [{'accountRestrictions': [],
+                 'currentPriceFlag': '',
+                 'hourlyRecurringFee': '0',
+                 'id': 272,
+                 "locationGroupId": '',
+                 'itemId': 186,
+                 'laborFee': '0',
+                 'onSaleFlag': '',
+                 'oneTimeFee': '0',
+                 'quantity': '',
+                 'recurringFee': '0',
+                 'setupFee': '0',
+                 'sort': 5}]},
+    {'attributes': [],
+     'capacity': '0',
+     'description': 'Ubuntu Linux 14.04 LTS Trusty Tahr (64 bit)',
+     'itemCategory': {'categoryCode': 'os', 'id': 12},
+     'keyName': 'OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+     'prices': [{'accountRestrictions': [],
+                 'currentPriceFlag': '',
+                 'hourlyRecurringFee': '0.10',
+                 'id': 37650,
+                 "locationGroupId": '',
+                 'itemId': 4702,
+                 'laborFee': '0',
+                 'onSaleFlag': '',
+                 'oneTimeFee': '0',
+                 'quantity': '',
+                 'recurringFee': '0.1',
+                 'setupFee': '0.1',
+                 'sort': 9}],
+     'softwareDescription': {'id': 1362,
+                             'longDescription': 'Ubuntu / 14.04-64',
+                             'referenceCode': 'UBUNTU_14_64'}}
+]
 
 getItemPricesISCSI = [
     {
@@ -1003,6 +1138,53 @@ getItemPricesISCSI = [
         'setupFee': '0',
         'sort': 0
     }]
+
+getItemsVS = [
+    {
+        'id': 1234,
+        'keyName': 'KeyName01',
+        'capacity': '1000',
+        'description': 'Public & Private Networks',
+        'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
+        'softwareDescription': {
+            'id': 1228,
+            'longDescription': 'Redhat EL 5.10-64',
+            'referenceCode': 'REDHAT_5_64'
+        },
+        'prices': [{'id': 1122,
+                    'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
+                    'categories': [{'id': 26,
+                                    'name': 'Uplink Port Speeds',
+                                    'categoryCode': 'port_speed'}]}],
+    },
+    {
+        'id': 2233,
+        'keyName': 'KeyName02',
+        'capacity': '1000',
+        'description': 'Public & Private Networks',
+        'itemCategory': {'categoryCode': 'Uplink Port Speeds'},
+        'prices': [{'id': 4477,
+                    'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
+                    'categories': [{'id': 26,
+                                    'name': 'Uplink Port Speeds',
+                                    'categoryCode': 'port_speed'}]}],
+    },
+    {
+        'id': 1239,
+        'keyName': 'KeyName03',
+        'capacity': '2',
+        'description': 'RAM',
+        'itemCategory': {'categoryCode': 'RAM'},
+        'prices': [{'id': 1133,
+                    'hourlyRecurringFee': 0.0,
+                    'recurringFee': 0.0,
+                    'categories': [{'id': 3,
+                                    'name': 'RAM',
+                                    'categoryCode': 'ram'}]}],
+    }
+]
 
 verifyOrderDH = {
     'preTaxSetup': '0',
@@ -1143,6 +1325,91 @@ verifyOrderDH = {
     'totalSetupTax': '0',
     'quantity': 1
 }
+
+itemsLoadbal = [
+    {
+        "capacity": "0",
+        "description": "Load Balancer as a Service",
+        "id": 10043,
+        "keyName": "LOAD_BALANCER_AS_A_SERVICE",
+        "itemCategory": {
+            "categoryCode": "load_balancer_as_a_service",
+            "id": 1116,
+            "name": "Load Balancer As A Service",
+        },
+        "prices": [
+            {
+                "hourlyRecurringFee": "0",
+                "id": 199447,
+                "locationGroupId": '',
+                "recurringFee": "0",
+            }
+        ]
+    },
+    {
+        "capacity": "0",
+        "description": "Load Balancer Uptime",
+        "id": 10785,
+        "keyName": "LOAD_BALANCER_UPTIME",
+        "itemCategory": {
+            "categoryCode": "load_balancer_uptime",
+            "id": 1119,
+            "name": "Load Balancer Uptime",
+        },
+        "prices": [
+            {
+                "hourlyRecurringFee": ".028",
+                "id": 205913,
+                "locationGroupId": 507,
+            }]}
+]
+
+regionsLoadbal = [{'description': 'WDC01 - Washington, DC - East Coast U.S.',
+                   'keyname': 'WASHINGTON_DC',
+                   'location': {'location': {'id': 37473,
+                                             'longName': 'Washington 1',
+                                             'name': 'wdc01',
+                                             "groups": [
+                                                 {
+                                                     "description": "Location Group 4",
+                                                     "id": 507,
+                                                     "locationGroupTypeId": 82,
+                                                     "name": "Location Group 4",
+                                                     "locationGroupType": {
+                                                         "name": "PRICING"
+                                                     }
+                                                 },
+                                                 {
+                                                     "description": "COS Cross Region - EU",
+                                                     "id": 1303,
+                                                     "locationGroupTypeId": 82,
+                                                     "name": "eu",
+                                                     "locationGroupType": {
+                                                         "name": "PRICING"
+                                                     }
+                                                 },
+                                                 {
+                                                     "description": "COS Regional Frankfurt",
+                                                     "id": 1783,
+                                                     "locationGroupTypeId": 82,
+                                                     "name": "eu-de",
+                                                     "locationGroupType": {
+                                                         "name": "PRICING"
+                                                     }
+                                                 }
+                                             ]
+                                             }},
+                   'sortOrder': 10}]
+
+getAllObjectsLoadbal = [
+    {
+        "id": 805,
+        "keyName": "LBAAS",
+        "name": "Load Balancer As A Service (LBaaS)",
+        "items": itemsLoadbal,
+        "regions": regionsLoadbal
+    }
+]
 
 getAllObjectsDH = [{
     "subDescription": "Dedicated Host",
@@ -1347,6 +1614,25 @@ getAllObjectsDHGpu = [{
 getRegions = [{
     "description": "WDC07 - Washington, DC",
     "keyname": "WASHINGTON07",
+    "location": {
+        "locationId": 2017603,
+        "location": {
+            "id": 2017603,
+            "longName": "Washington 7",
+            "name": "wdc07",
+            "priceGroups": [
+                {
+                    "description": "COS Regional - US East",
+                    "id": 1305,
+                    "locationGroupTypeId": 82,
+                    "name": "us-east",
+                    "locationGroupType": {
+                        "name": "PRICING"
+                    }
+                }
+            ]
+        }
+    },
     "locations": [{
         "location": {
             "euCompliantFlag": False,
@@ -1384,7 +1670,14 @@ getItemPrices = [
                     "id": 449610,
                     "longName": "Montreal 1",
                     "name": "mon01",
-                    "statusId": 2
+                    "statusId": 2,
+                    "regions": [
+                        {
+                            "description": "MON01 - Montreal",
+                            "keyname": "MONTREAL",
+                            "sortOrder": 94
+                        }
+                    ]
                 },
                 {
                     "id": 449618,
@@ -1408,7 +1701,14 @@ getItemPrices = [
                     "id": 221894,
                     "longName": "Amsterdam 2",
                     "name": "ams02",
-                    "statusId": 2
+                    "statusId": 2,
+                    "regions": [
+                        {
+                            "description": "AMS02 POP - Amsterdam",
+                            "keyname": "AMSTERDAM02",
+                            "sortOrder": 12
+                        }
+                    ]
                 },
                 {
                     "id": 265592,
@@ -1650,3 +1950,108 @@ getItems_1_IPV6_ADDRESS = [
         ]
     }
 ]
+
+getObject = {
+    'id': 200,
+    'regions': [{'description': 'WDC01 - Washington, DC - East Coast U.S.',
+                 'keyname': 'WASHINGTON_DC',
+                 'location': {'location': {'id': 37473,
+                                           'longName': 'Washington 1',
+                                           'name': 'wdc01'}},
+                 'sortOrder': 10}],
+    'accountRestrictedActivePresets': [],
+    'activePresets': [
+        {
+            'description': 'AC2.8x60x25',
+            'id': 861,
+            'isActive': '1',
+            'keyName': 'AC2_8X60X25',
+            'name': 'AC2.8x60x25',
+            'packageId': 835
+        },
+        {
+            'description': 'AC2.8x60x100',
+            'id': 863,
+            'isActive': '1',
+            'keyName': 'AC2_8X60X100',
+            'name': 'AC2.8x60x100',
+            'packageId': 835
+        }],
+    "items": [{
+        "capacity": "56",
+        "description": "56 Cores x 360 RAM x 1.2 TB x 2 GPU P100 [encryption enabled]",
+        "bundleItems": [
+            {
+                "capacity": "1200",
+                "keyName": "1.2 TB Local Storage (Dedicated Host Capacity)",
+                "categories": [{
+                    "categoryCode": "dedicated_host_disk"
+                }]
+            },
+            {
+                "capacity": "242",
+                "keyName": "2_GPU_P100_DEDICATED",
+                "hardwareGenericComponentModel": {
+                    "capacity": "16",
+                    "id": 849,
+                    "hardwareComponentType": {
+                        "id": 20,
+                        "keyName": "GPU"
+                    }
+                },
+                "categories": [{
+                    "categoryCode": "dedicated_host_ram"
+                }, {
+                    "capacity": "2",
+                    "description": "2 x 2.0 GHz or higher Cores",
+                    "keyName": "GUEST_CORES_2",
+                    "attributes": [
+                        {
+                            "id": 8261,
+                            "attributeTypeKeyName": "ORDER_SAVES_USAGE_FEES"
+                        }
+                    ],
+                    "itemCategory": {
+                        "categoryCode": "guest_core",
+                        "id": 80
+                    }}]
+            }
+        ],
+        "prices": [
+            {
+                "itemId": 10195,
+                "setupFee": "0",
+                "recurringFee": "2099",
+                "tierMinimumThreshold": "",
+                "hourlyRecurringFee": "3.164",
+                "oneTimeFee": "0",
+                "currentPriceFlag": "",
+                "id": 200269,
+                "sort": 0,
+                "onSaleFlag": "",
+                "laborFee": "0",
+                "locationGroupId": "",
+                "quantity": ""
+            },
+            {
+                "itemId": 10195,
+                "setupFee": "0",
+                "recurringFee": "2161.97",
+                "tierMinimumThreshold": "",
+                "hourlyRecurringFee": "3.258",
+                "oneTimeFee": "0",
+                "currentPriceFlag": "",
+                "id": 200271,
+                "sort": 0,
+                "onSaleFlag": "",
+                "laborFee": "0",
+                "locationGroupId": 503,
+                "quantity": ""
+            }
+        ],
+        "keyName": "56_CORES_X_484_RAM_X_1_5_TB_X_2_GPU_P100",
+        "id": 10195,
+        "itemCategory": {
+            "categoryCode": "dedicated_virtual_hosts"
+        }
+    }]}

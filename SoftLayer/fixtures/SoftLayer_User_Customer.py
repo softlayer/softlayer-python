@@ -13,10 +13,10 @@ getObject = {
     'isMasterUserFlag': False,
     'lastName': 'Testerson',
     'openIdConnectUserName': 'test@us.ibm.com',
-    'parent': {'id': 167758, 'username': 'SL12345'},
+    'parent': {
+        'id': 167758, 'username': 'SL12345'},
     'parentId': 167758,
     'postalCode': '77002',
-    'pptpVpnAllowedFlag': False,
     'sslVpnAllowedFlag': True,
     'state': 'TX',
     'statusDate': None,
@@ -63,7 +63,6 @@ getPermissions = [
      'name': 'Add/Upgrade Storage (StorageLayer)'}
 ]
 
-
 getLoginAttempts = [
     {
         "createDate": "2017-10-03T09:28:33-06:00",
@@ -74,8 +73,16 @@ getLoginAttempts = [
     }
 ]
 
+getOverrides = [
+    {
+        'id': 3661234,
+        'subnetId': 1234
+    }
+]
+
 addBulkPortalPermission = True
 removeBulkPortalPermission = True
 createObject = getObject
 editObject = True
 addApiAuthenticationKey = True
+updateVpnUser = True

@@ -5,6 +5,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import helpers
 
 
 @click.command()
@@ -16,6 +17,7 @@ def cli(env, identifier, credential_id):
     """Delete the credential of an Object Storage Account."""
 
     mgr = SoftLayer.ObjectStorageManager(env.client)
-    credential = mgr.delete_credential(identifier, credential_id=credential_id)
+    storage_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'Object Storage')
+    credential = mgr.delete_credential(storage_id, credential_id=credential_id)
 
     env.fout(credential)

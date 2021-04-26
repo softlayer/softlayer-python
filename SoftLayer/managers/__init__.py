@@ -25,6 +25,7 @@ from SoftLayer.managers.ordering import OrderingManager
 from SoftLayer.managers.reserved_capacity import ReservedCapacityManager
 from SoftLayer.managers.sshkey import SshKeyManager
 from SoftLayer.managers.ssl import SSLManager
+from SoftLayer.managers.tags import TagManager
 from SoftLayer.managers.ticket import TicketManager
 from SoftLayer.managers.user import UserManager
 from SoftLayer.managers.vs import VSManager
@@ -52,6 +53,7 @@ __all__ = [
     'ReservedCapacityManager',
     'SshKeyManager',
     'SSLManager',
+    'TagManager',
     'TicketManager',
     'UserManager',
     'VSManager',

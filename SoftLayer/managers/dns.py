@@ -7,13 +7,14 @@
 """
 import time
 
+from SoftLayer import exceptions
 from SoftLayer import utils
 
 
 class DNSManager(utils.IdentifierMixin, object):
     """Manage SoftLayer DNS.
 
-    See product information here: http://www.softlayer.com/DOMAIN-SERVICES
+    See product information here: https://www.ibm.com/cloud/dns
 
     :param SoftLayer.API.BaseClient client: the client instance
 
@@ -38,7 +39,10 @@ class DNSManager(utils.IdentifierMixin, object):
         :returns: A list of dictionaries representing the matching zones.
 
         """
-        return self.client['Account'].getDomains(**kwargs)
+        if kwargs.get('iter') is None:
+            kwargs['iter'] = True
+        return self.client.call('SoftLayer_Account', 'getDomains', **kwargs)
+        # return self.client['Account'].getDomains(**kwargs)
 
     def get_zone(self, zone_id, records=True):
         """Get a zone and its records.
@@ -180,8 +184,7 @@ class DNSManager(utils.IdentifierMixin, object):
         """
         return self.record.getObject(id=record_id)
 
-    def get_records(self, zone_id, ttl=None, data=None, host=None,
-                    record_type=None):
+    def get_records(self, zone_id, ttl=None, data=None, host=None, record_type=None):
         """List, and optionally filter, records within a zone.
 
         :param zone: the zone name in which to search.
@@ -190,8 +193,7 @@ class DNSManager(utils.IdentifierMixin, object):
         :param str host: record's host
         :param str record_type: the type of record
 
-        :returns: A list of dictionaries representing the matching records
-                  within the specified zone.
+        :returns: A list of dictionaries representing the matching records within the specified zone.
         """
         _filter = utils.NestedDict()
 
@@ -205,16 +207,11 @@ class DNSManager(utils.IdentifierMixin, object):
             _filter['resourceRecords']['data'] = utils.query_filter(data)
 
         if record_type:
-            _filter['resourceRecords']['type'] = utils.query_filter(
-                record_type.lower())
+            _filter['resourceRecords']['type'] = utils.query_filter(record_type.lower())
 
-        results = self.service.getResourceRecords(
-            id=zone_id,
-            mask='id,expire,domainId,host,minimum,refresh,retry,'
-            'mxPriority,ttl,type,data,responsiblePerson',
-            filter=_filter.to_dict(),
-        )
-
+        object_mask = 'id,expire,domainId,host,minimum,refresh,retry,mxPriority,ttl,type,data,responsiblePerson'
+        results = self.client.call('SoftLayer_Dns_Domain', 'getResourceRecords', id=zone_id,
+                                   mask=object_mask, filter=_filter.to_dict(), iter=True)
         return results
 
     def edit_record(self, record):
@@ -226,6 +223,7 @@ class DNSManager(utils.IdentifierMixin, object):
         :param dict record: the record to update
 
         """
+        record.pop('isGatewayAddress', None)
         self.record.editObject(record, id=record['id'])
 
     def dump_zone(self, zone_id):
@@ -235,3 +233,47 @@ class DNSManager(utils.IdentifierMixin, object):
 
         """
         return self.service.getZoneFileContents(id=zone_id)
+
+    def sync_host_record(self, zone_id, hostname, ip_address, record_type='a', ttl=7200):
+        """For a given zone_id, will set hostname's A record to ip_address
+
+        :param integer zone_id: The zone id for the domain
+        :param string hostname: host part of the record
+        :param string ip_address: data part of the record
+        :param integer ttl: TTL for the record
+        :param string record_type: 'a' or 'aaaa'
+        """
+        records = self.get_records(zone_id, host=hostname, record_type=record_type)
+        if not records:
+            # don't have a record, lets add one to the base zone
+            self.create_record(zone_id, hostname, record_type, ip_address, ttl=ttl)
+        else:
+            if len(records) != 1:
+                raise exceptions.SoftLayerError("Aborting record sync, found %d records!" % len(records))
+            rec = records[0]
+            rec['data'] = ip_address
+            rec['ttl'] = ttl
+            self.edit_record(rec)
+
+    def sync_ptr_record(self, ptr_domains, ip_address, fqdn, ttl=7200):
+        """Sync PTR record.
+
+        :param dict ptr_domains: result from SoftLayer_Virtual_Guest.getReverseDomainRecords or
+                                 SoftLayer_Hardware_Server.getReverseDomainRecords
+        :param string ip_address: ip address to sync with
+        :param string fqdn: Fully Qualified Domain Name
+        :param integer ttl: TTL for the record
+        """
+        host_rec = ip_address.split('.')[-1]
+        edit_ptr = None
+        for ptr in ptr_domains['resourceRecords']:
+            if ptr.get('host', '') == host_rec:
+                ptr['ttl'] = ttl
+                edit_ptr = ptr
+                break
+
+        if edit_ptr:
+            edit_ptr['data'] = fqdn
+            self.edit_record(edit_ptr)
+        else:
+            self.create_record(ptr_domains['id'], host_rec, 'ptr', fqdn, ttl=ttl)

@@ -9,26 +9,30 @@ from SoftLayer.CLI import formatting
 
 
 @click.command()
-@click.argument('account_id')
-@click.argument('content_url', nargs=-1)
+@click.argument('unique_id')
+@click.argument('path')
 @environment.pass_env
-def cli(env, account_id, content_url):
-    """Purge cached files from all edge nodes.
+def cli(env, unique_id, path):
+    """Creates a purge record and also initiates the purge call.
 
-    Examples:
-         slcli cdn purge 97794 http://example.com/cdn/file.txt
-         slcli cdn purge 97794 http://example.com/cdn/file.txt https://dal01.example.softlayer.net/image.png
+        Example:
+             slcli cdn purge 9779455 /article/file.txt
+
+        For more information see the following documentation: \n
+        https://cloud.ibm.com/docs/infrastructure/CDN?topic=CDN-manage-your-cdn#purging-cached-content
     """
 
     manager = SoftLayer.CDNManager(env.client)
-    content_list = manager.purge_content(account_id, content_url)
+    result = manager.purge_content(unique_id, path)
 
-    table = formatting.Table(['url', 'status'])
+    table = formatting.Table(['Date', 'Path', 'Saved', 'Status'])
 
-    for content in content_list:
+    for data in result:
         table.add_row([
-            content['url'],
-            content['statusCode']
+            data['date'],
+            data['path'],
+            data['saved'],
+            data['status']
         ])
 
     env.fout(table)

@@ -21,6 +21,7 @@ from SoftLayer.CLI import helpers
 @environment.pass_env
 def cli(env, identifier, enable, permission, from_user):
     """Enable or Disable specific permissions."""
+
     mgr = SoftLayer.UserManager(env.client)
     user_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'username')
     result = False
