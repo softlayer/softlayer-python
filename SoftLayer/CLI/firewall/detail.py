@@ -35,7 +35,6 @@ def cli(env, identifier):
         rules = mgr.get_dedicated_fwl_rules(firewall_id)
     else:
         rules = mgr.get_standard_fwl_rules(firewall_id)
-        
     table.add_row(['rules', get_rules_table(rules)])
     env.fout(table)
 
