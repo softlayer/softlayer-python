@@ -298,6 +298,11 @@ ALL_ROUTES = [
 
     ('report', 'SoftLayer.CLI.report'),
     ('report:bandwidth', 'SoftLayer.CLI.report.bandwidth:cli'),
+
+    ('reserved-capacity', 'SoftLayer.CLI.reservedcapacity'),
+    ('reserved-capacity:detail', 'SoftLayer.CLI.reservedcapacity.detail:cli'),
+    ('reserved-capacity:edit', 'SoftLayer.CLI.reservedcapacity.edit:cli'),
+    ('reserved-capacity:vs-instances', 'SoftLayer.CLI.reservedcapacity.vs_instances:cli'),
 ]
 
 ALL_ALIASES = {

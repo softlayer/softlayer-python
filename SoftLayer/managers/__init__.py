@@ -29,6 +29,7 @@ from SoftLayer.managers.user import UserManager
 from SoftLayer.managers.vs import VSManager
 from SoftLayer.managers.vs_capacity import CapacityManager
 from SoftLayer.managers.vs_placement import PlacementManager
+from SoftLayer.managers.reserved_capacity import ReservedCapacityManager
 
 __all__ = [
     'BlockStorageManager',
@@ -48,6 +49,7 @@ __all__ = [
     'ObjectStorageManager',
     'OrderingManager',
     'PlacementManager',
+    'ReservedCapacityManager',
     'SshKeyManager',
     'SSLManager',
     'TicketManager',
