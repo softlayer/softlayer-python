@@ -4,7 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import mock
+from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import testing
@@ -79,7 +79,7 @@ class DnsTests(testing.TestCase):
             {
                 "item": "Total monthly cost",
                 "cost": "2.00"
-            }])
+        }])
 
     def test_ip_unassign(self):
         result = self.run_command(['globalip', 'unassign', '1'])

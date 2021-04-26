@@ -4,7 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import mock
+from unittest import mock as mock
 
 import SoftLayer
 from SoftLayer import exceptions
@@ -744,7 +744,7 @@ class OrderingTests(testing.TestCase):
                 "capacity": "1",
                 "id": 10201,
                 "keyName": "GUEST_CORE_1_DEDICATED",
-            }]
+        }]
 
         item_capacity = self.ordering.get_item_capacity(items, ['GUEST_CORE_1_DEDICATED', 'OS_RHEL_7_X_LAMP_64_BIT'])
 
@@ -761,7 +761,7 @@ class OrderingTests(testing.TestCase):
                 "capacity": "1",
                 "id": 10201,
                 "keyName": "READHEAVY_TIER",
-            }]
+        }]
 
         item_capacity = self.ordering.get_item_capacity(items, ['READHEAVY_TIER', 'STORAGE_SPACE_FOR_2_IOPS_PER_GB'])
 
@@ -779,7 +779,7 @@ class OrderingTests(testing.TestCase):
                 "capacity": "1",
                 "id": 10201,
                 "keyName": "GUEST_CORE_1_DEDICATED",
-            }]
+        }]
 
         item_capacity = self.ordering.get_item_capacity(items, ['INTEL_XEON_2690_2_60', 'BANDWIDTH_20000_GB'])
 
@@ -848,7 +848,8 @@ class OrderingTests(testing.TestCase):
         self.assertIn("Invalid location", str(exc))
 
     def test_resolve_location_name_not_exist(self):
-        exc = self.assertRaises(exceptions.SoftLayerError, self.ordering.resolve_location_name, "UNKNOWN_LOCATION_TEST")
+        exc = self.assertRaises(exceptions.SoftLayerError,
+                                self.ordering.resolve_location_name, "UNKNOWN_LOCATION_TEST")
         self.assertIn("does not exist", str(exc))
 
     # https://github.com/softlayer/softlayer-python/issues/1425

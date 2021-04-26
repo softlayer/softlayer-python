@@ -9,7 +9,7 @@ import os.path
 import sys
 import tempfile
 
-import mock
+from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import testing

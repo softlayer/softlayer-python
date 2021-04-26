@@ -7,8 +7,9 @@
 
     Tests for the autoscale cli command
 """
-import mock
+
 import sys
+from unittest import mock as mock
 
 from SoftLayer import fixtures
 from SoftLayer import testing
