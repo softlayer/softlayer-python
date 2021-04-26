@@ -7,7 +7,7 @@
 from SoftLayer import testing
 
 import json
-import mock
+from unittest import mock as mock
 
 
 class SslTests(testing.TestCase):

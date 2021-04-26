@@ -4,8 +4,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-
-from mock import MagicMock
+from unittest.mock import MagicMock as MagicMock
 
 import SoftLayer
 from SoftLayer.exceptions import SoftLayerAPIError

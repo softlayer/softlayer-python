@@ -4,9 +4,9 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import mock
-import SoftLayer
+from unittest import mock as mock
 
+import SoftLayer
 from SoftLayer import exceptions
 from SoftLayer import fixtures
 from SoftLayer import testing

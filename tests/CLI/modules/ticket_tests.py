@@ -4,7 +4,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import json
-import mock
+from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
@@ -15,6 +15,7 @@ from SoftLayer import testing
 
 class FakeTTY():
     """A fake object to fake STD input"""
+
     def __init__(self, isatty=False, read="Default Output"):
         """Sets isatty and read"""
         self._isatty = isatty

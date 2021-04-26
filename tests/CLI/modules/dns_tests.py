@@ -8,7 +8,7 @@ import json
 import os.path
 import sys
 
-import mock
+from unittest import mock as mock
 
 from SoftLayer.CLI.dns import zone_import
 from SoftLayer.CLI import exceptions

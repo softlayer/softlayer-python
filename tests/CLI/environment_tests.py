@@ -6,8 +6,7 @@
 """
 
 import click
-import mock
-# from unittest.mock import MagicMock
+from unittest import mock as mock
 
 from SoftLayer.CLI import environment
 from SoftLayer import testing
