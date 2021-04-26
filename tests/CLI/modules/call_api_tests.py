@@ -305,8 +305,7 @@ result = client.call(u'Service',
                                    '--mask=virtualGuests.typeId,maxCpu',
                                    '-f', 'virtualGuests.typeId=1'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Account',
-                                'getVirtualGuests',
+        self.assert_called_with('SoftLayer_Account', 'getVirtualGuests',
                                 filter={
                                     'virtualGuests':
                                         {'id': {
