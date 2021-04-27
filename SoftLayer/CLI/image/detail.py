@@ -19,14 +19,10 @@ def cli(env, identifier):
 
     image_mgr = SoftLayer.ImageManager(env.client)
     image_id = helpers.resolve_id(image_mgr.resolve_ids, identifier, 'image')
-
     image = image_mgr.get_image(image_id, mask=image_mod.DETAIL_MASK)
-    disk_space = 0
-    datacenters = []
-    for child in image.get('children'):
-        disk_space = int(child.get('blockDevicesDiskSpaceTotal', 0))
-        if child.get('datacenter'):
-            datacenters.append(utils.lookup(child, 'datacenter', 'name'))
+
+    children_images = image.get('children')
+    total_size = utils.lookup(image, 'firstChild', 'blockDevicesDiskSpaceTotal') or 0
 
     table = formatting.KeyValueTable(['name', 'value'])
     table.align['name'] = 'r'
@@ -40,9 +36,10 @@ def cli(env, identifier):
         utils.lookup(image, 'status', 'keyname'),
         utils.lookup(image, 'status', 'name'),
     )])
+
     table.add_row([
         'active_transaction',
-        formatting.transaction_status(image.get('transaction')),
+        formatting.listing(_get_transaction_groups(children_images), separator=','),
     ])
     table.add_row(['account', image.get('accountId', formatting.blank())])
     table.add_row(['visibility',
@@ -56,8 +53,35 @@ def cli(env, identifier):
     table.add_row(['flex', image.get('flexImageFlag')])
     table.add_row(['note', image.get('note')])
     table.add_row(['created', image.get('createDate')])
-    table.add_row(['disk_space', formatting.b_to_gb(disk_space)])
-    table.add_row(['datacenters', formatting.listing(sorted(datacenters),
-                                                     separator=',')])
+    table.add_row(['total_size', formatting.b_to_gb(total_size)])
+    table.add_row(['datacenters', _get_datacenter_table(children_images)])
 
     env.fout(table)
+
+
+def _get_datacenter_table(children_images):
+    """Returns image details as datacenter, size, and transaction within a formatting table.
+
+      :param children_images: A list of images.
+      """
+    table_datacenter = formatting.Table(['DC', 'size', 'transaction'])
+    for child in children_images:
+        table_datacenter.add_row([
+            utils.lookup(child, 'datacenter', 'name'),
+            formatting.b_to_gb(child.get('blockDevicesDiskSpaceTotal', 0)),
+            formatting.transaction_status(child.get('transaction'))
+        ])
+
+    return table_datacenter
+
+
+def _get_transaction_groups(children_images):
+    """Returns a Set of transaction groups.
+
+      :param children_images: A list of images.
+      """
+    transactions = set()
+    for child in children_images:
+        transactions.add(utils.lookup(child, 'transaction', 'transactionGroup', 'name'))
+
+    return transactions
