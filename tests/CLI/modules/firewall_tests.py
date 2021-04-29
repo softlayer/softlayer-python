@@ -58,6 +58,8 @@ class FirewallTests(testing.TestCase):
     def test_detail(self):
         result = self.run_command(['firewall', 'detail', 'vlan:1234'])
         self.assert_no_fail(result)
+        json_result = json.loads(result.output)
+        self.assertEqual(json_result['rules'][0]['action'], 'permit')
         self.assertEqual(json.loads(result.output),
                          {'datacenter': 'Amsterdam 1',
                           'id': 3130,
