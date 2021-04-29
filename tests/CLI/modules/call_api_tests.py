@@ -308,10 +308,11 @@ result = client.call(u'Service',
         self.assert_called_with('SoftLayer_Account', 'getVirtualGuests',
                                 filter={
                                     'virtualGuests':
-                                        {'id': {
-                                            'operation': 'orderBy',
-                                            'options': [{
-                                                'name': 'sort',
-                                                'value': ['DESC']}]},
+                                        {'id':
+                                            {
+                                                'operation': 'orderBy',
+                                                'options': [{
+                                                    'name': 'sort',
+                                                    'value': ['DESC']}]},
                                             'typeId': {'operation': 1}}
                                 })
