@@ -297,7 +297,7 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param integer firewall_id: the instance ID of the standard firewall
         """
         if not mask:
-            mask = ('mask[datacenter,networkVlan]')
+            mask = 'mask[datacenter,networkVlan]'
 
         svc = self.client['Network_Vlan_Firewall']
 
