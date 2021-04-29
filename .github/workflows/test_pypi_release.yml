@@ -4,7 +4,7 @@ name: Publish 📦 to TestPyPI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ test-pypi ]
 
 jobs:
   build-n-publish:

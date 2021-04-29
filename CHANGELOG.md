@@ -1,5 +1,38 @@
 # Change Log
 
+## [5.9.4] - 2021-04-27
+https://github.com/softlayer/softlayer-python/compare/v5.9.3...v5.9.4
+
+#### New Commands
+- `slcli hw authorize-storage`  #1439
+- `slcli order quote-save` #1451
+
+
+#### Improvements
+
+- Refactored managers.ordering_manager.verify_quote() to work better with the REST endpoing #1430
+- Add routers for each DC in slcli hw create-options #1432
+- Add preset datatype in slcli virtual detail #1435
+- Add upgrade option to slcli hw. #1437
+- Ibmcloud authentication support #1315 / #1447
+  + `slcli config setup --ibmid`
+  + `slcli config setup --sso`
+  + `slcli config setup --cloud_key`
+  + `slcli config setup --classic_key`
+- Refactor slcli hw detail prices. #1443
+- Updated contributing guide #1458
+- Add the Hardware components on "slcli hardware detail" #1452
+- Add billing and lastTransaction on hardware detail #1446
+- Forced reserved capacity guests to be monthly #1454
+- Removing the rwhois commands #1456
+- Added automation to publish to test-pypi #1467
+- Updating author_email to SLDN distro list #1469
+- Add the option to add and upgrade the hw disk. #1455
+- Added a utility to merge objectFilters, #1468
+- Fixes shift+ins when pasteing into a password field for windows users. #1460
+- Add Billing and lastTransaction on slcli virtual detail #1466
+- Fixing 'import mock' pylint issues #1476
+
 
 ## [5.9.3] - 2021-03-03
 https://github.com/softlayer/softlayer-python/compare/v5.9.2...v5.9.3
