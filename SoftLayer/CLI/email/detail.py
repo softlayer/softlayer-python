@@ -13,7 +13,7 @@ from SoftLayer import utils
 @click.command()
 @environment.pass_env
 def cli(env):
-    """"""
+    """Display the Email Delivery account informatino """
     manager = AccountManager(env.client)
     email_manager = EmailManager(env.client)
     result = manager.get_Network_Message_Delivery_Accounts()
@@ -25,7 +25,6 @@ def cli(env):
     table_information.align['username'] = 'l'
 
     for email in result:
-        # print(email['id'])
         table_information.add_row([email.get('id'), email.get('username'), email.get('emailAddress'),
                                    utils.lookup(email, 'type', 'description'),
                                    utils.lookup(email, 'vendor', 'keyName')])
