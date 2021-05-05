@@ -218,6 +218,26 @@ def event_log_filter_less_than_date(date, utc):
     }
 
 
+def build_filter_orderby(orderby):
+    """Builds filters using the filter options passed into the CLI.
+
+    It only supports the orderBy option, the default value is DESC.
+    """
+    _filters = {}
+    reverse_filter = list(reversed(orderby.split('.')))
+    for keyword in reverse_filter:
+        _aux_filter = {}
+        if '=' in keyword:
+            _aux_filter[str(keyword).split('=')[0]] = query_filter_orderby(str(keyword).split('=')[1])
+            _filters = _aux_filter
+        elif keyword == list(reverse_filter)[0]:
+            _aux_filter[keyword] = query_filter_orderby('DESC')
+        else:
+            _aux_filter[keyword] = _filters
+        _filters = _aux_filter
+    return _filters
+
+
 class IdentifierMixin(object):
     """Mixin used to resolve ids from other names of objects.
 
