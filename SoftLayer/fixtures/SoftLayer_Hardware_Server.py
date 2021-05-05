@@ -377,3 +377,21 @@ getUpgradeItemPrices = [
         }
     }
 ]
+
+getComponents = [{
+    "hardwareComponentModelId": 147,
+    "hardwareId": 1234,
+    "id": 369,
+    "modifyDate": "2017-11-10T16:59:38-06:00",
+    "serviceProviderId": 1,
+    "hardwareComponentModel": {
+        "name": "IMM2 - Onboard",
+        "firmwares": [
+            {
+                "createDate": "2020-09-24T13:46:29-06:00",
+                "version": "5.60"
+            },
+            {
+                "createDate": "2019-10-14T16:51:12-06:00",
+                "version": "5.10"
+            }]}}]
