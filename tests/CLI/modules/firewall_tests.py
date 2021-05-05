@@ -58,28 +58,35 @@ class FirewallTests(testing.TestCase):
     def test_detail(self):
         result = self.run_command(['firewall', 'detail', 'vlan:1234'])
         self.assert_no_fail(result)
+        json_result = json.loads(result.output)
+        self.assertEqual(json_result['rules'][0]['action'], 'permit')
         self.assertEqual(json.loads(result.output),
-                         [{'#': 1,
-                           'action': 'permit',
-                           'dest': 'any on server:80-80',
-                           'dest_mask': '255.255.255.255',
-                           'protocol': 'tcp',
-                           'src_ip': '0.0.0.0',
-                           'src_mask': '0.0.0.0'},
-                          {'#': 2,
-                           'action': 'permit',
-                           'dest': 'any on server:1-65535',
-                           'dest_mask': '255.255.255.255',
-                           'protocol': 'tmp',
-                           'src_ip': '193.212.1.10',
-                           'src_mask': '255.255.255.255'},
-                          {'#': 3,
-                           'action': 'permit',
-                           'dest': 'any on server:80-800',
-                           'dest_mask': '255.255.255.255',
-                           'protocol': 'tcp',
-                           'src_ip': '0.0.0.0',
-                           'src_mask': '0.0.0.0'}])
+                         {'datacenter': 'Amsterdam 1',
+                          'id': 3130,
+                          'networkVlan': 'testvlan',
+                          'networkVlaniD': 371028,
+                          'primaryIpAddress': '192.155.239.146',
+                          'rules': [{'#': 1,
+                                     'action': 'permit',
+                                     'dest': 'any on server:80-80',
+                                     'dest_mask': '255.255.255.255',
+                                     'protocol': 'tcp',
+                                     'src_ip': '0.0.0.0',
+                                     'src_mask': '0.0.0.0'},
+                                    {'#': 2,
+                                     'action': 'permit',
+                                     'dest': 'any on server:1-65535',
+                                     'dest_mask': '255.255.255.255',
+                                     'protocol': 'tmp',
+                                     'src_ip': '193.212.1.10',
+                                     'src_mask': '255.255.255.255'},
+                                    {'#': 3,
+                                     'action': 'permit',
+                                     'dest': 'any on server:80-800',
+                                     'dest_mask': '255.255.255.255',
+                                     'protocol': 'tcp',
+                                     'src_ip': '0.0.0.0',
+                                     'src_mask': '0.0.0.0'}]})
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_cancel_firewall(self, confirm_mock):

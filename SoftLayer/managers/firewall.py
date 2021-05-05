@@ -290,3 +290,15 @@ class FirewallManager(utils.IdentifierMixin, object):
         template = {'networkComponentFirewallId': firewall_id, 'rules': rules}
 
         return rule_svc.createObject(template)
+
+    def get_instance(self, firewall_id, mask=None):
+        """Get the firewall information
+
+        :param integer firewall_id: the instance ID of the standard firewall
+        """
+        if not mask:
+            mask = 'mask[datacenter,networkVlan]'
+
+        svc = self.client['Network_Vlan_Firewall']
+
+        return svc.getObject(id=firewall_id, mask=mask)
