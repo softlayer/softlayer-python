@@ -1076,3 +1076,27 @@ getNetworkStorage = [
         "username": "SL01SEV1234567_111"
     }
 ]
+
+getNetworkMessageDeliveryAccounts = [
+    {
+        "accountId": 147258,
+        "createDate": "2020-07-06T10:29:11-06:00",
+        "id": 1232123,
+        "typeId": 21,
+        "username": "test_CLI@ie.ibm.com",
+        "vendorId": 1,
+        "type": {
+            "description": "Delivery of messages through e-mail",
+            "id": 21,
+            "keyName": "EMAIL",
+            "name": "Email"
+        },
+        "vendor": {
+            "id": 1,
+            "keyName": "SENDGRID",
+            "name": "SendGrid"
+        },
+        "emailAddress": "test_CLI@ie.ibm.com",
+        "smtpAccess": "1"
+    }
+]
