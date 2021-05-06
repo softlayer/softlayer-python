@@ -10,6 +10,6 @@ from SoftLayer import testing
 class EmailCLITests(testing.TestCase):
 
     def test_detail(self):
-        result = self.run_command(['email', 'detail'])
+        result = self.run_command(['email', 'list'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getNetworkMessageDeliveryAccounts')

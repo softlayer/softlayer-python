@@ -1,7 +1,7 @@
 """
-    SoftLayer.account
+    SoftLayer.email
     ~~~~~~~~~~~~~~~~~~~~~~~
-    Account manager
+    Email manager
 
     :license: MIT, see License for more details.
 """
@@ -14,7 +14,7 @@ from SoftLayer import utils
 
 
 class EmailManager(utils.IdentifierMixin, object):
-    """Common functions for getting information from the Account service
+    """Common functions for getting information from the email service
 
     :param SoftLayer.API.BaseClient client: the client instance
     """
@@ -22,7 +22,7 @@ class EmailManager(utils.IdentifierMixin, object):
     def __init__(self, client):
         self.client = client
 
-    def get_AccountOverview(self, identifier):
+    def get_account_overview(self, identifier):
         """Gets all the Network Message Delivery Account Overview
 
         :returns: Network Message Delivery Account overview
@@ -30,16 +30,16 @@ class EmailManager(utils.IdentifierMixin, object):
         return self.client.call('SoftLayer_Network_Message_Delivery_Email_Sendgrid',
                                 'getAccountOverview', id=identifier)
 
-    def get_statistics(self, identifier, selectedStatistics,
-                       startDate, endDate, aggregatesOnly, days):
-        """Gets statistics Network Message Delivery Account
+    def get_statistics(self, identifier, days=30):
+        """gets statistics from email accounts
 
+        :days: range number
         :returns: statistics Network Message Delivery Account
         """
-        body = [selectedStatistics,
-                startDate,
-                endDate,
-                aggregatesOnly,
+        body = [["requests", "delivered", "opens", "clicks", "bounds"],
+                True,
+                True,
+                True,
                 days
                 ]
 

@@ -1,4 +1,4 @@
-"""Get details for an image."""
+"""Get lists Email Delivery account Service """
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -13,10 +13,10 @@ from SoftLayer import utils
 @click.command()
 @environment.pass_env
 def cli(env):
-    """Display the Email Delivery account informatino """
+    """Lists Email Delivery Service """
     manager = AccountManager(env.client)
     email_manager = EmailManager(env.client)
-    result = manager.get_Network_Message_Delivery_Accounts()
+    result = manager.get_network_message_delivery_accounts()
 
     table = formatting.KeyValueTable(['name', 'value'])
 
@@ -29,10 +29,8 @@ def cli(env):
                                    utils.lookup(email, 'type', 'description'),
                                    utils.lookup(email, 'vendor', 'keyName')])
 
-        overview_table = _build_overview_table(email_manager.get_AccountOverview(email.get('id')))
-        statistics = email_manager.get_statistics(email.get('id'),
-                                                  ["requests", "delivered", "opens", "clicks", "bounds"],
-                                                  True, True, True, 6)
+        overview_table = _build_overview_table(email_manager.get_account_overview(email.get('id')))
+        statistics = email_manager.get_statistics(email.get('id'))
 
         table.add_row(['email information', table_information])
         table.add_row(['email overview', overview_table])
@@ -43,7 +41,7 @@ def cli(env):
 
 
 def _build_overview_table(email_overview):
-    table = formatting.KeyValueTable(['name', 'value'])
+    table = formatting.Table(['name', 'value'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'
 
@@ -57,7 +55,7 @@ def _build_overview_table(email_overview):
 
 
 def _build_statistics_table(statistics):
-    table = formatting.KeyValueTable(['name', 'value'])
+    table = formatting.Table(['name', 'value'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'
 
