@@ -4,6 +4,6 @@ Email Commands
 =================
 
 
-.. click:: SoftLayer.CLI.email.detail:cli
-    :prog: email detail
+.. click:: SoftLayer.CLI.email.list:cli
+    :prog: email list
     :show-nested:
