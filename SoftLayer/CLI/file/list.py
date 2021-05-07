@@ -5,7 +5,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
+from SoftLayer.CLI import storage_utils
 
 COLUMNS = [
     column_helper.Column('id', ('id',), mask="id"),
@@ -76,24 +76,5 @@ def cli(env, sortby, columns, datacenter, username, storage_type, order):
                                                   order=order,
                                                   mask=columns.mask())
 
-    table = formatting.Table(columns.columns)
-    table.sortby = sortby
-
-    _reduce_notes(file_volumes)
-
-    for file_volume in file_volumes:
-        table.add_row([value or formatting.blank()
-                       for value in columns.row(file_volume)])
-
+    table = storage_utils.build_output_table(env, file_volumes, columns, sortby)
     env.fout(table)
-
-
-def _reduce_notes(file_volumes):
-    """Reduces the size of the notes in a volume list.
-
-    :param file_volumes: An list of file volumes
-    """
-    for file_volume in file_volumes:
-        if len(file_volume.get('notes', '')) > DEFAULT_NOTES_SIZE:
-            shortened_notes = file_volume['notes'][:DEFAULT_NOTES_SIZE]
-            file_volume['notes'] = shortened_notes
