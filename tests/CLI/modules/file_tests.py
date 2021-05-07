@@ -5,6 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 from SoftLayer import SoftLayerError
 from SoftLayer import testing
 
@@ -62,6 +63,37 @@ class FileTests(testing.TestCase):
         self.assert_no_fail(result)
         json_result = json.loads(result.output)
         self.assertEqual(json_result[0]['id'], 1)
+
+    @mock.patch('SoftLayer.FileStorageManager.list_file_volumes')
+    def test_volume_list_notes_format_output_json(self, list_mock):
+        note_mock = 'test ' * 5
+        list_mock.return_value = [
+            {'notes': note_mock}
+        ]
+
+        result = self.run_command(['--format', 'json', 'file', 'volume-list', '--columns', 'notes'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(
+            [{
+                'notes': note_mock,
+            }],
+            json.loads(result.output))
+
+    @mock.patch('SoftLayer.FileStorageManager.list_file_volumes')
+    def test_volume_list_reduced_notes_format_output_table(self, list_mock):
+        note_mock = 'test ' * 10
+        expected_reduced_note = 'test ' * 4
+        list_mock.return_value = [
+            {'notes': note_mock}
+        ]
+        expected_table = formatting.Table(['notes'])
+        expected_table.add_row([expected_reduced_note])
+        expected_output = formatting.format_output(expected_table) + '\n'
+        result = self.run_command(['--format', 'table', 'file', 'volume-list', '--columns', 'notes'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(expected_output, result.output)
 
     @mock.patch('SoftLayer.FileStorageManager.list_file_volumes')
     def test_volume_count(self, list_mock):
