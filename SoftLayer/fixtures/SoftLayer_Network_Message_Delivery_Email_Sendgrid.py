@@ -25,3 +25,34 @@ getStatistics = [{
     "uniqueOpens": 0,
     "unsubscribes": 0
 }]
+
+getObject = {
+    "accountId": 123456,
+    "createDate": "2020-07-06T10:29:11-06:00",
+    "id": 1232123,
+    "password": "Test123456789",
+    "typeId": 21,
+    "username": "techsupport3@ie.ibm.com",
+    "vendorId": 1,
+    "billingItem": {
+        "categoryCode": "network_message_delivery",
+        "description": "Free Package",
+        "id": 695735054,
+        "notes": "techsupport3@ie.ibm.com",
+    },
+    "type": {
+        "description": "Delivery of messages through e-mail",
+        "id": 21,
+        "keyName": "EMAIL",
+        "name": "Email"
+    },
+    "vendor": {
+        "id": 1,
+        "keyName": "SENDGRID",
+        "name": "SendGrid"
+    },
+    "emailAddress": "techsupport3@ie.ibm.com",
+    "smtpAccess": "1"
+}
+
+editObject = True
