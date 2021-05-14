@@ -177,7 +177,7 @@ def _parse_create_args(client, args):
               help="Forces the VS to only have access the private network")
 @click.option('--like', is_eager=True, callback=_update_with_like_args,
               help="Use the configuration from an existing VS")
-@click.option('--network', '-n', help="Network port speed in Mbps")
+@click.option('--network', '-n', help="Network port speed in Mbps", type=click.INT)
 @helpers.multi_option('--tag', '-g', help="Tags to add to the instance")
 @click.option('--template', '-t', is_eager=True,
               callback=template.TemplateCallback(list_args=['disk', 'key', 'tag']),
