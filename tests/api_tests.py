@@ -96,7 +96,6 @@ class APIClient(testing.TestCase):
                                 offset=None,
                                 )
 
-
     def test_simple_call_2(self):
         mock = self.set_mock('SoftLayer_SERVICE', 'METHOD')
         mock.return_value = {"test": "result"}
