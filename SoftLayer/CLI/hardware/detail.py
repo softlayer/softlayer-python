@@ -9,13 +9,16 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer import utils
 
+# pylint: disable=R0915
+
 
 @click.command()
 @click.argument('identifier')
 @click.option('--passwords', is_flag=True, help='Show passwords (check over your shoulder!)')
 @click.option('--price', is_flag=True, help='Show associated prices')
+@click.option('--components', is_flag=True, default=False, help='Show associated hardware components')
 @environment.pass_env
-def cli(env, identifier, passwords, price):
+def cli(env, identifier, passwords, price, components):
     """Get details for a hardware device."""
 
     hardware = SoftLayer.HardwareManager(env.client)
@@ -66,7 +69,7 @@ def cli(env, identifier, passwords, price):
                                         utils.clean_time(utils.lookup(result, 'lastTransaction', 'modifyDate')))
 
     table.add_row(['last_transaction', last_transaction])
-    table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else'Monthly'])
+    table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else 'Monthly'])
 
     vlan_table = formatting.Table(['type', 'number', 'id'])
     for vlan in result['networkVlans']:
@@ -106,6 +109,24 @@ def cli(env, identifier, passwords, price):
         for item in result['remoteManagementAccounts']:
             pass_table.add_row([item['username'], item['password']])
         table.add_row(['remote users', pass_table])
+
+    if components:
+        components = hardware.get_components(identifier)
+        components_table = formatting.Table(['name', 'Firmware version', 'Firmware build date', 'Type'])
+        components_table.align['date'] = 'l'
+        component_ids = []
+        for hw_component in components:
+            if hw_component['id'] not in component_ids:
+                firmware = hw_component['hardwareComponentModel']['firmwares'][0]
+                components_table.add_row([utils.lookup(hw_component, 'hardwareComponentModel', 'longDescription'),
+                                          utils.lookup(firmware, 'version'),
+                                          utils.clean_time(utils.lookup(firmware, 'createDate')),
+                                          utils.lookup(hw_component, 'hardwareComponentModel',
+                                                       'hardwareGenericComponentModel', 'hardwareComponentType',
+                                                       'keyName')])
+                component_ids.append(hw_component['id'])
+
+        table.add_row(['components', components_table])
 
     table.add_row(['tags', formatting.tags(result['tagReferences'])])
 
