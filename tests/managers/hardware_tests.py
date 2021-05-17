@@ -879,7 +879,7 @@ class HardwareTests(testing.TestCase):
     def test_upgrade(self):
         result = self.hardware.upgrade(1, memory=32)
 
-        self.assertEqual(result, True)
+        self.assertEqual(result['orderId'], 1234)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
         order_container = call.args[0]
@@ -891,7 +891,7 @@ class HardwareTests(testing.TestCase):
         disk_list.append(disks)
         result = self.hardware.upgrade(1, disk=disk_list)
 
-        self.assertEqual(result, True)
+        self.assertEqual(result['orderId'], 1234)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
         order_container = call.args[0]
@@ -903,7 +903,7 @@ class HardwareTests(testing.TestCase):
         disk_list.append(disks)
         result = self.hardware.upgrade(1, disk=disk_list)
 
-        self.assertEqual(result, True)
+        self.assertEqual(result['orderId'], 1234)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
         order_container = call.args[0]
@@ -912,14 +912,14 @@ class HardwareTests(testing.TestCase):
     def test_upgrade_blank(self):
         result = self.hardware.upgrade(1)
 
-        self.assertEqual(result, False)
+        self.assertEqual(result, None)
         self.assertEqual(self.calls('SoftLayer_Product_Order', 'placeOrder'), [])
 
     def test_upgrade_full(self):
         result = self.hardware.upgrade(1, memory=32, nic_speed="10000 Redundant", drive_controller="RAID",
                                        public_bandwidth=500, test=False)
 
-        self.assertEqual(result, True)
+        self.assertEqual(result['orderId'], 1234)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         call = self.calls('SoftLayer_Product_Order', 'placeOrder')[0]
         order_container = call.args[0]

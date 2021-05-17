@@ -834,6 +834,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         :returns: bool
         """
+        result = None
         upgrade_prices = self._get_upgrade_prices(instance_id)
         prices = []
         data = {}
@@ -849,14 +850,24 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         server_response = self.get_instance(instance_id)
         package_id = server_response['billingItem']['package']['id']
+        location_id = server_response['datacenter']['id']
 
         maintenance_window = datetime.datetime.now(utils.UTC())
+        maintenance_window_id = self.get_maintenance_windows_id(location_id)
+
         order = {
             'complexType': 'SoftLayer_Container_Product_Order_Hardware_Server_Upgrade',
-            'properties': [{
-                'name': 'MAINTENANCE_WINDOW',
-                'value': maintenance_window.strftime("%Y-%m-%d %H:%M:%S%z")
-            }],
+            'properties': [
+                {
+                    'name': 'MAINTENANCE_WINDOW',
+                    'value': maintenance_window.strftime("%Y-%m-%d %H:%M:%S%z")
+                },
+                {
+                    'name': 'MAINTENANCE_WINDOW_ID',
+                    'value': str(maintenance_window_id)
+                }
+
+            ],
             'hardware': [{'id': int(instance_id)}],
             'packageId': package_id
         }
@@ -878,11 +889,26 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         if prices:
             if test:
-                self.client['Product_Order'].verifyOrder(order)
+                result = self.client['Product_Order'].verifyOrder(order)
             else:
-                self.client['Product_Order'].placeOrder(order)
-            return True
-        return False
+                result = self.client['Product_Order'].placeOrder(order)
+        return result
+
+    def get_maintenance_windows_id(self, location_id):
+        """Get the disks prices to be added or upgraded.
+
+        :param int location_id: Hardware Server location id.
+        :return int.
+        """
+        begin_date_object = datetime.datetime.now()
+        begin_date = begin_date_object.strftime("%Y-%m-%dT00:00:00.0000-06:00")
+        end_date_object = datetime.date.today() + datetime.timedelta(days=30)
+        end_date = end_date_object.strftime("%Y-%m-%dT00:00:00.0000-06:00")
+
+        result_windows = self.client['SoftLayer_Provisioning_Maintenance_Window'].getMaintenanceWindows(begin_date,
+                                                                                                        end_date,
+                                                                                                        location_id)
+        return result_windows[0]['id']
 
     @retry(logger=LOGGER)
     def get_instance(self, instance_id):
@@ -893,7 +919,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                   the specified instance.
         """
         mask = [
-            'billingItem[id,package[id,keyName],nextInvoiceChildren]'
+            'datacenter,billingItem[id,package[id,keyName],nextInvoiceChildren]'
         ]
         mask = "mask[%s]" % ','.join(mask)
 

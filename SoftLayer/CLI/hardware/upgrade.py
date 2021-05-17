@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
+from SoftLayer import utils
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -35,6 +36,9 @@ def cli(env, identifier, memory, network, drive_controller, public_bandwidth, ad
     """Upgrade a Hardware Server."""
 
     mgr = SoftLayer.HardwareManager(env.client)
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
 
     if not any([memory, network, drive_controller, public_bandwidth, add_disk, resize_disk]):
         raise exceptions.ArgumentError("Must provide "
@@ -57,7 +61,92 @@ def cli(env, identifier, memory, network, drive_controller, public_bandwidth, ad
             disks = {'description': 'resize_disk', 'capacity': guest_disk[0], 'number': guest_disk[1]}
             disk_list.append(disks)
 
-    if not mgr.upgrade(hw_id, memory=memory, nic_speed=network, drive_controller=drive_controller,
-                       public_bandwidth=public_bandwidth, disk=disk_list, test=test):
-        raise exceptions.CLIAbort('Hardware Server Upgrade Failed')
-    env.fout('Successfully Upgraded.')
+    response = mgr.upgrade(hw_id, memory=memory, nic_speed=network, drive_controller=drive_controller,
+                           public_bandwidth=public_bandwidth, disk=disk_list, test=test)
+
+    if response:
+        if test:
+            add_data_to_table(response, table)
+        else:
+            table.add_row(['order_date', response.get('orderDate')])
+            table.add_row(['order_id', response.get('orderId')])
+            add_data_to_table(response['orderDetails'], table)
+            place_order_table = get_place_order_information(response)
+            table.add_row(['Place Order Information', place_order_table])
+            order_detail_table = get_order_detail(response)
+            table.add_row(['Order Detail (Billing Information)', order_detail_table])
+
+    env.fout(table)
+
+
+def add_data_to_table(response, table):
+    """Add the hardware server upgrade result to the table"""
+    table.add_row(['location', utils.lookup(response, 'locationObject', 'longName')])
+    table.add_row(['quantity', response.get('quantity')])
+    table.add_row(['package_id', response.get('packageId')])
+    table.add_row(['currency_short_name', response.get('currencyShortName')])
+    table.add_row(['prorated_initial_charge', response.get('proratedInitialCharge')])
+    table.add_row(['prorated_order_total', response.get('proratedOrderTotal')])
+    table.add_row(['use_hourly_pricing', response.get('useHourlyPricing')])
+    table_hardware = get_hardware_detail(response)
+    table.add_row(['Hardware', table_hardware])
+    table_prices = get_hardware_prices(response)
+    table.add_row(['prices', table_prices])
+
+
+def get_place_order_information(response):
+    """Get the hardware server place order information."""
+    table_place_order = formatting.Table(['id', 'account_id', 'status', 'Account CompanyName',
+                                          'UserRecord FirstName', 'UserRecord lastName', 'UserRecord Username'])
+    table_place_order.add_row([response.get('id'),
+                               response.get('accountId'),
+                               response.get('status'),
+                               utils.lookup(response, 'account', 'companyName'),
+                               utils.lookup(response, 'userRecord', 'firstName'),
+                               utils.lookup(response, 'account', 'lastName'),
+                               utils.lookup(response, 'account', 'username')])
+
+    return table_place_order
+
+
+def get_hardware_detail(response):
+    """Get the hardware server detail."""
+    table_hardware = formatting.Table(['account_id', 'hostname', 'domain'])
+    for hardware in response['hardware']:
+        table_hardware.add_row([hardware.get('accountId'),
+                                hardware.get('hostname'),
+                                hardware.get('domain')])
+
+    return table_hardware
+
+
+def get_hardware_prices(response):
+    """Get the hardware server prices."""
+    table_prices = formatting.Table(['id', 'hourlyRecurringFee', 'recurringFee', 'categories', 'Item Description',
+                                     'Item Units'])
+    for price in response['prices']:
+        categories = price.get('categories')[0]
+        table_prices.add_row([price.get('id'),
+                              price.get('hourlyRecurringFee'),
+                              price.get('recurringFee'),
+                              categories.get('name'),
+                              utils.lookup(price, 'item', 'description'),
+                              utils.lookup(price, 'item', 'units')])
+
+    return table_prices
+
+
+def get_order_detail(response):
+    """Get the hardware server order detail."""
+    table_order_detail = formatting.Table(['billing_city', 'billing_country_code', 'billing_email',
+                                           'billing_name_first', 'billing_name_last', 'billing_postal_code',
+                                           'billing_state'])
+    table_order_detail.add_row([utils.lookup(response, 'orderDetails', 'billingInformation', 'billingCity'),
+                                utils.lookup(response, 'orderDetails', 'billingInformation', 'billingCountryCode'),
+                                utils.lookup(response, 'orderDetails', 'billingInformation', 'billingEmail'),
+                                utils.lookup(response, 'orderDetails', 'billingInformation', 'billingNameFirst'),
+                                utils.lookup(response, 'orderDetails', 'billingInformation', 'billingNameLast'),
+                                utils.lookup(response, 'orderDetails', 'billingInformation', 'billingPostalCode'),
+                                utils.lookup(response, 'orderDetails', 'billingInformation', 'billingState')])
+
+    return table_order_detail
