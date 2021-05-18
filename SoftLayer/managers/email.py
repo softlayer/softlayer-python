@@ -57,7 +57,7 @@ class EmailManager(utils.IdentifierMixin, object):
         return self.client.call('SoftLayer_Network_Message_Delivery_Email_Sendgrid',
                                 'getObject', id=identifier, mask=_mask)
 
-    def editObject(self, identifier, username=None, emailAddress=None, password=None):
+    def editObject(self, identifier, username=None, password=None):
         """Edit email delivery account related details.
 
                :param int identifier: The ID of the email account
@@ -68,10 +68,18 @@ class EmailManager(utils.IdentifierMixin, object):
         data = {}
         if username:
             data['username'] = username
-        if emailAddress:
-            data['emailAddress'] = emailAddress
         if password:
             data['password'] = password
 
         return self.client.call('SoftLayer_Network_Message_Delivery_Email_Sendgrid',
                                 'editObject', data, id=identifier)
+
+    def update_email(self, identifier, email):
+        """Edit email address delivery account .
+
+        :param int identifier: The ID of the email account
+        :param string email: email of the email account.
+
+        """
+        return self.client.call('SoftLayer_Network_Message_Delivery_Email_Sendgrid',
+                                'updateEmailAddress', email, id=identifier)

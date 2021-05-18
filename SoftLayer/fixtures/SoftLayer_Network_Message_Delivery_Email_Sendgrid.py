@@ -56,3 +56,4 @@ getObject = {
 }
 
 editObject = True
+updateEmailAddress = True

@@ -27,3 +27,5 @@ class EmailCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_Message_Delivery_Email_Sendgrid',
                                 'editObject')
+        self.assert_called_with('SoftLayer_Network_Message_Delivery_Email_Sendgrid',
+                                'updateEmailAddress')

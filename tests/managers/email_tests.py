@@ -27,3 +27,9 @@ class EmailManagerTests(testing.TestCase):
         self.manager.get_instance(1232123)
         self.assert_called_with('SoftLayer_Network_Message_Delivery_Email_Sendgrid',
                                 'getObject')
+
+    def test_update_email_address(self):
+        self.manager = EmailManager(self.client)
+        self.manager.update_email(1232123, 'test@ibm.com')
+        self.assert_called_with('SoftLayer_Network_Message_Delivery_Email_Sendgrid',
+                                'updateEmailAddress')
