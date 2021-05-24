@@ -42,7 +42,7 @@ class VirtCreateTests(testing.TestCase):
                  'hostname': 'host',
                  'startCpus': 2,
                  'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-                 'networkComponents': [{'maxSpeed': '100'}],
+                 'networkComponents': [{'maxSpeed': 100}],
                  'supplementalCreateObjectOptions': {'bootMode': None}},)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
 
@@ -225,7 +225,7 @@ class VirtCreateTests(testing.TestCase):
             'supplementalCreateObjectOptions': {'bootMode': None},
             'blockDeviceTemplateGroup': {'globalIdentifier': 'aaaa1111bbbb2222'},
             'datacenter': {'name': 'dal05'},
-            'networkComponents': [{'maxSpeed': '100'}]
+            'networkComponents': [{'maxSpeed': 100}]
         },)
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
@@ -257,7 +257,7 @@ class VirtCreateTests(testing.TestCase):
                      'bootMode': None,
                      'flavorKeyName': 'B1_1X2X25'},
                  'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-                 'networkComponents': [{'maxSpeed': '100'}]},)
+                 'networkComponents': [{'maxSpeed': 100}]},)
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
 
@@ -351,21 +351,11 @@ class VirtCreateTests(testing.TestCase):
             'domain': 'example.com',
             'localDiskFlag': True,
             'hourlyBillingFlag': True,
-            'supplementalCreateObjectOptions': {
-                'bootMode': None
-            },
-            'dedicatedHost': {
-                'id': 123
-            },
+            'supplementalCreateObjectOptions': {'bootMode': None},
+            'dedicatedHost': {'id': 123},
             'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-            'datacenter': {
-                'name': 'dal05'
-            },
-            'networkComponents': [
-                {
-                    'maxSpeed': '100'
-                }
-            ]
+            'datacenter': {'name': 'dal05'},
+            'networkComponents': [{'maxSpeed': 100}]
         },)
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=template_args)

@@ -96,6 +96,18 @@ class APIClient(testing.TestCase):
                                 offset=None,
                                 )
 
+    def test_simple_call_2(self):
+        mock = self.set_mock('SoftLayer_SERVICE', 'METHOD')
+        mock.return_value = {"test": "result"}
+
+        resp = self.client.call('SERVICE', 'METHOD', {'networkComponents': [{'maxSpeed': 100}]})
+
+        self.assertEqual(resp, {"test": "result"})
+        self.assert_called_with('SoftLayer_SERVICE', 'METHOD',
+                                mask=None, filter=None, identifier=None,
+                                args=({'networkComponents': [{'maxSpeed': 100}]},), limit=None, offset=None,
+                                )
+
     def test_verify_request_false(self):
         client = SoftLayer.BaseClient(transport=self.mocks)
         mock = self.set_mock('SoftLayer_SERVICE', 'METHOD')
