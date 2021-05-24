@@ -395,7 +395,8 @@ class RestTransport(object):
                 try:
                     result = json.loads(resp.text)
                 except ValueError as json_ex:
-                    raise exceptions.SoftLayerAPIError(resp.status_code, str(json_ex))
+                    LOGGER.warning(json_ex)
+                    raise exceptions.SoftLayerAPIError(resp.status_code, str(resp.text))
             else:
                 raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response.")
 
@@ -413,8 +414,8 @@ class RestTransport(object):
             except ValueError as json_ex:
                 if ex.response.text == "":
                     raise exceptions.SoftLayerAPIError(resp.status_code, "Empty response.")
-
-                raise exceptions.SoftLayerAPIError(resp.status_code, str(json_ex))
+                LOGGER.warning(json_ex)
+                raise exceptions.SoftLayerAPIError(resp.status_code, ex.response.text)
 
             raise exceptions.SoftLayerAPIError(ex.response.status_code, message)
         except requests.RequestException as ex:

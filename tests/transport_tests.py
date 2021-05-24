@@ -40,7 +40,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 
     def set_up(self):
         self.transport = transports.XmlRpcTransport(
-            endpoint_url='http://something.com',
+            endpoint_url='http://something9999999999999999999999.com',
         )
         self.response = get_xmlrpc_response()
 
@@ -71,7 +71,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         resp = self.transport(req)
 
         request.assert_called_with('POST',
-                                   'http://something.com/SoftLayer_Service',
+                                   'http://something9999999999999999999999.com/SoftLayer_Service',
                                    headers={'Content-Type': 'application/xml',
                                             'User-Agent': consts.USER_AGENT},
                                    proxies=None,
@@ -123,7 +123,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         request.return_value = self.response
 
         req = transports.Request()
-        req.endpoint = "http://something.com"
+        req.endpoint = "http://something9999999999999999999999.com"
         req.service = "SoftLayer_Service"
         req.method = "getObject"
         req.identifier = 1234
@@ -141,7 +141,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         request.return_value = self.response
 
         req = transports.Request()
-        req.endpoint = "http://something.com"
+        req.endpoint = "http://something9999999999999999999999.com"
         req.service = "SoftLayer_Service"
         req.method = "getObject"
         req.filter = {'TYPE': {'attribute': {'operation': '^= prefix'}}}
@@ -159,7 +159,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         request.return_value = self.response
 
         req = transports.Request()
-        req.endpoint = "http://something.com"
+        req.endpoint = "http://something9999999999999999999999.com"
         req.service = "SoftLayer_Service"
         req.method = "getObject"
         req.limit = 10
@@ -179,7 +179,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         request.return_value = self.response
 
         req = transports.Request()
-        req.endpoint = "http://something.com"
+        req.endpoint = "http://something9999999999999999999999.com"
         req.service = "SoftLayer_Service"
         req.method = "getObject"
         req.mask = {"something": "nested"}
@@ -201,7 +201,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         request.return_value = self.response
 
         req = transports.Request()
-        req.endpoint = "http://something.com"
+        req.endpoint = "http://something9999999999999999999999.com"
         req.service = "SoftLayer_Service"
         req.method = "getObject"
         req.mask = "something.nested"
@@ -217,7 +217,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         request.return_value = self.response
 
         req = transports.Request()
-        req.endpoint = "http://something.com"
+        req.endpoint = "http://something9999999999999999999999.com"
         req.service = "SoftLayer_Service"
         req.method = "getObject"
         req.mask = "mask[something[nested]]"
@@ -233,7 +233,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         request.return_value = self.response
 
         req = transports.Request()
-        req.endpoint = "http://something.com"
+        req.endpoint = "http://something9999999999999999999999.com"
         req.service = "SoftLayer_Service"
         req.method = "getObject"
         req.mask = "filteredMask[something[nested]]"
@@ -249,7 +249,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         request.return_value = self.response
 
         req = transports.Request()
-        req.endpoint = "http://something.com"
+        req.endpoint = "http://something9999999999999999999999.com"
         req.service = "SoftLayer_Service"
         req.method = "getObject"
         req.mask = "mask.something.nested"
@@ -313,7 +313,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 
         auth.assert_called_with('apikey', '1234567890qweasdzxc')
         request.assert_called_with('POST',
-                                   'http://something.com/SoftLayer_Service',
+                                   'http://something9999999999999999999999.com/SoftLayer_Service',
                                    headers={'Content-Type': 'application/xml',
                                             'User-Agent': consts.USER_AGENT},
                                    proxies=None,
@@ -385,7 +385,7 @@ def test_verify(request,
     request.return_value = get_xmlrpc_response()
 
     transport = transports.XmlRpcTransport(
-        endpoint_url='http://something.com',
+        endpoint_url='http://something9999999999999999999999.com',
     )
 
     req = transports.Request()
@@ -401,7 +401,7 @@ def test_verify(request,
     transport(req)
 
     request.assert_called_with('POST',
-                               'http://something.com/SoftLayer_Service',
+                               'http://something9999999999999999999999.com/SoftLayer_Service',
                                data=mock.ANY,
                                headers=mock.ANY,
                                cert=mock.ANY,
@@ -415,7 +415,7 @@ class TestRestAPICall(testing.TestCase):
 
     def set_up(self):
         self.transport = transports.RestTransport(
-            endpoint_url='http://something.com',
+            endpoint_url='http://something9999999999999999999999.com',
         )
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
@@ -435,7 +435,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertIsInstance(resp, transports.SoftLayerListResult)
         self.assertEqual(resp.total_count, 10)
         request.assert_called_with(
-            'GET', 'http://something.com/SoftLayer_Service/Resource.json',
+            'GET', 'http://something9999999999999999999999.com/SoftLayer_Service/Resource.json',
             headers=mock.ANY,
             auth=None,
             data=None,
@@ -501,7 +501,6 @@ class TestRestAPICall(testing.TestCase):
         req.service = 'SoftLayer_Service'
         req.method = 'Resource'
         req.proxy = 'localhost:3128'
-
         try:
             self.assertRaises(SoftLayer.TransportError, self.transport, req)
         except AssertionError:
@@ -519,7 +518,7 @@ class TestRestAPICall(testing.TestCase):
         self.transport(req)
 
         request.assert_called_with(
-            'GET', 'http://something.com/SoftLayer_Service/Resource.json',
+            'GET', 'http://something9999999999999999999999.com/SoftLayer_Service/Resource.json',
             proxies={'https': 'http://localhost:3128',
                      'http': 'http://localhost:3128'},
             auth=None,
@@ -544,7 +543,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertEqual(resp, {})
         request.assert_called_with(
             'GET',
-            'http://something.com/SoftLayer_Service/2/getObject.json',
+            'http://something9999999999999999999999.com/SoftLayer_Service/2/getObject.json',
             headers=mock.ANY,
             auth=None,
             data=None,
@@ -568,7 +567,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertEqual(resp, {})
         request.assert_called_with(
             'POST',
-            'http://something.com/SoftLayer_Service/getObject.json',
+            'http://something9999999999999999999999.com/SoftLayer_Service/getObject.json',
             headers=mock.ANY,
             auth=None,
             data='{"parameters": ["test", 1]}',
@@ -592,7 +591,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertEqual(resp, {})
         request.assert_called_with(
             'POST',
-            'http://something.com/SoftLayer_Service/getObject.json',
+            'http://something9999999999999999999999.com/SoftLayer_Service/getObject.json',
             headers=mock.ANY,
             auth=None,
             data='{"parameters": ["test", "YXNkZg=="]}',
@@ -616,7 +615,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertEqual(resp, {})
         request.assert_called_with(
             'GET',
-            'http://something.com/SoftLayer_Service/getObject.json',
+            'http://something9999999999999999999999.com/SoftLayer_Service/getObject.json',
             params={'objectFilter':
                     '{"TYPE": {"attribute": {"operation": "^= prefix"}}}'},
             headers=mock.ANY,
@@ -641,7 +640,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertEqual(resp, {})
         request.assert_called_with(
             'GET',
-            'http://something.com/SoftLayer_Service/getObject.json',
+            'http://something9999999999999999999999.com/SoftLayer_Service/getObject.json',
             params={'objectMask': 'mask[id,property]'},
             headers=mock.ANY,
             auth=None,
@@ -662,7 +661,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertEqual(resp, {})
         request.assert_called_with(
             'GET',
-            'http://something.com/SoftLayer_Service/getObject.json',
+            'http://something9999999999999999999999.com/SoftLayer_Service/getObject.json',
             params={'objectMask': 'mask[id,property]'},
             headers=mock.ANY,
             auth=None,
@@ -688,7 +687,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertEqual(resp, {})
         request.assert_called_with(
             'GET',
-            'http://something.com/SoftLayer_Service/2/getObject.json',
+            'http://something9999999999999999999999.com/SoftLayer_Service/2/getObject.json',
             headers=mock.ANY,
             auth=None,
             data=None,
@@ -731,7 +730,7 @@ class TestRestAPICall(testing.TestCase):
         auth.assert_called_with(user, password)
         request.assert_called_with(
             'GET',
-            'http://something.com/SoftLayer_Service/2/getObject.json',
+            'http://something9999999999999999999999.com/SoftLayer_Service/2/getObject.json',
             headers=mock.ANY,
             auth=mock.ANY,
             data=None,
