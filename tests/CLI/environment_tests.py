@@ -81,3 +81,7 @@ class EnvironmentTests(testing.TestCase):
         ]
         self.env.fout(output)
         self.assertEqual(2, echo.call_count)
+
+    def test_format_output_is_json(self):
+        self.env.format = 'jsonraw'
+        self.assertTrue(self.env.format_output_is_json())

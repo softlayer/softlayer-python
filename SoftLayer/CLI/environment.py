@@ -52,6 +52,10 @@ class Environment(object):
             fmt = self.format
         return formatting.format_output(output, fmt)
 
+    def format_output_is_json(self):
+        """Return True if format output is json or jsonraw"""
+        return 'json' in self.format
+
     def fout(self, output, newline=True):
         """Format the input and output to the console (stdout)."""
         if output is not None:
