@@ -1,4 +1,4 @@
-"""Get lists Email Delivery account Service """
+"""Lists Email Delivery Service """
 # :license: MIT, see LICENSE for more details.
 
 import click
