@@ -1,7 +1,7 @@
 # Change Log
 
 
-## [5.9.4] - 2021-04-24
+## [5.9.5] - 2021-05-25
 https://github.com/softlayer/softlayer-python/compare/v5.9.4...v5.9.5
 
 #### Improvements
