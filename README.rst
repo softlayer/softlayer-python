@@ -60,7 +60,12 @@ To install the slcli snap:
 
 .. code-block:: bash
 
-	$ sudo snap install slcli
+	$ sudo snap install slcli 
+	
+	(or to get the latest release)
+	
+	$ sudo snap install slcli --edge
+	
 	
 
 

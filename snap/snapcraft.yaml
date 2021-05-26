@@ -6,13 +6,13 @@ description: |
 
 license: MIT
 
-base: core18
+base: core20
 grade: stable 
 confinement: strict
 
 apps:
   slcli:
-    command: slcli
+    command: bin/slcli
     environment: 
       LC_ALL: C.UTF-8
     plugs:
@@ -25,7 +25,6 @@ parts:
     source: https://github.com/softlayer/softlayer-python
     source-type: git
     plugin: python
-    python-version: python3
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version "$(git describe --tags | sed 's/^v//')"
