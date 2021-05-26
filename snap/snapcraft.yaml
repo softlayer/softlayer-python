@@ -6,7 +6,7 @@ description: |
 
 license: MIT
 
-base: core18
+base: core20
 grade: stable 
 confinement: strict
 
@@ -25,7 +25,6 @@ parts:
     source: https://github.com/softlayer/softlayer-python
     source-type: git
     plugin: python
-    python-version: python3
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version "$(git describe --tags | sed 's/^v//')"
