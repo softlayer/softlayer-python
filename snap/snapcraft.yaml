@@ -12,7 +12,7 @@ confinement: strict
 
 apps:
   slcli:
-    command: slcli
+    command: bin/slcli
     environment: 
       LC_ALL: C.UTF-8
     plugs:
