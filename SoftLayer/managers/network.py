@@ -49,6 +49,7 @@ DEFAULT_GET_VLAN_MASK = ','.join([
     'primaryRouter[id, fullyQualifiedDomainName, datacenter]',
     'totalPrimaryIpAddressCount',
     'networkSpace',
+    'billingItem',
     'hardware',
     'subnets',
     'virtualGuests',
@@ -752,3 +753,10 @@ class NetworkManager(object):
         """
         result = self.client.call('SoftLayer_Network_Subnet_IpAddress', 'editObject', note, id=identifier)
         return result
+
+    def get_cancel_failure_reasons(self, identifier):
+        """get the reasons by cannot cancel the VLAN
+
+        :param integer identifier:  the instance ID
+        """
+        return self.vlan.getCancelFailureReasons(id=identifier)

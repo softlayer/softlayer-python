@@ -99,3 +99,15 @@ class VlanTests(testing.TestCase):
         result = self.run_command(['vlan', 'list'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getNetworkVlans')
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_vlan_cancel(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vlan', 'cancel', '1234'])
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_vlan_cancel_fail(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['vlan', 'cancel', '1234'])
+        self.assertTrue(result.exit_code, 2)

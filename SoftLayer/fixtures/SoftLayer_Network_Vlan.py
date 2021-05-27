@@ -5,9 +5,19 @@ getObject = {
     },
     'id': 1234,
     'vlanNumber': 4444,
-    'firewallInterfaces': None
+    'firewallInterfaces': None,
+    'billingItem': {
+            'allowCancellationFlag': 1,
+            'categoryCode': 'network_vlan',
+            'description': 'Private Network Vlan',
+            'id': 235689,
+            'notes': 'test cli',
+            'orderItemId': 147258,
+        }
 }
 
 editObject = True
 setTags = True
 getList = [getObject]
+
+cancel = True
