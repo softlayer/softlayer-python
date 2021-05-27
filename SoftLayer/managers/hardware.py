@@ -1056,6 +1056,41 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         return disk_price
 
+    def get_components(self, hardware_id, mask=None, filter_component=None):
+        """Get details about a hardware components.
+
+        :param int hardware_id: the instance ID
+        :returns: A dictionary containing a large amount of information about
+                  the specified components.
+        """
+        if not mask:
+            mask = 'id,hardwareComponentModel[longDescription,' \
+                   'hardwareGenericComponentModel[description,hardwareComponentType[keyName]],' \
+                   'firmwares[createDate,version]]'
+
+        if not filter_component:
+            filter_component = {"components": {
+                "hardwareComponentModel": {
+                    "firmwares": {
+                        "createDate": {
+                            "operation": "orderBy",
+                            "options": [
+                                {
+                                    "name": "sort",
+                                    "value": [
+                                        "DESC"
+                                    ]
+                                },
+                                {
+                                    "name": "sortOrder",
+                                    "value": [
+                                        1
+                                    ]}]}
+                    }}}}
+
+        return self.client.call('Hardware_Server', 'getComponents',
+                                mask=mask, filter=filter_component, id=hardware_id)
+
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
     """Picks a valid Bandwidth Item, returns the KeyName"""

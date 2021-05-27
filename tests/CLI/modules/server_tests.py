@@ -992,3 +992,7 @@ class ServerCLITests(testing.TestCase):
                                    '--drive-controller=RAID', '--network=10000 Redundant'])
 
         self.assert_no_fail(result)
+
+    def test_components(self):
+        result = self.run_command(['hardware', 'detail', '100', '--components'])
+        self.assert_no_fail(result)

@@ -5,9 +5,9 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
-
 
 import json
 from unittest import mock as mock
@@ -135,13 +135,44 @@ class BlockTests(testing.TestCase):
                 'IOPs': None,
                 'ip_addr': '10.1.2.3',
                 'lunId': None,
-                'notes': "{'status': 'availabl",
+                'notes': "{'status': 'available'}",
                 'rep_partner_count': None,
                 'storage_type': 'ENDURANCE',
                 'username': 'username',
                 'active_transactions': None
             }],
             json.loads(result.output))
+
+    @mock.patch('SoftLayer.BlockStorageManager.list_block_volumes')
+    def test_volume_list_notes_format_output_json(self, list_mock):
+        note_mock = 'test ' * 5
+        list_mock.return_value = [
+            {'notes': note_mock}
+        ]
+
+        result = self.run_command(['--format', 'json', 'block', 'volume-list', '--columns', 'notes'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(
+            [{
+                'notes': note_mock,
+            }],
+            json.loads(result.output))
+
+    @mock.patch('SoftLayer.BlockStorageManager.list_block_volumes')
+    def test_volume_list_reduced_notes_format_output_table(self, list_mock):
+        note_mock = 'test ' * 10
+        expected_reduced_note = 'test ' * 4
+        list_mock.return_value = [
+            {'notes': note_mock}
+        ]
+        expected_table = formatting.Table(['notes'])
+        expected_table.add_row([expected_reduced_note])
+        expected_output = formatting.format_output(expected_table)+'\n'
+        result = self.run_command(['--format', 'table', 'block', 'volume-list', '--columns', 'notes'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(expected_output, result.output)
 
     def test_volume_list_order(self):
         result = self.run_command(['block', 'volume-list', '--order=1234567'])

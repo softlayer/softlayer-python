@@ -2,6 +2,43 @@
 # :license: MIT, see LICENSE for more details.
 
 from SoftLayer.CLI import columns as column_helper
+from SoftLayer.CLI import formatting
+
+DEFAULT_NOTES_SIZE = 20
+
+
+def reduce_notes(volumes, env):
+    """Reduces all long notes found in the volumes list just if the format output is different from a JSON format.
+
+    :param list volumes: An list of storage volumes
+    :param env :A environment console.
+    """
+    if env.format_output_is_json():
+        return
+
+    for volume in volumes:
+        if len(volume.get('notes', '')) > DEFAULT_NOTES_SIZE:
+            shortened_notes = volume['notes'][:DEFAULT_NOTES_SIZE]
+            volume['notes'] = shortened_notes
+
+
+def build_output_table(env, volumes, columns, sortby):
+    """Builds a formatting table for a list of volumes.
+
+        :param env :A Environment console.
+        :param list volumes: An list of storage volumes
+        :param columns :A ColumnFormatter for column names
+        :param str sortby :A string to sort by.
+        """
+    table = formatting.Table(columns.columns)
+    if sortby in table.columns:
+        table.sortby = sortby
+
+    reduce_notes(volumes, env)
+    for volume in volumes:
+        table.add_row([value or formatting.blank()
+                       for value in columns.row(volume)])
+    return table
 
 
 def _format_name(obj):
@@ -95,7 +132,6 @@ allowedSubnets.allowedHost.id
 allowedIpAddresses.allowedHost.id
 """),
 ]
-
 
 DEFAULT_COLUMNS = [
     'id',

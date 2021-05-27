@@ -1,5 +1,19 @@
 # Change Log
 
+
+## [5.9.5] - 2021-05-25
+https://github.com/softlayer/softlayer-python/compare/v5.9.4...v5.9.5
+
+#### Improvements
+- Changed a testing domain to one that really doesnt exist #1492
+- Fix Incomplete notes field for file and block #1484
+- Show component versions on hw detail #1470
+- Add the firewall information on slcli firewall detail #1475
+- Add an --orderBy parameters to call-api #1459
+- Add image detail transaction data #1479
+
+
+
 ## [5.9.4] - 2021-04-27
 https://github.com/softlayer/softlayer-python/compare/v5.9.3...v5.9.4
 

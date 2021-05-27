@@ -5,8 +5,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
-
+from SoftLayer.CLI import storage_utils
 
 COLUMNS = [
     column_helper.Column('id', ('id',), mask="id"),
@@ -18,7 +17,7 @@ COLUMNS = [
         'storage_type',
         lambda b: b['storageType']['keyName'].split('_').pop(0)
         if 'storageType' in b and 'keyName' in b['storageType']
-        and isinstance(b['storageType']['keyName'], str)
+           and isinstance(b['storageType']['keyName'], str)
         else '-',
         mask="storageType.keyName"),
     column_helper.Column('capacity_gb', ('capacityGb',), mask="capacityGb"),
@@ -52,8 +51,6 @@ DEFAULT_COLUMNS = [
     'notes'
 ]
 
-DEFAULT_NOTES_SIZE = 20
-
 
 @click.command()
 @click.option('--username', '-u', help='Volume username')
@@ -78,24 +75,5 @@ def cli(env, sortby, columns, datacenter, username, storage_type, order):
                                                      order=order,
                                                      mask=columns.mask())
 
-    table = formatting.Table(columns.columns)
-    table.sortby = sortby
-
-    _reduce_notes(block_volumes)
-
-    for block_volume in block_volumes:
-        table.add_row([value or formatting.blank()
-                       for value in columns.row(block_volume)])
-
+    table = storage_utils.build_output_table(env, block_volumes, columns, sortby)
     env.fout(table)
-
-
-def _reduce_notes(block_volumes):
-    """Reduces the size of the notes in a volume list.
-
-    :param block_volumes: An list of block volumes
-    """
-    for block_volume in block_volumes:
-        if len(block_volume.get('notes', '')) > DEFAULT_NOTES_SIZE:
-            shortened_notes = block_volume['notes'][:DEFAULT_NOTES_SIZE]
-            block_volume['notes'] = shortened_notes

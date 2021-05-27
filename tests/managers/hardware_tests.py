@@ -928,6 +928,26 @@ class HardwareTests(testing.TestCase):
         self.assertIn({'id': 22482}, order_container['prices'])
         self.assertIn({'id': 50357}, order_container['prices'])
 
+    def test_get_components(self):
+        result = self.hardware.get_components(1234)
+        components = [{'hardwareComponentModelId': 147,
+                       'hardwareId': 1234,
+                       'id': 369,
+                       'modifyDate': '2017-11-10T16:59:38-06:00',
+                       'serviceProviderId': 1,
+                       'hardwareComponentModel':
+                           {'name': 'IMM2 - Onboard',
+                            'firmwares':
+                                [{'createDate': '2020-09-24T13:46:29-06:00',
+                                  'version': '5.60'},
+                                 {'createDate': '2019-10-14T16:51:12-06:00',
+                                  'version': '5.10'}]}}]
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getComponents')
+        self.assertEqual(result, components)
+        self.assertEqual(result[0]['hardwareId'], 1234)
+        self.assertEqual(result[0]['hardwareComponentModel']['name'], 'IMM2 - Onboard')
+        self.assertEqual(result[0]['hardwareComponentModel']['firmwares'][0]['version'], '5.60')
+
 
 class HardwareHelperTests(testing.TestCase):
 
