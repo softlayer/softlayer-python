@@ -69,7 +69,7 @@ hardware_verifyOrder = {
         {
             "accountId": 1111,
             "domain": "testedit.com",
-            "hostname": "bardcabero",
+            "hostname": "test",
             "globalIdentifier": "81434794-af69-44d5-bb97-12312asdasdasd"
         }
     ],
@@ -135,8 +135,8 @@ hardware_placeOrder = {
                 "accountId": 1111111,
                 "bareMetalInstanceFlag": 0,
                 "domain": "testedit.com",
-                "fullyQualifiedDomainName": "bardcabero.testedit.com",
-                "hostname": "bardcabero",
+                "fullyQualifiedDomainName": "test.testedit.com",
+                "hostname": "test",
                 "globalIdentifier": "81434794-af69-44d5-bb97-1111111"
             }
         ],
@@ -205,8 +205,8 @@ hardware_placeOrder = {
             "accountId": 1234,
             "firstName": "test",
             "id": 3333,
-            "lastName": "cabero",
-            "username": "sl1234-dcabero"
+            "lastName": "test",
+            "username": "sl1234-test"
         }
     }
 }

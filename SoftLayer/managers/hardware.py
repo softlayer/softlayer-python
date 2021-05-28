@@ -908,7 +908,8 @@ class HardwareManager(utils.IdentifierMixin, object):
         result_windows = self.client['SoftLayer_Provisioning_Maintenance_Window'].getMaintenanceWindows(begin_date,
                                                                                                         end_date,
                                                                                                         location_id)
-        return result_windows[0]['id']
+        if len(result_windows) > 0:
+            return result_windows[0].get('id')
 
     @retry(logger=LOGGER)
     def get_instance(self, instance_id):
