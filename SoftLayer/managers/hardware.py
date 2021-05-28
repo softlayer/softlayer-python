@@ -835,6 +835,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         :returns: bool
         """
         result = None
+        maintenance_window_id = None
         upgrade_prices = self._get_upgrade_prices(instance_id)
         prices = []
         data = {}
@@ -853,7 +854,9 @@ class HardwareManager(utils.IdentifierMixin, object):
         location_id = server_response['datacenter']['id']
 
         maintenance_window = datetime.datetime.now(utils.UTC())
-        maintenance_window_id = self.get_maintenance_windows_id(location_id)
+        maintenance_window_detail = self.get_maintenance_windows_detail(location_id)
+        if maintenance_window_detail:
+            maintenance_window_id = maintenance_window_detail.get('id')
 
         order = {
             'complexType': 'SoftLayer_Container_Product_Order_Hardware_Server_Upgrade',
@@ -894,12 +897,13 @@ class HardwareManager(utils.IdentifierMixin, object):
                 result = self.client['Product_Order'].placeOrder(order)
         return result
 
-    def get_maintenance_windows_id(self, location_id):
+    def get_maintenance_windows_detail(self, location_id):
         """Get the disks prices to be added or upgraded.
 
         :param int location_id: Hardware Server location id.
         :return int.
         """
+        result = None
         begin_date_object = datetime.datetime.now()
         begin_date = begin_date_object.strftime("%Y-%m-%dT00:00:00.0000-06:00")
         end_date_object = datetime.date.today() + datetime.timedelta(days=30)
@@ -909,7 +913,9 @@ class HardwareManager(utils.IdentifierMixin, object):
                                                                                                         end_date,
                                                                                                         location_id)
         if len(result_windows) > 0:
-            return result_windows[0].get('id')
+            result = result_windows[0]
+
+        return result
 
     @retry(logger=LOGGER)
     def get_instance(self, instance_id):

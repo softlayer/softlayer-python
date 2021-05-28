@@ -112,7 +112,7 @@ def get_place_order_information(response):
 def get_hardware_detail(response):
     """Get the hardware server detail."""
     table_hardware = formatting.Table(['Account Id', 'Hostname', 'Domain'])
-    for hardware in response['Hardware']:
+    for hardware in response['hardware']:
         table_hardware.add_row([hardware.get('accountId'),
                                 hardware.get('hostname'),
                                 hardware.get('domain')])
