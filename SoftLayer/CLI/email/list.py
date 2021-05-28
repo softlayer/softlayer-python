@@ -1,4 +1,4 @@
-"""Get lists Email Delivery account Service """
+"""Lists Email Delivery Service """
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -36,25 +36,29 @@ def cli(env):
         table.add_row(['email_information', table_information])
         table.add_row(['email_overview', overview_table])
         for statistic in statistics:
-            table.add_row(['statistics', _build_statistics_table(statistic)])
+            table.add_row(['statistics', build_statistics_table(statistic)])
 
     env.fout(table)
 
 
 def _build_overview_table(email_overview):
-    table = formatting.Table(['credit_Allowed', 'credits_Remain', 'package', 'reputation', 'requests'])
+    table = formatting.Table(
+        ['credit_allowed', 'credits_remain', 'credits_overage', 'credits_used',
+         'package', 'reputation', 'requests'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'
 
     table.add_row([email_overview.get('creditsAllowed'), email_overview.get('creditsRemain'),
+                   email_overview.get('creditsOverage'), email_overview.get('creditsUsed'),
                    email_overview.get('package'), email_overview.get('reputation'),
                    email_overview.get('requests')])
 
     return table
 
 
-def _build_statistics_table(statistics):
-    table = formatting.Table(['delivered', 'requests', 'bounces', 'opens', 'clicks', 'spamReports'])
+def build_statistics_table(statistics):
+    """statistics records of Email Delivery account"""
+    table = formatting.Table(['delivered', 'requests', 'bounces', 'opens', 'clicks', 'spam_reports'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'
 

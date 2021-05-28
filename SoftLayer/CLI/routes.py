@@ -121,6 +121,8 @@ ALL_ROUTES = [
 
     ('email', 'SoftLayer.CLI.email'),
     ('email:list', 'SoftLayer.CLI.email.list:cli'),
+    ('email:detail', 'SoftLayer.CLI.email.detail:cli'),
+    ('email:edit', 'SoftLayer.CLI.email.edit:cli'),
 
     ('event-log', 'SoftLayer.CLI.event_log'),
     ('event-log:get', 'SoftLayer.CLI.event_log.get:cli'),
