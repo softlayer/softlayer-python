@@ -43,6 +43,8 @@ DEFAULT_VLAN_MASK = ','.join([
     'totalPrimaryIpAddressCount',
     'virtualGuestCount',
     'networkSpace',
+    'networkVlanFirewall[id,fullyQualifiedDomainName,primaryIpAddress]',
+    'attachedNetworkGateway[id,name,networkFirewall]',
 ])
 DEFAULT_GET_VLAN_MASK = ','.join([
     'firewallInterfaces',
@@ -53,6 +55,8 @@ DEFAULT_GET_VLAN_MASK = ','.join([
     'hardware',
     'subnets',
     'virtualGuests',
+    'networkVlanFirewall[id,fullyQualifiedDomainName,primaryIpAddress]',
+    'attachedNetworkGateway[id,name,networkFirewall]',
 ])
 
 
@@ -424,6 +428,16 @@ class NetworkManager(object):
         return self.subnet.getObject(id=subnet_id, **kwargs)
 
     def get_vlan(self, vlan_id):
+        """Returns information about a single VLAN.
+
+        :param int id: The unique identifier for the VLAN
+        :returns: A dictionary containing a large amount of information about
+                  the specified VLAN.
+
+        """
+        return self.vlan.getObject(id=vlan_id, mask=DEFAULT_GET_VLAN_MASK)
+
+    def get_network_gateway_firewall(self, vlan_id):
         """Returns information about a single VLAN.
 
         :param int id: The unique identifier for the VLAN
