@@ -63,6 +63,154 @@ rsc_verifyOrder = {
     'postTaxRecurring': '0.32',
 }
 
+hardware_verifyOrder = {
+    "currencyShortName": "USD",
+    "hardware": [
+        {
+            "accountId": 1111,
+            "domain": "testedit.com",
+            "hostname": "test",
+            "globalIdentifier": "81434794-af69-44d5-bb97-12312asdasdasd"
+        }
+    ],
+    "location": "1441195",
+    "locationObject": {
+        "id": 1441195,
+        "longName": "Dallas 10",
+        "name": "dal10"
+    },
+    "packageId": 911,
+    "postTaxRecurring": "0",
+    "postTaxRecurringHourly": "0",
+    "postTaxRecurringMonthly": "0",
+    "preTaxRecurring": "0",
+    "preTaxRecurringHourly": "0",
+    "preTaxRecurringMonthly": "0",
+    "prices": [
+        {
+            "hourlyRecurringFee": "0",
+            "id": 209391,
+            "recurringFee": "0",
+            "categories": [
+                {
+                    "categoryCode": "ram",
+                    "id": 3,
+                    "name": "RAM"
+                }
+            ],
+            "item": {
+                "capacity": "32",
+                "description": "32 GB RAM",
+                "id": 11291,
+                "units": "GB"
+            }
+        }
+    ],
+    "proratedInitialCharge": "0",
+    "proratedOrderTotal": "0",
+    "quantity": 1,
+    "sendQuoteEmailFlag": None,
+    "totalRecurringTax": "0",
+    "useHourlyPricing": False
+}
+
+hardware_placeOrder = {
+    "orderDate": "2021-05-07T07:41:41-06:00",
+    "orderDetails": {
+        "billingInformation": {
+            "billingAddressLine1": "4849 Alpha Rd",
+            "billingCity": "Dallas",
+            "billingCountryCode": "US",
+            "billingEmail": "test.ibm.com",
+            "billingNameCompany": "SoftLayer Internal - Development Community",
+            "billingNameFirst": "Test",
+            "billingNameLast": "Test",
+            "billingPhoneVoice": "1111111",
+            "billingPostalCode": "75244-1111",
+            "billingState": "TX",
+        },
+        "currencyShortName": "USD",
+        "hardware": [
+            {
+                "accountId": 1111111,
+                "bareMetalInstanceFlag": 0,
+                "domain": "testedit.com",
+                "fullyQualifiedDomainName": "test.testedit.com",
+                "hostname": "test",
+                "globalIdentifier": "81434794-af69-44d5-bb97-1111111"
+            }
+        ],
+        "location": "1441195",
+        "locationObject": {
+            "id": 1441195,
+            "longName": "Dallas 10",
+            "name": "dal10"
+        },
+        "packageId": 911,
+        "paymentType": "ADD_TO_BALANCE",
+        "postTaxRecurring": "0",
+        "postTaxRecurringHourly": "0",
+        "postTaxRecurringMonthly": "0",
+        "postTaxSetup": "0",
+        "preTaxRecurring": "0",
+        "preTaxRecurringHourly": "0",
+        "preTaxRecurringMonthly": "0",
+        "preTaxSetup": "0",
+        "prices": [
+            {
+                "hourlyRecurringFee": "0",
+                "id": 209391,
+                "recurringFee": "0",
+                "categories": [
+                    {
+                        "categoryCode": "ram",
+                        "id": 3,
+                        "name": "RAM"
+                    }
+                ],
+                "item": {
+                    "capacity": "32",
+                    "description": "32 GB RAM",
+                    "id": 11291,
+                    "keyName": "RAM_32_GB_DDR4_2133_ECC_NON_REG",
+                    "units": "GB",
+                }
+            }
+        ],
+        "proratedInitialCharge": "0",
+        "proratedOrderTotal": "0",
+        "quantity": 1,
+        "totalRecurringTax": "0",
+        "useHourlyPricing": False
+    },
+    "orderId": 78332111,
+    "placedOrder": {
+        "accountId": 1111111,
+        "id": 1234,
+        "status": "PENDING_UPGRADE",
+        "account": {
+            "brandId": 2,
+            "companyName": "SoftLayer Internal - Development Community",
+            "id": 1234
+        },
+        "items": [
+            {
+                "categoryCode": "ram",
+                "description": "32 GB RAM",
+                "id": 824199364,
+                "recurringFee": "0"
+            }
+        ],
+        "userRecord": {
+            "accountId": 1234,
+            "firstName": "test",
+            "id": 3333,
+            "lastName": "test",
+            "username": "sl1234-test"
+        }
+    }
+}
+
 rsc_placeOrder = {
     'orderDate': '2013-08-01 15:23:45',
     'orderId': 1234,
