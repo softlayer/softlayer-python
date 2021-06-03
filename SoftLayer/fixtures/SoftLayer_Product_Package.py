@@ -2055,3 +2055,66 @@ getObject = {
             "categoryCode": "dedicated_virtual_hosts"
         }
     }]}
+
+getItemsVLAN = [{
+    "description": "Private Network Vlan",
+    "id": 1072,
+    "itemTaxCategoryId": 166,
+    "keyName": "PRIVATE_NETWORK_VLAN",
+    "itemCategory": {
+        "categoryCode": "network_vlan",
+        "id": 113,
+        "name": "Network Vlan"},
+    "prices": [{
+        "id": 203707,
+        "itemId": 1072,
+        "laborFee": "0",
+        "locationGroupId": 505,
+        "oneTimeFee": "0",
+        "recurringFee": "0",
+        "setupFee": "0",
+        "sort": 10,
+    },
+        {
+            "id": 203727,
+            "itemId": 1072,
+            "laborFee": "0",
+            "locationGroupId": 545,
+            "oneTimeFee": "0",
+            "recurringFee": "0",
+            "setupFee": "0",
+            "sort": 10,
+        }]
+}, {
+    "description": "Public Network Vlan",
+    "id": 1071,
+    "itemTaxCategoryId": 166,
+    "keyName": "PUBLIC_NETWORK_VLAN",
+    "units": "N/A",
+    "itemCategory": {
+        "categoryCode": "network_vlan",
+        "id": 113,
+        "name": "Network Vlan",
+    },
+    "prices": [{
+        "id": 203637,
+        "itemId": 1071,
+        "laborFee": "0",
+        "locationGroupId": 509,
+        "oneTimeFee": "0",
+        "recurringFee": "0",
+        "setupFee": "0",
+        "sort": 10,
+    },
+        {
+            "id": 203667,
+            "itemId": 1071,
+            "laborFee": "0",
+            "locationGroupId": 545,
+            "oneTimeFee": "0",
+            "recurringFee": "0",
+            "setupFee": "0",
+            "sort": 10,
+        }]
+}
+]

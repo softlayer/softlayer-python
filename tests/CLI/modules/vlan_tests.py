@@ -4,8 +4,11 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import json
 from unittest import mock as mock
 
+from SoftLayer.fixtures import SoftLayer_Product_Order
+from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
 
 
@@ -99,3 +102,21 @@ class VlanTests(testing.TestCase):
         result = self.run_command(['vlan', 'list'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getNetworkVlans')
+
+    def test_create_vlan(self):
+        amock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        amock.return_value = SoftLayer_Product_Package.getItemsVLAN
+
+        order_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
+        order_mock.return_value = SoftLayer_Product_Order.vlan_placeOrder
+
+        result = self.run_command(['vlan', 'create',
+                                   '-H test',
+                                   '-d TEST00',
+                                   '--network', 'public',
+                                   '--billing', 'hourly'
+                                   ])
+
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output),
+                         {'id': 123456, 'created': '2021-06-02 15:23:47'})
