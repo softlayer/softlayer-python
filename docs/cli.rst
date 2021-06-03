@@ -79,6 +79,7 @@ To discover the available commands, simply type `slcli`.
           config          CLI configuration.
           dedicatedhost   Dedicated Host.
           dns             Domain Name System.
+          email           Email Deliviry Network
           event-log       Event Logs.
           file            File Storage.
           firewall        Firewalls.
