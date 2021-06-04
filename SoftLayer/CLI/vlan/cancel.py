@@ -7,7 +7,6 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-from SoftLayer.managers.billing import BillingManager
 
 
 @click.command()
@@ -17,14 +16,20 @@ def cli(env, identifier):
     """Cancel network vlan."""
 
     mgr = SoftLayer.NetworkManager(env.client)
-    billing = BillingManager(env.client)
+
     if not (env.skip_confirmations or formatting.no_going_back(identifier)):
         raise exceptions.CLIAbort('Aborted')
 
+    reasons = mgr.get_cancel_failure_reasons(identifier)
+    if len(reasons) > 0:
+        raise exceptions.CLIAbort(reasons)
     item = mgr.get_vlan(identifier).get('billingItem')
     if item:
-        billing.cancel_item(item.get('id'), 'cancel by cli command')
-        env.fout('Cancel Successfully')
+        mgr.cancel_item(item.get('id'),
+                        True,
+                        'Cancel by cli command',
+                        'Cancel by cli command')
     else:
-        res = mgr.get_cancel_failure_reasons(identifier)
-        raise exceptions.ArgumentError(res)
+        raise exceptions.CLIAbort(
+            "VLAN is an automatically assigned and free of charge VLAN,"
+            " it will automatically be removed from your account when it is empty")

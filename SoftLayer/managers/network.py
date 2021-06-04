@@ -755,8 +755,22 @@ class NetworkManager(object):
         return result
 
     def get_cancel_failure_reasons(self, identifier):
-        """get the reasons by cannot cancel the VLAN
+        """get the reasons why we cannot cancel the VLAN.
 
         :param integer identifier:  the instance ID
         """
         return self.vlan.getCancelFailureReasons(id=identifier)
+
+    def cancel_item(self, identifier, cancel_immediately,
+                    reason_cancel, customer_note):
+        """Cancel a billing item immediately, deleting all its data.
+
+        :param integer identifier: the instance ID to cancel
+        :param string reason_cancel: reason cancel
+        """
+        return self.client.call('SoftLayer_Billing_Item', 'cancelItem',
+                                True,
+                                cancel_immediately,
+                                reason_cancel,
+                                customer_note,
+                                id=identifier)

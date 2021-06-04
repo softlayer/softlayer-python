@@ -21,3 +21,8 @@ setTags = True
 getList = [getObject]
 
 cancel = True
+
+getCancelFailureReasons = [
+    "1 bare metal server(s) still on the VLAN ",
+    "1 virtual guest(s) still on the VLAN "
+]
