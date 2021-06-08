@@ -303,3 +303,25 @@ class AccountManager(utils.IdentifierMixin, object):
         _mask = """vendor,type"""
 
         return self.client['SoftLayer_Account'].getNetworkMessageDeliveryAccounts(mask=_mask)
+
+    def get_active_virtual_licenses(self):
+        """Gets all active virtual licenses account.
+
+                :returns: active virtual licenses account
+                """
+
+        _mask = """billingItem[categoryCode,createDate,description],
+                    key,id,ipAddress,
+                    softwareDescription[longDescription,name,manufacturer],
+                    subnet"""
+
+        return self.client['SoftLayer_Account'].getActiveVirtualLicenses(mask=_mask)
+
+    def get_active_account_licenses(self):
+        """Gets all active account licenses.
+
+                        :returns: Active account Licenses
+                        """
+        _mask = """billingItem,softwareDescription"""
+
+        return self.client['SoftLayer_Account'].getActiveAccountLicenses(mask=_mask)

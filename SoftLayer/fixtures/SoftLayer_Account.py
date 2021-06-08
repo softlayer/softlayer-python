@@ -1100,3 +1100,110 @@ getNetworkMessageDeliveryAccounts = [
         "smtpAccess": "1"
     }
 ]
+
+getActiveAccountLicenses = [{
+    "accountId": 123456,
+    "capacity": "4",
+    "key": "M02A5-6CJ8L-J8R9H-000R0-CDR70",
+    "units": "CPU",
+    "billingItem": {
+        "allowCancellationFlag": 1,
+        "categoryCode": "software_license",
+        "cycleStartDate": "2021-06-03T23:11:22-06:00",
+        "description": "vCenter Server Appliance 6.0",
+        "id": 741258963,
+        "laborFee": "0",
+        "laborFeeTaxRate": "0",
+        "oneTimeFee": "0",
+        "oneTimeFeeTaxRate": "0",
+        "orderItemId": 963258741,
+        "recurringFee": "0",
+        "recurringFeeTaxRate": "0",
+        "recurringMonths": 1,
+        "serviceProviderId": 1,
+        "setupFee": "0",
+        "setupFeeTaxRate": "0"
+    },
+    "softwareDescription": {
+        "controlPanel": 0,
+        "id": 15963,
+        "licenseTermValue": 0,
+        "longDescription": "VMware vCenter 6.0",
+        "manufacturer": "VMware",
+        "name": "vCenter",
+        "operatingSystem": 0,
+        "version": "6.0",
+        "virtualLicense": 0,
+        "virtualizationPlatform": 0,
+        "requiredUser": "administrator@vsphere.local"
+    }
+},
+    {
+        "accountId": 123456,
+        "capacity": "4",
+        "key": "4122M-ABXC05-K829T-098HP-00QJM",
+        "units": "CPU",
+        "billingItem": {
+            "allowCancellationFlag": 1,
+            "categoryCode": "software_license",
+            "description": "vCenter Server Appliance 6.x",
+            "id": 36987456,
+            "laborFee": "0",
+            "laborFeeTaxRate": "0",
+            "oneTimeFee": "0",
+            "oneTimeFeeTaxRate": "0",
+            "orderItemId": 25839,
+            "recurringFee": "0",
+            "recurringFeeTaxRate": "0",
+            "recurringMonths": 1,
+            "serviceProviderId": 1,
+            "setupFee": "0",
+            "setupFeeTaxRate": "0"
+        },
+        "softwareDescription": {
+            "controlPanel": 0,
+            "id": 1472,
+            "licenseTermValue": 0,
+            "longDescription": "VMware vCenter 6.0",
+            "manufacturer": "VMware",
+            "name": "vCenter",
+            "operatingSystem": 0,
+            "version": "6.0",
+            "virtualLicense": 0,
+            "virtualizationPlatform": 0,
+            "requiredUser": "administrator@vsphere.local"
+        }
+    }
+]
+
+getActiveVirtualLicenses = [{
+    "id": 12345,
+    "ipAddress": "192.168.23.78",
+    "key": "PLSK.06866259.0000",
+    "billingItem": {
+        "categoryCode": "control_panel",
+        "description": "Plesk Onyx (Linux) - (Unlimited) - VPS "
+    },
+    "softwareDescription": {
+        "longDescription": "Plesk - Unlimited Domain w/ Power Pack for VPS 17.8.11 Linux",
+        "manufacturer": "Plesk",
+        "name": "Plesk - Unlimited Domain w/ Power Pack for VPS"
+    },
+    "subnet": {
+        "broadcastAddress": "192.168.23.79",
+        "cidr": 28,
+        "gateway": "192.168.23.65",
+        "id": 1973163,
+        "isCustomerOwned": False,
+        "isCustomerRoutable": False,
+        "netmask": "255.255.255.240",
+        "networkIdentifier": "128.116.23.64",
+        "networkVlanId": 123456,
+        "note": "test note",
+        "sortOrder": "1",
+        "subnetType": "ADDITIONAL_PRIMARY",
+        "totalIpAddresses": "16",
+        "usableIpAddressCount": "13",
+        "version": 4
+    }
+}]
