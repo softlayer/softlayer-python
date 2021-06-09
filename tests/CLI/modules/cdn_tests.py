@@ -95,3 +95,31 @@ class CdnTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(result.output, "Origin with path /example1 has been deleted\n")
+
+    def test_edit_header(self):
+        result = self.run_command(['cdn', 'edit', 'test.example.com',
+                                   '--origin=10.34.12.125', '--header=www.test.com'])
+        self.assert_no_fail(result)
+        header_result = json.loads(result.output)
+        self.assertEqual('www.test.com', header_result['Header'])
+
+    def test_edit_http_port(self):
+        result = self.run_command(['cdn', 'edit', 'test.example.com',
+                                   '--origin=10.34.12.125', '--http-port=83'])
+        self.assert_no_fail(result)
+        header_result = json.loads(result.output)
+        self.assertEqual(83, header_result['Http Port'])
+
+    def test_edit_respect_headers(self):
+        result = self.run_command(['cdn', 'edit', 'test.example.com',
+                                   '--origin=10.34.12.125', '--respect-headers=1'])
+        self.assert_no_fail(result)
+        header_result = json.loads(result.output)
+        self.assertEqual(True, header_result['Respect Headers'])
+
+    def test_edit_cache(self):
+        result = self.run_command(['cdn', 'edit', 'test.example.com',
+                                   '--origin=10.34.12.125', '--cache', 'include-specified', '--cache', 'test'])
+        self.assert_no_fail(result)
+        header_result = json.loads(result.output)
+        self.assertEqual('include: test', header_result['CacheKeyQueryRule'])

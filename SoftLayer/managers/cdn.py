@@ -5,7 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-
+import SoftLayer
 from SoftLayer import utils
 
 
@@ -170,3 +170,92 @@ class CDNManager(utils.IdentifierMixin, object):
     def end_date(self):
         """Retrieve the cdn usage metric end date."""
         return self._end_date
+
+    def edit(self, hostname, header=None, http_port=None, origin=None,
+             respect_headers=None, cache=None, performance_configuration=None):
+        """Edit the cdn object.
+
+        :param string hostname: The CDN hostname.
+        :param header: The cdn Host header.
+        :param http_port: The cdn HTTP port.
+        :param origin: The cdn Origin server address.
+        :param respect_headers: The cdn Respect headers.
+        :param cache: The cdn Cache key optimization.
+        :param performance_configuration: The cdn performance configuration.
+
+        :returns: SoftLayer_Container_Network_CdnMarketplace_Configuration_Mapping[].
+        """
+        cdn_instance_detail = self.get_cdn_instance_by_hostname(hostname)
+        if cdn_instance_detail is None:
+            raise SoftLayer.SoftLayerError('The CDN was not found with the hostname: %s' % hostname)
+
+        unique_id = cdn_instance_detail.get('uniqueId')
+
+        config = {
+            'uniqueId': unique_id,
+            'originType': cdn_instance_detail.get('originType'),
+            'protocol': cdn_instance_detail.get('protocol'),
+            'path': cdn_instance_detail.get('path'),
+            'vendorName': cdn_instance_detail.get('vendorName'),
+            'cname': cdn_instance_detail.get('cname'),
+            'domain': cdn_instance_detail.get('domain'),
+            'httpPort': cdn_instance_detail.get('httpPort')
+        }
+
+        if header:
+            config['header'] = header
+
+        if http_port:
+            config['httpPort'] = http_port
+
+        if origin:
+            config['origin'] = origin
+
+        if respect_headers:
+            config['respectHeaders'] = respect_headers
+
+        if cache:
+            if 'include-specified' in cache['cacheKeyQueryRule']:
+                cache_key_rule = self.get_cache_key_query_rule('include', cache)
+                config['cacheKeyQueryRule'] = cache_key_rule
+            elif 'ignore-specified' in cache['cacheKeyQueryRule']:
+                cache_key_rule = self.get_cache_key_query_rule('ignore', cache)
+                config['cacheKeyQueryRule'] = cache_key_rule
+            else:
+                config['cacheKeyQueryRule'] = cache['cacheKeyQueryRule']
+
+        if performance_configuration:
+            config['performanceConfiguration'] = performance_configuration
+
+        return self.cdn_configuration.updateDomainMapping(config)
+
+    def get_cdn_instance_by_hostname(self, hostname):
+        """Get the cdn object detail.
+
+        :param string hostname: The CDN identifier.
+        :returns: SoftLayer_Container_Network_CdnMarketplace_Configuration_Mapping[].
+        """
+        result = None
+        cdn_list = self.cdn_configuration.listDomainMappings()
+        for cdn in cdn_list:
+            if cdn.get('domain') == hostname:
+                result = cdn
+                break
+
+        return result
+
+    @staticmethod
+    def get_cache_key_query_rule(cache_type, cache):
+        """Get the cdn object detail.
+
+        :param string cache_type: Cache type.
+        :param  cache: Cache description.
+
+        :return: string value.
+        """
+        if 'description' not in cache:
+            raise SoftLayer.SoftLayerError('Please add a description to be able to update the'
+                                           ' cache.')
+        cache_result = '%s: %s' % (cache_type, cache['description'])
+
+        return cache_result
