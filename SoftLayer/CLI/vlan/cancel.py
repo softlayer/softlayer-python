@@ -13,7 +13,7 @@ from SoftLayer.CLI import formatting
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Cancel network vlan."""
+    """Cancel network VLAN."""
 
     mgr = SoftLayer.NetworkManager(env.client)
 
