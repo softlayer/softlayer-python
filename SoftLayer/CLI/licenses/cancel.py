@@ -18,20 +18,20 @@ def cli(env, key, immediate):
 
     if not immediate:
         immediate = False
-    vmware_find = False
-    license = LicensesManager(env.client)
+    vm_ware_find = False
+    licenses = LicensesManager(env.client)
 
-    vmware_licenses = license.get_all_objects()
+    vm_ware_licenses = licenses.get_all_objects()
 
-    for vmware in vmware_licenses:
-        if vmware.get('key') == key:
-            vmware_find = True
-            license.cancel_item(utils.lookup(vmware, 'billingItem', 'id'),
+    for vm_ware in vm_ware_licenses:
+        if vm_ware.get('key') == key:
+            vm_ware_find = True
+            licenses.cancel_item(utils.lookup(vm_ware, 'billingItem', 'id'),
                                 immediate,
                                 'Cancel by cli command',
                                 'Cancel by cli command')
             break
 
-    if not vmware_find:
+    if not vm_ware_find:
         raise exceptions.CLIAbort(
             "The VMware not found, try whit another key")
