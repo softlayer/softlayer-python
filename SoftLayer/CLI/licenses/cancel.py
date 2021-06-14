@@ -1,5 +1,5 @@
-"""Cancel VMware licenses."""
-# :license: MIT, see LICENSE for more details.
+"""Cancel a vwmare licenses."""
+# :licenses: MIT, see LICENSE for more details.
 
 import click
 from SoftLayer import utils
