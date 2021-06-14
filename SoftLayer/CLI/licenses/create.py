@@ -13,7 +13,7 @@ from SoftLayer.CLI import formatting
 @click.option('--datacenter', '-d', required=True, prompt=True, help="Datacenter shortname")
 @environment.pass_env
 def cli(env, key, datacenter):
-    """Order/create a vlan instance."""
+    """Order/create a Vm licenses instance."""
 
     complex_type = 'SoftLayer_Container_Product_Order_Software_License'
     item_package = [key]

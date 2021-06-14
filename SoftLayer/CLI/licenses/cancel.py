@@ -14,7 +14,7 @@ from SoftLayer.managers.license import LicensesManager
 @click.option('--immediate', is_flag=True, help='Immediate cancellation')
 @environment.pass_env
 def cli(env, key, immediate):
-    """Cancel VMware license."""
+    """Cancel VMware licenses."""
 
     if not immediate:
         immediate = False
