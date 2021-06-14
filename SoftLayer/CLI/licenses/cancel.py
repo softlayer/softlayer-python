@@ -27,9 +27,9 @@ def cli(env, key, immediate):
         if vm_ware.get('key') == key:
             vm_ware_find = True
             licenses.cancel_item(utils.lookup(vm_ware, 'billingItem', 'id'),
-                                immediate,
-                                'Cancel by cli command',
-                                'Cancel by cli command')
+                                 immediate,
+                                 'Cancel by cli command',
+                                 'Cancel by cli command')
             break
 
     if not vm_ware_find:
