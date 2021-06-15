@@ -293,3 +293,13 @@ class AccountManager(utils.IdentifierMixin, object):
             }
 
         return self.client['SoftLayer_Account'].getRouters(filter=object_filter, mask=mask)
+
+    def get_network_message_delivery_accounts(self):
+        """Gets all Network Message delivery accounts.
+
+        :returns: Network Message delivery accounts
+        """
+
+        _mask = """vendor,type"""
+
+        return self.client['SoftLayer_Account'].getNetworkMessageDeliveryAccounts(mask=_mask)
