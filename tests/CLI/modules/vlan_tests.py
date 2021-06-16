@@ -111,7 +111,7 @@ class VlanTests(testing.TestCase):
         order_mock.return_value = SoftLayer_Product_Order.vlan_placeOrder
 
         result = self.run_command(['vlan', 'create',
-                                   '--name','test',
+                                   '--name', 'test',
                                    '-d TEST00',
                                    '--network', 'public',
                                    '--billing', 'hourly'
