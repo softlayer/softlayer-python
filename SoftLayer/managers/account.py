@@ -307,8 +307,8 @@ class AccountManager(utils.IdentifierMixin, object):
     def get_active_virtual_licenses(self):
         """Gets all active virtual licenses account.
 
-                :returns: active virtual licenses account
-                """
+        :returns: active virtual licenses account
+        """
 
         _mask = """billingItem[categoryCode,createDate,description],
                     key,id,ipAddress,
@@ -320,8 +320,9 @@ class AccountManager(utils.IdentifierMixin, object):
     def get_active_account_licenses(self):
         """Gets all active account licenses.
 
-                        :returns: Active account Licenses
-                        """
+        :returns: Active account Licenses
+        """
+
         _mask = """billingItem,softwareDescription"""
 
         return self.client['SoftLayer_Account'].getActiveAccountLicenses(mask=_mask)

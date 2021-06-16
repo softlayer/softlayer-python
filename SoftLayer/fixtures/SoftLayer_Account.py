@@ -1104,7 +1104,7 @@ getNetworkMessageDeliveryAccounts = [
 getActiveAccountLicenses = [{
     "accountId": 123456,
     "capacity": "4",
-    "key": "M02A5-6CJ8L-J8R9H-000R0-CDR70",
+    "key": "Y8GNS-7QRNG-OUIJO-MATEI-5GJRM",
     "units": "CPU",
     "billingItem": {
         "allowCancellationFlag": 1,
@@ -1141,7 +1141,7 @@ getActiveAccountLicenses = [{
     {
         "accountId": 123456,
         "capacity": "4",
-        "key": "4122M-ABXC05-K829T-098HP-00QJM",
+        "key": "TSZES-SJF85-04GLD-AXA64-8O1EO",
         "units": "CPU",
         "billingItem": {
             "allowCancellationFlag": 1,
@@ -1179,7 +1179,7 @@ getActiveAccountLicenses = [{
 getActiveVirtualLicenses = [{
     "id": 12345,
     "ipAddress": "192.168.23.78",
-    "key": "PLSK.06866259.0000",
+    "key": "TEST.60220734.0000",
     "billingItem": {
         "categoryCode": "control_panel",
         "description": "Plesk Onyx (Linux) - (Unlimited) - VPS "

@@ -1,4 +1,4 @@
-"""Show the all account licenses."""
+"""Show all licenses."""
 # :license: MIT, see LICENSE for more details.
 import click
 from SoftLayer import utils
@@ -11,7 +11,7 @@ from SoftLayer.managers.account import AccountManager
 @click.command()
 @environment.pass_env
 def cli(env):
-    """return the control panel and VMWare licenses"""
+    """Show all licenses."""
 
     manager = AccountManager(env.client)
 
