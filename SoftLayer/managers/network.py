@@ -437,16 +437,6 @@ class NetworkManager(object):
         """
         return self.vlan.getObject(id=vlan_id, mask=DEFAULT_GET_VLAN_MASK)
 
-    def get_network_gateway_firewall(self, vlan_id):
-        """Returns information about a single VLAN.
-
-        :param int id: The unique identifier for the VLAN
-        :returns: A dictionary containing a large amount of information about
-                  the specified VLAN.
-
-        """
-        return self.vlan.getObject(id=vlan_id, mask=DEFAULT_GET_VLAN_MASK)
-
     def list_global_ips(self, version=None, identifier=None, **kwargs):
         """Returns a list of all global IP address records on the account.
 
