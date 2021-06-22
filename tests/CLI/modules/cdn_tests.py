@@ -122,4 +122,11 @@ class CdnTests(testing.TestCase):
                                    '--origin=10.34.12.125', '--cache', 'include-specified', '--cache', 'test'])
         self.assert_no_fail(result)
         header_result = json.loads(result.output)
-        self.assertEqual('include: test', header_result['CacheKeyQueryRule'])
+        self.assertEqual('include: test', header_result['Cache key optimization'])
+
+    def test_edit_cache_by_uniqueId(self):
+        result = self.run_command(['cdn', 'edit', '9934111111111',
+                                   '--origin=10.34.12.125', '--cache', 'include-specified', '--cache', 'test'])
+        self.assert_no_fail(result)
+        header_result = json.loads(result.output)
+        self.assertEqual('include: test', header_result['Cache key optimization'])

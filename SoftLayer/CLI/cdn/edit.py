@@ -6,10 +6,11 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
 @click.command()
-@click.argument('hostname')
+@click.argument('identifier')
 @click.option('--header', '-H',
               type=click.STRING,
               help="Host header."
@@ -39,10 +40,14 @@ from SoftLayer.CLI import formatting
                    "the Dynamic content acceleration option is not added because this has a special configuration."
               )
 @environment.pass_env
-def cli(env, hostname, header, http_port, origin, respect_headers, cache, performance_configuration):
-    """Edit a CDN Account."""
+def cli(env, identifier, header, http_port, origin, respect_headers, cache, performance_configuration):
+    """Edit a CDN Account.
+
+       You can use the hostname or uniqueId as IDENTIFIER.
+    """
 
     manager = SoftLayer.CDNManager(env.client)
+    cdn_id = helpers.resolve_id(manager.resolve_ids, identifier, 'CDN')
 
     cache_result = {}
     if cache:
@@ -52,7 +57,7 @@ def cli(env, hostname, header, http_port, origin, respect_headers, cache, perfor
         else:
             cache_result['cacheKeyQueryRule'] = cache[0]
 
-    cdn_result = manager.edit(hostname, header=header, http_port=http_port, origin=origin,
+    cdn_result = manager.edit(cdn_id, header=header, http_port=http_port, origin=origin,
                               respect_headers=respect_headers, cache=cache_result,
                               performance_configuration=performance_configuration)
 
@@ -70,7 +75,7 @@ def cli(env, hostname, header, http_port, origin, respect_headers, cache, perfor
         table.add_row(['Respect Headers', cdn.get('respectHeaders')])
         table.add_row(['Unique Id', cdn.get('uniqueId')])
         table.add_row(['Vendor Name', cdn.get('vendorName')])
-        table.add_row(['CacheKeyQueryRule', cdn.get('cacheKeyQueryRule')])
+        table.add_row(['Cache key optimization', cdn.get('cacheKeyQueryRule')])
         table.add_row(['cname', cdn.get('cname')])
 
     env.fout(table)

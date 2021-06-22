@@ -9,6 +9,9 @@ import SoftLayer
 from SoftLayer import utils
 
 
+# pylint: disable=no-self-use,too-many-lines,too-many-instance-attributes
+
+
 class CDNManager(utils.IdentifierMixin, object):
     """Manage Content Delivery Networks in the account.
 
@@ -27,6 +30,7 @@ class CDNManager(utils.IdentifierMixin, object):
         self.cdn_path = self.client['SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path']
         self.cdn_metrics = self.client['Network_CdnMarketplace_Metrics']
         self.cdn_purge = self.client['SoftLayer_Network_CdnMarketplace_Configuration_Cache_Purge']
+        self.resolvers = [self._get_ids_from_hostname]
 
     def list_cdn(self, **kwargs):
         """Lists Content Delivery Networks for the active user.
@@ -171,11 +175,11 @@ class CDNManager(utils.IdentifierMixin, object):
         """Retrieve the cdn usage metric end date."""
         return self._end_date
 
-    def edit(self, hostname, header=None, http_port=None, origin=None,
+    def edit(self, identifier, header=None, http_port=None, origin=None,
              respect_headers=None, cache=None, performance_configuration=None):
         """Edit the cdn object.
 
-        :param string hostname: The CDN hostname.
+        :param string identifier: The CDN identifier.
         :param header: The cdn Host header.
         :param http_port: The cdn HTTP port.
         :param origin: The cdn Origin server address.
@@ -185,14 +189,10 @@ class CDNManager(utils.IdentifierMixin, object):
 
         :returns: SoftLayer_Container_Network_CdnMarketplace_Configuration_Mapping[].
         """
-        cdn_instance_detail = self.get_cdn_instance_by_hostname(hostname)
-        if cdn_instance_detail is None:
-            raise SoftLayer.SoftLayerError('The CDN was not found with the hostname: %s' % hostname)
-
-        unique_id = cdn_instance_detail.get('uniqueId')
+        cdn_instance_detail = self.get_cdn(str(identifier))
 
         config = {
-            'uniqueId': unique_id,
+            'uniqueId': cdn_instance_detail.get('uniqueId'),
             'originType': cdn_instance_detail.get('originType'),
             'protocol': cdn_instance_detail.get('protocol'),
             'path': cdn_instance_detail.get('path'),
@@ -229,17 +229,17 @@ class CDNManager(utils.IdentifierMixin, object):
 
         return self.cdn_configuration.updateDomainMapping(config)
 
-    def get_cdn_instance_by_hostname(self, hostname):
+    def _get_ids_from_hostname(self, hostname):
         """Get the cdn object detail.
 
         :param string hostname: The CDN identifier.
         :returns: SoftLayer_Container_Network_CdnMarketplace_Configuration_Mapping[].
         """
-        result = None
+        result = []
         cdn_list = self.cdn_configuration.listDomainMappings()
         for cdn in cdn_list:
-            if cdn.get('domain') == hostname:
-                result = cdn
+            if cdn.get('domain', '').lower() == hostname.lower():
+                result.append(cdn.get('uniqueId'))
                 break
 
         return result
