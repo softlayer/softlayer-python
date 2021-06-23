@@ -10,17 +10,22 @@ from SoftLayer.CLI import formatting
 
 @click.command()
 @click.option('--name', required=False, prompt=True, help="Vlan name")
-@click.option('--datacenter', '-d', required=True, prompt=True, help="Datacenter shortname")
+@click.option('--datacenter', '-d', required=False, help="Datacenter shortname")
+@click.option('--pod', '-p', required=False, help="Pod name. E.g dal05.pod01")
 @click.option('--network', default='public', show_default=True, type=click.Choice(['public', 'private']),
               help='Network vlan type')
 @click.option('--billing', default='hourly', show_default=True, type=click.Choice(['hourly', 'monthly']),
               help="Billing rate")
 @environment.pass_env
-def cli(env, name, datacenter, network, billing):
+def cli(env, name, datacenter, pod, network, billing):
     """Order/create a VLAN instance."""
 
     item_package = ['PUBLIC_NETWORK_VLAN']
     complex_type = 'SoftLayer_Container_Product_Order_Network_Vlan'
+
+    if pod and not datacenter:
+        datacenter = pod.split('.')[0]
+
     if not network:
         item_package = ['PRIVATE_NETWORK_VLAN']
 
