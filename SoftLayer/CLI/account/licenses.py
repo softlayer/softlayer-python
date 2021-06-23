@@ -1,11 +1,12 @@
 """Show all licenses."""
 # :license: MIT, see LICENSE for more details.
 import click
+
 from SoftLayer import utils
 
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-from SoftLayer.managers.account import AccountManager
+from SoftLayer.managers import account
 
 
 @click.command()
@@ -13,17 +14,17 @@ from SoftLayer.managers.account import AccountManager
 def cli(env):
     """Show all licenses."""
 
-    manager = AccountManager(env.client)
+    manager = account.AccountManager(env.client)
 
-    panel_control = manager.get_active_virtual_licenses()
+    control_panel = manager.get_active_virtual_licenses()
     vmwares = manager.get_active_account_licenses()
 
     table_panel = formatting.KeyValueTable(['id', 'ip_address', 'manufacturer', 'software',
-                                            'key', 'subnet', 'subnet notes'])
+                                            'key', 'subnet', 'subnet notes'], title="Control Panel Licenses")
 
     table_vmware = formatting.KeyValueTable(['name', 'license_key', 'cpus', 'description',
-                                             'manufacturer', 'requiredUser'])
-    for panel in panel_control:
+                                             'manufacturer', 'requiredUser'], title="VMware Licenses")
+    for panel in control_panel:
         table_panel.add_row([panel.get('id'), panel.get('ipAddress'),
                              utils.lookup(panel, 'softwareDescription', 'manufacturer'),
                              utils.trim_to(utils.lookup(panel, 'softwareDescription', 'longDescription'), 40),
