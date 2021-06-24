@@ -2,28 +2,29 @@
 # :licenses: MIT, see LICENSE for more details.
 
 import click
-from SoftLayer.managers import ordering
+
+import SoftLayer
 
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
 
 @click.command()
-@click.option('--key', '-k', required=True, prompt=True, help="The License Key for this specific Account License.")
+@click.option('--key', '-k', required=True, prompt=True,
+              help="The VMware License Key. "
+                   "To get could use the product_package::getItems id=301 with name Software License Package"
+                   "E.g VMWARE_VSAN_ENTERPRISE_TIER_III_65_124_TB_6_X_2")
 @click.option('--datacenter', '-d', required=True, prompt=True, help="Datacenter shortname")
 @environment.pass_env
 def cli(env, key, datacenter):
-    """Order/create a Vm licenses instance."""
+    """Order/Create License."""
 
-    complex_type = 'SoftLayer_Container_Product_Order_Software_License'
     item_package = [key]
 
-    ordering_manager = ordering.OrderingManager(env.client)
-    result = ordering_manager.place_order(package_keyname='SOFTWARE_LICENSE_PACKAGE',
-                                          location=datacenter,
-                                          item_keynames=item_package,
-                                          complex_type=complex_type,
-                                          hourly=False)
+    licenses = SoftLayer.LicensesManager(env.client)
+
+    result = licenses.create(datacenter, item_package)
+
     table = formatting.KeyValueTable(['name', 'value'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'

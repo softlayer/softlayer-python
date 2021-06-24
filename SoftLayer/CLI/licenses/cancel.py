@@ -1,12 +1,10 @@
-"""Cancel a vwmare licenses."""
+"""Cancel a license."""
 # :licenses: MIT, see LICENSE for more details.
 
 import click
-from SoftLayer import utils
+import SoftLayer
 
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
-from SoftLayer.managers.license import LicensesManager
 
 
 @click.command()
@@ -14,24 +12,8 @@ from SoftLayer.managers.license import LicensesManager
 @click.option('--immediate', is_flag=True, help='Immediate cancellation')
 @environment.pass_env
 def cli(env, key, immediate):
-    """Cancel VMware licenses."""
+    """Cancel a license."""
 
-    if not immediate:
-        immediate = False
-    vm_ware_find = False
-    licenses = LicensesManager(env.client)
+    licenses = SoftLayer.LicensesManager(env.client)
 
-    vm_ware_licenses = licenses.get_all_objects()
-
-    for vm_ware in vm_ware_licenses:
-        if vm_ware.get('key') == key:
-            vm_ware_find = True
-            licenses.cancel_item(utils.lookup(vm_ware, 'billingItem', 'id'),
-                                 immediate,
-                                 'Cancel by cli command',
-                                 'Cancel by cli command')
-            break
-
-    if not vm_ware_find:
-        raise exceptions.CLIAbort(
-            "The VMware not found, try whit another key")
+    env.fout(licenses.cancel_item(key, immediate))
