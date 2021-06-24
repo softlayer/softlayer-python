@@ -51,7 +51,11 @@ class LicensesManager(object):
         return vm_ware_find
 
     def create(self, datacenter, item_package):
+        """Create a license
 
+        :param string datacenter: the datacenter shortname
+        :param string[] item_package: items array
+        """
         complex_type = 'SoftLayer_Container_Product_Order_Software_License'
         ordering_manager = ordering.OrderingManager(self.client)
         return ordering_manager.place_order(package_keyname='SOFTWARE_LICENSE_PACKAGE',
