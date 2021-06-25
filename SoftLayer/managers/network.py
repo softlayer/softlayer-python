@@ -774,3 +774,10 @@ class NetworkManager(object):
                                 reason_cancel,
                                 customer_note,
                                 id=identifier)
+
+    def get_router(self):
+        """return routers account.
+
+        Returns routers.
+        """
+        return self.client.call('SoftLayer_Network_Pod', 'getAllObjects')

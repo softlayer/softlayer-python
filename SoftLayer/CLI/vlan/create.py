@@ -1,10 +1,11 @@
 """Order/create a VLAN instance."""
 # :license: MIT, see LICENSE for more details.
-
 import click
+import SoftLayer
 from SoftLayer.managers import ordering
 
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
@@ -22,10 +23,18 @@ def cli(env, name, datacenter, pod, network, billing):
 
     item_package = ['PUBLIC_NETWORK_VLAN']
     complex_type = 'SoftLayer_Container_Product_Order_Network_Vlan'
-
+    extras = {'name': name}
     if pod and not datacenter:
         datacenter = pod.split('.')[0]
-
+        mgr = SoftLayer.NetworkManager(env.client)
+        pods = mgr.get_router()
+        for router in pods:
+            if router.get('name') == pod:
+                extras['routerId'] = router.get('frontendRouterId')
+                break
+        if not extras.get('routerId'):
+            raise exceptions.CLIAbort(
+                "Unable to find pod name: {}".format(pod))
     if not network:
         item_package = ['PRIVATE_NETWORK_VLAN']
 
@@ -35,7 +44,7 @@ def cli(env, name, datacenter, pod, network, billing):
                                           item_keynames=item_package,
                                           complex_type=complex_type,
                                           hourly=billing,
-                                          extras={'name': name})
+                                          extras=extras)
     table = formatting.KeyValueTable(['name', 'value'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'

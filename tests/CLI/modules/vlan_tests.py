@@ -130,7 +130,7 @@ class VlanTests(testing.TestCase):
 
         result = self.run_command(['vlan', 'create',
                                    '--name', 'test',
-                                   '-p TEST00.pod2',
+                                   '-p', 'TEST00.pod2',
                                    '--network', 'public',
                                    '--billing', 'hourly'
                                    ])
