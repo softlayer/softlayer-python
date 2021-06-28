@@ -5,8 +5,9 @@
     :license: MIT, see LICENSE for more details.
 """
 
-
 # pylint: disable=too-many-public-methods
+
+LICENSE_PACKAGE_ID = 301
 
 
 class LicensesManager(object):
@@ -18,8 +19,7 @@ class LicensesManager(object):
     def get_create_options(self):
         """Returns valid options for ordering Licenses.
 
-        :param string datacenter: short name, like dal09
         """
 
         return self.client.call('SoftLayer_Product_Package', 'getItems',
-                                id=301)
+                                id=LICENSE_PACKAGE_ID)
