@@ -24,10 +24,10 @@ def cli(env, name, datacenter, pod, network, billing):
     item_package = ['PUBLIC_NETWORK_VLAN']
     complex_type = 'SoftLayer_Container_Product_Order_Network_Vlan'
     extras = {'name': name}
-    if pod and not datacenter:
+    if pod:
         datacenter = pod.split('.')[0]
         mgr = SoftLayer.NetworkManager(env.client)
-        pods = mgr.get_router()
+        pods = mgr.get_pods()
         for router in pods:
             if router.get('name') == pod:
                 extras['routerId'] = router.get('frontendRouterId')
@@ -35,7 +35,7 @@ def cli(env, name, datacenter, pod, network, billing):
         if not extras.get('routerId'):
             raise exceptions.CLIAbort(
                 "Unable to find pod name: {}".format(pod))
-    if not network:
+    if network == 'private':
         item_package = ['PRIVATE_NETWORK_VLAN']
 
     ordering_manager = ordering.OrderingManager(env.client)

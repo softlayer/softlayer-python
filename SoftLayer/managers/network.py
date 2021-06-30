@@ -775,9 +775,13 @@ class NetworkManager(object):
                                 customer_note,
                                 id=identifier)
 
-    def get_router(self):
-        """return routers account.
+    def get_pods(self, datacenter=None):
+        """Calls SoftLayer_Network_Pod::getAllObjects()
 
-        Returns routers.
+        returns list of all network pods and their routers.
         """
-        return self.client.call('SoftLayer_Network_Pod', 'getAllObjects')
+        _filter = None
+        if datacenter:
+            _filter = {"datacenterName": {"operation": datacenter}}
+
+        return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', filter=_filter)
