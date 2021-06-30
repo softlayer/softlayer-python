@@ -116,3 +116,9 @@ class AccountCLITests(testing.TestCase):
         result = self.run_command(['account', 'orders'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Billing_Order', 'getAllObjects')
+
+    def test_acccount_licenses(self):
+        result = self.run_command(['account', 'licenses'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getActiveVirtualLicenses')
+        self.assert_called_with('SoftLayer_Account', 'getActiveAccountLicenses')
