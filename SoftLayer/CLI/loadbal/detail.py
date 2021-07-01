@@ -83,8 +83,8 @@ def lbaas_table(this_lb):
 
     # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_Member/
     member_col = ['UUID', 'Address', 'Weight', 'Modify', 'Active']
-    for uuid in pools:
-        member_col.append(pools[uuid])
+    for uuid in pools.values():
+        member_col.append(uuid)
     member_table = formatting.Table(member_col)
     for member in this_lb.get('members', []):
         row = [
