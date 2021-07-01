@@ -228,7 +228,7 @@ def build_filter_orderby(orderby):
     for keyword in reverse_filter:
         _aux_filter = {}
         if '=' in keyword:
-            _aux_filter[str(keyword).split('=')[0]] = query_filter_orderby(str(keyword).split('=')[1])
+            _aux_filter[str(keyword).split('=',  maxsplit=1)[0]] = query_filter_orderby(str(keyword).split('=')[1])
             _filters = _aux_filter
         elif keyword == list(reverse_filter)[0]:
             _aux_filter[keyword] = query_filter_orderby('DESC')

@@ -24,11 +24,11 @@ class TemplateCallback(object):
         if value is None:
             return
 
-        config = configparser.ConfigParser()
-        ini_str = '[settings]\n' + open(
-            os.path.expanduser(value), 'r').read()
-        ini_fp = io.StringIO(ini_str)
-        config.read_file(ini_fp)
+        with open(os.path.expanduser(value), 'r') as file_handle:
+            config = configparser.ConfigParser()
+            ini_str = '[settings]\n' + file_handle.read()
+            ini_fp = io.StringIO(ini_str)
+            config.read_file(ini_fp)
 
         # Merge template options with the options passed in
         args = {}

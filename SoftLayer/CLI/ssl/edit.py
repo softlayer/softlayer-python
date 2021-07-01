@@ -24,14 +24,18 @@ from SoftLayer.CLI import environment
 def cli(env, identifier, crt, csr, icc, key, notes):
     """Edit SSL certificate."""
     template = {'id': identifier}
-    if crt:
-        template['certificate'] = open(crt).read()
-    if key:
-        template['privateKey'] = open(key).read()
-    if csr:
-        template['certificateSigningRequest'] = open(csr).read()
-    if icc:
-        template['intermediateCertificate'] = open(icc).read()
+    with open(crt) as file_crt:
+        if crt:
+            template['certificate'] = file_crt.read()
+    with open(key) as file_key:
+        if key:
+            template['privateKey'] = file_key.read()
+    with open(csr) as file_csr:
+        if csr:
+            template['certificateSigningRequest'] = file_csr.read()
+    with open(icc) as file_icc:
+        if icc:
+            template['intermediateCertificate'] = file_icc.read()
     if notes:
         template['notes'] = notes
 
