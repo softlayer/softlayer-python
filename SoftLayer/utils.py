@@ -228,7 +228,7 @@ def build_filter_orderby(orderby):
     for keyword in reverse_filter:
         _aux_filter = {}
         if '=' in keyword:
-            _aux_filter[str(keyword).split('=')[0]] = query_filter_orderby(str(keyword).split('=')[1])
+            _aux_filter[str(keyword).split('=',  maxsplit=1)[0]] = query_filter_orderby(str(keyword).split('=')[1])
             _filters = _aux_filter
         elif keyword == list(reverse_filter)[0]:
             _aux_filter[keyword] = query_filter_orderby('DESC')
@@ -406,3 +406,24 @@ def trim_to(string, length=80, tail="..."):
         return string[:length] + tail
     else:
         return string
+
+
+def format_comment(comment, max_line_length=60):
+    """Return a string that is length long, added a next line and keep the table format.
+
+    :param string comment: String you want to add next line
+    :param int max_line_length: max length for the string
+    """
+    comment_length = 0
+    words = comment.split(" ")
+    formatted_comment = ""
+    for word in words:
+        if comment_length + (len(word) + 1) <= max_line_length:
+            formatted_comment = formatted_comment + word + " "
+
+            comment_length = comment_length + len(word) + 1
+        else:
+            formatted_comment = formatted_comment + "\n" + word + " "
+
+            comment_length = len(word) + 1
+    return formatted_comment

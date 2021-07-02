@@ -114,9 +114,9 @@ def edit(env, identifier, listener, **args):
         'sslcert': 'tlsCertificateId'
     }
 
-    for arg in args:
-        if args[arg]:
-            new_listener[arg_to_option[arg]] = args[arg]
+    for key, value in args.items():
+        if value:
+            new_listener[arg_to_option[key]] = value
 
     try:
         mgr.add_lb_listener(uuid, new_listener)

@@ -39,3 +39,7 @@ Account Commands
 .. click:: SoftLayer.CLI.account.orders:cli
     :prog: account orders
     :show-nested:
+
+.. click:: SoftLayer.CLI.account.licenses:cli
+    :prog: account licenses
+    :show-nested:

@@ -6,12 +6,13 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI.vlan.detail import get_gateway_firewall
 from SoftLayer import utils
 
 COLUMNS = ['id',
            'number',
            'name',
-           'firewall',
+           'Gateway/Firewall',
            'datacenter',
            'hardware',
            'virtual_servers',
@@ -45,14 +46,14 @@ def cli(env, sortby, datacenter, number, name, limit):
                            limit=limit)
     for vlan in vlans:
         table.add_row([
-            vlan['id'],
-            vlan['vlanNumber'],
+            vlan.get('id'),
+            vlan.get('vlanNumber'),
             vlan.get('name') or formatting.blank(),
-            'Yes' if vlan['firewallInterfaces'] else 'No',
+            get_gateway_firewall(vlan),
             utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name'),
-            vlan['hardwareCount'],
-            vlan['virtualGuestCount'],
-            vlan['totalPrimaryIpAddressCount'],
+            vlan.get('hardwareCount'),
+            vlan.get('virtualGuestCount'),
+            vlan.get('totalPrimaryIpAddressCount'),
         ])
 
     env.fout(table)

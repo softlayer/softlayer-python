@@ -37,6 +37,6 @@ def cli(env, sortby, datacenter):
 
     table = formatting.KeyValueTable(DEFAULT_COLUMNS)
     table.sortby = sortby
-    for datacenter_name in datacenters:
-        table.add_row([datacenter_name, datacenters[datacenter_name]])
+    for key, value in datacenters.items():
+        table.add_row([key, value])
     env.fout(table)
