@@ -17,6 +17,7 @@ from SoftLayer.managers.firewall import FirewallManager
 from SoftLayer.managers.hardware import HardwareManager
 from SoftLayer.managers.image import ImageManager
 from SoftLayer.managers.ipsec import IPSECManager
+from SoftLayer.managers.license import LicensesManager
 from SoftLayer.managers.load_balancer import LoadBalancerManager
 from SoftLayer.managers.metadata import MetadataManager
 from SoftLayer.managers.network import NetworkManager
@@ -43,6 +44,7 @@ __all__ = [
     'HardwareManager',
     'ImageManager',
     'IPSECManager',
+    'LicensesManager',
     'LoadBalancerManager',
     'MetadataManager',
     'NetworkManager',
