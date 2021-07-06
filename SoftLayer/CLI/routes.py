@@ -218,6 +218,10 @@ ALL_ROUTES = [
     ('nas:list', 'SoftLayer.CLI.nas.list:cli'),
     ('nas:credentials', 'SoftLayer.CLI.nas.credentials:cli'),
 
+    ('licenses', 'SoftLayer.CLI.licenses'),
+    ('licenses:create', 'SoftLayer.CLI.licenses.create:cli'),
+    ('licenses:cancel', 'SoftLayer.CLI.licenses.cancel:cli'),
+
     ('object-storage', 'SoftLayer.CLI.object_storage'),
 
     ('object-storage:accounts', 'SoftLayer.CLI.object_storage.list_accounts:cli'),

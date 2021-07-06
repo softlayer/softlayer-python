@@ -2056,6 +2056,32 @@ getObject = {
         }
     }]}
 
+getItems_vmware = [{
+    "capacity": "2",
+    "description": "VMware vSAN Enterprise Tier III 65 - 124 TB 6.x",
+    "id": 9567,
+    "itemTaxCategoryId": 166,
+    "keyName": "VMWARE_VSAN_ENTERPRISE_TIER_III_65_124_TB_6_X_2",
+    "softwareDescriptionId": 1979,
+    "units": "CPU",
+    "itemCategory": {
+        "categoryCode": "software_license",
+        "id": 438,
+        "name": "Software License",
+        "quantityLimit": 1,
+    },
+    "prices": [
+        {
+            "id": 245164,
+            "itemId": 9567,
+            "laborFee": "0",
+            "locationGroupId": None,
+            "oneTimeFee": "0",
+            "setupFee": "0",
+            "sort": 0,
+        }
+    ]}]
+
 getItemsVLAN = [{
     "description": "Private Network Vlan",
     "id": 1072,
