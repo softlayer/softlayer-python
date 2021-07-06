@@ -155,7 +155,7 @@ class VlanTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
-                         {'id': 123456, 'created': '2021-06-02 15:23:47'})
+                         {'id': 123456, 'created': '2021-06-02 15:23:47', 'name': 'test'})
 
     def test_create_vlan_pod(self):
         _mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
@@ -173,7 +173,7 @@ class VlanTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
-                         {'id': 123456, 'created': '2021-06-02 15:23:47'})
+                         {'id': 123456, 'created': '2021-06-02 15:23:47', 'name': 'test'})
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     def test_vlan_cancel(self, confirm_mock):
