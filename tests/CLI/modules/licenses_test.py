@@ -6,8 +6,8 @@
 """
 
 from SoftLayer.fixtures import SoftLayer_Product_Order
-from SoftLayer.fixtures import SoftLayer_Product_Package
 
+from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
 
 
@@ -31,4 +31,5 @@ class LicensesTests(testing.TestCase):
                                    'cancel',
                                    'ABCDE-6CJ8L-J8R9H-000R0-CDR70',
                                    '--immediate'])
+        result = self.run_command(['licenses', 'create-options'])
         self.assert_no_fail(result)

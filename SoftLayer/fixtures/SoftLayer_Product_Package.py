@@ -2076,7 +2076,7 @@ getItems_vmware = [{
             "itemId": 9567,
             "laborFee": "0",
             "locationGroupId": None,
-            "oneTimeFee": "0",
+            "recurringFee": "0",
             "setupFee": "0",
             "sort": 0,
         }
