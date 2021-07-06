@@ -16,6 +16,7 @@ ALL_ROUTES = [
     ('account:invoices', 'SoftLayer.CLI.account.invoices:cli'),
     ('account:events', 'SoftLayer.CLI.account.events:cli'),
     ('account:event-detail', 'SoftLayer.CLI.account.event_detail:cli'),
+    ('account:licenses', 'SoftLayer.CLI.account.licenses:cli'),
     ('account:summary', 'SoftLayer.CLI.account.summary:cli'),
     ('account:billing-items', 'SoftLayer.CLI.account.billing_items:cli'),
     ('account:item-detail', 'SoftLayer.CLI.account.item_detail:cli'),
@@ -219,6 +220,10 @@ ALL_ROUTES = [
     ('nas', 'SoftLayer.CLI.nas'),
     ('nas:list', 'SoftLayer.CLI.nas.list:cli'),
     ('nas:credentials', 'SoftLayer.CLI.nas.credentials:cli'),
+
+    ('licenses', 'SoftLayer.CLI.licenses'),
+    ('licenses:create', 'SoftLayer.CLI.licenses.create:cli'),
+    ('licenses:cancel', 'SoftLayer.CLI.licenses.cancel:cli'),
 
     ('object-storage', 'SoftLayer.CLI.object_storage'),
 

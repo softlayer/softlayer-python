@@ -95,6 +95,42 @@ class VlanTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_Vlan', 'editObject', identifier=100)
 
+    def test_vlan_detail_firewall(self):
+        vlan_mock = self.set_mock('SoftLayer_Network_Vlan', 'getObject')
+        get_object = {
+            'primaryRouter': {
+                'datacenter': {'id': 1234, 'longName': 'TestDC'},
+                'fullyQualifiedDomainName': 'fcr01.TestDC'
+            },
+            'id': 1234,
+            'vlanNumber': 4444,
+            'networkVlanFirewall': {
+                'datacenter': {'id': 1234, 'longName': 'TestDC'},
+                'fullyQualifiedDomainName': 'fcr01.TestDC'
+            },
+        }
+        vlan_mock.return_value = get_object
+        result = self.run_command(['vlan', 'detail', '1234'])
+        self.assert_no_fail(result)
+
+    def test_vlan_detail_gateway(self):
+        vlan_mock = self.set_mock('SoftLayer_Network_Vlan', 'getObject')
+        get_object = {
+            'primaryRouter': {
+                'datacenter': {'id': 1234, 'longName': 'TestDC'},
+                'fullyQualifiedDomainName': 'fcr01.TestDC'
+            },
+            'id': 1234,
+            'vlanNumber': 4444,
+            'attachedNetworkGateway': {
+                'id': 54321,
+                "name": 'support'
+            },
+        }
+        vlan_mock.return_value = get_object
+        result = self.run_command(['vlan', 'detail', '1234'])
+        self.assert_no_fail(result)
+
     def test_vlan_list(self):
         result = self.run_command(['vlan', 'list'])
         self.assert_no_fail(result)

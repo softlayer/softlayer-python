@@ -7,6 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
+from SoftLayer import utils
 
 
 @click.command()
@@ -30,26 +31,24 @@ def cli(env, identifier, no_vs, no_hardware):
     table.align['name'] = 'r'
     table.align['value'] = 'l'
 
-    table.add_row(['id', vlan['id']])
-    table.add_row(['number', vlan['vlanNumber']])
+    table.add_row(['id', vlan.get('id')])
+    table.add_row(['number', vlan.get('vlanNumber')])
     table.add_row(['datacenter',
-                   vlan['primaryRouter']['datacenter']['longName']])
+                   utils.lookup(vlan, 'primaryRouter', 'datacenter', 'longName')])
     table.add_row(['primary_router',
-                   vlan['primaryRouter']['fullyQualifiedDomainName']])
-    table.add_row(['firewall',
-                   'Yes' if vlan['firewallInterfaces'] else 'No'])
+                   utils.lookup(vlan, 'primaryRouter', 'fullyQualifiedDomainName')])
+    table.add_row(['Gateway/Firewall', get_gateway_firewall(vlan)])
     subnets = []
     for subnet in vlan.get('subnets', []):
         subnet_table = formatting.KeyValueTable(['name', 'value'])
         subnet_table.align['name'] = 'r'
         subnet_table.align['value'] = 'l'
-        subnet_table.add_row(['id', subnet['id']])
-        subnet_table.add_row(['identifier', subnet['networkIdentifier']])
-        subnet_table.add_row(['netmask', subnet['netmask']])
-        subnet_table.add_row(['gateway', subnet.get('gateway', '-')])
-        subnet_table.add_row(['type', subnet['subnetType']])
-        subnet_table.add_row(['usable ips',
-                              subnet['usableIpAddressCount']])
+        subnet_table.add_row(['id', subnet.get('id')])
+        subnet_table.add_row(['identifier', subnet.get('networkIdentifier')])
+        subnet_table.add_row(['netmask', subnet.get('netmask')])
+        subnet_table.add_row(['gateway', subnet.get('gateway', formatting.blank())])
+        subnet_table.add_row(['type', subnet.get('subnetType')])
+        subnet_table.add_row(['usable ips', subnet.get('usableIpAddressCount')])
         subnets.append(subnet_table)
 
     table.add_row(['subnets', subnets])
@@ -81,3 +80,15 @@ def cli(env, identifier, no_vs, no_hardware):
             table.add_row(['hardware', 'none'])
 
     env.fout(table)
+
+
+def get_gateway_firewall(vlan):
+    """Gets the name of a gateway/firewall from a VLAN. """
+
+    firewall = utils.lookup(vlan, 'networkVlanFirewall', 'fullyQualifiedDomainName')
+    if firewall:
+        return firewall
+    gateway = utils.lookup(vlan, 'attachedNetworkGateway', 'name')
+    if gateway:
+        return gateway
+    return formatting.blank()

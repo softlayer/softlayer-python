@@ -153,3 +153,11 @@ class AccountManagerTests(testing.TestCase):
     def test_get_routers(self):
         self.manager.get_routers()
         self.assert_called_with("SoftLayer_Account", "getRouters")
+
+    def test_get_active_account_licenses(self):
+        self.manager.get_active_account_licenses()
+        self.assert_called_with("SoftLayer_Account", "getActiveAccountLicenses")
+
+    def test_get_active_virtual_licenses(self):
+        self.manager.get_active_virtual_licenses()
+        self.assert_called_with("SoftLayer_Account", "getActiveVirtualLicenses")
