@@ -30,7 +30,10 @@ def cli(env, name, datacenter, pod, network, billing):
         pods = mgr.get_pods()
         for router in pods:
             if router.get('name') == pod:
-                extras['routerId'] = router.get('frontendRouterId')
+                if network == 'public':
+                    extras['routerId'] = router.get('frontendRouterId')
+                elif network == 'private':
+                    extras['routerId'] = router.get('backendRouterId')
                 break
         if not extras.get('routerId'):
             raise exceptions.CLIAbort(
@@ -50,5 +53,6 @@ def cli(env, name, datacenter, pod, network, billing):
     table.align['value'] = 'l'
     table.add_row(['id', result['orderId']])
     table.add_row(['created', result['orderDate']])
+    table.add_row(['name', result['orderDetails']['orderContainers'][0]['name']])
 
     env.fout(table)
