@@ -1,5 +1,28 @@
 # Change Log
 
+## [5.9.6] - 2021-07-05
+https://github.com/softlayer/softlayer-python/compare/v5.9.5...v5.9.6
+
+#### Improvements
+- Updated snap to core20 and edited README #1494
+- Add a table result for `slcli hw upgrade` output. #1488
+- Remove block/file interval option for replica volume. #1497
+- `slcli vlan cancel` should report if a vlan is automatic. #1495
+- New method to manage how long text is in output tables. #1506
+- Fix Tox-analysis issues. #1510
+
+#### New Commands
+- add new email feature #1483
+    + `slcli email list`
+    + `slcli email detail`
+    + `slcli email edit`
+- `slcli vlan cancel`
+- Add slcli account licenses #1501
+    + `slcli account licenses`
+- Create a new commands on slcli that create/cancel a VMware licenses #1504
+    + `slcli licenses create`
+    + `slcli licenses cancel`
+
 
 ## [5.9.5] - 2021-05-25
 https://github.com/softlayer/softlayer-python/compare/v5.9.4...v5.9.5
