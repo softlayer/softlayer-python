@@ -1,4 +1,4 @@
-name: Release
+name: Release Snapcraft and PyPi (Testing)
 
 on:
   release:
@@ -20,4 +20,32 @@ jobs:
           VERSION=`snapcraft list-revisions slcli --arch ${{ matrix.arch }} | grep "edge\*" | awk '{print $1}'`
           echo Publishing $VERSION on ${{ matrix.arch }}
           snapcraft release slcli $VERSION stable
+  build-n-publish:
+    name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install pypa/build
+      run: >-
+        python -m
+        pip install
+        build
+        --user
+    - name: Build a binary wheel and a source tarball
+      run: >-
+        python -m
+        build
+        --sdist
+        --wheel
+        --outdir dist/
+        .
+    - name: Publish 📦 to Test PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.CGALLO_TEST_PYPI }}
+        repository_url: https://test.pypi.org/legacy/
 

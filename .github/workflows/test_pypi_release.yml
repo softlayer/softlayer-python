@@ -4,16 +4,16 @@ name: Publish 📦 to TestPyPI
 
 on:
   push:
-    branches: [ master, test-pypi ]
+    branches: [test-pypi ]
 
 jobs:
   build-n-publish:
     name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Set up Python 3.8
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: 3.8
     - name: Install pypa/build
