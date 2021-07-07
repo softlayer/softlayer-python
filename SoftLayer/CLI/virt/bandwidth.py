@@ -71,15 +71,15 @@ def create_bandwidth_table(data, summary_period, title="Bandwidth Report"):
         {'keyName': 'privateOut_net_octet', 'sum': 0.0, 'max': 0, 'name': 'Pri Out'},
     ]
 
-    for point in formatted_data:
-        new_row = [point]
+    for key, value in formatted_data.items():
+        new_row = [key]
         for bw_type in bw_totals:
-            counter = formatted_data[point].get(bw_type['keyName'], 0)
+            counter = value.get(bw_type['keyName'], 0)
             new_row.append(mb_to_gb(counter))
             bw_type['sum'] = bw_type['sum'] + counter
             if counter > bw_type['max']:
                 bw_type['max'] = counter
-                bw_type['maxDate'] = point
+                bw_type['maxDate'] = key
         table.add_row(new_row)
 
     for bw_type in bw_totals:

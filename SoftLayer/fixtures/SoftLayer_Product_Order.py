@@ -252,3 +252,35 @@ rsi_placeOrder = {
         ]
     }
 }
+
+wmware_placeOrder = {
+    "orderDate": "2021-06-02 15:23:47",
+    "orderId": 123456,
+    "prices": [
+        {
+            "id": 176535,
+            "itemId": 8109,
+            "categories": [
+                {
+                    "categoryCode": "software_license",
+                    "id": 438,
+                    "name": "Software License"
+                }
+            ],
+            "item": {
+                "capacity": "1",
+                "description": "VMware vSAN Advanced Tier III 64 - 124 TB 6.x",
+                "id": 8109,
+                "keyName": "VMWARE_VSAN_ADVANCE_TIER_III_64_124_6_X",
+                "softwareDescription": {
+                    "id": 1795,
+                },
+                "thirdPartyPolicyAssignments": [
+                    {
+                        "id": 29263,
+                        "policyName": "3rd Party Software Terms VMWare v4"
+                    }
+                ]
+            }
+        }
+    ]}

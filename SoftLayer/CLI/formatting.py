@@ -248,11 +248,11 @@ class SequentialOutput(list):
 class CLIJSONEncoder(json.JSONEncoder):
     """A JSON encoder which is able to use a .to_python() method on objects."""
 
-    def default(self, obj):
+    def default(self, o):
         """Encode object if it implements to_python()."""
-        if hasattr(obj, 'to_python'):
-            return obj.to_python()
-        return super().default(obj)
+        if hasattr(o, 'to_python'):
+            return o.to_python()
+        return super().default(o)
 
 
 class Table(object):

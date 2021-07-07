@@ -901,7 +901,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         """Get the disks prices to be added or upgraded.
 
         :param int location_id: Hardware Server location id.
-        :return int.
+        :return int:
         """
         result = None
         begin_date_object = datetime.datetime.now()

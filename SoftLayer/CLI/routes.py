@@ -16,6 +16,7 @@ ALL_ROUTES = [
     ('account:invoices', 'SoftLayer.CLI.account.invoices:cli'),
     ('account:events', 'SoftLayer.CLI.account.events:cli'),
     ('account:event-detail', 'SoftLayer.CLI.account.event_detail:cli'),
+    ('account:licenses', 'SoftLayer.CLI.account.licenses:cli'),
     ('account:summary', 'SoftLayer.CLI.account.summary:cli'),
     ('account:billing-items', 'SoftLayer.CLI.account.billing_items:cli'),
     ('account:item-detail', 'SoftLayer.CLI.account.item_detail:cli'),
@@ -125,6 +126,9 @@ ALL_ROUTES = [
     ('email:detail', 'SoftLayer.CLI.email.detail:cli'),
     ('email:edit', 'SoftLayer.CLI.email.edit:cli'),
 
+    ('licenses', 'SoftLayer.CLI.licenses'),
+    ('licenses:create-options', 'SoftLayer.CLI.licenses.create_options:cli'),
+
     ('event-log', 'SoftLayer.CLI.event_log'),
     ('event-log:get', 'SoftLayer.CLI.event_log.get:cli'),
     ('event-log:types', 'SoftLayer.CLI.event_log.types:cli'),
@@ -217,6 +221,10 @@ ALL_ROUTES = [
     ('nas', 'SoftLayer.CLI.nas'),
     ('nas:list', 'SoftLayer.CLI.nas.list:cli'),
     ('nas:credentials', 'SoftLayer.CLI.nas.credentials:cli'),
+
+    ('licenses', 'SoftLayer.CLI.licenses'),
+    ('licenses:create', 'SoftLayer.CLI.licenses.create:cli'),
+    ('licenses:cancel', 'SoftLayer.CLI.licenses.cancel:cli'),
 
     ('object-storage', 'SoftLayer.CLI.object_storage'),
 
@@ -342,6 +350,7 @@ ALL_ROUTES = [
     ('vlan:detail', 'SoftLayer.CLI.vlan.detail:cli'),
     ('vlan:edit', 'SoftLayer.CLI.vlan.edit:cli'),
     ('vlan:list', 'SoftLayer.CLI.vlan.list:cli'),
+    ('vlan:cancel', 'SoftLayer.CLI.vlan.cancel:cli'),
 
     ('summary', 'SoftLayer.CLI.summary:cli'),
 

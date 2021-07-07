@@ -31,6 +31,7 @@ __all__ = [
     'BaseClient',
     'API_PUBLIC_ENDPOINT',
     'API_PRIVATE_ENDPOINT',
+    'IAMClient',
 ]
 
 VALID_CALL_ARGS = set((

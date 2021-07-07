@@ -14,3 +14,7 @@ VLANs
 .. click:: SoftLayer.CLI.vlan.list:cli
     :prog: vlan list
     :show-nested:
+
+.. click:: SoftLayer.CLI.vlan.cancel:cli
+    :prog: vlan cancel
+    :show-nested:
