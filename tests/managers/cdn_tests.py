@@ -107,8 +107,7 @@ class CDNTests(testing.TestCase):
     def test_cdn_edit(self):
         identifier = '9934111111111'
         header = 'www.test.com'
-        origin = '1.1.1.1'
-        result = self.cdn_client.edit(identifier, header=header, origin=origin)
+        result = self.cdn_client.edit(identifier, header=header)
 
         self.assertEqual(fixtures.SoftLayer_Network_CdnMarketplace_Configuration_Mapping.
                          updateDomainMapping, result)

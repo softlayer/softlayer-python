@@ -199,7 +199,8 @@ class CDNManager(utils.IdentifierMixin, object):
             'vendorName': cdn_instance_detail.get('vendorName'),
             'cname': cdn_instance_detail.get('cname'),
             'domain': cdn_instance_detail.get('domain'),
-            'httpPort': cdn_instance_detail.get('httpPort')
+            'httpPort': cdn_instance_detail.get('httpPort'),
+            'origin': cdn_instance_detail.get('originHost')
         }
 
         if header:

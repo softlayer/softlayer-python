@@ -20,7 +20,6 @@ from SoftLayer.CLI import helpers
               help="HTTP port."
               )
 @click.option('--origin', '-o',
-              required=True,
               type=click.STRING,
               help="Origin server address."
               )
@@ -43,7 +42,7 @@ from SoftLayer.CLI import helpers
 def cli(env, identifier, header, http_port, origin, respect_headers, cache, performance_configuration):
     """Edit a CDN Account.
 
-       You can use the hostname or uniqueId as IDENTIFIER.
+       Note: You can use the hostname or uniqueId as IDENTIFIER.
     """
 
     manager = SoftLayer.CDNManager(env.client)
@@ -77,5 +76,6 @@ def cli(env, identifier, header, http_port, origin, respect_headers, cache, perf
         table.add_row(['Vendor Name', cdn.get('vendorName')])
         table.add_row(['Cache key optimization', cdn.get('cacheKeyQueryRule')])
         table.add_row(['cname', cdn.get('cname')])
+        table.add_row(['Origin server address', cdn.get('originHost')])
 
     env.fout(table)
