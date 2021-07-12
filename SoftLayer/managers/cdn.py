@@ -200,7 +200,8 @@ class CDNManager(utils.IdentifierMixin, object):
             'cname': cdn_instance_detail.get('cname'),
             'domain': cdn_instance_detail.get('domain'),
             'httpPort': cdn_instance_detail.get('httpPort'),
-            'origin': cdn_instance_detail.get('originHost')
+            'origin': cdn_instance_detail.get('originHost'),
+            'header': cdn_instance_detail.get('header')
         }
 
         if header:
