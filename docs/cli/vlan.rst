@@ -3,6 +3,10 @@
 VLANs
 =====
 
+.. click:: SoftLayer.CLI.vlan.create:cli
+    :prog: vlan create
+    :show-nested:
+
 .. click:: SoftLayer.CLI.vlan.detail:cli
     :prog: vlan detail
     :show-nested:

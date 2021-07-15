@@ -284,3 +284,22 @@ wmware_placeOrder = {
             }
         }
     ]}
+
+vlan_placeOrder = {"orderDate": "2021-06-02 15:23:47",
+                   "orderId": 123456,
+                   "orderDetails": {
+                       "orderContainers": [{
+                           "name": "test"}]},
+                   "prices": [{
+                       "id": 2018,
+                       "itemId": 1071,
+                       "categories": [{
+                           "categoryCode": "network_vlan",
+                           "id": 113,
+                           "name": "Network Vlan"}],
+                       "item": {
+                           "capacity": "0",
+                           "description": "Public Network Vlan",
+                           "id": 1071,
+                           "keyName": "PUBLIC_NETWORK_VLAN"}}
+                   ]}

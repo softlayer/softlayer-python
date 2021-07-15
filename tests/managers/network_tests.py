@@ -624,3 +624,7 @@ class NetworkTests(testing.TestCase):
 
         self.network.edit(vlan_id, name, note, tags)
         self.assert_called_with('SoftLayer_Network_Vlan', 'editObject')
+
+    def test_get_all_pods(self):
+        self.network.get_pods()
+        self.assert_called_with('SoftLayer_Network_Pod', 'getAllObjects')

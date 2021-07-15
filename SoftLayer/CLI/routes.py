@@ -346,6 +346,7 @@ ALL_ROUTES = [
     ('user:vpn-subnet', 'SoftLayer.CLI.user.vpn_subnet:cli'),
 
     ('vlan', 'SoftLayer.CLI.vlan'),
+    ('vlan:create', 'SoftLayer.CLI.vlan.create:cli'),
     ('vlan:detail', 'SoftLayer.CLI.vlan.detail:cli'),
     ('vlan:edit', 'SoftLayer.CLI.vlan.edit:cli'),
     ('vlan:list', 'SoftLayer.CLI.vlan.list:cli'),
