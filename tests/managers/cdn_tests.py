@@ -5,6 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
+from SoftLayer import fixtures
 from SoftLayer.managers import cdn
 from SoftLayer import testing
 
@@ -102,3 +103,37 @@ class CDNTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Cache_Purge',
                                 'createPurge',
                                 args=args)
+
+    def test_cdn_edit(self):
+        identifier = '9934111111111'
+        header = 'www.test.com'
+        result = self.cdn_client.edit(identifier, header=header)
+
+        self.assertEqual(fixtures.SoftLayer_Network_CdnMarketplace_Configuration_Mapping.
+                         updateDomainMapping, result)
+
+        self.assert_called_with(
+            'SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
+            'updateDomainMapping',
+            args=({
+                'uniqueId': '9934111111111',
+                'originType': 'HOST_SERVER',
+                'protocol': 'HTTP',
+                'path': '/',
+                'vendorName': 'akamai',
+                'cname': 'cdnakauuiet7s6u6.cdnedge.bluemix.net',
+                'domain': 'test.example.com',
+                'httpPort': 80,
+                'header': 'www.test.com',
+                'origin': '1.1.1.1'
+            },)
+        )
+
+    def test_cdn_instance_by_hostname(self):
+        hostname = 'test.example.com'
+        result = self.cdn_client._get_ids_from_hostname(hostname)
+        expected_result = fixtures.SoftLayer_Network_CdnMarketplace_Configuration_Mapping.listDomainMappings
+        self.assertEqual(expected_result[0]['uniqueId'], result[0])
+        self.assert_called_with(
+            'SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
+            'listDomainMappings',)

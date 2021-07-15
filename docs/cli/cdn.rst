@@ -27,3 +27,7 @@ Interacting with CDN
 .. click:: SoftLayer.CLI.cdn.purge:cli
    :prog: cdn purge
    :show-nested:
+
+.. click:: SoftLayer.CLI.cdn.edit:cli
+   :prog: cdn edit
+   :show-nested:
