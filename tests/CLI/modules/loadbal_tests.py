@@ -258,11 +258,11 @@ class LoadBalancerTests(testing.TestCase):
         self.assert_no_fail(result)
 
     def test_order_options(self):
-        mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
-        mock.return_value = SoftLayer_Product_Package.getAllObjectsLoadbal
+        fault_string = 'Use `slcli lb order-options --datacenter <DC>`' \
+                       ' to find pricing information and private subnets for that specific site.'
         result = self.run_command(['loadbal', 'order-options'])
-
-        self.assert_no_fail(result)
+        self.assertIn("ERROR: {}".format(fault_string),
+                      result.output)
 
     def test_order_options_with_datacenter(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')

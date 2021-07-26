@@ -89,53 +89,64 @@ def order_options(env, datacenter):
     net_mgr = SoftLayer.NetworkManager(env.client)
     package = mgr.lbaas_order_options()
 
-    for region in package['regions']:
-        dc_name = utils.lookup(region, 'location', 'location', 'name')
+    if not datacenter:
+        data_table = formatting.KeyValueTable(['Datacenters', 'City'])
+        for region in package['regions']:
+            data_table.add_row([region['description'].split('-')[0], region['description'].split('-')[1]])
+            # print(region)
+        env.fout(data_table)
+        click.secho("ERROR: Use `slcli lb order-options --datacenter <DC>` "
+                    "to find pricing information and private subnets for that specific site.")
 
-        # Skip locations if they are not the one requested.
-        if datacenter and dc_name != datacenter:
-            continue
-        this_table = formatting.Table(
-            ['Prices', 'Private Subnets'],
-            title="{}: {}".format(region['keyname'], region['description'])
-        )
+    else:
+        for region in package['regions']:
+            dc_name = utils.lookup(region, 'location', 'location', 'name')
 
-        l_groups = []
-        for group in region['location']['location']['groups']:
-            l_groups.append(group.get('id'))
-
-        # Price lookups
-        prices = []
-        price_table = formatting.KeyValueTable(['KeyName', 'Cost'])
-        for item in package['items']:
-            i_price = {'keyName': item['keyName']}
-            for price in item.get('prices', []):
-                if not price.get('locationGroupId'):
-                    i_price['default_price'] = price.get('hourlyRecurringFee')
-                elif price.get('locationGroupId') in l_groups:
-                    i_price['region_price'] = price.get('hourlyRecurringFee')
-            prices.append(i_price)
-        for price in prices:
-            if price.get('region_price'):
-                price_table.add_row([price.get('keyName'), price.get('region_price')])
-            else:
-                price_table.add_row([price.get('keyName'), price.get('default_price')])
-
-        # Vlan/Subnet Lookups
-        mask = "mask[networkVlan,podName,addressSpace]"
-        subnets = net_mgr.list_subnets(datacenter=dc_name, network_space='PRIVATE', mask=mask)
-        subnet_table = formatting.Table(['Id', 'Subnet', 'Vlan'])
-
-        for subnet in subnets:
-            # Only show these types, easier to filter here than in an API call.
-            if subnet.get('subnetType') != 'PRIMARY' and subnet.get('subnetType') != 'ADDITIONAL_PRIMARY':
+            # Skip locations if they are not the one requested.
+            if datacenter and dc_name != datacenter:
                 continue
-            space = "{}/{}".format(subnet.get('networkIdentifier'), subnet.get('cidr'))
-            vlan = "{}.{}".format(subnet['podName'], subnet['networkVlan']['vlanNumber'])
-            subnet_table.add_row([subnet.get('id'), space, vlan])
-        this_table.add_row([price_table, subnet_table])
+            this_table = formatting.Table(
+                ['Prices', 'Private Subnets'],
+                title="{}: {}".format(region['keyname'], region['description'])
+            )
 
-        env.fout(this_table)
+            l_groups = []
+            for group in region['location']['location']['groups']:
+                l_groups.append(group.get('id'))
+
+            # Price lookups
+            prices = []
+            price_table = formatting.KeyValueTable(['KeyName', 'Cost'])
+            for item in package['items']:
+                i_price = {'keyName': item['keyName']}
+                for price in item.get('prices', []):
+                    if not price.get('locationGroupId'):
+                        i_price['default_price'] = price.get('hourlyRecurringFee')
+                    elif price.get('locationGroupId') in l_groups:
+                        i_price['region_price'] = price.get('hourlyRecurringFee')
+                prices.append(i_price)
+            for price in prices:
+                if price.get('region_price'):
+                    price_table.add_row([price.get('keyName'), price.get('region_price')])
+                else:
+                    price_table.add_row([price.get('keyName'), price.get('default_price')])
+
+            # Vlan/Subnet Lookups
+            mask = "mask[networkVlan,podName,addressSpace]"
+            subnets = net_mgr.list_subnets(datacenter=dc_name, network_space='PRIVATE', mask=mask)
+            subnet_table = formatting.Table(['Id', 'Subnet', 'Vlan'])
+
+            for subnet in subnets:
+                # Only show these types, easier to filter here than in an API call.
+                if subnet.get('subnetType') != 'PRIMARY' and \
+                        subnet.get('subnetType') != 'ADDITIONAL_PRIMARY':
+                    continue
+                space = "{}/{}".format(subnet.get('networkIdentifier'), subnet.get('cidr'))
+                vlan = "{}.{}".format(subnet['podName'], subnet['networkVlan']['vlanNumber'])
+                subnet_table.add_row([subnet.get('id'), space, vlan])
+            this_table.add_row([price_table, subnet_table])
+
+            env.fout(this_table)
 
 
 @click.command()
