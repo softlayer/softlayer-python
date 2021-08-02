@@ -163,6 +163,6 @@ class AccountManagerTests(testing.TestCase):
         self.assert_called_with("SoftLayer_Account", "getActiveVirtualLicenses")
 
     def test_get_routers_with_datacenter(self):
-        self.manager.get_routers('dal13')
+        self.manager.get_routers(location='dal13')
         object_filter = {'routers': {'topLevelLocation': {'name': {'operation': 'dal13'}}}}
         self.assert_called_with("SoftLayer_Account", "getRouters", filter=object_filter)
