@@ -26,7 +26,7 @@ def cli(env, identifier, no_vs, no_hardware):
     subnet_id = helpers.resolve_id(mgr.resolve_subnet_ids, identifier,
                                    name='subnet')
 
-    mask = 'mask[ipAddresses[id, ipAddress,note], datacenter, virtualGuests, hardware]'
+    mask = 'mask[ipAddresses[id, ipAddress,note], datacenter, virtualGuests, hardware, networkVlan[networkSpace]]'
 
     subnet = mgr.get_subnet(subnet_id, mask=mask)
 
