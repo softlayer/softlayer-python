@@ -76,6 +76,26 @@ InsecurePlatformWarning Notice
 ------------------------------
 This library relies on the `requests <http://docs.python-requests.org/>`_ library to make HTTP requests. On Python versions below Python 2.7.9, requests has started emitting a security warning (InsecurePlatformWarning) due to insecurities with creating SSL connections. To resolve this, upgrade to Python 2.7.9+ or follow the instructions here: http://stackoverflow.com/a/29099439.
 
+Basic Usage
+-----------
+
+- `The Complete Command Directory <https://softlayer-python.readthedocs.io/en/latest/cli_directory/>`_
+
+Advanced Usage
+--------------
+
+You can automatically set some parameters via environment variables with by using the SLCLI prefix. For example
+
+.. code-block:: bash
+  $ export SLCLI_VERBOSE=3
+  $ export SLCLI_FORMAT=json
+  $ slcli vs list
+
+is equivalent to 
+
+.. code-block:: bash
+  $ slcli -vvv --format=json vs list
+
 Getting Help
 ------------
 Bugs and feature requests about this library should have a `GitHub issue <https://github.com/softlayer/softlayer-python/issues>`_ opened about them. 
