@@ -103,7 +103,7 @@ def order_options(env, datacenter):
             dc_name = utils.lookup(region, 'location', 'location', 'name')
 
             # Skip locations if they are not the one requested.
-            if datacenter and dc_name != datacenter:
+            if datacenter and dc_name != datacenter.lower():
                 continue
 
             l_groups = []
