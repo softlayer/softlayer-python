@@ -95,7 +95,7 @@ def order_options(env, datacenter):
             data_table.add_row([region['description'].split('-')[0], region['description'].split('-')[1]])
             # print(region)
         env.fout(data_table)
-        click.secho("ERROR: Use `slcli lb order-options --datacenter <DC>` "
+        click.secho("Use `slcli lb order-options --datacenter <DC>` "
                     "to find pricing information and private subnets for that specific site.")
 
     else:
@@ -105,10 +105,6 @@ def order_options(env, datacenter):
             # Skip locations if they are not the one requested.
             if datacenter and dc_name != datacenter:
                 continue
-            this_table = formatting.Table(
-                ['Prices', 'Private Subnets'],
-                title="{}: {}".format(region['keyname'], region['description'])
-            )
 
             l_groups = []
             for group in region['location']['location']['groups']:
@@ -116,7 +112,7 @@ def order_options(env, datacenter):
 
             # Price lookups
             prices = []
-            price_table = formatting.KeyValueTable(['KeyName', 'Cost'])
+            price_table = formatting.KeyValueTable(['KeyName', 'Cost'], title='Prices')
             for item in package['items']:
                 i_price = {'keyName': item['keyName']}
                 for price in item.get('prices', []):
@@ -134,7 +130,7 @@ def order_options(env, datacenter):
             # Vlan/Subnet Lookups
             mask = "mask[networkVlan,podName,addressSpace]"
             subnets = net_mgr.list_subnets(datacenter=dc_name, network_space='PRIVATE', mask=mask)
-            subnet_table = formatting.Table(['Id', 'Subnet', 'Vlan'])
+            subnet_table = formatting.Table(['Id', 'Subnet', 'Vlan'], title='Private subnet')
 
             for subnet in subnets:
                 # Only show these types, easier to filter here than in an API call.
@@ -144,9 +140,9 @@ def order_options(env, datacenter):
                 space = "{}/{}".format(subnet.get('networkIdentifier'), subnet.get('cidr'))
                 vlan = "{}.{}".format(subnet['podName'], subnet['networkVlan']['vlanNumber'])
                 subnet_table.add_row([subnet.get('id'), space, vlan])
-            this_table.add_row([price_table, subnet_table])
 
-            env.fout(this_table)
+            env.fout(price_table)
+            env.fout(subnet_table)
 
 
 @click.command()
