@@ -129,7 +129,7 @@ use: 'slcli setup'""",
               required=False,
               help="Use demo data instead of actually making API calls")
 @click.option('--version', is_flag=True, expose_value=False, is_eager=True, callback=get_version_message,
-              help="Show version information.")
+              help="Show version information.",  allow_from_autoenv=False,)
 @environment.pass_env
 def cli(env,
         format='table',
