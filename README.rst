@@ -87,6 +87,7 @@ Advanced Usage
 You can automatically set some parameters via environment variables with by using the SLCLI prefix. For example
 
 .. code-block:: bash
+
   $ export SLCLI_VERBOSE=3
   $ export SLCLI_FORMAT=json
   $ slcli vs list
@@ -94,6 +95,7 @@ You can automatically set some parameters via environment variables with by usin
 is equivalent to 
 
 .. code-block:: bash
+
   $ slcli -vvv --format=json vs list
 
 Getting Help
