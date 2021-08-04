@@ -1,5 +1,23 @@
 # Change Log
 
+## [5.9.7] - 2021-08-04
+https://github.com/softlayer/softlayer-python/compare/v5.9.6...v5.9.7
+
+#### Improvements
+- Fixed some doc block issues when generating HTML #1513
+- Updates to the Release workflow for publishing to test pypi #1514
+
+- Adding in CodeQL Analysis #1517
+- Create SECURITY.md #1518
+- Fix the network space is empty on subnet detail #1523
+- Prevents SLCLI_VERSION environment variable from breaking things #1527
+- Refactor loadbal order-options #1521
+- slcli server create-options dal13 Error #1526
+
+#### New Commands
+- add new feature on vlan cli #1499
+    + `slcli vlan create`
+
 ## [5.9.6] - 2021-07-05
 https://github.com/softlayer/softlayer-python/compare/v5.9.5...v5.9.6
 
