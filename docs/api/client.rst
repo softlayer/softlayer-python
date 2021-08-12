@@ -228,11 +228,13 @@ The Solution
 Using the python dictionary's `.get() <https://docs.python.org/3/library/stdtypes.html#dict.get>`_ is great for non-nested items.
 
 ::
+
     print("{}, {}".format(item.get('id'), item.get('hostName')))
 
 Otherwise, this SDK provides a util function to do something similar. Each additional argument passed into `utils.lookup` will go one level deeper into the nested dictionary to find the item requested, returning `None` if a KeyError shows up.
 
 ::
+
     itemId = SoftLayer.utils.lookup(item, 'id')
     itemHostname = SoftLayer.utils.lookup(item, 'hostName')
     print("{}, {}".format(itemId, itemHostname))
