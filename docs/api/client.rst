@@ -245,3 +245,11 @@ API Reference
 
 .. automodule:: SoftLayer
     :members:
+    :ignore-module-all:
+
+.. automodule:: SoftLayer.API
+    :members:
+    :ignore-module-all:      
+
+.. automodule:: SoftLayer.decoration
+    :members:
