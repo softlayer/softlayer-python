@@ -20,7 +20,7 @@ def lookup(dic, key, *keys):
     """A generic dictionary access helper.
 
     This helps simplify code that uses heavily nested dictionaries. It will
-    return None if any of the keys in *keys do not exist.
+    return None if any of the keys in `*keys` do not exist.
 
     ::
 
