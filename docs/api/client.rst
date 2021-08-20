@@ -253,3 +253,6 @@ API Reference
 
 .. automodule:: SoftLayer.decoration
     :members:
+
+.. automodule:: SoftLayer.utils
+    :members:
