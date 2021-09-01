@@ -25,7 +25,7 @@ def cli(env, sortby, datacenter):
                                                      mask=mask)
 
     # cycle through all block volumes and count datacenter occurences.
-    datacenters = dict()
+    datacenters = {}
     for volume in block_volumes:
         service_resource = volume['serviceResource']
         if 'datacenter' in service_resource:

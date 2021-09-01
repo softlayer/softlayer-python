@@ -26,7 +26,7 @@ def cli(env, identifier, out_file):
     key = mgr.get_key(key_id)
 
     if out_file:
-        with open(path.expanduser(out_file), 'w') as pub_file:
+        with open(path.expanduser(out_file), 'w', encoding="utf-8") as pub_file:
             pub_file.write(key['key'])
 
     table = formatting.KeyValueTable(['name', 'value'])

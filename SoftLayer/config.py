@@ -118,5 +118,5 @@ def write_config(configuration, config_file=None):
     if config_file is None:
         config_file = '~/.softlayer'
     config_file = os.path.expanduser(config_file)
-    with open(config_file, 'w') as file:
+    with open(config_file, 'w', encoding="utf-8") as file:
         configuration.write(file)
