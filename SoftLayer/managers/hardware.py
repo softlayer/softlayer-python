@@ -1098,6 +1098,10 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self.client.call('Hardware_Server', 'getComponents',
                                 mask=mask, filter=filter_component, id=hardware_id)
 
+    def get_sensors(self, hardware_id):
+        """Returns Hardware sensor data"""
+        return self.client.call('Hardware', 'getSensorData', id=hardware_id)
+
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
     """Picks a valid Bandwidth Item, returns the KeyName"""

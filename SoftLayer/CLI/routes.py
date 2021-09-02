@@ -272,6 +272,7 @@ ALL_ROUTES = [
     ('hardware:dns-sync', 'SoftLayer.CLI.hardware.dns:cli'),
     ('hardware:storage', 'SoftLayer.CLI.hardware.storage:cli'),
     ('hardware:upgrade', 'SoftLayer.CLI.hardware.upgrade:cli'),
+    ('hardware:sensor', 'SoftLayer.CLI.hardware.sensor:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),

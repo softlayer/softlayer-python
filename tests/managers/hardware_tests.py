@@ -557,10 +557,10 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'editObject',
                                 args=({
-                                    'hostname': 'new-host',
-                                    'domain': 'new.sftlyr.ws',
-                                    'notes': 'random notes',
-                                },),
+                                          'hostname': 'new-host',
+                                          'domain': 'new.sftlyr.ws',
+                                          'notes': 'random notes',
+                                      },),
                                 identifier=100)
 
     def test_rescue(self):
@@ -947,6 +947,10 @@ class HardwareTests(testing.TestCase):
         self.assertEqual(result[0]['hardwareId'], 1234)
         self.assertEqual(result[0]['hardwareComponentModel']['name'], 'IMM2 - Onboard')
         self.assertEqual(result[0]['hardwareComponentModel']['firmwares'][0]['version'], '5.60')
+
+    def test_sensor(self):
+        self.hardware.get_sensors(100)
+        self.assert_called_with('SoftLayer_Hardware', 'getSensorData')
 
 
 class HardwareHelperTests(testing.TestCase):
