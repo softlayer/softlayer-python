@@ -48,7 +48,7 @@ class TestXmlRpcAPICall(testing.TestCase):
     def test_call(self, request):
         request.return_value = self.response
 
-        data = '''<?xml version='1.0'?>
+        data = '''<?xml version='1.0' encoding='iso-8859-1'?>
 <methodCall>
 <methodName>getObject</methodName>
 <params>
@@ -63,7 +63,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 </param>
 </params>
 </methodCall>
-'''
+'''.encode()
 
         req = transports.Request()
         req.service = 'SoftLayer_Service'
@@ -134,7 +134,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             """<member>
 <name>id</name>
 <value><int>1234</int></value>
-</member>""", kwargs['data'])
+</member>""".encode(), kwargs['data'])
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_filter(self, request):
@@ -152,7 +152,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             """<member>
 <name>operation</name>
 <value><string>^= prefix</string></value>
-</member>""", kwargs['data'])
+</member>""".encode(), kwargs['data'])
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_limit_offset(self, request):
@@ -169,10 +169,10 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertIn("""<member>
 <name>resultLimit</name>
 <value><struct>
-<member>""", kwargs['data'])
+<member>""".encode(), kwargs['data'])
         self.assertIn("""<name>limit</name>
 <value><int>10</int></value>
-</member>""", kwargs['data'])
+</member>""".encode(), kwargs['data'])
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_old_mask(self, request):
@@ -194,7 +194,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 <value><string>nested</string></value>
 </member>
 </struct></value>
-</member>""", kwargs['data'])
+</member>""".encode(), kwargs['data'])
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
     def test_mask_call_no_mask_prefix(self, request):
@@ -209,7 +209,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 
         args, kwargs = request.call_args
         self.assertIn(
-            "<value><string>mask[something.nested]</string></value>",
+            "<value><string>mask[something.nested]</string></value>".encode(),
             kwargs['data'])
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
@@ -225,7 +225,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 
         args, kwargs = request.call_args
         self.assertIn(
-            "<value><string>mask[something[nested]]</string></value>",
+            "<value><string>mask[something[nested]]</string></value>".encode(),
             kwargs['data'])
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
@@ -241,7 +241,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 
         args, kwargs = request.call_args
         self.assertIn(
-            "<value><string>filteredMask[something[nested]]</string></value>",
+            "<value><string>filteredMask[something[nested]]</string></value>".encode(),
             kwargs['data'])
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
@@ -256,7 +256,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.transport(req)
 
         args, kwargs = request.call_args
-        self.assertIn("<value><string>mask.something.nested</string></value>",
+        self.assertIn("<value><string>mask.something.nested</string></value>".encode(),
                       kwargs['data'])
 
     @mock.patch('SoftLayer.transports.requests.Session.request')
@@ -287,7 +287,7 @@ class TestXmlRpcAPICall(testing.TestCase):
     def test_ibm_id_call(self, auth, request):
         request.return_value = self.response
 
-        data = '''<?xml version='1.0'?>
+        data = '''<?xml version='1.0' encoding='iso-8859-1'?>
 <methodCall>
 <methodName>getObject</methodName>
 <params>
@@ -302,7 +302,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 </param>
 </params>
 </methodCall>
-'''
+'''.encode()
 
         req = transports.Request()
         req.service = 'SoftLayer_Service'
@@ -359,6 +359,57 @@ class TestXmlRpcAPICall(testing.TestCase):
         req.method = 'getObject'
         resp = self.transport(req)
         self.assertEqual(resp[0]['bytesUsed'], 2666148982056)
+
+    @mock.patch('SoftLayer.transports.requests.Session.request')
+    def test_nonascii_characters(self, request):
+        request.return_value = self.response
+        hostname = 'testé'
+        data = '''<?xml version='1.0' encoding='iso-8859-1'?>
+<methodCall>
+<methodName>getObject</methodName>
+<params>
+<param>
+<value><struct>
+<member>
+<name>headers</name>
+<value><struct>
+</struct></value>
+</member>
+</struct></value>
+</param>
+<param>
+<value><struct>
+<member>
+<name>hostname</name>
+<value><string>testé</string></value>
+</member>
+</struct></value>
+</param>
+</params>
+</methodCall>
+'''.encode()
+
+        req = transports.Request()
+        req.service = 'SoftLayer_Service'
+        req.method = 'getObject'
+        req.args = ({'hostname': hostname},)
+        req.transport_user = "testUser"
+        req.transport_password = "testApiKey"
+        resp = self.transport(req)
+
+        request.assert_called_with('POST',
+                                   'http://something9999999999999999999999.com/SoftLayer_Service',
+                                   headers={'Content-Type': 'application/xml',
+                                            'User-Agent': consts.USER_AGENT},
+                                   proxies=None,
+                                   data=data,
+                                   timeout=None,
+                                   cert=None,
+                                   verify=True,
+                                   auth=mock.ANY)
+        self.assertEqual(resp, [])
+        self.assertIsInstance(resp, transports.SoftLayerListResult)
+        self.assertEqual(resp.total_count, 10)
 
 
 @mock.patch('SoftLayer.transports.requests.Session.request')

@@ -42,7 +42,7 @@ def cli(env, identifier, cpu, private, memory, network, flavor, add_disk, resize
     if not (env.skip_confirmations or formatting.confirm("This action will incur charges on your account. Continue?")):
         raise exceptions.CLIAbort('Aborted')
 
-    disk_json = list()
+    disk_json = []
     if memory:
         memory = int(memory / 1024)
     if resize_disk:

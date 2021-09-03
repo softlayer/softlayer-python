@@ -118,7 +118,7 @@ def _parse_create_args(client, args):
     if args.get('userdata'):
         data['userdata'] = args['userdata']
     elif args.get('userfile'):
-        with open(args['userfile'], 'r') as userfile:
+        with open(args['userfile'], 'r', encoding="utf-8") as userfile:
             data['userdata'] = userfile.read()
 
     # Get the SSH keys

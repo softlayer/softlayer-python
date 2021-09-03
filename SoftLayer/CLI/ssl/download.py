@@ -30,5 +30,5 @@ def cli(env, identifier):
 
 def write_cert(filename, content):
     """Writes certificate body to the given file path."""
-    with open(filename, 'w') as cert_file:
+    with open(filename, 'w', encoding="utf-8") as cert_file:
         cert_file.write(content)

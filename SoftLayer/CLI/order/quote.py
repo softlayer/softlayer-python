@@ -43,7 +43,7 @@ def _parse_create_args(client, args):
     if args.get('userdata'):
         userdata = args['userdata']
     elif args.get('userfile'):
-        with open(args['userfile'], 'r') as userfile:
+        with open(args['userfile'], 'r', encoding="utf-8") as userfile:
             userdata = userfile.read()
     if userdata:
         for hardware in data['hardware']:

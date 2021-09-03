@@ -51,7 +51,7 @@ def cli(env, identifier, memory, network, drive_controller, public_bandwidth, ad
                 "This action will incur charges on your account. Continue?")):
             raise exceptions.CLIAbort('Aborted')
 
-    disk_list = list()
+    disk_list = []
     if add_disk:
         for guest_disk in add_disk:
             disks = {'description': 'add_disk', 'capacity': guest_disk[0], 'number': guest_disk[1]}

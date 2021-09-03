@@ -40,7 +40,7 @@ def cli(env, identifier, domain, userfile, tag, hostname, userdata, public_speed
     if userdata:
         data['userdata'] = userdata
     elif userfile:
-        with open(userfile, 'r') as userfile_obj:
+        with open(userfile, 'r', encoding="utf-8") as userfile_obj:
             data['userdata'] = userfile_obj.read()
 
     if tag:

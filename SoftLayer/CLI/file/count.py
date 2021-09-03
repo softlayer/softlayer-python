@@ -24,7 +24,7 @@ def cli(env, sortby, datacenter):
     file_volumes = file_manager.list_file_volumes(datacenter=datacenter,
                                                   mask=mask)
 
-    datacenters = dict()
+    datacenters = {}
     for volume in file_volumes:
         service_resource = volume['serviceResource']
         if 'datacenter' in service_resource:

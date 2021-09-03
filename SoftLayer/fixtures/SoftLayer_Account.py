@@ -14,7 +14,7 @@ getPrivateBlockDeviceTemplateGroups = [{
     'globalIdentifier': 'F9329795-4220-4B0A-B970-C86B950667FA',
     'id': 201,
     # 'name': 'private_image2',
-    'name': u'a¬ሴ€耀',
+    'name': 'a¬ሴ€耀',
     'parentId': '',
     'publicFlag': False,
 }]
