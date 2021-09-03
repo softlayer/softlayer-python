@@ -32,7 +32,7 @@ def cli(env, identifier, name, minimum, maximum, userdata, userfile, cpu, memory
     if userdata:
         virt_template['userData'] = [{"value": userdata}]
     elif userfile:
-        with open(userfile, 'r') as userfile_obj:
+        with open(userfile, 'r', encoding="utf-8") as userfile_obj:
             virt_template['userData'] = [{"value": userfile_obj.read()}]
     virt_template['startCpus'] = cpu
     virt_template['maxMemory'] = memory

@@ -6,28 +6,10 @@ import SoftLayer
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import storage_utils
 
-COLUMNS = [
-    column_helper.Column('ID', ('id',)),
-    column_helper.Column('Username', ('username',), mask="username"),
-    column_helper.Column('Account ID', ('accountId',), mask="accountId"),
-    column_helper.Column('Capacity (GB)', ('capacityGb',), mask="capacityGb"),
-    column_helper.Column('Hardware ID', ('hardwareId',), mask="hardwareId"),
-    column_helper.Column('Guest ID', ('guestId',), mask="guestId"),
-    column_helper.Column('Host ID', ('hostId',), mask="hostId"),
-]
-
-# In-line comment to avoid similarity flag with block version
-
-DEFAULT_COLUMNS = [
-    'ID',
-    'Username',
-    'Account ID',
-    'Capacity (GB)',
-    'Hardware ID',
-    'Guest ID',
-    'Host ID'
-]
+COLUMNS = storage_utils.REPLICATION_PARTNER_COLUMNS
+DEFAULT_COLUMNS = storage_utils.REPLICATION_PARTNER_DEFAULT
 
 
 @click.command()

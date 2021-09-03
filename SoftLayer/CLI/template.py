@@ -24,7 +24,7 @@ class TemplateCallback(object):
         if value is None:
             return
 
-        with open(os.path.expanduser(value), 'r') as file_handle:
+        with open(os.path.expanduser(value), 'r', encoding="utf-8") as file_handle:
             config = configparser.ConfigParser()
             ini_str = '[settings]\n' + file_handle.read()
             ini_fp = io.StringIO(ini_str)
@@ -58,7 +58,7 @@ def export_to_template(filename, args, exclude=None):
     exclude.append('format')
     exclude.append('debug')
 
-    with open(filename, "w") as template_file:
+    with open(filename, "w", encoding="utf-8") as template_file:
         for k, val in args.items():
             if val and k not in exclude:
                 if isinstance(val, tuple):

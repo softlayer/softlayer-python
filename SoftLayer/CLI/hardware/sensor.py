@@ -16,20 +16,20 @@ def cli(env, identifier, discrete):
     mgr = SoftLayer.HardwareManager(env.client)
     sensors = mgr.get_sensors(identifier)
 
-    temperature_table = formatting.Table(["sensor", "status", "Reading", "min", "Max"],
-                                         title='temperature Degree c')
+    temperature_table = formatting.Table(["Sensor", "Status", "Reading", "Min", "Max"],
+                                         title='Temperature (c)')
 
-    volts_table = formatting.Table(["sensor", "status", "Reading", "min", "Max"],
-                                   title='volts')
+    volts_table = formatting.Table(["Sensor", "Status", "Reading", "Min", "Max"],
+                                   title='Volts')
 
-    watts_table = formatting.Table(["sensor", "status", "Reading"],
+    watts_table = formatting.Table(["Sensor", "Status", "Reading"],
                                    title='Watts')
 
-    rpm_table = formatting.Table(["sensor", "status", "Reading", "min"],
+    rpm_table = formatting.Table(["Sensor", "Status", "Reading", "Min"],
                                  title='RPM')
 
-    discrete_table = formatting.Table(["sensor", "status", "Reading"],
-                                      title='discrete')
+    discrete_table = formatting.Table(["Sensor", "Status", "Reading"],
+                                      title='Discrete')
 
     for sensor in sensors:
         if sensor.get('sensorUnits') == 'degrees C':

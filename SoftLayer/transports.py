@@ -205,7 +205,8 @@ class XmlRpcTransport(object):
         request.url = '/'.join([self.endpoint_url, request.service])
         request.payload = xmlrpc.client.dumps(tuple(largs),
                                               methodname=request.method,
-                                              allow_none=True)
+                                              allow_none=True,
+                                              encoding="iso-8859-1")
 
         # Prefer the request setting, if it's not None
         verify = request.verify
@@ -214,7 +215,7 @@ class XmlRpcTransport(object):
 
         try:
             resp = self.client.request('POST', request.url,
-                                       data=request.payload,
+                                       data=request.payload.encode(),
                                        auth=auth,
                                        headers=request.transport_headers,
                                        timeout=self.timeout,
@@ -273,7 +274,7 @@ client.mount('https://', adapter)
 #auth=HTTPBasicAuth('apikey', YOUR_CLOUD_API_KEY)
 auth=None
 url = '$url'
-payload = """$payload"""
+payload = $payload
 transport_headers = $transport_headers
 timeout = $timeout
 verify = $verify
@@ -287,6 +288,7 @@ ElementTree.dump(xml)
 
         safe_payload = re.sub(r'<string>[a-z0-9]{64}</string>', r'<string>API_KEY_GOES_HERE</string>', request.payload)
         safe_payload = re.sub(r'(\s+)', r' ', safe_payload)
+        safe_payload = safe_payload.encode()
         substitutions = dict(url=request.url, payload=safe_payload, transport_headers=request.transport_headers,
                              timeout=self.timeout, verify=request.verify, cert=request.cert,
                              proxy=_proxies_dict(self.proxy))

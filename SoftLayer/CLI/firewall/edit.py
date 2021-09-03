@@ -23,7 +23,7 @@ def parse_rules(content=None):
     :returns: a list of rules
     """
     rules = content.split(DELIMITER)
-    parsed_rules = list()
+    parsed_rules = []
     order = 1
     for rule in rules:
         if rule.strip() == '':

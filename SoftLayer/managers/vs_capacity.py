@@ -89,7 +89,7 @@ instances[id, billingItem[description, hourlyRecurringFee]], instanceCount, back
         for region in regions:
             routers[region['keyname']] = []
             for location in region['locations']:
-                location['location']['pods'] = list()
+                location['location']['pods'] = []
                 for pod in pods:
                     if pod['datacenterName'] == location['location']['name']:
                         location['location']['pods'].append(pod)

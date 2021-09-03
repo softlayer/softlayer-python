@@ -26,7 +26,7 @@ def cli(env, zonefile, dry_run):
     """Import zone based off a BIND zone file."""
 
     manager = SoftLayer.DNSManager(env.client)
-    with open(zonefile) as zone_f:
+    with open(zonefile, encoding="utf-8") as zone_f:
         zone_contents = zone_f.read()
 
     zone, records, bad_lines = parse_zone_details(zone_contents)
