@@ -59,3 +59,31 @@ getObject = {
 }
 
 allowAccessToNetworkStorageList = True
+
+getSensorData = [
+    {
+        "sensorId": "Ambient 1 Temperature",
+        "sensorReading": "25.000",
+        "sensorUnits": "degrees C",
+        "status": "ok",
+        "upperCritical": "43.000",
+        "upperNonCritical": "41.000",
+        "upperNonRecoverable": "46.000"
+    },
+    {
+        "lowerCritical": "3500.000",
+        "sensorId": "Fan 1 Tach",
+        "sensorReading": "6580.000",
+        "sensorUnits": "RPM",
+        "status": "ok"
+    }, {
+        "sensorId": "IPMI Watchdog",
+        "sensorReading": "0x0",
+        "sensorUnits": "discrete",
+        "status": "0x0080"
+    }, {
+        "sensorId": "Avg Power",
+        "sensorReading": "70.000",
+        "sensorUnits": "Watts",
+        "status": "ok"
+    }]
