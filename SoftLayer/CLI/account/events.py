@@ -69,7 +69,6 @@ def unplanned_event_table(events):
     unplanned_table.align['Subject'] = 'l'
     unplanned_table.align['Impacted Resources'] = 'l'
     for event in events:
-        print(event.get('modifyDate'))
         unplanned_table.add_row([
             event.get('id'),
             event.get('systemTicketId'),
