@@ -4,6 +4,8 @@
 
     Tests for the user cli command
 """
+import json
+
 from SoftLayer.fixtures import SoftLayer_Account as SoftLayer_Account
 from SoftLayer import testing
 
@@ -37,8 +39,20 @@ class AccountCLITests(testing.TestCase):
         self.assert_called_with(self.SLNOE, 'getAllObjects')
         self.assert_called_with(self.SLNOE, 'acknowledgeNotification', identifier=1234)
 
-    # slcli account invoice-detail
+    def test_event_jsonraw_output(self):
+        # https://github.com/softlayer/softlayer-python/issues/1545
+        command = '--format jsonraw account events'
+        command_params = command.split()
+        result = self.run_command(command_params)
+        json_text_tables = result.stdout.split('\n')
+        # removing an extra item due to an additional Newline at the end of the output
+        json_text_tables.pop()
+        # each item in the json_text_tables should be a list
+        for json_text_table in json_text_tables:
+            json_table = json.loads(json_text_table)
+            self.assertIsInstance(json_table, list)
 
+    # slcli account invoice-detail
     def test_invoice_detail(self):
         result = self.run_command(['account', 'invoice-detail', '1234'])
         self.assert_no_fail(result)
