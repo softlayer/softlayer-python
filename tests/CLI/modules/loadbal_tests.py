@@ -215,6 +215,9 @@ class LoadBalancerTests(testing.TestCase):
     def test_lb_detail(self):
         result = self.run_command(['lb', 'detail', '1111111'])
         self.assert_no_fail(result)
+        self.assertIn('Id', result.output)
+        self.assertIn('UUI', result.output)
+        self.assertIn('Address', result.output)
 
     def test_lb_detail_by_name(self):
         name = SoftLayer_Network_LBaaS_LoadBalancer.getObject.get('name')
