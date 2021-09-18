@@ -18,6 +18,11 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
     :param SoftLayer.API.BaseClient client: the client instance
 
     """
+    TYPE = {
+        1: "Public to Private",
+        0: "Private to Private",
+        2: "Public to Public",
+    }
 
     def __init__(self, client):
         self.client = client
