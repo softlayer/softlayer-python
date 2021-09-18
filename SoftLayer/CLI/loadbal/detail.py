@@ -29,12 +29,33 @@ def lbaas_table(this_lb):
     table.align['value'] = 'l'
     table.add_row(['Id', this_lb.get('id')])
     table.add_row(['UUI', this_lb.get('uuid')])
+    table.add_row(['Name', this_lb.get('name')])
     table.add_row(['Address', this_lb.get('address')])
+    table.add_row(['Type', SoftLayer.LoadBalancerManager.TYPE.get(this_lb.get('type'))])
     table.add_row(['Location', utils.lookup(this_lb, 'datacenter', 'longName')])
     table.add_row(['Description', this_lb.get('description')])
-    table.add_row(['Name', this_lb.get('name')])
     table.add_row(['Status', "{} / {}".format(this_lb.get('provisioningStatus'), this_lb.get('operatingStatus'))])
 
+    listener_table, pools = get_listener_table(this_lb)
+    table.add_row(['Protocols', listener_table])
+
+    member_table = get_member_table(this_lb, pools)
+    table.add_row(['Members', member_table])
+
+    hp_table = get_hp_table(this_lb)
+    table.add_row(['Health Checks', hp_table])
+
+    l7pool_table = get_l7pool_table(this_lb)
+    table.add_row(['L7 Pools', l7pool_table])
+
+    ssl_table = get_ssl_table(this_lb)
+    table.add_row(['Ciphers', ssl_table])
+
+    return table
+
+
+def get_hp_table(this_lb):
+    """Generates a table from a list of LBaaS devices"""
     # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_HealthMonitor/
     hp_table = formatting.Table(['UUID', 'Interval', 'Retries', 'Type', 'Timeout', 'Modify', 'Active'])
     for health in this_lb.get('healthMonitors', []):
@@ -47,22 +68,43 @@ def lbaas_table(this_lb):
             utils.clean_time(health.get('modifyDate')),
             health.get('provisioningStatus')
         ])
-    table.add_row(['Checks', hp_table])
+    return hp_table
 
-    # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_L7Pool/
-    l7_table = formatting.Table(['Id', 'UUID', 'Balancer', 'Name', 'Protocol', 'Modify', 'Active'])
-    for layer7 in this_lb.get('l7Pools', []):
-        l7_table.add_row([
-            layer7.get('id'),
-            layer7.get('uuid'),
-            layer7.get('loadBalancingAlgorithm'),
-            layer7.get('name'),
-            layer7.get('protocol'),
-            utils.clean_time(layer7.get('modifyDate')),
-            layer7.get('provisioningStatus')
-        ])
-    table.add_row(['L7 Pools', l7_table])
 
+def get_member_table(this_lb, pools):
+    """Generates a members table from a list of LBaaS devices"""
+    # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_Member/
+    member_col = ['UUID', 'Address', 'Weight', 'Modify', 'Active']
+    counter = 0
+    for uuid in pools.values():
+        member_col.append(f'P{counter}-> {uuid}')
+        counter += 1
+    member_table = formatting.Table(member_col)
+    for member in this_lb.get('members', []):
+        row = [
+            member.get('uuid'),
+            member.get('address'),
+            member.get('weight'),
+            utils.clean_time(member.get('modifyDate')),
+            member.get('provisioningStatus')
+        ]
+        for uuid in pools:
+            row.append(get_member_hp(this_lb.get('health'), member.get('uuid'), uuid))
+        member_table.add_row(row)
+    return member_table
+
+
+def get_ssl_table(this_lb):
+    """Generates a ssl table from a list of LBaaS devices"""
+    # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_SSLCipher/
+    ssl_table = formatting.Table(['Id', 'Name'])
+    for ssl in this_lb.get('sslCiphers', []):
+        ssl_table.add_row([ssl.get('id'), ssl.get('name')])
+    return ssl_table
+
+
+def get_listener_table(this_lb):
+    """Generates a protocols table from a list of LBaaS devices"""
     pools = {}
     # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_Listener/
     listener_table = formatting.Table(['UUID', 'Max Connection', 'Mapping', 'Balancer', 'Modify', 'Active'])
@@ -79,32 +121,24 @@ def lbaas_table(this_lb):
             utils.clean_time(listener.get('modifyDate')),
             listener.get('provisioningStatus')
         ])
-    table.add_row(['Pools', listener_table])
+    return listener_table, pools
 
-    # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_Member/
-    member_col = ['UUID', 'Address', 'Weight', 'Modify', 'Active']
-    for uuid in pools.values():
-        member_col.append(uuid)
-    member_table = formatting.Table(member_col)
-    for member in this_lb.get('members', []):
-        row = [
-            member.get('uuid'),
-            member.get('address'),
-            member.get('weight'),
-            utils.clean_time(member.get('modifyDate')),
-            member.get('provisioningStatus')
-        ]
-        for uuid in pools:
-            row.append(get_member_hp(this_lb.get('health'), member.get('uuid'), uuid))
-        member_table.add_row(row)
-    table.add_row(['Members', member_table])
 
-    # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_SSLCipher/
-    ssl_table = formatting.Table(['Id', 'Name'])
-    for ssl in this_lb.get('sslCiphers', []):
-        ssl_table.add_row([ssl.get('id'), ssl.get('name')])
-    table.add_row(['Ciphers', ssl_table])
-    return table
+def get_l7pool_table(this_lb):
+    """Generates a l7Pools table from a list of LBaaS devices"""
+    # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_L7Pool/
+    l7_table = formatting.Table(['Id', 'UUID', 'Balancer', 'Name', 'Protocol', 'Modify', 'Active'])
+    for layer7 in this_lb.get('l7Pools', []):
+        l7_table.add_row([
+            layer7.get('id'),
+            layer7.get('uuid'),
+            layer7.get('loadBalancingAlgorithm'),
+            layer7.get('name'),
+            layer7.get('protocol'),
+            utils.clean_time(layer7.get('modifyDate')),
+            layer7.get('provisioningStatus')
+        ])
+    return l7_table
 
 
 def get_member_hp(checks, member_uuid, pool_uuid):
