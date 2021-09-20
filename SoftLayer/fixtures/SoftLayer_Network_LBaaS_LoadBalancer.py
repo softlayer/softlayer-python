@@ -58,6 +58,17 @@ getObject = {
                 'uuid': 'ab1a1abc-0e83-4690-b5d4-1359625dba8f',
             }
         },
+        {
+            'clientTimeout': 15,
+            'defaultPool': {
+                'healthMonitor': {
+                    'uuid': '222222ab-bbcc-4f32-9b31-1b6d3a1959c0'
+                },
+                'protocol': 'HTTP',
+                'protocolPort': 256,
+                'uuid': 'ab1a1abc-0e83-4690-b5d4-1359625dba8x',
+            }
+        },
         {'connectionLimit': None,
          'createDate': '2019-08-21T17:19:25-04:00',
          'defaultPool': {'createDate': '2019-08-21T17:19:25-04:00',
