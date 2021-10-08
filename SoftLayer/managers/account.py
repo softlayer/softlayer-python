@@ -8,7 +8,7 @@
 
 import logging
 
-from SoftLayer import SoftLayerAPIError
+from SoftLayer.exceptions import SoftLayerAPIError
 from SoftLayer import utils
 
 # Invalid names are ignored due to long method names and short argument names
