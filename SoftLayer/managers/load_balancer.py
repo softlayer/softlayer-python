@@ -160,6 +160,32 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         return self.client.call('SoftLayer_Network_LBaaS_Listener', 'updateLoadBalancerProtocols',
                                 identifier, [listener])
 
+    def get_l7policies(self, identifier):
+        """Gets Layer7 policies from a listener
+
+        :param identifier: id
+        """
+
+        return self.client.call('SoftLayer_Network_LBaaS_Listener', 'getL7Policies', id=identifier)
+
+    def get_all_l7policies(self):
+        """Gets all Layer7 policies
+         :returns: Dictionary of (protocol_id: policies list).
+        """
+
+        mask = 'mask[listeners[l7Policies]]'
+        lbaas = self.get_lbaas(mask=mask)
+        listeners = []
+        for lb in lbaas:
+            listeners.extend(lb.get('listeners'))
+        policies = {}
+        for protocol in listeners:
+            if protocol.get('l7Policies'):
+                listener_id = protocol.get('id')
+                l7policies = protocol.get('l7Policies')
+                policies[listener_id] = l7policies
+        return policies
+
     def add_lb_l7_pool(self, identifier, pool, members, health, session):
         """Creates a new l7 pool for a LBaaS instance
 

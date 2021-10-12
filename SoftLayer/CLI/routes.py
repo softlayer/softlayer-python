@@ -204,6 +204,7 @@ ALL_ROUTES = [
     ('loadbal:health', 'SoftLayer.CLI.loadbal.health:cli'),
     ('loadbal:member-add', 'SoftLayer.CLI.loadbal.members:add'),
     ('loadbal:member-del', 'SoftLayer.CLI.loadbal.members:remove'),
+    ('loadbal:l7policies', 'SoftLayer.CLI.loadbal.layer7_policy_list:policies'),
     ('loadbal:pool-add', 'SoftLayer.CLI.loadbal.pools:add'),
     ('loadbal:pool-edit', 'SoftLayer.CLI.loadbal.pools:edit'),
     ('loadbal:pool-del', 'SoftLayer.CLI.loadbal.pools:delete'),

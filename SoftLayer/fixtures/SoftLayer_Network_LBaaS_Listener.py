@@ -41,3 +41,26 @@ deleteLoadBalancerProtocols = {'accountId': 1234,
                                    'name': 'ams01',
                                    'statusId': 2
                                }}
+
+getL7Policies = [
+    {'action': 'REJECT',
+     'createDate': '2021-09-08T15:08:35-06:00',
+     'id': 123456,
+     'modifyDate': None,
+     'name': 'test-reject',
+     'priority': 2,
+     'redirectL7PoolId': None,
+     'uuid': '123mock-1234-43c9-b659-12345678mock'
+     },
+    {'action': 'REDIRECT_HTTPS',
+     'createDate': '2021-09-08T15:03:53-06:00',
+     'id': 432922,
+     'modifyDate': None,
+     'name': 'test-policy-https-1',
+     'priority': 0,
+     'redirectL7PoolId': None,
+     'redirectUrl': 'url-test-uuid-mock-1234565',
+     'uuid': 'test-uuid-mock-1234565'
+     }
+]
+
