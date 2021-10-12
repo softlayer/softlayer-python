@@ -63,4 +63,3 @@ getL7Policies = [
      'uuid': 'test-uuid-mock-1234565'
      }
 ]
-

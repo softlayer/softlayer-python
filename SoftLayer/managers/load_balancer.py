@@ -170,14 +170,15 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
     def get_all_l7policies(self):
         """Gets all Layer7 policies
+
          :returns: Dictionary of (protocol_id: policies list).
         """
 
         mask = 'mask[listeners[l7Policies]]'
         lbaas = self.get_lbaas(mask=mask)
         listeners = []
-        for lb in lbaas:
-            listeners.extend(lb.get('listeners'))
+        for load_bal in lbaas:
+            listeners.extend(load_bal.get('listeners'))
         policies = {}
         for protocol in listeners:
             if protocol.get('l7Policies'):
