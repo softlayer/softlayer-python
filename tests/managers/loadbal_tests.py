@@ -110,6 +110,16 @@ class LoadBalancerTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_LBaaS_Listener', 'updateLoadBalancerProtocols',
                                 args=(uuid, [listener]))
 
+    def test_get_l7policies(self):
+        my_id = 1111111
+        self.lb_mgr.get_l7policies(my_id)
+        self.assert_called_with('SoftLayer_Network_LBaaS_Listener', 'getL7Policies', identifier=my_id)
+
+    def test_get_all_l7policies(self):
+        policies = self.lb_mgr.get_all_l7policies()
+        self.assert_called_with('SoftLayer_Network_LBaaS_LoadBalancer', 'getAllObjects')
+        self.assertIsInstance(policies, dict)
+
     def test_add_lb_l7_pool(self):
         uuid = 'aa-bb-cc'
         pool = {'id': 1}

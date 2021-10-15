@@ -40,6 +40,9 @@ LBaaS Commands
 .. click:: SoftLayer.CLI.loadbal.pools:l7pool_del
    :prog: loadbal l7pool-del
    :show-nested:
+.. click:: SoftLayer.CLI.loadbal.layer7_policy_list:policies
+   :prog: loadbal l7policies
+   :show-nested:
 .. click:: SoftLayer.CLI.loadbal.order:order
    :prog: loadbal order
    :show-nested:

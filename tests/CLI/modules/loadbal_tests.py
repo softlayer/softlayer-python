@@ -181,6 +181,16 @@ class LoadBalancerTests(testing.TestCase):
         self.assert_no_fail(result)
         click.secho.assert_called_with(output, fg='green')
 
+    def test_lb_l7policies_list(self):
+        command = 'loadbal l7policies'
+        result = self.run_command(command.split(' '))
+        self.assert_no_fail(result)
+
+    def test_lb_l7policies_protocol_list(self):
+        command = 'loadbal l7policies -p 123456'
+        result = self.run_command(command.split(' '))
+        self.assert_no_fail(result)
+
     @mock.patch('SoftLayer.CLI.loadbal.health.click')
     def test_lb_health_manage(self, click):
         lb_id = '1111111'
