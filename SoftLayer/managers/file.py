@@ -129,7 +129,24 @@ class FileStorageManager(StorageManager):
         :return: Returns a list of snapshots for the specified volume.
         """
         return self.get_volume_snapshot_list(volume_id, **kwargs)
+    def set_file_volume_snapshot_notification(self, volume_id, notification_flag, **kwargs):
+        """Enables/Disables snapshot space usage threshold warning for a given volume.
 
+        :param volume_id: ID of volume.
+        :param kwargs:
+        :param notification-flag: Enable/Disable flag for snapshot warning notification.
+        :return:  Enables/Disables snapshot space usage threshold warning for a given volume.
+        """
+        return self.client.call('Network_Storage', 'setSnapshotNotification',  notification_flag, id=volume_id,)
+
+    def get_file_snapshots_notification_status(self, volume_id, **kwargs):
+        """returns Enabled/Disabled snapshot space usage threshold warning for a given volume.
+
+        :param volume_id: ID of volume.
+        :param kwargs:
+        :return: Enabled/Disabled snapshot space usage threshold warning for a given volume.
+        """
+        return self.client.call('Network_Storage', 'getSnapshotNotificationStatus', id=volume_id,)
     def order_file_volume(self, storage_type, location, size,
                           iops=None, tier_level=None, snapshot_size=None,
                           service_offering='storage_as_a_service',
