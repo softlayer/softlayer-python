@@ -112,6 +112,15 @@ class StorageManager(utils.IdentifierMixin, object):
             kwargs['mask'] = ','.join(items)
 
         return self.client.call('Network_Storage', 'getSnapshots', id=volume_id, **kwargs)
+    def set_volume_snapshot_notification(self, volume_id, notification_flag, **kwargs):
+        """Returns a list of snapshots for the specified volume.
+
+        :param volume_id: ID of volume.
+        :param kwargs:
+        :return: Returns a list of snapshots for the specified volume.
+        """
+
+        return self.client.call('Network_Storage', 'setSnapshotNotification', notification_flag, id=volume_id , **kwargs)
 
     def authorize_host_to_volume(self, volume_id, hardware_ids=None, virtual_guest_ids=None,
                                  ip_address_ids=None, subnet_ids=None):

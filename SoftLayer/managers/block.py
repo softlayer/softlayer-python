@@ -110,7 +110,7 @@ class BlockStorageManager(StorageManager):
         :param notification-flag: Enable/Disable flag for snapshot warning notification.
         :return:  Enables/Disables snapshot space usage threshold warning for a given volume.
                 """
-        return self.client.call('Network_Storage', 'setSnapshotNotification',  notification_flag, id=volume_id,)
+        return self.client.call('Network_Storage', 'setSnapshotNotification', notification_flag, id=volume_id, **kwargs)
 
     def get_block_snapshots_notification_status(self, volume_id, **kwargs):
         """returns Enabled/Disabled snapshot space usage threshold warning for a given volume.
@@ -119,7 +119,7 @@ class BlockStorageManager(StorageManager):
         :param kwargs:
         :return: Enabled/Disabled snapshot space usage threshold warning for a given volume.
         """
-        return self.client.call('Network_Storage', 'getSnapshotNotificationStatus', id=volume_id,)
+        return self.client.call('Network_Storage', 'getSnapshotNotificationStatus', id=volume_id, **kwargs)
 
     def assign_subnets_to_acl(self, access_id, subnet_ids):
         """Assigns subnet records to ACL for the access host.

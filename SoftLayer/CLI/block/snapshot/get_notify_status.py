@@ -24,5 +24,5 @@ def cli(env, volume_id):
         click.echo('Snapshots space usage threshold warning flag setting is enabled for volume %s'
             % (volume_id))
     else:
-        click.echo('DISABLED: Snapshots space usage threshold warning flag setting is disabled for volume %s'
+        click.echo('Snapshots space usage threshold warning flag setting is disabled for volume %s'
             % (volume_id))

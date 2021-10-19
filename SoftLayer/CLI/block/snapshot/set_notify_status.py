@@ -15,7 +15,6 @@ from SoftLayer.CLI import exceptions
 @environment.pass_env
 def cli(env, volume_id, notification_flag):
     """Enables/Disables snapshot space usage threshold warning for a given volume"""
-
     if (notification_flag not in ['True', 'False']):
          raise exceptions.CLIAbort(
              '--notification-flag must be True or False')
