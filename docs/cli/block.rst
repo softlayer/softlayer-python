@@ -153,5 +153,5 @@ Block Commands
     :show-nested:
 
 .. click:: SoftLayer.CLI.block.snapshot.get_notify_status:cli
-    :prog: block snapshot-get-notification
+    :prog: block snapshot-get-notification-status
     :show-nested:

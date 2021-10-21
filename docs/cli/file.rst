@@ -132,6 +132,6 @@ File Commands
     :show-nested:
 
 .. click:: SoftLayer.CLI.file.snapshot.get_notify_status:cli
-    :prog: file snapshot-get-notification
+    :prog: file snapshot-get-notification-status
     :show-nested:
 
