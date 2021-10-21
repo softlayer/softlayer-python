@@ -126,3 +126,12 @@ File Commands
 .. click:: SoftLayer.CLI.file.replication.disaster_recovery_failover:cli
     :prog: file disaster-recovery-failover
     :show-nested:
+
+.. click:: SoftLayer.CLI.file.snapshot.set_notify_status:cli
+    :prog: file snapshot-set-notification
+    :show-nested:
+
+.. click:: SoftLayer.CLI.file.snapshot.get_notify_status:cli
+    :prog: file snapshot-get-notification
+    :show-nested:
+
