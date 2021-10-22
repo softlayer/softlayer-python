@@ -868,19 +868,25 @@ class ServerCLITests(testing.TestCase):
 
     def test_billing(self):
         result = self.run_command(['hw', 'billing', '123456'])
-        billing_json = {
+        hardware_server_billing = {
             'Billing Item Id': 6327,
             'Id': '123456',
             'Provision Date': None,
             'Recurring Fee': 1.54,
             'Total': 16.08,
-            'prices': [{
-                'Item': 'test',
-                'Recurring Price': 1
-            }]
+            'prices': [
+                {
+                    'Item': 'test',
+                    'Recurring Price': 1
+                },
+                {
+                    'Item': 'test2',
+                    'Recurring Price': 2
+                },
+            ]
         }
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output), billing_json)
+        self.assertEqual(json.loads(result.output), hardware_server_billing)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_create_hw_no_confirm(self, confirm_mock):
