@@ -31,7 +31,7 @@ def cli(env, identifier):
     table.add_row(['Provision Date', utils.lookup(result, 'billingItem', 'provisionDate')])
 
     price_table = formatting.Table(['Item', 'Recurring Price'])
-    for item in utils.lookup(result, 'billingItem', 'children') or []:
+    for item in utils.lookup(result, 'billingItem', 'nextInvoiceChildren') or []:
         price_table.add_row([item['description'], item['nextInvoiceTotalRecurringAmount']])
 
     table.add_row(['prices', price_table])

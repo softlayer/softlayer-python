@@ -7,7 +7,7 @@ getObject = {
         'id': 6327,
         'recurringFee': 1.54,
         'nextInvoiceTotalRecurringAmount': 16.08,
-        'children': [
+        'nextInvoiceChildren': [
             {'description': 'test', 'nextInvoiceTotalRecurringAmount': 1},
         ],
         'orderItem': {
