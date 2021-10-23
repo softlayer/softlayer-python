@@ -9,23 +9,23 @@ from SoftLayer.CLI import exceptions
 
 @click.command()
 @click.argument('volume_id')
-@click.option(
-    '--notification_flag',
+@click.option('--enable/--disable', default=True,
     help=
-    'Enable / disable sending sending notifications for snapshots space usage threshold warning [True|False]',
+    'Enable/Disable snapshot usage warning notification. Use  `slcli block snapshot-set-notification volumeId --enable` to enable' ,
     required=True)
 @environment.pass_env
-def cli(env, volume_id, notification_flag):
+def cli(env, volume_id, enable):
     """Enables/Disables snapshot space usage threshold warning for a given volume"""
-
-    if (notification_flag not in ['True', 'False']):
-        raise exceptions.CLIAbort('--notification-flag must be True or False')
-
     file_manager = SoftLayer.FileStorageManager(env.client)
-    disabled = file_manager.set_file_volume_snapshot_notification(
-        volume_id, notification_flag)
 
-    if disabled:
+    if enable:
+        enabled = 'True'
+    else:
+        enabled = 'False'
+
+    status = file_manager.set_file_volume_snapshot_notification(
+            volume_id, enabled)
+    if status:
         click.echo(
             'Snapshots space usage threshold warning notification has bee set to %s for volume %s'
-            % (notification - flag, volume_id))
+            % (enable, volume_id))

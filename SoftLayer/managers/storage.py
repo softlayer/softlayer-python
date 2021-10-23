@@ -112,15 +112,23 @@ class StorageManager(utils.IdentifierMixin, object):
             kwargs['mask'] = ','.join(items)
 
         return self.client.call('Network_Storage', 'getSnapshots', id=volume_id, **kwargs)
-    def set_volume_snapshot_notification(self, volume_id, notification_flag, **kwargs):
-        """Returns a list of snapshots for the specified volume.
+    def set_volume_snapshot_notification(self, volume_id, enable):
+        """Enables/Disables snapshot space usage threshold warning for a given volume.
 
         :param volume_id: ID of volume.
-        :param kwargs:
-        :return: Returns a list of snapshots for the specified volume.
+        :param enable: Enable/Disable flag for snapshot warning notification.
+        :return:  Enables/Disables snapshot space usage threshold warning for a given volume.
         """
 
-        return self.client.call('Network_Storage', 'setSnapshotNotification', notification_flag, id=volume_id , **kwargs)
+        return self.client.call('Network_Storage', 'setSnapshotNotification', enable, id=volume_id)
+
+    def get_volume_snapshot_notification_status(self, volume_id):
+        """returns Enabled/Disabled status of snapshot space usage threshold warning for a given volume.
+
+        :param volume_id: ID of volume.
+        :return:  Enables/Disables snapshot space usage threshold warning for a given volume.
+        """
+        return self.client.call('Network_Storage', 'getSnapshotNotificationStatus', id=volume_id)
 
     def authorize_host_to_volume(self, volume_id, hardware_ids=None, virtual_guest_ids=None,
                                  ip_address_ids=None, subnet_ids=None):
