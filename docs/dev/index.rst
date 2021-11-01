@@ -72,10 +72,7 @@ your code. You can run only the linting checks by using this command:
 
 The project's configuration instructs tox to test against many different
 versions of Python. A tox test will use as many of those as it can find on your
-local computer. Rather than installing all those versions, we recommend that
-you point the `Travis <https://travis-ci.org>`_ continuous integration tool at
-your GitHub fork. Travis will run the test against the full suite of Python
-versions every time you push new code.
+local computer.
 
 Using tox to run tests in multiple environments can be very time
 consuming. If you wish to quickly run the tests in your own environment, you
@@ -178,7 +175,7 @@ Developer Resources
 -------------------
 .. toctree::
 
-   SoftLayer API Documentation <http://developer.softlayer.com/reference/softlayerapi>
+   SoftLayer API Documentation <https://sldn.softlayer.com/reference/softlayerapi/>
    Source on GitHub <https://github.com/softlayer/softlayer-python>
    Issues <https://github.com/softlayer/softlayer-python/issues>
    Pull Requests <https://github.com/softlayer/softlayer-python/pulls>
