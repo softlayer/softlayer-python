@@ -18,13 +18,8 @@ def cli(env, volume_id, enable):
     """Enables/Disables snapshot space usage threshold warning for a given volume"""
     file_manager = SoftLayer.FileStorageManager(env.client)
 
-    if enable:
-        enabled = 'True'
-    else:
-        enabled = 'False'
-
-    status = file_manager.set_file_volume_snapshot_notification(
-            volume_id, enabled)
+    status = file_manager.set_volume_snapshot_notification(
+            volume_id, enable)
     if status:
         click.echo(
             'Snapshots space usage threshold warning notification has bee set to %s for volume %s'
