@@ -736,6 +736,13 @@ class VirtTests(testing.TestCase):
 
         self.assert_no_fail(result)
 
+    def test_usage_vs_cpu_lower_case(self):
+        result = self.run_command(
+            ['vs', 'usage', '100', '--start_date=2019-3-4', '--end_date=2019-4-2', '--valid_type=cpu0',
+             '--summary_period=300'])
+
+        self.assert_no_fail(result)
+
     def test_usage_vs_memory(self):
         result = self.run_command(
             ['vs', 'usage', '100', '--start_date=2019-3-4', '--end_date=2019-4-2', '--valid_type=MEMORY_USAGE',
