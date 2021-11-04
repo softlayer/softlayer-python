@@ -14,11 +14,11 @@ def cli(env, volume_id):
     block_manager = SoftLayer.BlockStorageManager(env.client)
     enabled = block_manager.get_volume_snapshot_notification_status(volume_id)
 
-    if (enabled == ''):
+    if enabled == '':
         click.echo("""
         Enabled:Snapshots space usage warning flag is null. Set to default value enable. For volume %s
         """ % (volume_id))
-    elif (enabled == 'True'):
+    elif enabled == 'True':
         click.echo(
             'Enabled:Snapshots space usage threshold warning flag setting is enabled for volume %s'
             % (volume_id))
