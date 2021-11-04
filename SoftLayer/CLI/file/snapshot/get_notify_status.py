@@ -4,7 +4,6 @@
 import click
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 
 
 @click.command()
@@ -18,7 +17,7 @@ def cli(env, volume_id):
 
     if (enabled == ''):
         click.echo(
-            'Enabled:Snapshots space usage threshold warning flag setting is null. Set to default value enable. For volume %s'
+            'Enabled:Snapshots space usage threshold warning flag is null. Set to default value enable. For volume %s'
             % (volume_id))
     elif (enabled == 'True'):
         click.echo(

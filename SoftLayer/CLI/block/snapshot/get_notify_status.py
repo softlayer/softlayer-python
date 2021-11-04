@@ -4,7 +4,6 @@
 import click
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 
 
 @click.command()
@@ -12,14 +11,13 @@ from SoftLayer.CLI import exceptions
 @environment.pass_env
 def cli(env, volume_id):
     """Get snapshots space usage threshold warning flag setting for a given volume"""
-
     block_manager = SoftLayer.BlockStorageManager(env.client)
     enabled = block_manager.get_volume_snapshot_notification_status(volume_id)
 
     if (enabled == ''):
-        click.echo(
-            'Enabled:Snapshots space usage threshold warning flag setting is null. Set to default value enable. For volume %s'
-            % (volume_id))
+        click.echo("""
+        Enabled:Snapshots space usage warning flag is null. Set to default value enable. For volume %s
+        """ % (volume_id))
     elif (enabled == 'True'):
         click.echo(
             'Enabled:Snapshots space usage threshold warning flag setting is enabled for volume %s'
