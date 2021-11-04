@@ -146,3 +146,12 @@ Block Commands
 .. click:: SoftLayer.CLI.block.replication.disaster_recovery_failover:cli
     :prog: block disaster-recovery-failover
     :show-nested:
+
+
+.. click:: SoftLayer.CLI.block.snapshot.set_notify_status:cli
+    :prog: block snapshot-set-notification
+    :show-nested:
+
+.. click:: SoftLayer.CLI.block.snapshot.get_notify_status:cli
+    :prog: block snapshot-get-notification-status
+    :show-nested:
