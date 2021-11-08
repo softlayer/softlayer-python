@@ -30,7 +30,7 @@ def cli(env, identifier, start_date, end_date, valid_type, summary_period):
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
 
     result = vsi.get_summary_data_usage(vs_id, start_date=start_date, end_date=end_date,
-                                        valid_type=valid_type, summary_period=summary_period)
+                                        valid_type=valid_type.upper(), summary_period=summary_period)
 
     if len(result) == 0:
         raise exceptions.CLIAbort('No metric data for this range of dates provided')
@@ -38,7 +38,7 @@ def cli(env, identifier, start_date, end_date, valid_type, summary_period):
     count = 0
     counter = 0.00
     for data in result:
-        if valid_type == "MEMORY_USAGE":
+        if valid_type.upper() == "MEMORY_USAGE":
             usage_counter = data['counter'] / 2 ** 30
         else:
             usage_counter = data['counter']
