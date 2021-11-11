@@ -245,7 +245,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'userData,'
                 '''billingItem[id,nextInvoiceTotalRecurringAmount,
                                package[id,keyName],
-                               children[categoryCode,nextInvoiceTotalRecurringAmount],
+                               children[description,categoryCode,nextInvoiceTotalRecurringAmount],
                                orderItem[id,
                                          order.userRecord[username],
                                          preset.keyName]],'''
