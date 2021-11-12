@@ -820,11 +820,11 @@ class VirtTests(testing.TestCase):
             'Recurring Fee': None,
             'Total': 1.54,
             'prices': [
-                {'description': '1 GB', 'Recurring Price': 1},
-                {'description': 'Reboot / Remote Console', 'Recurring Price': 1},
-                {'description': '1 Gbps Public & Private Network Uplinks', 'Recurring Price': 1},
-                {'description': '1 Gbps Public Uplink', 'Recurring Price': 1},
-                {'description': '1 Gbps Private Uplink', 'Recurring Price': 1}
+                {'Description': '1 GB', 'Recurring Price': 1},
+                {'Description': 'Reboot / Remote Console', 'Recurring Price': 1},
+                {'Description': '1 Gbps Public & Private Network Uplinks', 'Recurring Price': 1},
+                {'Description': '1 Gbps Public Uplink', 'Recurring Price': 1},
+                {'Description': '1 Gbps Private Uplink', 'Recurring Price': 1}
             ]
         }
         self.assert_no_fail(result)
