@@ -8,16 +8,31 @@ getObject = {
         'id': 6327,
         'nextInvoiceTotalRecurringAmount': 1.54,
         'children': [
-            {'categoryCode': 'port_speed',
-             'nextInvoiceTotalRecurringAmount': 1},
-            {'categoryCode': 'guest_core',
-             'nextInvoiceTotalRecurringAmount': 1},
-            {'categoryCode': 'ram',
-             'nextInvoiceTotalRecurringAmount': 1},
-            {'categoryCode': 'guest_core',
-             'nextInvoiceTotalRecurringAmount': 1},
-            {'categoryCode': 'guest_disk1',
-             'nextInvoiceTotalRecurringAmount': 1},
+            {
+                'categoryCode': 'ram',
+                'description': '1 GB',
+                'nextInvoiceTotalRecurringAmount': 1
+            },
+            {
+                'categoryCode': 'remote_management',
+                'description': 'Reboot / Remote Console',
+                'nextInvoiceTotalRecurringAmount': 1
+            },
+            {
+                'categoryCode': 'port_speed',
+                'description': '1 Gbps Public & Private Network Uplinks',
+                'nextInvoiceTotalRecurringAmount': 1
+            },
+            {
+                'categoryCode': 'public_port',
+                'description': '1 Gbps Public Uplink',
+                'nextInvoiceTotalRecurringAmount': 1
+            },
+            {
+                'categoryCode': 'service_port',
+                'description': '1 Gbps Private Uplink',
+                'nextInvoiceTotalRecurringAmount': 1
+            }
         ],
         'package': {
             "id": 835,

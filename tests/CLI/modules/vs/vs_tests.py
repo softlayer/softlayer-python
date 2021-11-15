@@ -323,7 +323,7 @@ class VirtTests(testing.TestCase):
 
     def test_create_options_prices_location(self):
         result = self.run_command(['vs', 'create-options', '--prices', 'dal13',
-                                  '--vsi-type', 'TRANSIENT_CLOUD_SERVER'])
+                                   '--vsi-type', 'TRANSIENT_CLOUD_SERVER'])
         self.assert_no_fail(result)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
@@ -345,19 +345,19 @@ class VirtTests(testing.TestCase):
                                            'getResourceRecords')
         getResourceRecords.return_value = []
         createAargs = ({
-            'type': 'a',
-            'host': 'vs-test1',
-            'domainId': 12345,  # from SoftLayer_Account::getDomains
-            'data': '172.16.240.2',
-            'ttl': 7200
-        },)
+                           'type': 'a',
+                           'host': 'vs-test1',
+                           'domainId': 12345,  # from SoftLayer_Account::getDomains
+                           'data': '172.16.240.2',
+                           'ttl': 7200
+                       },)
         createPTRargs = ({
-            'type': 'ptr',
-            'host': '2',
-            'domainId': 123456,
-            'data': 'vs-test1.test.sftlyr.ws',
-            'ttl': 7200
-        },)
+                             'type': 'ptr',
+                             'host': '2',
+                             'domainId': 123456,
+                             'data': 'vs-test1.test.sftlyr.ws',
+                             'ttl': 7200
+                         },)
 
         result = self.run_command(['vs', 'dns-sync', '100'])
 
@@ -400,12 +400,12 @@ class VirtTests(testing.TestCase):
             }
         }
         createV6args = ({
-            'type': 'aaaa',
-            'host': 'vs-test1',
-            'domainId': 12345,
-            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
-            'ttl': 7200
-        },)
+                            'type': 'aaaa',
+                            'host': 'vs-test1',
+                            'domainId': 12345,
+                            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
+                            'ttl': 7200
+                        },)
         guest.return_value = test_guest
         result = self.run_command(['vs', 'dns-sync', '--aaaa-record', '100'])
         self.assert_no_fail(result)
@@ -822,11 +822,11 @@ class VirtTests(testing.TestCase):
             'Recurring Fee': None,
             'Total': 1.54,
             'prices': [
-                {'Recurring Price': 1},
-                {'Recurring Price': 1},
-                {'Recurring Price': 1},
-                {'Recurring Price': 1},
-                {'Recurring Price': 1}
+                {'Description': '1 GB', 'Recurring Price': 1},
+                {'Description': 'Reboot / Remote Console', 'Recurring Price': 1},
+                {'Description': '1 Gbps Public & Private Network Uplinks', 'Recurring Price': 1},
+                {'Description': '1 Gbps Public Uplink', 'Recurring Price': 1},
+                {'Description': '1 Gbps Private Uplink', 'Recurring Price': 1}
             ]
         }
         self.assert_no_fail(result)
