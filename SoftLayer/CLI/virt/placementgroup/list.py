@@ -5,6 +5,7 @@ import click
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
+from SoftLayer import utils
 
 
 @click.command()
@@ -19,12 +20,12 @@ def cli(env):
     )
     for group in result:
         table.add_row([
-            group['id'],
-            group['name'],
-            group['backendRouter']['hostname'],
-            group['rule']['name'],
-            group['guestCount'],
-            group['createDate']
+            utils.lookup(group, 'id'),
+            utils.lookup(group, 'name'),
+            utils.lookup(group, 'backendRouter', 'hostname'),
+            utils.lookup(group, 'rule', 'name'),
+            utils.lookup(group, 'guestCount'),
+            utils.lookup(group, 'createDate')
         ])
 
     env.fout(table)
