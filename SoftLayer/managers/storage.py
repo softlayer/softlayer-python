@@ -25,7 +25,7 @@ class StorageManager(utils.IdentifierMixin, object):
         self.client = client
         self.resolvers = [self._get_ids_from_username]
 
-    def _get_ids_from_username(self, username):
+    def _get_ids_from_username(self, username):  # pylint: disable=unused-argument,no-self-use
         """Should only be actually called from the block/file manager"""
         return []
 

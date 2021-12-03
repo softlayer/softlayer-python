@@ -5,9 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-import copy
 import SoftLayer
-from SoftLayer import exceptions
 from SoftLayer import testing
 
 
@@ -33,3 +31,4 @@ class StorageGenericTests(testing.TestCase):
         result = self.storage.set_volume_snapshot_notification(12345, False)
         self.assert_called_with('SoftLayer_Network_Storage', 'setSnapshotNotification',
                                 identifier=12345, args=(False,))
+        self.assertEqual(None, result)
