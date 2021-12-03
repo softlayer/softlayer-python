@@ -19,10 +19,15 @@ class StorageManager(utils.IdentifierMixin, object):
 
     :param SoftLayer.API.BaseClient client: the client instance
     """
+
     def __init__(self, client):
         self.configuration = {}
         self.client = client
         self.resolvers = [self._get_ids_from_username]
+
+    def _get_ids_from_username(self, username):
+        """Should only be actually called from the block/file manager"""
+        return []
 
     def get_volume_count_limits(self):
         """Returns a list of block volume count limit.
@@ -122,10 +127,7 @@ class StorageManager(utils.IdentifierMixin, object):
         :return:  Enables/Disables snapshot space usage threshold warning for a given volume.
         """
 
-        return self.client.call('Network_Storage',
-                                'setSnapshotNotification',
-                                enable,
-                                id=volume_id)
+        return self.client.call('Network_Storage', 'setSnapshotNotification', enable, id=volume_id)
 
     def get_volume_snapshot_notification_status(self, volume_id):
         """returns Enabled/Disabled status of snapshot space usage threshold warning for a given volume.
@@ -133,9 +135,13 @@ class StorageManager(utils.IdentifierMixin, object):
         :param volume_id: ID of volume.
         :return:  Enables/Disables snapshot space usage threshold warning for a given volume.
         """
-        return self.client.call('Network_Storage',
-                                'getSnapshotNotificationStatus',
-                                id=volume_id)
+        status = self.client.call('Network_Storage', 'getSnapshotNotificationStatus', id=volume_id)
+        # A None status is enabled as well.
+        if status is None:
+            status = 1
+        # We need to force int on the return because otherwise the API will return the string '0'
+        # instead of either a boolean or real int...
+        return int(status)
 
     def authorize_host_to_volume(self,
                                  volume_id,
