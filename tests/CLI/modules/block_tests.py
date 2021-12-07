@@ -812,3 +812,13 @@ class BlockTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertIn("Note could not be set!", result.output)
+
+    @mock.patch('SoftLayer.BlockStorageManager.get_volume_snapshot_notification_status')
+    def test_snapshot_get_notification_status(self, status):
+        status.side_effect = [None, 1, 0]
+        expected = ['Enabled', 'Enabled', 'Disabled']
+
+        for expect in expected:
+            result = self.run_command(['block', 'snapshot-get-notification-status', '999'])
+            self.assert_no_fail(result)
+            self.assertIn(expect, result.output)

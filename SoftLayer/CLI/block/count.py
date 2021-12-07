@@ -30,7 +30,7 @@ def cli(env, sortby, datacenter):
         service_resource = volume['serviceResource']
         if 'datacenter' in service_resource:
             datacenter_name = service_resource['datacenter']['name']
-            if datacenter_name not in datacenters.keys():
+            if datacenter_name not in datacenters.keys():  # pylint: disable=consider-iterating-dictionary
                 datacenters[datacenter_name] = 1
             else:
                 datacenters[datacenter_name] += 1
