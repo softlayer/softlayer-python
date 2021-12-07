@@ -1,5 +1,39 @@
 # Change Log
 
+## [5.9.8] - 2021-12-07
+
+https://github.com/softlayer/softlayer-python/compare/v5.9.7...v5.9.8
+
+#### Improvements
+
+- Fix code blocks formatting of The Solution section docs #1534
+- Add retry decorator to documentation #1535
+- Updated utility docs #1536
+- Add Exceptions to Documentation #1537
+- Forces specific encoding on XMLRPC requests #1543
+- Add sensor data to hardware #1544
+- Ignoring f-string related messages for tox for now #1548
+- Fix account events #1546
+- Improved loadbal details #1549
+- Fix initialized accountmanger #1552
+- Fix hw billing reports 0 items #1556
+- Update API docs link and remove travisCI mention #1557
+- Fix errors with vs bandwidth #1563
+- Add Item names to vs billing report #1564
+- Mapping is now in collections.abc #1565
+- fix vs placementgroup list #1567
+- fixed up snapshot-notification cli commands #1569
+
+#### New Commands
+- loadbal l7policies #1553
+    + ` slcli loadbal l7policies --protocol-id`
+    + `slcli loadbal l7policies`
+- Snapshot notify #1554
+    + `slcli file|block snapshot-set-notification`
+    + `slcli file|block snapshot-get-notification-status`
+
+
+
 ## [5.9.7] - 2021-08-04
 https://github.com/softlayer/softlayer-python/compare/v5.9.6...v5.9.7
 
@@ -173,7 +207,7 @@ https://github.com/softlayer/softlayer-python/compare/v5.8.9...v5.9.0
 - #1318 add Drive number in guest drives details using the device number
 - #1323 add vs list hardware and all option
 
-## [5.8.9] - 2020-07-06 
+## [5.8.9] - 2020-07-06
 https://github.com/softlayer/softlayer-python/compare/v5.8.8...v5.8.9
 
 - #1252 Automated Snap publisher
