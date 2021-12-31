@@ -789,3 +789,17 @@ class NetworkManager(object):
             _filter = {"datacenterName": {"operation": datacenter}}
 
         return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', filter=_filter)
+
+    def get_list_datacenter(self):
+        """Calls SoftLayer_Location::getDatacenters()
+
+        returns all datacenter locations.
+        """
+        return self.client.call('SoftLayer_Location_Datacenter', 'getDatacenters')
+
+    def get_routers(self, identifier):
+        """Calls SoftLayer_Location::getRouters()
+
+                returns all routers locations.
+                """
+        return self.client.call('SoftLayer_Location_Datacenter', 'getHardwareRouters', id=identifier)

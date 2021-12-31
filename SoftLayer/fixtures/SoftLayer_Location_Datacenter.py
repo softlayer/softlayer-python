@@ -10,3 +10,5 @@ getDatacenters = [
         "name": "dal09"
     }
 ]
+
+getHardwareRouters = []

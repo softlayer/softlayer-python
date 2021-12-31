@@ -18,6 +18,10 @@ class VlanTests(testing.TestCase):
         result = self.run_command(['vlan', 'detail', '1234'])
         self.assert_no_fail(result)
 
+    def test_create_options(self):
+        result = self.run_command(['vlan', 'create-options'])
+        self.assert_no_fail(result)
+
     def test_detail_no_vs(self):
         result = self.run_command(['vlan', 'detail', '1234', '--no-vs'])
         self.assert_no_fail(result)
