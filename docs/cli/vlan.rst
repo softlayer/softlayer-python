@@ -7,7 +7,7 @@ VLANs
     :prog: vlan create
     :show-nested:
 
-.. click:: SoftLayer.CLI.vlan.create-options:cli
+.. click:: SoftLayer.CLI.vlan.create_options:cli
     :prog: vlan create-options
     :show-nested:
 
