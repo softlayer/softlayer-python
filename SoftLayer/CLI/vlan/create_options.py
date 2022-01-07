@@ -11,13 +11,13 @@ from SoftLayer.CLI import formatting
 @click.command(short_help="Get options to use for creating Vlan servers.")
 @environment.pass_env
 def cli(env):
-    """Vlan order options."""
+    """List all the options for creating VLAN"""
 
     mgr = SoftLayer.NetworkManager(env.client)
     datacenters = mgr.get_list_datacenter()
 
-    table = formatting.Table(['name', 'Value'], title="Datacenters")
-    router_table = formatting.Table(['datacenter', 'hostname'])
+    table = formatting.Table(['Options', 'Value'], title="Datacenters")
+    router_table = formatting.Table(['Datacenter', 'Router/Pod'])
     dc_table = formatting.Table(['Datacenters'])
     table.add_row(['VLAN type', 'Private, Public'])
 

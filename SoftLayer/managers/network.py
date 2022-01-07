@@ -800,6 +800,6 @@ class NetworkManager(object):
     def get_routers(self, identifier):
         """Calls SoftLayer_Location::getRouters()
 
-                returns all routers locations.
-                """
+        returns all routers locations.
+        """
         return self.client.call('SoftLayer_Location_Datacenter', 'getHardwareRouters', id=identifier)
