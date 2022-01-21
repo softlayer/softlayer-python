@@ -39,17 +39,29 @@ def lbaas_table(this_lb):
     listener_table, pools = get_listener_table(this_lb)
     table.add_row(['Protocols', listener_table])
 
-    member_table = get_member_table(this_lb, pools)
-    table.add_row(['Members', member_table])
+    if pools.get('members') is not None:
+        member_table = get_member_table(this_lb, pools)
+        table.add_row(['Members', member_table])
+    else:
+        table.add_row(['Members', "Not Found"])
 
-    hp_table = get_hp_table(this_lb)
-    table.add_row(['Health Checks', hp_table])
+    if this_lb.get('healthMonitors') != []:
+        hp_table = get_hp_table(this_lb)
+        table.add_row(['Health Checks', hp_table])
+    else:
+        table.add_row(['Health Checks', "Not Found"])
 
-    l7pool_table = get_l7pool_table(this_lb)
-    table.add_row(['L7 Pools', l7pool_table])
+    if this_lb.get('l7Pools') != []:
+        l7pool_table = get_l7pool_table(this_lb)
+        table.add_row(['L7 Pools', l7pool_table])
+    else:
+        table.add_row(['L7 Pools', "Not Found"])
 
-    ssl_table = get_ssl_table(this_lb)
-    table.add_row(['Ciphers', ssl_table])
+    if this_lb.get('sslCiphers') != []:
+        ssl_table = get_ssl_table(this_lb)
+        table.add_row(['Ciphers', ssl_table])
+    else:
+        table.add_row(['Ciphers', "Not Found"])
 
     return table
 
@@ -57,14 +69,14 @@ def lbaas_table(this_lb):
 def get_hp_table(this_lb):
     """Generates a table from a list of LBaaS devices"""
     # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_HealthMonitor/
-    hp_table = formatting.Table(['UUID', 'Interval', 'Retries', 'Type', 'Timeout', 'Modify', 'Active'])
+    hp_table = formatting.Table(['UUID', 'Interval', 'Retries', 'Type', 'ServerTimeout ', 'Modify', 'Active'])
     for health in this_lb.get('healthMonitors', []):
         hp_table.add_row([
             health.get('uuid'),
             health.get('interval'),
             health.get('maxRetries'),
             health.get('monitorType'),
-            health.get('timeout'),
+            health.get('serverTimeout'),
             utils.clean_time(health.get('modifyDate')),
             health.get('provisioningStatus')
         ])
