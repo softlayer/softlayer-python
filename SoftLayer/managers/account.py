@@ -326,3 +326,23 @@ class AccountManager(utils.IdentifierMixin, object):
         _mask = """billingItem,softwareDescription"""
 
         return self.client['SoftLayer_Account'].getActiveAccountLicenses(mask=_mask)
+
+    def get_bandwidth_pools(self, mask=None):
+        """Gets all the bandwidth pools on an account"""
+
+        if mask is None:
+            mask = """mask[totalBandwidthAllocated,locationGroup, id, name, billingCyclePublicUsageTotal,
+                      projectedPublicBandwidthUsage]
+                   """
+
+        return self.client.call('SoftLayer_Account', 'getBandwidthAllotments', mask=mask, iter=True)
+
+    def get_bandwidth_pool_counts(self, identifier):
+        """Gets a count of all servers in a bandwidth pool"""
+        mask = "mask[id, bareMetalInstanceCount, hardwareCount, virtualGuestCount]"
+        counts = self.client.call('SoftLayer_Network_Bandwidth_Version1_Allotment', 'getObject',
+                                  id=identifier, mask=mask)
+        total = counts.get('bareMetalInstanceCount', 0) + \
+                counts.get('hardwareCount', 0) + \
+                counts.get('virtualGuestCount', 0)
+        return total
