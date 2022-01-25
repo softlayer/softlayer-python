@@ -331,18 +331,22 @@ class AccountManager(utils.IdentifierMixin, object):
         """Gets all the bandwidth pools on an account"""
 
         if mask is None:
-            mask = """mask[totalBandwidthAllocated,locationGroup, id, name, billingCyclePublicUsageTotal,
-                      projectedPublicBandwidthUsage]
+            mask = """mask[totalBandwidthAllocated,locationGroup, id, name, projectedPublicBandwidthUsage,
+                      billingCyclePublicBandwidthUsage[amountOut,amountIn]]
                    """
 
         return self.client.call('SoftLayer_Account', 'getBandwidthAllotments', mask=mask, iter=True)
 
     def get_bandwidth_pool_counts(self, identifier):
-        """Gets a count of all servers in a bandwidth pool"""
+        """Gets a count of all servers in a bandwidth pool
+
+        Getting the server counts individually is significantly faster than pulling them in
+        with the get_bandwidth_pools api call.
+        """
         mask = "mask[id, bareMetalInstanceCount, hardwareCount, virtualGuestCount]"
         counts = self.client.call('SoftLayer_Network_Bandwidth_Version1_Allotment', 'getObject',
                                   id=identifier, mask=mask)
         total = counts.get('bareMetalInstanceCount', 0) + \
-                counts.get('hardwareCount', 0) + \
-                counts.get('virtualGuestCount', 0)
+            counts.get('hardwareCount', 0) + \
+            counts.get('virtualGuestCount', 0)
         return total

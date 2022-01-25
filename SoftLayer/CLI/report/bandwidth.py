@@ -9,7 +9,6 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
-from pprint import pprint as pp 
 
 # pylint: disable=unused-argument
 def _validate_datetime(ctx, param, value):
