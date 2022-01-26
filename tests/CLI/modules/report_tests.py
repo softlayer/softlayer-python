@@ -8,7 +8,8 @@ from SoftLayer import testing
 
 import json
 
-from pprint import pprint as pp 
+from pprint import pprint as pp
+
 
 class ReportTests(testing.TestCase):
 
@@ -93,14 +94,14 @@ class ReportTests(testing.TestCase):
         ])
 
         self.assert_no_fail(result)
-        
+
         stripped_output = '[' + result.output.split('[', 1)[1]
         json_output = json.loads(stripped_output)
         pp(json.loads(stripped_output))
         print("======= ^^^^^^^^^ ==============")
         self.assertEqual(json_output[0]['hostname'], 'pool1')
         self.assertEqual(json_output[0]['private_in'], 30)
-        
+
         self.assertEqual(6, len(self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData')))
         self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=1)
         self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=3)
@@ -110,25 +111,25 @@ class ReportTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=203)
         call = self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=1)[0]
         expected_args = ('2016-02-04 00:00:00 ', '2016-03-04 12:34:56 ',
-            [{
-                'keyName': 'PUBLICIN',
-                'name': 'publicIn',
-                'summaryType': 'sum',
-            }, {
-                'keyName': 'PUBLICOUT',
-                'name': 'publicOut',
-                'summaryType': 'sum',
-            }, {
-                'keyName': 'PRIVATEIN',
-                'name': 'privateIn',
-                'summaryType': 'sum',
-            }, {
-                'keyName': 'PRIVATEOUT',
-                'name': 'privateOut',
-                'summaryType': 'sum',
-            }],
-            300,
-        )
+                         [{
+                             'keyName': 'PUBLICIN',
+                             'name': 'publicIn',
+                             'summaryType': 'sum',
+                         }, {
+                             'keyName': 'PUBLICOUT',
+                             'name': 'publicOut',
+                             'summaryType': 'sum',
+                         }, {
+                             'keyName': 'PRIVATEIN',
+                             'name': 'privateIn',
+                             'summaryType': 'sum',
+                         }, {
+                             'keyName': 'PRIVATEOUT',
+                             'name': 'privateOut',
+                             'summaryType': 'sum',
+                         }],
+                         300,
+                         )
         self.assertEqual(expected_args, call.args)
 
     def test_virtual_bandwidth_report(self):
@@ -192,25 +193,25 @@ class ReportTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=203)
         call = self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=1)[0]
         expected_args = ('2016-02-04 00:00:00 ', '2016-03-04 12:34:56 ',
-            [{
-                'keyName': 'PUBLICIN',
-                'name': 'publicIn',
-                'summaryType': 'sum',
-            }, {
-                'keyName': 'PUBLICOUT',
-                'name': 'publicOut',
-                'summaryType': 'sum',
-            }, {
-                'keyName': 'PRIVATEIN',
-                'name': 'privateIn',
-                'summaryType': 'sum',
-            }, {
-                'keyName': 'PRIVATEOUT',
-                'name': 'privateOut',
-                'summaryType': 'sum',
-            }],
-            300,
-        )
+                         [{
+                             'keyName': 'PUBLICIN',
+                             'name': 'publicIn',
+                             'summaryType': 'sum',
+                         }, {
+                             'keyName': 'PUBLICOUT',
+                             'name': 'publicOut',
+                             'summaryType': 'sum',
+                         }, {
+                             'keyName': 'PRIVATEIN',
+                             'name': 'privateIn',
+                             'summaryType': 'sum',
+                         }, {
+                             'keyName': 'PRIVATEOUT',
+                             'name': 'privateOut',
+                             'summaryType': 'sum',
+                         }],
+                         300,
+                         )
         self.assertEqual(expected_args, call.args)
 
     def test_server_bandwidth_report(self):
@@ -267,30 +268,30 @@ class ReportTests(testing.TestCase):
         self.assertEqual(json_output[1]['private_in'], 0)
         self.assertEqual(json_output[2]['private_in'], 30)
         self.assertEqual(json_output[3]['type'], 'hardware')
-        
+
         self.assertEqual(4, len(self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData')))
         self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=101)
         self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=103)
 
         call = self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=1)[0]
         expected_args = ('2016-02-04 00:00:00 ', '2016-03-04 12:34:56 ',
-            [{
-                'keyName': 'PUBLICIN',
-                'name': 'publicIn',
-                'summaryType': 'sum',
-            }, {
-                'keyName': 'PUBLICOUT',
-                'name': 'publicOut',
-                'summaryType': 'sum',
-            }, {
-                'keyName': 'PRIVATEIN',
-                'name': 'privateIn',
-                'summaryType': 'sum',
-            }, {
-                'keyName': 'PRIVATEOUT',
-                'name': 'privateOut',
-                'summaryType': 'sum',
-            }],
-            300,
-        )
+                         [{
+                             'keyName': 'PUBLICIN',
+                             'name': 'publicIn',
+                             'summaryType': 'sum',
+                         }, {
+                             'keyName': 'PUBLICOUT',
+                             'name': 'publicOut',
+                             'summaryType': 'sum',
+                         }, {
+                             'keyName': 'PRIVATEIN',
+                             'name': 'privateIn',
+                             'summaryType': 'sum',
+                         }, {
+                             'keyName': 'PRIVATEOUT',
+                             'name': 'privateOut',
+                             'summaryType': 'sum',
+                         }],
+                         300,
+                         )
         self.assertEqual(expected_args, call.args)
