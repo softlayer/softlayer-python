@@ -300,6 +300,11 @@ class OrderTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getActivePresets', filter=_filter)
 
+    def test_preset_list_prices(self):
+        result = self.run_command(['order', 'preset-list', 'package', '--prices'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Product_Package', 'getActivePresets')
+
     def test_location_list(self):
         result = self.run_command(['order', 'package-locations', 'package'])
         self.assert_no_fail(result)

@@ -16,8 +16,9 @@ COLUMNS = ['name',
 @click.argument('package_keyname')
 @click.option('--keyword',
               help="A word (or string) used to filter preset names.")
+@click.option('--prices', '-p', is_flag=True, help='Use --prices to list the server item prices, e.g. --prices')
 @environment.pass_env
-def cli(env, package_keyname, keyword):
+def cli(env, package_keyname, keyword, prices):
     """List package presets.
 
     .. Note::
@@ -33,6 +34,8 @@ def cli(env, package_keyname, keyword):
         slcli order preset-list BARE_METAL_SERVER --keyword gpu
 
     """
+
+    tables = []
     table = formatting.Table(COLUMNS)
     manager = ordering.OrderingManager(env.client)
 
@@ -41,10 +44,36 @@ def cli(env, package_keyname, keyword):
         _filter = {'activePresets': {'name': {'operation': '*= %s' % keyword}}}
     presets = manager.list_presets(package_keyname, filter=_filter)
 
-    for preset in presets:
-        table.add_row([
-            str(preset['name']).strip(),
-            str(preset['keyName']).strip(),
-            str(preset['description']).strip()
-        ])
-    env.fout(table)
+    if prices:
+        table_prices = formatting.Table(['keyName', 'priceId', 'Hourly', 'Monthly', 'Restriction', 'Location'])
+        for price in presets:
+            locations = []
+            if price['locations'] != []:
+                for location in price['locations']:
+                    locations.append(location['name'])
+            cr_max = get_item_price_data(price['prices'][0], 'capacityRestrictionMaximum')
+            cr_min = get_item_price_data(price['prices'][0], 'capacityRestrictionMinimum')
+            cr_type = get_item_price_data(price['prices'][0], 'capacityRestrictionType')
+            table_prices.add_row([price['keyName'], price['id'],
+                                  get_item_price_data(price['prices'][0], 'hourlyRecurringFee'),
+                                  get_item_price_data(price['prices'][0], 'recurringFee'),
+                                  "%s - %s %s" % (cr_min, cr_max, cr_type), str(locations)])
+        tables.append(table_prices)
+
+    else:
+        for preset in presets:
+            table.add_row([
+                str(preset['name']).strip(),
+                str(preset['keyName']).strip(),
+                str(preset['description']).strip()
+            ])
+        tables.append(table)
+    env.fout(tables)
+
+
+def get_item_price_data(price, item_attribute):
+    """Given an SoftLayer_Product_Item_Price, returns its default price data"""
+    result = '-'
+    if item_attribute in price:
+        result = price[item_attribute]
+    return result
