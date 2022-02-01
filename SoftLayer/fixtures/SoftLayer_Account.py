@@ -1207,3 +1207,21 @@ getActiveVirtualLicenses = [{
         "version": 4
     }
 }]
+
+getBandwidthAllotments = [{
+    'billingCyclePublicBandwidthUsage': {
+        'amountIn': '6.94517',
+        'amountOut': '6.8859'
+    },
+    'id': 309961,
+    'locationGroup': {
+        'description': 'All Datacenters in Mexico',
+        'id': 262,
+        'locationGroupTypeId': 1,
+        'name': 'MEX',
+        'securityLevelId': None
+    },
+    'name': 'MexRegion',
+    'projectedPublicBandwidthUsage': 9.88,
+    'totalBandwidthAllocated': 3361
+}]
