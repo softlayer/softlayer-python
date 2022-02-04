@@ -1,5 +1,18 @@
 # Change Log
 
+
+## [5.9.9] - 2021-12-07
+
+https://github.com/softlayer/softlayer-python/compare/v5.9.8...v5.9.9
+
+#### Improvements
+- Add loadbalancer timeout values #1576
+- Add pricing date to slcli order preset-list #1578
+
+#### New Commands
+- `slcli vlan create-options` add new feature on vlan #1572
+- `slcli account bandwidth-pools` Bandwidth pool features #1579
+
 ## [5.9.8] - 2021-12-07
 
 https://github.com/softlayer/softlayer-python/compare/v5.9.7...v5.9.8
