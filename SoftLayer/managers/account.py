@@ -326,3 +326,14 @@ class AccountManager(utils.IdentifierMixin, object):
         _mask = """billingItem,softwareDescription"""
 
         return self.client['SoftLayer_Account'].getActiveAccountLicenses(mask=_mask)
+
+    def getBandwidthDetail(self, identifier):
+        """Gets bandwidth pool detail.
+
+        :returns: bandwidth pool detail
+        """
+        _mask = """activeDetails[allocation],projectedPublicBandwidthUsage, billingCyclePublicBandwidthUsage,
+        hardware[outboundBandwidthUsage,bandwidthAllotmentDetail[allocation]],inboundPublicBandwidthUsage,
+        virtualGuests[outboundPublicBandwidthUsage,bandwidthAllotmentDetail[allocation]],
+        bareMetalInstances[outboundBandwidthUsage,bandwidthAllotmentDetail[allocation]]"""
+        return self.client['SoftLayer_Network_Bandwidth_Version1_Allotment'].getObject(id=identifier, mask=_mask)
