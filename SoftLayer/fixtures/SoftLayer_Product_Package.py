@@ -1847,7 +1847,16 @@ getActivePresets = [
         "isActive": "1",
         "keyName": "M1_64X512X25",
         "name": "M1.64x512x25",
-        "packageId": 835
+        "packageId": 835,
+        "locations": [],
+        "prices": [
+            {
+                "hourlyRecurringFee": "0",
+                "id": 258963,
+                "itemId": 8195,
+                "recurringFee": "0",
+                "setupFee": "0"
+            }]
     },
     {
         "description": "M1.56x448x100",
@@ -1855,7 +1864,16 @@ getActivePresets = [
         "isActive": "1",
         "keyName": "M1_56X448X100",
         "name": "M1.56x448x100",
-        "packageId": 835
+        "packageId": 835,
+        "locations": [],
+        "prices": [
+            {
+                "hourlyRecurringFee": "0",
+                "id": 698563,
+                "itemId": 8195,
+                "recurringFee": "0",
+                "setupFee": "0"
+            }]
     },
     {
         "description": "M1.64x512x100",
@@ -1863,7 +1881,16 @@ getActivePresets = [
         "isActive": "1",
         "keyName": "M1_64X512X100",
         "name": "M1.64x512x100",
-        "packageId": 835
+        "packageId": 835,
+        "locations": [],
+        "prices": [
+            {
+                "hourlyRecurringFee": "0",
+                "id": 963258,
+                "itemId": 8195,
+                "recurringFee": "0",
+                "setupFee": "0"
+            }]
     }
 ]
 

@@ -5,6 +5,9 @@ getObject = {
     'locationGroupId': 262,
     'name': 'MexRegion',
     'serviceProviderId': 1,
+    'bareMetalInstanceCount': 0,
+    'hardwareCount': 2,
+    'virtualGuestCount': 0,
     'activeDetails': [
         {
             'allocationId': 48293300,
