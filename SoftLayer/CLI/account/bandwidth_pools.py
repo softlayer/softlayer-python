@@ -30,7 +30,7 @@ def cli(env):
     ], title="Bandwidth Pools")
     table.align = 'l'
     for item in items:
-        id = item.get('id')
+        id_bandwidth = item.get('id')
         name = item.get('name')
         region = utils.lookup(item, 'locationGroup', 'name')
         servers = manager.get_bandwidth_pool_counts(identifier=item.get('id'))
@@ -38,5 +38,5 @@ def cli(env):
         current = "{} GB".format(utils.lookup(item, 'billingCyclePublicBandwidthUsage', 'amountOut'))
         projected = "{} GB".format(item.get('projectedPublicBandwidthUsage', 0))
 
-        table.add_row([id, name, region, servers, allocation, current, projected])
+        table.add_row([id_bandwidth, name, region, servers, allocation, current, projected])
     env.fout(table)
