@@ -23,7 +23,7 @@ def cli(env, identifier):
     table.add_row(['Id', bandwidths['id']])
     table.add_row(['Name', bandwidths['name']])
     table.add_row(['Create Date', bandwidths['createDate']])
-    current = "{} GB".format(bandwidths['billingCyclePublicBandwidthUsage']['amountOut'], 0)
+    current = "{} GB".format(utils.lookup(bandwidths, 'billingCyclePublicBandwidthUsage', 'amountOut', 0))
     table.add_row(['Current Usage', current])
     projected = "{} GB".format(bandwidths.get('projectedPublicBandwidthUsage', 0))
     table.add_row(['Projected  Usage', projected])
@@ -51,8 +51,8 @@ def _bw_table(bw_data):
     """Generates a bandwidth useage table"""
     table_data = formatting.Table(['Id', 'HostName', "IP Address", 'Amount', "Current Usage"])
     for bw_point in bw_data:
-        amount = "{} GB".format(utils.lookup(bw_point, 'bandwidthAllotmentDetail', 'allocation', 'amountOut'), 0)
-        current = "{} GB".format(utils.lookup(bw_point, 'outboundBandwidthUsage'), 0)
+        amount = "{} GB".format(utils.lookup(bw_point, 'bandwidthAllotmentDetail', 'allocation', 'amountOut', 0))
+        current = "{} GB".format(utils.lookup(bw_point, 'outboundBandwidthUsage', 0))
         ip_address = bw_point['primaryIpAddress']
         table_data.add_row([bw_point['id'], bw_point['fullyQualifiedDomainName'], ip_address, amount, current])
     return [table_data]
@@ -62,8 +62,8 @@ def _virtual_table(bw_data):
     """Generates a virtual bandwidth usage table"""
     table_data = formatting.Table(['Id', 'HostName', "IP Address", 'Amount', "Current Usage"])
     for bw_point in bw_data:
-        amount = "{} GB".format(utils.lookup(bw_point, 'bandwidthAllotmentDetail', 'allocation', 'amountOut'), 0)
-        current = "{} GB".format(utils.lookup(bw_point, 'outboundBandwidthUsage'), 0)
+        amount = "{} GB".format(utils.lookup(bw_point, 'bandwidthAllotmentDetail', 'allocation', 'amountOut', 0))
+        current = "{} GB".format(utils.lookup(bw_point, 'outboundBandwidthUsage', 0))
         ip_address = bw_point['primaryIpAddress']
         table_data.add_row([bw_point['id'], bw_point['fullyQualifiedDomainName'], ip_address, amount, current])
     return [table_data]
