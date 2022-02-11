@@ -11,11 +11,7 @@ import os
 
 import click
 
-# If both PTable and prettytable are installed, its impossible to use the new version
-try:
-    from prettytable import prettytable
-except ImportError:
-    import prettytable
+import prettytable
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import utils
