@@ -142,3 +142,8 @@ class AccountCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getBandwidthAllotments')
         self.assert_called_with('SoftLayer_Network_Bandwidth_Version1_Allotment', 'getObject')
+
+    def test_acccount_bandwidth_pool_detail(self):
+        result = self.run_command(['account', 'bandwidth-pools-detail', '123456'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Bandwidth_Version1_Allotment', 'getObject')

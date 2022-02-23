@@ -15,6 +15,7 @@ ALL_ROUTES = [
     ('account:invoice-detail', 'SoftLayer.CLI.account.invoice_detail:cli'),
     ('account:invoices', 'SoftLayer.CLI.account.invoices:cli'),
     ('account:events', 'SoftLayer.CLI.account.events:cli'),
+    ('account:bandwidth-pools-detail', 'SoftLayer.CLI.account.bandwidth_pools_detail:cli'),
     ('account:event-detail', 'SoftLayer.CLI.account.event_detail:cli'),
     ('account:licenses', 'SoftLayer.CLI.account.licenses:cli'),
     ('account:summary', 'SoftLayer.CLI.account.summary:cli'),

@@ -350,3 +350,14 @@ class AccountManager(utils.IdentifierMixin, object):
             counts.get('hardwareCount', 0) + \
             counts.get('virtualGuestCount', 0)
         return total
+
+    def getBandwidthDetail(self, identifier):
+        """Gets bandwidth pool detail.
+
+        :returns: bandwidth pool detail
+        """
+        _mask = """activeDetails[allocation],projectedPublicBandwidthUsage, billingCyclePublicBandwidthUsage,
+        hardware[outboundBandwidthUsage,bandwidthAllotmentDetail[allocation]],inboundPublicBandwidthUsage,
+        virtualGuests[outboundPublicBandwidthUsage,bandwidthAllotmentDetail[allocation]],
+        bareMetalInstances[outboundBandwidthUsage,bandwidthAllotmentDetail[allocation]]"""
+        return self.client['SoftLayer_Network_Bandwidth_Version1_Allotment'].getObject(id=identifier, mask=_mask)

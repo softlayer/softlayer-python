@@ -47,3 +47,7 @@ Account Commands
 .. click:: SoftLayer.CLI.account.bandwidth_pools:cli
     :prog: account bandwidth-pools
     :show-nested:
+
+.. click:: SoftLayer.CLI.account.bandwidth_pools_detail:cli
+    :prog: account bandwidth-pools-detail
+    :show-nested:
