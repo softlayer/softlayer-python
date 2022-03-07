@@ -366,6 +366,7 @@ ALL_ROUTES = [
 
     ('report', 'SoftLayer.CLI.report'),
     ('report:bandwidth', 'SoftLayer.CLI.report.bandwidth:cli'),
+    ('report:datacenter-closures', 'SoftLayer.CLI.report.dc_closures:cli'),
 
     ('autoscale', 'SoftLayer.CLI.autoscale'),
     ('autoscale:list', 'SoftLayer.CLI.autoscale.list:cli'),
