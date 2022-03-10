@@ -937,3 +937,7 @@ class VirtTests(testing.TestCase):
         result = self.run_command(['vs', 'authorize-storage', '--username-storage=SL01SEL301234-11',
                                    '--portable-id=12345', '1234'])
         self.assert_no_fail(result)
+
+    def test_monitoring_vs(self):
+        result = self.run_command(['vs', 'monitoring', '1234'])
+        self.assert_no_fail(result)

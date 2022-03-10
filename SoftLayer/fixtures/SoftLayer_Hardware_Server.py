@@ -1,7 +1,7 @@
 getObject = {
     'id': 1000,
     'globalIdentifier': '1a2b3c-1701',
-    'datacenter': {'id': 50, 'name': 'TEST00',
+    'datacenter': {'id': 50, 'name': 'TEST00', 'longName': 'test 00',
                    'description': 'Test Data Center'},
     'billingItem': {
         'id': 6327,
@@ -74,7 +74,35 @@ getObject = {
             'friendlyName': 'Friendly Transaction Name',
             'id': 6660
         }
-    }
+    },
+    'networkMonitors': [
+        {
+            'hardwareId': 3123796,
+            'hostId': 3123796,
+            'id': 19016454,
+            'ipAddress': '169.53.167.199',
+            'queryTypeId': 1,
+            'responseActionId': 2,
+            'status': 'ON',
+            'waitCycles': 0,
+            'lastResult': {
+                'finishTime': '2022-03-10T08:31:40-06:00',
+                'responseStatus': 2,
+                'responseTime': 159.15,
+            },
+            'queryType': {
+                'description': 'Test ping to address',
+                'id': 1,
+                'monitorLevel': 0,
+                'name': 'SERVICE PING'
+            },
+            'responseAction': {
+                'actionDescription': 'Notify Users',
+                'id': 2,
+                'level': 0
+            }
+        }
+    ]
 }
 editObject = True
 setTags = True
