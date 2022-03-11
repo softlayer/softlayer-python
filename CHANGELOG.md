@@ -1,7 +1,7 @@
 # Change Log
 
 
-## [6.0.0] - 2022-03-11
+## [6.0.1] - 2022-03-11
 
 
 ## What's Changed
@@ -12,8 +12,9 @@
 * fix to errors in slcli hw create-options by @caberos in https://github.com/softlayer/softlayer-python/pull/1594
 
 
-**Full Changelog**: https://github.com/softlayer/softlayer-python/compare/v5.9.9...v6.0.0
+**Full Changelog**: https://github.com/softlayer/softlayer-python/compare/v5.9.9...v6.0.1
 
+6.0.0 was skipped.
 
 ## [5.9.9] - 2022-02-04
 
