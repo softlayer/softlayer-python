@@ -19,6 +19,7 @@ setup(
     version='6.0.0',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/x-rst',
     author='SoftLayer, Inc., an IBM Company',
     author_email='SLDNDeveloperRelations@wwpdl.vnet.ibm.com',
     packages=find_packages(exclude=['tests']),
