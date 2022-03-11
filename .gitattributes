@@ -1,0 +1,18 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# Language aware diff headers
+# https://tekin.co.uk/2020/10/better-git-diff-output-for-ruby-python-elixir-and-more
+# https://gist.github.com/tekin/12500956bd56784728e490d8cef9cb81
+*.css   diff=css
+*.html  diff=html
+*.py    diff=python
+*.md    diff=markdown
+
+
+# Declare files that will always have CRLF line endings on checkout.
+*.sln text eol=crlf
+
+# Denote all files that are truly binary and should not be modified.
+*.png binary
+*.jpg binary
