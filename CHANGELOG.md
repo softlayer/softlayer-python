@@ -1,7 +1,21 @@
 # Change Log
 
 
-## [5.9.9] - 2021-12-07
+## [6.0.0] - 2022-03-11
+
+
+## What's Changed
+* Replace the use of ptable with prettytable by @dvzrv in https://github.com/softlayer/softlayer-python/pull/1584
+* Bandwidth pool management by @caberos in https://github.com/softlayer/softlayer-python/pull/1582
+* Add id in the result in the command bandwidth-pools by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1586
+* Datacenter closure report by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1592
+* fix to errors in slcli hw create-options by @caberos in https://github.com/softlayer/softlayer-python/pull/1594
+
+
+**Full Changelog**: https://github.com/softlayer/softlayer-python/compare/v5.9.9...v6.0.0
+
+
+## [5.9.9] - 2022-02-04
 
 https://github.com/softlayer/softlayer-python/compare/v5.9.8...v5.9.9
 
