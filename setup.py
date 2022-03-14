@@ -16,9 +16,10 @@ else:
 
 setup(
     name='SoftLayer',
-    version='5.9.9',
+    version='6.0.1',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/x-rst',
     author='SoftLayer, Inc., an IBM Company',
     author_email='SLDNDeveloperRelations@wwpdl.vnet.ibm.com',
     packages=find_packages(exclude=['tests']),

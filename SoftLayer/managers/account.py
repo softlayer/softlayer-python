@@ -284,6 +284,11 @@ class AccountManager(utils.IdentifierMixin, object):
         :param string location: location string
         :returns: Routers
         """
+
+        if mask is None:
+            mask = """
+                 topLevelLocation
+               """
         object_filter = ''
         if location:
             object_filter = {
