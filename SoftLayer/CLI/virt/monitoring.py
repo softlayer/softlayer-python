@@ -1,4 +1,4 @@
-"""Get monitoring for a vSI device."""
+"""Get monitoring for a VSI device."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -22,12 +22,12 @@ def cli(env, identifier):
 
     monitoring = vsi.get_instance(identifier)
 
-    table.add_row(['domain', monitoring.get('fullyQualifiedDomainName')])
-    table.add_row(['public Ip', monitoring.get('primaryIpAddress')])
-    table.add_row(['private Ip', monitoring.get('primaryBackendIpAddress')])
-    table.add_row(['location', monitoring['datacenter']['longName']])
+    table.add_row(['Domain', monitoring.get('fullyQualifiedDomainName')])
+    table.add_row(['Public Ip', monitoring.get('primaryIpAddress')])
+    table.add_row(['Private Ip', monitoring.get('primaryBackendIpAddress')])
+    table.add_row(['Location', monitoring['datacenter']['longName']])
 
-    monitoring_table = formatting.Table(['Id', 'ipAddress', 'status', 'type', 'notify'])
+    monitoring_table = formatting.Table(['Id', 'IpAddress', 'Status', 'Type', 'Notify'])
     for monitor in monitoring['networkMonitors']:
         monitoring_table.add_row([monitor.get('id'), monitor.get('ipAddress'), monitor.get('status'),
                                   monitor['queryType']['name'], monitor['responseAction']['actionDescription']])
