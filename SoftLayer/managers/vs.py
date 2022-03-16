@@ -252,6 +252,7 @@ class VSManager(utils.IdentifierMixin, object):
                 'tagReferences[id,tag[name,id]],'
                 'networkVlans[id,vlanNumber,networkSpace],'
                 'dedicatedHost.id,'
+                'monitoringServiceComponent,networkMonitors[queryType,lastResult,responseAction],'
                 'placementGroupId'
             )
 

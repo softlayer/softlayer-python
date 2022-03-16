@@ -24,6 +24,10 @@ Interacting with Hardware
    :prog: hardware create
    :show-nested:
 
+.. click:: SoftLayer.CLI.hardware.monitoring:cli
+   :prog: hardware monitoring
+   :show-nested:
+
 
 Provides some basic functionality to order a server. `slcli order` has a more full featured method of ordering servers. This command only supports the FAST_PROVISION type.
 

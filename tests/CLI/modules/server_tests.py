@@ -1010,3 +1010,7 @@ class ServerCLITests(testing.TestCase):
     def test_sensor_discrete(self):
         result = self.run_command(['hardware', 'sensor', '100', '--discrete'])
         self.assert_no_fail(result)
+
+    def test_monitoring(self):
+        result = self.run_command(['hardware', 'monitoring', '100'])
+        self.assert_no_fail(result)

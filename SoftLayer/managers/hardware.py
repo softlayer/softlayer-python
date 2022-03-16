@@ -231,6 +231,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'domain,'
                 'provisionDate,'
                 'hardwareStatus,'
+                'bareMetalInstanceFlag,'
                 'processorPhysicalCoreAmount,'
                 'memoryCapacity,'
                 'notes,'
@@ -269,6 +270,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'hourlyBillingFlag,'
                 'tagReferences[id,tag[name,id]],'
                 'networkVlans[id,vlanNumber,networkSpace],'
+                'monitoringServiceComponent,networkMonitors[queryType,lastResult,responseAction],'
                 'remoteManagementAccounts[username,password]'
             )
 

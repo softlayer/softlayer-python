@@ -47,7 +47,7 @@ getObject = {
             'preset': {'keyName': 'B1_8X16X100'}
         }
     },
-    'datacenter': {'id': 50, 'name': 'TEST00',
+    'datacenter': {'id': 50, 'name': 'TEST00', 'longName': 'test 00',
                    'description': 'Test Data Center'},
     'powerState': {'keyName': 'RUNNING', 'name': 'Running'},
     'maxCpu': 2,
@@ -83,6 +83,29 @@ getObject = {
             'softwareDescription': {'name': 'Ubuntu'}}
     }],
     'tagReferences': [{'tag': {'name': 'production'}}],
+    'networkMonitors': [
+        {
+            'guestId': 116114480,
+            'hostId': 116114480,
+            'id': 17653845,
+            'ipAddress': '52.116.23.73',
+            'queryTypeId': 1,
+            'responseActionId': 1,
+            'status': 'ON',
+            'waitCycles': 0,
+            'queryType': {
+                'description': 'Test ping to address',
+                'id': 1,
+                'monitorLevel': 0,
+                'name': 'SERVICE PING'
+            },
+            'responseAction': {
+                'actionDescription': 'Do Nothing',
+                'id': 1,
+                'level': 0
+            }
+        }
+    ]
 }
 getCreateObjectOptions = {
     'flavors': [
@@ -894,6 +917,6 @@ migrateDedicatedHost = True
 allowAccessToNetworkStorageList = True
 
 attachDiskImage = {
-            "createDate": "2021-03-22T13:15:31-06:00",
-            "id": 1234567
-        }
+    "createDate": "2021-03-22T13:15:31-06:00",
+    "id": 1234567
+}
