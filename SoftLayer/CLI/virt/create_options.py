@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 # pylint: disable=too-many-statements
 import click
+from SoftLayer.managers import network
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -22,16 +23,41 @@ def cli(env, vsi_type, prices, location=None):
     """Virtual server order options."""
 
     vsi = SoftLayer.VSManager(env.client)
+    network_manager = network.NetworkManager(env.client)
     options = vsi.get_create_options(vsi_type, location)
+
+    closing_filter = {
+        'capabilities': {
+            'operation': 'in',
+            'options': [{'name': 'data', 'value': ['CLOSURE_ANNOUNCED']}]
+        },
+        'name': {
+            'operation': 'orderBy',
+            'options': [{'name': 'sort', 'value': ['DESC']}]
+        }
+    }
+
+    pods_mask = """mask[name, datacenterLongName, frontendRouterId, capabilities, datacenterId, backendRouterId,
+            backendRouterName, frontendRouterName]"""
+    pods = network_manager.get_pods(mask=pods_mask, filter=closing_filter)
 
     tables = []
 
     # Datacenters
-    dc_table = formatting.Table(['datacenter', 'Value'], title="Datacenters")
+    dc_table = formatting.Table(['Datacenter', 'Value', 'note'], title="Datacenters")
     dc_table.sortby = 'Value'
     dc_table.align = 'l'
     for location_info in options['locations']:
-        dc_table.add_row([location_info['name'], location_info['key']])
+        closure = []
+        for pod in pods:
+            if ((location_info['key'] in str(pod['name']))):
+                closure.append(pod['name'])
+
+        if len(closure) == 0:
+            closure = ''
+        else:
+            closure = 'closed soon: %s' % (str(closure))
+        dc_table.add_row([location_info['name'], location_info['key'], str(closure)])
     tables.append(dc_table)
 
     if vsi_type == 'CLOUD_SERVER':

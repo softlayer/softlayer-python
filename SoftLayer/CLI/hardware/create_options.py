@@ -7,6 +7,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import account
 from SoftLayer.managers import hardware
+from SoftLayer.managers import network
 
 
 @click.command()
@@ -22,14 +23,39 @@ def cli(env, prices, location=None):
     account_manager = account.AccountManager(env.client)
     options = hardware_manager.get_create_options(location)
     routers = account_manager.get_routers(location=location)
+    network_manager = network.NetworkManager(env.client)
+
+    closing_filter = {
+        'capabilities': {
+            'operation': 'in',
+            'options': [{'name': 'data', 'value': ['CLOSURE_ANNOUNCED']}]
+        },
+        'name': {
+            'operation': 'orderBy',
+            'options': [{'name': 'sort', 'value': ['DESC']}]
+        }
+    }
+
+    pods_mask = """mask[name, datacenterLongName, frontendRouterId, capabilities, datacenterId, backendRouterId,
+        backendRouterName, frontendRouterName]"""
+    pods = network_manager.get_pods(mask=pods_mask, filter=closing_filter)
     tables = []
 
     # Datacenters
-    dc_table = formatting.Table(['Datacenter', 'Value'], title="Datacenters")
+    dc_table = formatting.Table(['Datacenter', 'Value', 'note'], title="Datacenters")
     dc_table.sortby = 'Value'
     dc_table.align = 'l'
     for location_info in options['locations']:
-        dc_table.add_row([location_info['name'], location_info['key']])
+        closure = []
+        for pod in pods:
+            if ((location_info['key'] in str(pod['name']))):
+                closure.append(pod['name'])
+
+        if len(closure) == 0:
+            closure = ''
+        else:
+            closure = 'closed soon: %s' % (str(closure))
+        dc_table.add_row([location_info['name'], location_info['key'], str(closure)])
     tables.append(dc_table)
 
     tables.append(_preset_prices_table(options['sizes'], prices))
