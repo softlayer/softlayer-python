@@ -25,8 +25,8 @@ def cli(env, prices, location=None):
     routers = account_manager.get_routers(location=location)
     network_manager = network.NetworkManager(env.client)
 
-
     pods = network_manager.get_closed_pods()
+
     tables = []
 
     # Datacenters
