@@ -779,16 +779,17 @@ class NetworkManager(object):
                                 customer_note,
                                 id=identifier)
 
-    def get_pods(self, mask=None, filter=None, datacenter=None):
+    def get_pods(self, datacenter=None):
         """Calls SoftLayer_Network_Pod::getAllObjects()
 
         returns list of all network pods and their routers.
         """
+        _filter = None
 
         if datacenter:
-            filter = {"datacenterName": {"operation": datacenter}}
+            _filter = {"datacenterName": {"operation": datacenter}}
 
-        return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', mask=mask, filter=filter)
+        return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', filter=_filter)
 
     def get_list_datacenter(self):
         """Calls SoftLayer_Location::getDatacenters()
@@ -803,3 +804,23 @@ class NetworkManager(object):
         returns all routers locations.
         """
         return self.client.call('SoftLayer_Location_Datacenter', 'getHardwareRouters', id=identifier)
+
+    def get_closed_pods(self):
+        """Calls SoftLayer_Network_Pod::getAllObjects()
+
+        returns list of all closing network pods.
+        """
+        closing_filter = {
+            'capabilities': {
+                'operation': 'in',
+                'options': [{'name': 'data', 'value': ['CLOSURE_ANNOUNCED']}]
+            },
+            'name': {
+                'operation': 'orderBy',
+                'options': [{'name': 'sort', 'value': ['DESC']}]
+            }
+        }
+
+        mask = """mask[name, datacenterLongName, frontendRouterId, capabilities, datacenterId, backendRouterId,
+                backendRouterName, frontendRouterName]"""
+        return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', mask=mask, filter=closing_filter)

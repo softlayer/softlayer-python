@@ -26,25 +26,12 @@ def cli(env, vsi_type, prices, location=None):
     network_manager = network.NetworkManager(env.client)
     options = vsi.get_create_options(vsi_type, location)
 
-    closing_filter = {
-        'capabilities': {
-            'operation': 'in',
-            'options': [{'name': 'data', 'value': ['CLOSURE_ANNOUNCED']}]
-        },
-        'name': {
-            'operation': 'orderBy',
-            'options': [{'name': 'sort', 'value': ['DESC']}]
-        }
-    }
-
-    pods_mask = """mask[name, datacenterLongName, frontendRouterId, capabilities, datacenterId, backendRouterId,
-            backendRouterName, frontendRouterName]"""
-    pods = network_manager.get_pods(mask=pods_mask, filter=closing_filter)
+    pods = network_manager.get_closed_pods()
 
     tables = []
 
     # Datacenters
-    dc_table = formatting.Table(['Datacenter', 'Value', 'note'], title="Datacenters")
+    dc_table = formatting.Table(['Datacenter', 'Value', 'Note'], title="Datacenters")
     dc_table.sortby = 'Value'
     dc_table.align = 'l'
     for location_info in options['locations']:
@@ -53,11 +40,10 @@ def cli(env, vsi_type, prices, location=None):
             if ((location_info['key'] in str(pod['name']))):
                 closure.append(pod['name'])
 
-        if len(closure) == 0:
-            closure = ''
-        else:
-            closure = 'closed soon: %s' % (str(closure))
-        dc_table.add_row([location_info['name'], location_info['key'], str(closure)])
+        notes = '-'
+        if len(closure) > 0:
+            notes = 'closed soon: %s' % (', '.join(closure))
+        dc_table.add_row([location_info['name'], location_info['key'], notes])
     tables.append(dc_table)
 
     if vsi_type == 'CLOUD_SERVER':
