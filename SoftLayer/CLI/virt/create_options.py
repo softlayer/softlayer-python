@@ -37,7 +37,7 @@ def cli(env, vsi_type, prices, location=None):
     for location_info in options['locations']:
         closure = []
         for pod in pods:
-            if ((location_info['key'] in str(pod['name']))):
+            if location_info['key'] in str(pod['name']):
                 closure.append(pod['name'])
 
         notes = '-'
