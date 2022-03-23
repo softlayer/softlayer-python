@@ -309,7 +309,8 @@ class OrderTests(testing.TestCase):
         result = self.run_command(['order', 'package-locations', 'package'])
         self.assert_no_fail(result)
         expected_results = [
-            {'id': 2017603, 'dc': 'wdc07', 'description': 'WDC07 - Washington, DC', 'keyName': 'WASHINGTON07'}
+            {'id': 2017603, 'dc': 'wdc07', 'description': 'WDC07 - Washington, DC',
+             'keyName': 'WASHINGTON07','note': 'closed soon: wdc07.pod01'}
         ]
         print("FUCK")
         print(result.output)
