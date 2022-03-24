@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 # pylint: disable=too-many-statements
 import click
+from SoftLayer.managers import network
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -22,16 +23,27 @@ def cli(env, vsi_type, prices, location=None):
     """Virtual server order options."""
 
     vsi = SoftLayer.VSManager(env.client)
+    network_manager = network.NetworkManager(env.client)
     options = vsi.get_create_options(vsi_type, location)
+
+    pods = network_manager.get_closed_pods()
 
     tables = []
 
     # Datacenters
-    dc_table = formatting.Table(['datacenter', 'Value'], title="Datacenters")
+    dc_table = formatting.Table(['Datacenter', 'Value', 'Note'], title="Datacenters")
     dc_table.sortby = 'Value'
     dc_table.align = 'l'
     for location_info in options['locations']:
-        dc_table.add_row([location_info['name'], location_info['key']])
+        closure = []
+        for pod in pods:
+            if location_info['key'] in str(pod['name']):
+                closure.append(pod['name'])
+
+        notes = '-'
+        if len(closure) > 0:
+            notes = 'closed soon: %s' % (', '.join(closure))
+        dc_table.add_row([location_info['name'], location_info['key'], notes])
     tables.append(dc_table)
 
     if vsi_type == 'CLOUD_SERVER':
