@@ -7,7 +7,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers import network
 from SoftLayer.managers import ordering
 
-COLUMNS = ['id', 'dc', 'description', 'keyName', 'note']
+COLUMNS = ['id', 'dc', 'description', 'keyName', 'Note']
 
 
 @click.command()
