@@ -397,8 +397,9 @@ class ServerCLITests(testing.TestCase):
                                    ])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'id': 98765, 'created': '2013-08-02 15:23:47'})
+        self.assertEqual(
+            str(result.output),
+            'Warning: Closed soon: TEST00.pod2\n{\n    "id": 98765,\n    "created": "2013-08-02 15:23:47"\n}\n')
 
     @mock.patch('SoftLayer.CLI.template.export_to_template')
     def test_create_server_with_export(self, export_mock):
