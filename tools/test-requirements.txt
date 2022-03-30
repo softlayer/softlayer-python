@@ -5,7 +5,7 @@ pytest-cov
 mock
 sphinx
 prettytable >= 2.0.0
-click >= 7
+click == 8.0.4
 requests >= 2.20.0
 prompt_toolkit >= 2
 pygments >= 2.0.0

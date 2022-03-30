@@ -16,7 +16,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='6.0.1',
+    version='6.0.2',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/x-rst',
@@ -35,7 +35,7 @@ setup(
     python_requires='>=3.5',
     install_requires=[
         'prettytable >= 2.0.0',
-        'click >= 7',
+        'click == 8.0.4',
         'requests >= 2.20.0',
         'prompt_toolkit >= 2',
         'pygments >= 2.0.0',
