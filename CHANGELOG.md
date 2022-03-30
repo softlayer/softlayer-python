@@ -1,6 +1,15 @@
 # Change Log
 
 
+## [6.0.2] - 2022-03-30
+
+## What's Changed
+* New Command slcli hardware|virtual monitoring by @caberos in https://github.com/softlayer/softlayer-python/pull/1593
+* When listing datacenters/pods, mark those that are closing soon. by @caberos in https://github.com/softlayer/softlayer-python/pull/1597
+
+
+**Full Changelog**: https://github.com/softlayer/softlayer-python/compare/v6.0.1...v6.0.2
+
 ## [6.0.1] - 2022-03-11
 
 
