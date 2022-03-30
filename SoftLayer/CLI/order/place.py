@@ -8,6 +8,7 @@ import click
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
+from SoftLayer.managers import NetworkManager
 from SoftLayer.managers import ordering
 
 COLUMNS = ['keyName',
@@ -64,6 +65,10 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
 
     """
     manager = ordering.OrderingManager(env.client)
+    network = NetworkManager(env.client)
+
+    pods = network.get_closed_pods()
+    closure = []
 
     if extras:
         try:
@@ -90,6 +95,10 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
             ])
 
     else:
+        print(args)
+        for pod in pods:
+            closure.append(pod['name'])
+        click.secho(click.style('Warning: Closed soon: %s' % (', '.join(closure)), fg='yellow'))
         if not (env.skip_confirmations or formatting.confirm(
                 "This action will incur charges on your account. Continue?")):
             raise exceptions.CLIAbort("Aborting order.")
