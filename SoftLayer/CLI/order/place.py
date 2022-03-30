@@ -95,7 +95,6 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
             ])
 
     else:
-        print(args)
         for pod in pods:
             closure.append(pod['name'])
         click.secho(click.style('Warning: Closed soon: %s' % (', '.join(closure)), fg='yellow'))
