@@ -218,8 +218,16 @@ def cli(env, **args):
     create_args = _parse_create_args(env.client, args)
     test = args.get('test', False)
     do_create = not (args.get('export') or test)
+    network = SoftLayer.NetworkManager(env.client)
+
+    pods = network.get_closed_pods()
+    closure = []
 
     if do_create:
+        for pod in pods:
+            if args.get('datacenter') in str(pod['name']):
+                closure.append(pod['name'])
+        click.secho(click.style('Warning: Closed soon: %s' % (', '.join(closure)), fg='yellow'))
         if not (env.skip_confirmations or formatting.confirm(
                 "This action will incur charges on your account. Continue?")):
             raise exceptions.CLIAbort('Aborting virtual server order.')
