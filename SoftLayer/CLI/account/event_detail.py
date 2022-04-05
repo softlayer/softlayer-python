@@ -65,9 +65,9 @@ def update_table(event):
     """Formats a basic event update table"""
     update_number = 0
     for update in event.get('updates', []):
+        update_number = update_number + 1
         header = "======= Update #%s on %s =======" % (update_number, utils.clean_time(update.get('startDate')))
         click.secho(header, fg='green')
-        update_number = update_number + 1
         text = update.get('contents')
         # deals with all the \r\n from the API
         click.secho(utils.clean_splitlines(text))
