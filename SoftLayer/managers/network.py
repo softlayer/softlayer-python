@@ -542,7 +542,10 @@ class NetworkManager(object):
             kwargs['mask'] = DEFAULT_VLAN_MASK
 
         kwargs['iter'] = True
-        return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), limit=limit)
+        if limit > 0:
+            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), limit=limit)
+        else:
+            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), iter=True)
 
     def list_securitygroups(self, **kwargs):
         """List security groups."""

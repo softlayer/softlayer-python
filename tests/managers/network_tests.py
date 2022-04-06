@@ -360,13 +360,14 @@ class NetworkTests(testing.TestCase):
         self.assertEqual(result, fixtures.SoftLayer_Account.getNetworkVlans)
         _filter = {
             'networkVlans': {
-                'primaryRouter': {
-                    'datacenter': {
-                        'name': {'operation': '_= dal00'}},
-                },
+                'id': {
+                    'operation': 'orderBy',
+                    'options': [
+                           {'name': 'sort', 'value': ['ASC']}]},
                 'vlanNumber': {'operation': 5},
                 'name': {'operation': '_= primary-vlan'},
-            },
+                'primaryRouter': {
+                      'datacenter': {'name': {'operation': '_= dal00'}}}}
         }
         self.assert_called_with('SoftLayer_Account', 'getNetworkVlans',
                                 filter=_filter)
