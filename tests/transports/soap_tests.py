@@ -39,21 +39,42 @@ def get_soap_response():
     return response
 
 
-class TestXmlRpcAPICall(testing.TestCase):
+class TestSoapAPICall(testing.TestCase):
 
     def set_up(self):
         self.transport = SoapTransport(endpoint_url='https://api.softlayer.com/soap/v3.1/')
         self.response = get_soap_response()
         self.user = os.getenv('SL_USER')
         self.password = os.environ.get('SL_APIKEY')
-
-    def test_call(self):
         request = Request()
         request.service = 'SoftLayer_Account'
         request.method = 'getObject'
         request.transport_user = self.user
         request.transport_password = self.password
-        data = self.transport(request)
+        self.request = request
+
+    def test_call(self):
+
+        data = self.transport(self.request)
         pp(data)
+        self.assertEqual(data.get('id'), 307608)
+        self.assertEqual(data.get('companyName'), "SoftLayer Internal - Development Community")
+
+    # def test_debug_call(self):
+
+    #     self.request.mask = "mask[id,accountName,companyName]"
+    #     data = self.transport(self.request)
+        
+    #     self.assertEqual(data.get('id'), 307608)
+    #     debug_data = self.transport.print_reproduceable(self.request)
+    #     print(debug_data['envelope'])
+    #     self.assertEqual(":sdfsdf", debug_data)
+
+    def test_objectMask(self):
+        self.request.mask = "mask[id,companyName]"
+        data = self.transport(self.request)
+        pp(data)
+        self.assertEqual(data.get('companyName'), "SoftLayer Internal - Development Community")
+        self.assertIsNone(data.get('address1'))
         self.assertEqual(data.get('id'), 307608)
 
