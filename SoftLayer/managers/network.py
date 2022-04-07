@@ -506,7 +506,7 @@ class NetworkManager(object):
         kwargs['iter'] = True
         return self.client.call('Account', 'getSubnets', **kwargs)
 
-    def list_vlans(self, datacenter=None, vlan_number=None, name=None, **kwargs):
+    def list_vlans(self, datacenter=None, vlan_number=None, name=None, limit=100, **kwargs):
         """Display a list of all VLANs on the account.
 
         This provides a quick overview of all VLANs including information about
@@ -522,6 +522,8 @@ class NetworkManager(object):
 
         """
         _filter = utils.NestedDict(kwargs.get('filter') or {})
+
+        _filter['networkVlans']['id'] = utils.query_filter_orderby()
 
         if vlan_number:
             _filter['networkVlans']['vlanNumber'] = (
@@ -540,7 +542,10 @@ class NetworkManager(object):
             kwargs['mask'] = DEFAULT_VLAN_MASK
 
         kwargs['iter'] = True
-        return self.account.getNetworkVlans(**kwargs)
+        if limit > 0:
+            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), limit=limit)
+        else:
+            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), iter=True)
 
     def list_securitygroups(self, **kwargs):
         """List security groups."""
