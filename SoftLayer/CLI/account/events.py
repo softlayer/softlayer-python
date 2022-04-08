@@ -12,11 +12,11 @@ from SoftLayer import utils
 @click.option('--ack-all', is_flag=True, default=False,
               help="Acknowledge every upcoming event. Doing so will turn off the popup in the control portal")
 @click.option('--planned', is_flag=True, default=False,
-              help="Show just planned events")
+              help="Show only planned events")
 @click.option('--unplanned', is_flag=True, default=False,
-              help="Show just unplanned events")
+              help="Show only unplanned events")
 @click.option('--announcement', is_flag=True, default=False,
-              help="Show just announcement events")
+              help="Show only announcement events")
 @environment.pass_env
 def cli(env, ack_all, planned, unplanned, announcement):
     """Summary and acknowledgement of upcoming and ongoing maintenance events"""
