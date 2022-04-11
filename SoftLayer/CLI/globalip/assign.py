@@ -5,17 +5,17 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(epilog="More information about types and ")
 @click.argument('identifier')
-@click.argument('target')
+@click.option('--target',
+              help='See SLDN docs. '
+                   'E.g SoftLayer_Network_Subnet_IpAddress, SoftLayer_Hardware_Server,SoftLayer_Virtual_Guest')
+@click.option('--router', help='An appropriate identifier for the specified $type. Some types have multiple identifier')
 @environment.pass_env
-def cli(env, identifier, target):
+def cli(env, identifier, target, router):
     """Assigns the global IP to a target."""
 
     mgr = SoftLayer.NetworkManager(env.client)
-    global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids, identifier,
-                                      name='global ip')
-    mgr.assign_global_ip(global_ip_id, target)
+    mgr.route(identifier, target, router)

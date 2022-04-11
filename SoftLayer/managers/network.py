@@ -824,3 +824,13 @@ class NetworkManager(object):
         mask = """mask[name, datacenterLongName, frontendRouterId, capabilities, datacenterId, backendRouterId,
                 backendRouterName, frontendRouterName]"""
         return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', mask=mask, filter=closing_filter)
+
+    def route(self, subnet_id, type_serv, target):
+        """Assigns a global IP address to a specified target.
+
+        :param int subnet_id: The ID of the global IP being assigned
+        :param string type_serv: The type service to assign
+        :param string target: The instance to assign
+        """
+        return self.client.call('SoftLayer_Network_Subnet', 'route',
+                                type_serv, target, id=subnet_id, )

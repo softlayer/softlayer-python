@@ -15,7 +15,7 @@ import json
 class DnsTests(testing.TestCase):
 
     def test_ip_assign(self):
-        result = self.run_command(['globalip', 'assign', '1', '127.0.0.1'])
+        result = self.run_command(['globalip', 'assign', '1'])
 
         self.assert_no_fail(result)
         self.assertEqual(result.output, "")
