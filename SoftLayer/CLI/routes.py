@@ -323,6 +323,7 @@ ALL_ROUTES = [
     ('subnet:list', 'SoftLayer.CLI.subnet.list:cli'),
     ('subnet:lookup', 'SoftLayer.CLI.subnet.lookup:cli'),
     ('subnet:edit-ip', 'SoftLayer.CLI.subnet.edit_ip:cli'),
+    ('subnet:route', 'SoftLayer.CLI.subnet.route:cli'),
 
     ('tags', 'SoftLayer.CLI.tags'),
     ('tags:cleanup', 'SoftLayer.CLI.tags.cleanup:cli'),
