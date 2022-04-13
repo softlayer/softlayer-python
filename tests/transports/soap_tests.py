@@ -78,3 +78,15 @@ class TestSoapAPICall(testing.TestCase):
         self.assertIsNone(data.get('address1'))
         self.assertEqual(data.get('id'), 307608)
 
+    def test_objectFilter(self):
+        self.request.service = "SoftLayer_Product_Package"
+        self.request.method = "getAllObjects"
+        self.request.mask = "mask[id,description,keyName,type[id,keyName],name]"
+        self.request.filter = {'type': {'keyName': {'operation': 'BARE_METAL_CPU'}}}
+        data = self.transport(self.request)
+        # pp(data)
+        # print("^^^ DATA **** ")
+        for package in data:
+            pp(package)
+            print("^^^ PACKAGE **** ")
+            self.assertEqual(package.get('type').get('keyName'), "BARE_METAL_CPU")

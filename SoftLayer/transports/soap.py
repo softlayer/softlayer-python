@@ -40,6 +40,7 @@ class SoapTransport(object):
         self.verify = verify
         self._client = None
         self.history = HistoryPlugin()
+        self.soapNS = "http://api.service.softlayer.com/soap/v3.1/"
 
     def __call__(self, request):
         """Makes a SoftLayer API call against the SOAP endpoint.
@@ -55,29 +56,49 @@ class SoapTransport(object):
         # MUST define headers like this because otherwise the objectMask header doesn't work
         # because it isn't sent in with a namespace.
         xsdUserAuth = xsd.Element(
-            '{http://api.softlayer.com/soap/v3/}authenticate',
+            f"{{{self.soapNS}}}authenticate",
             xsd.ComplexType([
-                xsd.Element('{http://api.service.softlayer.com/soap/v3/}username', xsd.String()),
-                xsd.Element('{http://api.service.softlayer.com/soap/v3/}apiKey', xsd.String())
+                xsd.Element(f'{{{self.soapNS}}}username', xsd.String()),
+                xsd.Element(f'{{{self.soapNS}}}apiKey', xsd.String())
             ])
         )
+        factory = client.type_factory(f"{self.soapNS}")
+        theMask = client.get_type(f"{{{self.soapNS}}}SoftLayer_ObjectMask")
         xsdMask = xsd.Element(
             '{http://api.service.softlayer.com/soap/v3.1/}SoftLayer_ObjectMask',
+            factory['SoftLayer_ObjectMask']
+        )
+
+        # Object Filter
+        filterType = client.get_type(f"{{{self.soapNS}}}{request.service}ObjectFilter")
+        xsdFilter = xsd.Element(
+            f"{{{self.soapNS}}}{request.service}ObjectFilter", filterType
+        )
+
+        # Result Limit
+        xsdResultLimit = xsd.Element(
+            f"{{{self.soapNS}}}resultLimit",
             xsd.ComplexType([
-                xsd.Element('mask', xsd.String()),
+                xsd.Element('limit', xsd.String()),
+                xsd.Element('offset', xsd.String()),
             ])
         )
 
+        test = {"type":{"keyName":{"operation":"BARE_METAL_CPU"}} }
         headers = [
             xsdMask(mask=request.mask or ''),
-            xsdUserAuth(username=request.transport_user, apiKey=request.transport_password)
+            xsdUserAuth(username=request.transport_user, apiKey=request.transport_password),
+            xsdResultLimit(limit=2, offset=0),
+            xsdFilter(**request.filter or '') # The ** here forces python to treat this dict as properties
         ]
 
         pp(headers)
         print("HEADERS ^^^^^")
         method = getattr(client.service, request.method)
-        result = client.service.getObject(_soapheaders=headers)
-        return serialize_object(result)
+
+        # result = client.service.getObject(_soapheaders=headers)
+        result = method(_soapheaders=headers)
+        return serialize_object(result['body']['getAllObjectsReturn'])
         # result = transport.post(f"{self.endpoint_url}/{request.service}")
 
 
