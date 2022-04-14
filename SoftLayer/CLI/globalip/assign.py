@@ -5,17 +5,22 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import helpers
+
+target_types = {'vlan': 'SoftLayer_Network_Vlan',
+                'ip': 'SoftLayer_Network_Subnet_IpAddress',
+                'hardware': 'SoftLayer_Hardware_Server',
+                'vsi': 'SoftLayer_Virtual_Guest'}
 
 
-@click.command()
+@click.command(epilog="More information about types and identifiers "
+                      "on https://sldn.softlayer.com/reference/services/SoftLayer_Network_Subnet/route/")
 @click.argument('identifier')
-@click.argument('target')
+@click.option('--target', type=click.Choice(['vlan', 'ip', 'hardware', 'vsi']),
+              help='choose the type. vlan, ip, hardware, vsi')
+@click.option('--target-id', help='The identifier for the destination resource to route this subnet to. ')
 @environment.pass_env
-def cli(env, identifier, target):
-    """Assigns the global IP to a target."""
+def cli(env, identifier, target, target_id):
+    """Assigns the subnet to a target."""
 
     mgr = SoftLayer.NetworkManager(env.client)
-    global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids, identifier,
-                                      name='global ip')
-    mgr.assign_global_ip(global_ip_id, target)
+    mgr.route(identifier, target_types.get(target), target_id)

@@ -41,6 +41,10 @@ from SoftLayer.CLI import template
 def cli(env, **args):
     """Order/create a dedicated server."""
     mgr = SoftLayer.HardwareManager(env.client)
+    network = SoftLayer.NetworkManager(env.client)
+
+    pods = network.get_closed_pods()
+    closure = []
 
     # Get the SSH keys
     ssh_keys = []
@@ -99,6 +103,10 @@ def cli(env, **args):
         return
 
     if do_create:
+        for pod in pods:
+            if args.get('datacenter') in str(pod['name']):
+                closure.append(pod['name'])
+        click.secho(click.style('Warning: Closed soon: %s' % (', '.join(closure)), fg='yellow'))
         if not (env.skip_confirmations or formatting.confirm(
                 "This action will incur charges on your account. Continue?")):
             raise exceptions.CLIAbort('Aborting dedicated server order.')
