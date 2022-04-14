@@ -184,3 +184,9 @@ class SubnetTests(testing.TestCase):
     def test_cancel_fail(self):
         result = self.run_command(['subnet', 'cancel', '1234'])
         self.assertEqual(result.exit_code, 2)
+
+    def test_route(self):
+        result = self.run_command(['subnet', 'route', '1'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.exit_code, 0)

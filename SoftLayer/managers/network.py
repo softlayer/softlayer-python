@@ -831,7 +831,7 @@ class NetworkManager(object):
         return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', mask=mask, filter=closing_filter)
 
     def route(self, subnet_id, type_serv, target):
-        """Assigns a global IP address to a specified target.
+        """Assigns a subnet to a specified target.
 
         :param int subnet_id: The ID of the global IP being assigned
         :param string type_serv: The type service to assign
