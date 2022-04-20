@@ -83,10 +83,13 @@ class TestSoapAPICall(testing.TestCase):
         self.request.method = "getAllObjects"
         self.request.mask = "mask[id,description,keyName,type[id,keyName],name]"
         self.request.filter = {'type': {'keyName': {'operation': 'BARE_METAL_CPU'}}}
+        self.request.limit = 5
+        self.request.offset = 0
         data = self.transport(self.request)
         # pp(data)
         # print("^^^ DATA **** ")
         for package in data:
-            pp(package)
-            print("^^^ PACKAGE **** ")
+
             self.assertEqual(package.get('type').get('keyName'), "BARE_METAL_CPU")
+
+    ## TODO MORE COMPLEX OBJECT FILTERS!

@@ -12,6 +12,8 @@ from zeep import Client, Settings, Transport, xsd
 from zeep.helpers import serialize_object
 from zeep.cache import SqliteCache
 from zeep.plugins import HistoryPlugin
+from zeep.wsdl.messages.multiref import process_multiref
+
 
 import requests
 
@@ -53,6 +55,8 @@ class SoapTransport(object):
         client = Client(f"{self.endpoint_url}/{request.service}?wsdl",
                         settings=zeep_settings, transport=zeep_transport, plugins=[self.history])
 
+        # print(client.wsdl.dump())
+        # print("=============== WSDL ==============")
         # MUST define headers like this because otherwise the objectMask header doesn't work
         # because it isn't sent in with a namespace.
         xsdUserAuth = xsd.Element(
@@ -65,7 +69,7 @@ class SoapTransport(object):
         factory = client.type_factory(f"{self.soapNS}")
         theMask = client.get_type(f"{{{self.soapNS}}}SoftLayer_ObjectMask")
         xsdMask = xsd.Element(
-            '{http://api.service.softlayer.com/soap/v3.1/}SoftLayer_ObjectMask',
+            f"{{{self.soapNS}}}SoftLayer_ObjectMask",
             factory['SoftLayer_ObjectMask']
         )
 
@@ -84,22 +88,48 @@ class SoapTransport(object):
             ])
         )
 
-        test = {"type":{"keyName":{"operation":"BARE_METAL_CPU"}} }
+        # Might one day want to support unauthenticated requests, but for now assume user auth.
         headers = [
-            xsdMask(mask=request.mask or ''),
             xsdUserAuth(username=request.transport_user, apiKey=request.transport_password),
-            xsdResultLimit(limit=2, offset=0),
-            xsdFilter(**request.filter or '') # The ** here forces python to treat this dict as properties
         ]
 
-        pp(headers)
-        print("HEADERS ^^^^^")
-        method = getattr(client.service, request.method)
+        if request.limit:
+            headers.append(xsdResultLimit(limit=request.limit, offset=request.offset))
+        if request.mask:
+            headers.append(xsdMask(mask=request.mask))
+        if request.filter:
+            # The ** here forces python to treat this dict as properties
+            headers.append(xsdFilter(**request.filter))
 
-        # result = client.service.getObject(_soapheaders=headers)
+
+        try:
+            method = getattr(client.service, request.method)
+        except AttributeError as ex:
+            message = f"{request.service}::{request.method}() does not exist in {self.soapNS}{request.service}?wsdl"
+            raise exceptions.TransportError(404, message) from ex
+
         result = method(_soapheaders=headers)
-        return serialize_object(result['body']['getAllObjectsReturn'])
-        # result = transport.post(f"{self.endpoint_url}/{request.service}")
+        # result = client.service.getObject(_soapheaders=headers)
+        
+        # process_multiref(result['body']['getAllObjectsReturn'])
+
+        # print("^^^ RESULT ^^^^^^^")
+
+        # TODO GET A WAY TO FIND TOTAL ITEMS
+        # print(result['header']['totalItems']['amount'])
+        # print(" ^^ ITEMS ^^^ ")
+
+        try:
+            methodReturn = f"{request.method}Return"
+            serialize = serialize_object(result)
+            if serialize.get('body'):
+                return serialize['body'][methodReturn]
+            else:
+                # Some responses (like SoftLayer_Account::getObject) don't have a body?
+                return serialize
+        except KeyError as e:
+            message = f"Error serializeing response\n{result}\n"
+            raise exceptions.TransportError(500, message)
 
 
     def print_reproduceable(self, request):
