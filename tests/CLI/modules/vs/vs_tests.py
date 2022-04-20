@@ -609,7 +609,13 @@ class VirtTests(testing.TestCase):
                                    '100'])
 
         self.assert_no_fail(result)
-        self.assertEqual(result.output, '')
+        expected_output = '"The userdata of virtual server instance: 100 was updated."\n' \
+                          + '"The hostname of virtual server instance: 100 was updated."\n' \
+                          + '"The domain of virtual server instance: 100 was updated."\n' \
+                          + '"The tags of virtual server instance: 100 was updated."\n' \
+                          + '"The public speed of virtual server instance: 100 was updated."\n' \
+                          + '"The private speed of virtual server instance: 100 was updated."\n'
+        self.assertEqual(result.output, expected_output)
 
         self.assert_called_with(
             'SoftLayer_Virtual_Guest', 'editObject',
