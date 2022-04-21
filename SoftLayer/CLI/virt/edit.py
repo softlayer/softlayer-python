@@ -54,11 +54,16 @@ def cli(env, identifier, domain, userfile, tag, hostname, userdata,
 
     vsi = SoftLayer.VSManager(env.client)
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
-    if not vsi.edit(vs_id, **data):
-        raise exceptions.CLIAbort("Failed to update virtual server")
+
+    if vsi.edit(vs_id, **data):
+        for key, value in data.items():
+            if value is not None:
+                env.fout("The {} of virtual server instance: {} was updated.".format(key, vs_id))
 
     if public_speed is not None:
-        vsi.change_port_speed(vs_id, True, int(public_speed))
+        if vsi.change_port_speed(vs_id, True, int(public_speed)):
+            env.fout("The public speed of virtual server instance: {} was updated.".format(vs_id))
 
     if private_speed is not None:
-        vsi.change_port_speed(vs_id, False, int(private_speed))
+        if vsi.change_port_speed(vs_id, False, int(private_speed)):
+            env.fout("The private speed of virtual server instance: {} was updated.".format(vs_id))
