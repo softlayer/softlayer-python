@@ -92,4 +92,27 @@ class TestSoapAPICall(testing.TestCase):
 
             self.assertEqual(package.get('type').get('keyName'), "BARE_METAL_CPU")
 
+    def test_virtualGuest(self):
+        accountRequest = Request()
+        accountRequest.service = "SoftLayer_Account"
+        accountRequest.method = "getVirtualGuests"
+        accountRequest.limit = 5
+        accountRequest.offset = 0
+        accountRequest.mask = "mask[id,hostname,domain]"
+        accountRequest.transport_user = self.user
+        accountRequest.transport_password = self.password
+
+        vsis = self.transport(accountRequest)
+        for vsi in vsis:
+            self.assertGreater(vsi.get('id'), 1)
+            vsiRequest = Request()
+            vsiRequest.service = "SoftLayer_Virtual_Guest"
+            vsiRequest.method = "getObject"
+            vsiRequest.identifier = vsi.get('id')
+            vsiRequest.mask = "mask[id,hostname,domain]"
+            vsiRequest.transport_user = self.user
+            vsiRequest.transport_password = self.password
+            thisVsi = self.transport(vsiRequest)
+            self.assertEqual(thisVsi.get('id'), vsi.get('id'))
+
     ## TODO MORE COMPLEX OBJECT FILTERS!

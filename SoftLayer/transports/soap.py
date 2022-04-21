@@ -102,6 +102,17 @@ class SoapTransport(object):
             headers.append(xsdFilter(**request.filter))
 
 
+
+        if request.identifier:
+            initParam = f"{request.service}InitParameters"
+            initParamType = client.get_type(f"{{{self.soapNS}}}{initParam}")
+            xsdInitParam = xsd.Element(
+                f"{{{self.soapNS}}}{initParam}", initParamType
+            )
+            # Might want to check if its an id or globalIdentifier at some point, for now only id.
+            headers.append(xsdInitParam(id=request.identifier))
+
+        # TODO Add params... maybe
         try:
             method = getattr(client.service, request.method)
         except AttributeError as ex:
