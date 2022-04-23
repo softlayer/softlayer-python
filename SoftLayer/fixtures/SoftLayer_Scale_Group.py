@@ -455,3 +455,79 @@ getLogs = [
 ]
 
 editObject = True
+
+createObject = {
+    "accountId": 307608,
+    "cooldown": 3600,
+    "createDate": "2022-04-22T13:45:24-06:00",
+    "id": 5446140,
+    "lastActionDate": "2022-04-22T13:45:29-06:00",
+    "maximumMemberCount": 5,
+    "minimumMemberCount": 1,
+    "name": "test22042022",
+    "regionalGroupId": 4568,
+    "suspendedFlag": False,
+    "terminationPolicyId": 2,
+    "virtualGuestMemberTemplate": {
+        "accountId": 307608,
+        "domain": "test.com",
+        "hostname": "testvs",
+        "maxMemory": 2048,
+        "startCpus": 2,
+        "blockDevices": [
+            {
+                "diskImage": {
+                    "capacity": 100,
+                }
+            }
+        ],
+        "hourlyBillingFlag": True,
+        "localDiskFlag": True,
+        "networkComponents": [
+            {
+                "maxSpeed": 100,
+            }
+        ],
+        "operatingSystemReferenceCode": "CENTOS_7_64",
+        "userData": [
+            {
+                "value": "the userData"
+            }
+        ]
+    },
+    "virtualGuestMemberCount": 0,
+    "networkVlans": [],
+    "policies": [],
+    "status": {
+        "id": 1,
+        "keyName": "ACTIVE",
+        "name": "Active"
+    },
+    "virtualGuestAssets": [],
+    "virtualGuestMembers": [
+        {
+            "createDate": "2022-04-22T13:45:29-06:00",
+            "id": 123456,
+            "scaleGroupId": 5446140,
+            "virtualGuest": {
+                "createDate": "2022-04-22T13:45:28-06:00",
+                "deviceStatusId": 3,
+                "domain": "test.com",
+                "fullyQualifiedDomainName": "testvs-97e7.test.com",
+                "hostname": "testvs-97e7",
+                "id": 129911702,
+                "maxCpu": 2,
+                "maxCpuUnits": "CORE",
+                "maxMemory": 2048,
+                "startCpus": 2,
+                "statusId": 1001,
+                "typeId": 1,
+                "uuid": "46e55f99-b412-4287-95b5-b8182b2fc924",
+                "status": {
+                    "keyName": "ACTIVE",
+                    "name": "Active"
+                }
+            }
+        }
+    ]
+}

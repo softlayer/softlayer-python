@@ -116,3 +116,14 @@ class AutoScaleManager(object):
         .. _SoftLayer_Scale_Group: https://sldn.softlayer.com/reference/datatypes/SoftLayer_Scale_Group/
         """
         return self.client.call('SoftLayer_Scale_Group', 'editObject', template, id=identifier)
+
+    def create(self, template):
+        """Calls `SoftLayer_Scale_Group::createObject()`_
+
+               :param template: `SoftLayer_Scale_Group`_
+
+                .. _SoftLayer_Scale_Group::createObject():
+                    https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/createObject/
+                .. _SoftLayer_Scale_Group: https://sldn.softlayer.com/reference/datatypes/SoftLayer_Scale_Group/
+                """
+        return self.client.call('SoftLayer_Scale_Group', 'createObject', template)

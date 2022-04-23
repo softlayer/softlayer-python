@@ -123,3 +123,54 @@ class AutoScaleTests(testing.TestCase):
             'editObject',
             args=(template,),
             identifier=12345)
+
+    def test_create_object(self):
+        template = {
+            'name': 'test',
+            'cooldown': 3600,
+            'maximumMemberCount': 5,
+            'minimumMemberCount': 1,
+            'regionalGroupId': 4568,
+            'suspendedFlag': False,
+            'balancedTerminationFlag': False,
+            'virtualGuestMemberTemplate': {
+                'domain': 'test.com',
+                'hostname': 'testvs',
+                'operatingSystemReferenceCode': 'CENTOS_7_64',
+                'maxMemory': 2048,
+                'datacenter': {
+                    'id': 265592
+                },
+                'startCpus': 2,
+                'blockDevices': [
+                    {
+                        'diskImage': {
+                            'capacity': '100'
+                        },
+                        'device': 0
+                    }
+                ],
+                'hourlyBillingFlag': True,
+                'networkComponents': [
+                    {
+                        'maxSpeed': 100
+                    }
+                ],
+                'localDiskFlag': True,
+                'typeId': 1,
+                'userData': [
+                    {
+                        'value': 'the userData'
+                    }
+                ]
+            },
+            'virtualGuestMemberCount': 0,
+
+            'terminationPolicyId': '2',
+        }
+
+        self.autoscale.create(template)
+        self.assert_called_with(
+            'SoftLayer_Scale_Group',
+            'createObject',
+            args=(template,))

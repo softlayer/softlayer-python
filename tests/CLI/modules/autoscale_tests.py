@@ -77,7 +77,7 @@ class AutoscaleTests(testing.TestCase):
     @mock.patch('SoftLayer.managers.autoscale.AutoScaleManager.edit')
     def test_autoscale_edit_userfile(self, manager):
         # On windows, python cannot edit a NamedTemporaryFile.
-        if(sys.platform.startswith("win")):
+        if (sys.platform.startswith("win")):
             self.skipTest("Test doesn't work in Windows")
         group = fixtures.SoftLayer_Scale_Group.getObject
         template = {
@@ -89,3 +89,25 @@ class AutoscaleTests(testing.TestCase):
             result = self.run_command(['autoscale', 'edit', '12345', '--userfile', userfile.name])
         self.assert_no_fail(result)
         manager.assert_called_with('12345', template)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_autoscale_create(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['autoscale', 'create',
+                                   '--name=test',
+                                   '--cooldown=3600',
+                                   '--min=1',
+                                   '--max=3',
+                                   '-o=CENTOS_7_64',
+                                   '--datacenter=ams01',
+                                   '--termination-policy=2',
+                                   '-H=testvs',
+                                   '-D=test.com',
+                                   '--cpu=2',
+                                   '--memory=1024',
+                                   '--policy-relative=absolute',
+                                   '--policy-amount=3',
+                                   '--regional=102',
+                                   '--disk=25'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.exit_code, 0)

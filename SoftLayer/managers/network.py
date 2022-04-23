@@ -824,3 +824,15 @@ class NetworkManager(object):
         mask = """mask[name, datacenterLongName, frontendRouterId, capabilities, datacenterId, backendRouterId,
                 backendRouterName, frontendRouterName]"""
         return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', mask=mask, filter=closing_filter)
+
+    def get_datacenter(self, _filter=None, datacenter=None):
+        """Calls SoftLayer_Location::getDatacenters()
+
+        returns datacenter list.
+        """
+        _filter = None
+
+        if datacenter:
+            _filter = {"name": {"operation": datacenter}}
+
+        return self.client.call('SoftLayer_Location', 'getDatacenters', filter=_filter, limit=1)

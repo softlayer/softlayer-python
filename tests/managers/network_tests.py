@@ -628,3 +628,7 @@ class NetworkTests(testing.TestCase):
     def test_get_all_pods(self):
         self.network.get_pods()
         self.assert_called_with('SoftLayer_Network_Pod', 'getAllObjects')
+
+    def test_get_all_datacenter(self):
+        self.network.get_datacenter()
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters')
