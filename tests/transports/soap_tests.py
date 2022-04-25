@@ -5,22 +5,12 @@
     :license: MIT, see LICENSE for more details.
 """
 import io
-import json
-from unittest import mock as mock
 import os
-import warnings
-
-import pytest
 import requests
 
-import SoftLayer
-from SoftLayer import consts
 from SoftLayer import testing
-from SoftLayer.transports.soap import SoapTransport
 from SoftLayer.transports import Request
-
-
-from pprint import pprint as pp
+from SoftLayer.transports.soap import SoapTransport
 
 
 def get_soap_response():
@@ -58,7 +48,6 @@ class TestSoapAPICall(testing.TestCase):
     def test_call(self):
 
         data = self.transport(self.request)
-        pp(data)
         self.assertEqual(data.get('id'), 307608)
         self.assertEqual(data.get('companyName'), "SoftLayer Internal - Development Community")
 
@@ -75,7 +64,6 @@ class TestSoapAPICall(testing.TestCase):
     def test_objectMask(self):
         self.request.mask = "mask[id,companyName]"
         data = self.transport(self.request)
-        pp(data)
         self.assertEqual(data.get('companyName'), "SoftLayer Internal - Development Community")
         self.assertIsNone(data.get('address1'))
         self.assertEqual(data.get('id'), 307608)
@@ -88,10 +76,7 @@ class TestSoapAPICall(testing.TestCase):
         self.request.limit = 5
         self.request.offset = 0
         data = self.transport(self.request)
-        # pp(data)
-        # print("^^^ DATA **** ")
         for package in data:
-
             self.assertEqual(package.get('type').get('keyName'), "BARE_METAL_CPU")
 
     def test_virtualGuest(self):
@@ -117,4 +102,4 @@ class TestSoapAPICall(testing.TestCase):
             thisVsi = self.transport(vsiRequest)
             self.assertEqual(thisVsi.get('id'), vsi.get('id'))
 
-    # TODO MORE COMPLEX OBJECT FILTERS!
+    # NEXT MORE COMPLEX OBJECT FILTERS!

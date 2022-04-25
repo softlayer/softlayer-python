@@ -6,31 +6,22 @@
     :license: MIT, see LICENSE for more details.
 """
 import logging
-import re
-from string import Template
-from zeep import Client, Settings, Transport, xsd
-from zeep.helpers import serialize_object
+from zeep import Client
+from zeep import Settings
+from zeep import Transport
+from zeep import xsd
+
 from zeep.cache import SqliteCache
+from zeep.helpers import serialize_object
 from zeep.plugins import HistoryPlugin
-from zeep.wsdl.messages.multiref import process_multiref
-
-
-import requests
 
 from SoftLayer import consts
 from SoftLayer import exceptions
 
-from .transport import _format_object_mask
-from .transport import _proxies_dict
-from .transport import ComplexEncoder
-from .transport import get_session
-from .transport import SoftLayerListResult
 
-from pprint import pprint as pp
-
-
+# pylint: disable=too-many-instance-attributes
 class SoapTransport(object):
-    """XML-RPC transport."""
+    """SoapTransport."""
 
     def __init__(self, endpoint_url=None, timeout=None, proxy=None, user_agent=None, verify=True):
 
@@ -44,7 +35,7 @@ class SoapTransport(object):
         self.verify = verify
         self._client = None
         self.history = HistoryPlugin()
-        self.soapNS = "http://api.service.softlayer.com/soap/v3.1/"
+        self.soapns = "http://api.service.softlayer.com/soap/v3.1/"
 
     def __call__(self, request):
         """Makes a SoftLayer API call against the SOAP endpoint.
@@ -59,31 +50,31 @@ class SoapTransport(object):
 
         # print(client.wsdl.dump())
         # print("=============== WSDL ==============")
-        # MUST define headers like this because otherwise the objectMask header doesn't work
+
+        # Must define headers like this because otherwise the objectMask header doesn't work
         # because it isn't sent in with a namespace.
-        xsdUserAuth = xsd.Element(
-            f"{{{self.soapNS}}}authenticate",
+        xsd_userauth = xsd.Element(
+            f"{{{self.soapns}}}authenticate",
             xsd.ComplexType([
-                xsd.Element(f'{{{self.soapNS}}}username', xsd.String()),
-                xsd.Element(f'{{{self.soapNS}}}apiKey', xsd.String())
+                xsd.Element(f'{{{self.soapns}}}username', xsd.String()),
+                xsd.Element(f'{{{self.soapns}}}apiKey', xsd.String())
             ])
         )
-        factory = client.type_factory(f"{self.soapNS}")
-        theMask = client.get_type(f"{{{self.soapNS}}}SoftLayer_ObjectMask")
-        xsdMask = xsd.Element(
-            f"{{{self.soapNS}}}SoftLayer_ObjectMask",
-            factory['SoftLayer_ObjectMask']
+        # factory = client.type_factory(f"{self.soapns}")
+        the_mask = client.get_type(f"{{{self.soapns}}}SoftLayer_ObjectMask")
+        xsd_mask = xsd.Element(
+            f"{{{self.soapns}}}SoftLayer_ObjectMask", the_mask
         )
 
         # Object Filter
-        filterType = client.get_type(f"{{{self.soapNS}}}{request.service}ObjectFilter")
-        xsdFilter = xsd.Element(
-            f"{{{self.soapNS}}}{request.service}ObjectFilter", filterType
+        filter_type = client.get_type(f"{{{self.soapns}}}{request.service}ObjectFilter")
+        xsd_filter = xsd.Element(
+            f"{{{self.soapns}}}{request.service}ObjectFilter", filter_type
         )
 
         # Result Limit
-        xsdResultLimit = xsd.Element(
-            f"{{{self.soapNS}}}resultLimit",
+        xsd_resultlimit = xsd.Element(
+            f"{{{self.soapns}}}resultLimit",
             xsd.ComplexType([
                 xsd.Element('limit', xsd.String()),
                 xsd.Element('offset', xsd.String()),
@@ -92,54 +83,47 @@ class SoapTransport(object):
 
         # Might one day want to support unauthenticated requests, but for now assume user auth.
         headers = [
-            xsdUserAuth(username=request.transport_user, apiKey=request.transport_password),
+            xsd_userauth(username=request.transport_user, apiKey=request.transport_password),
         ]
 
         if request.limit:
-            headers.append(xsdResultLimit(limit=request.limit, offset=request.offset))
+            headers.append(xsd_resultlimit(limit=request.limit, offset=request.offset))
         if request.mask:
-            headers.append(xsdMask(mask=request.mask))
+            headers.append(xsd_mask(mask=request.mask))
         if request.filter:
             # The ** here forces python to treat this dict as properties
-            headers.append(xsdFilter(**request.filter))
+            headers.append(xsd_filter(**request.filter))
 
         if request.identifier:
-            initParam = f"{request.service}InitParameters"
-            initParamType = client.get_type(f"{{{self.soapNS}}}{initParam}")
-            xsdInitParam = xsd.Element(
-                f"{{{self.soapNS}}}{initParam}", initParamType
+            init_param = f"{request.service}init_parameters"
+            init_paramtype = client.get_type(f"{{{self.soapns}}}{init_param}")
+            xsdinit_param = xsd.Element(
+                f"{{{self.soapns}}}{init_param}", init_paramtype
             )
             # Might want to check if its an id or globalIdentifier at some point, for now only id.
-            headers.append(xsdInitParam(id=request.identifier))
+            headers.append(xsdinit_param(id=request.identifier))
 
-        # TODO Add params... maybe
+        # NEXT Add params... maybe
         try:
             method = getattr(client.service, request.method)
         except AttributeError as ex:
-            message = f"{request.service}::{request.method}() does not exist in {self.soapNS}{request.service}?wsdl"
+            message = f"{request.service}::{request.method}() does not exist in {self.soapns}{request.service}?wsdl"
             raise exceptions.TransportError(404, message) from ex
 
         result = method(_soapheaders=headers)
-        # result = client.service.getObject(_soapheaders=headers)
 
-        # process_multiref(result['body']['getAllObjectsReturn'])
-
-        # print("^^^ RESULT ^^^^^^^")
-
-        # TODO GET A WAY TO FIND TOTAL ITEMS
-        # print(result['header']['totalItems']['amount'])
-        # print(" ^^ ITEMS ^^^ ")
+        # NEXT GET A WAY TO FIND TOTAL ITEMS
 
         try:
-            methodReturn = f"{request.method}Return"
+            method_return = f"{request.method}Return"
             serialize = serialize_object(result)
             if serialize.get('body'):
-                return serialize['body'][methodReturn]
+                return serialize['body'][method_return]
             else:
                 # Some responses (like SoftLayer_Account::getObject) don't have a body?
                 return serialize
-        except KeyError as e:
-            message = f"Error serializeing response\n{result}\n"
+        except KeyError as ex:
+            message = f"Error serializeing response\n{result}\n{ex}"
             raise exceptions.TransportError(500, message)
 
     def print_reproduceable(self, request):
@@ -149,5 +133,6 @@ class SoapTransport(object):
 
         :param request request: Request object
         """
-
+        log = logging.getLogger(__name__)
+        log.DEBUG(f"{request.service}::{request.method}()")
         return self.history.last_sent

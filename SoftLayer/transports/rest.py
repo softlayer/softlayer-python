@@ -157,7 +157,8 @@ class RestTransport(object):
         except requests.RequestException as ex:
             raise exceptions.TransportError(0, str(ex))
 
-    def print_reproduceable(self, request):
+    @staticmethod
+    def print_reproduceable(request):
         """Prints out the minimal python code to reproduce a specific request
 
         The will also automatically replace the API key so its not accidently exposed.

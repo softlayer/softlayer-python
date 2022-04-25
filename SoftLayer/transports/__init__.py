@@ -5,21 +5,16 @@
 
     :license: MIT, see LICENSE for more details.
 """
-
-
-import requests
-
-
 # Required imports to not break existing code.
-from .rest import RestTransport
-from .xmlrpc import XmlRpcTransport
-from .fixture import FixtureTransport
-from .timing import TimingTransport
-from .debug import DebugTransport
 
+
+from .debug import DebugTransport
+from .fixture import FixtureTransport
+from .rest import RestTransport
+from .timing import TimingTransport
 from .transport import Request
 from .transport import SoftLayerListResult as SoftLayerListResult
-
+from .xmlrpc import XmlRpcTransport
 
 # transports.Request does have a lot of instance attributes. :(
 # pylint: disable=too-many-instance-attributes, no-self-use

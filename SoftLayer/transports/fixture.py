@@ -26,6 +26,7 @@ class FixtureTransport(object):
             message = '{}::{} fixture is not implemented'.format(call.service, call.method)
             raise NotImplementedError(message) from ex
 
-    def print_reproduceable(self, call):
+    @staticmethod
+    def print_reproduceable(call):
         """Not Implemented"""
         return call.service

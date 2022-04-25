@@ -4,16 +4,10 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import io
-import json
-from unittest import mock as mock
-import warnings
-
-import pytest
 import requests
+from unittest import mock as mock
 
 import SoftLayer
-from SoftLayer import consts
 from SoftLayer import testing
 from SoftLayer import transports
 

@@ -5,7 +5,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import logging
 import re
 from string import Template
 import xmlrpc.client
@@ -17,7 +16,6 @@ from SoftLayer import exceptions
 
 from .transport import _format_object_mask
 from .transport import _proxies_dict
-from .transport import ComplexEncoder
 from .transport import get_session
 from .transport import SoftLayerListResult
 

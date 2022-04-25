@@ -35,6 +35,7 @@ class TimingTransport(object):
         self.last_calls = []
         return last_calls
 
-    def print_reproduceable(self, call):
+    @staticmethod
+    def print_reproduceable(call):
         """Not Implemented"""
         return call.service

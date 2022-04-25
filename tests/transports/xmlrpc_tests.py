@@ -5,7 +5,6 @@
     :license: MIT, see LICENSE for more details.
 """
 import io
-import json
 from unittest import mock as mock
 import warnings
 
