@@ -33,13 +33,3 @@ __all__ = [
     'FixtureTransport',
     'SoftLayerListResult'
 ]
-
-
-
-
-
-
-
-
-
-

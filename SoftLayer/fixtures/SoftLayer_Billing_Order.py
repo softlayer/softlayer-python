@@ -44,7 +44,7 @@ getAllObjects = [{
         ],
         'orderApprovalDate': '2019-09-15T13:13:13-06:00',
         'orderTotalAmount': '0'
-    }]
+}]
 
 getObject = {
     'accountId': 1234,

@@ -17,6 +17,7 @@ from SoftLayer import consts
 from SoftLayer import testing
 from SoftLayer import transports
 
+
 class TestRestAPICall(testing.TestCase):
 
     def set_up(self):

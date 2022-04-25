@@ -105,6 +105,7 @@ class Request(object):
         return "{service}::{method}({params})".format(
             service=self.service, method=self.method, params=param_string)
 
+
 class SoftLayerListResult(list):
     """A SoftLayer API list result."""
 
@@ -114,6 +115,7 @@ class SoftLayerListResult(list):
         #: paginating through a large list of objects.
         self.total_count = total_count
         super().__init__(items)
+
 
 def _proxies_dict(proxy):
     """Makes a proxy dict appropriate to pass to requests."""

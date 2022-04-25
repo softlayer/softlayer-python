@@ -460,8 +460,3 @@ def test_verify(request,
                                timeout=mock.ANY,
                                verify=expected,
                                auth=None)
-
-
-
-
-

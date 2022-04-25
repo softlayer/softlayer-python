@@ -27,6 +27,8 @@ from .transport import get_session
 from .transport import SoftLayerListResult
 
 from pprint import pprint as pp
+
+
 class SoapTransport(object):
     """XML-RPC transport."""
 
@@ -101,8 +103,6 @@ class SoapTransport(object):
             # The ** here forces python to treat this dict as properties
             headers.append(xsdFilter(**request.filter))
 
-
-
         if request.identifier:
             initParam = f"{request.service}InitParameters"
             initParamType = client.get_type(f"{{{self.soapNS}}}{initParam}")
@@ -121,7 +121,7 @@ class SoapTransport(object):
 
         result = method(_soapheaders=headers)
         # result = client.service.getObject(_soapheaders=headers)
-        
+
         # process_multiref(result['body']['getAllObjectsReturn'])
 
         # print("^^^ RESULT ^^^^^^^")
@@ -142,7 +142,6 @@ class SoapTransport(object):
             message = f"Error serializeing response\n{result}\n"
             raise exceptions.TransportError(500, message)
 
-
     def print_reproduceable(self, request):
         """Prints out the minimal python code to reproduce a specific request
 
@@ -150,5 +149,5 @@ class SoapTransport(object):
 
         :param request request: Request object
         """
-        
+
         return self.history.last_sent

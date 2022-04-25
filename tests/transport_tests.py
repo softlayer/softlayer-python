@@ -18,7 +18,6 @@ from SoftLayer import testing
 from SoftLayer import transports
 
 
-
 class TestFixtureTransport(testing.TestCase):
 
     def set_up(self):

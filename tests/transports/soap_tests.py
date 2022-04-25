@@ -20,7 +20,9 @@ from SoftLayer.transports.soap import SoapTransport
 from SoftLayer.transports import Request
 
 
-from pprint import pprint as pp 
+from pprint import pprint as pp
+
+
 def get_soap_response():
     response = requests.Response()
     list_body = b'''<?xml version="1.0" encoding="utf-8"?>
@@ -64,7 +66,7 @@ class TestSoapAPICall(testing.TestCase):
 
     #     self.request.mask = "mask[id,accountName,companyName]"
     #     data = self.transport(self.request)
-        
+
     #     self.assertEqual(data.get('id'), 307608)
     #     debug_data = self.transport.print_reproduceable(self.request)
     #     print(debug_data['envelope'])
@@ -115,4 +117,4 @@ class TestSoapAPICall(testing.TestCase):
             thisVsi = self.transport(vsiRequest)
             self.assertEqual(thisVsi.get('id'), vsi.get('id'))
 
-    ## TODO MORE COMPLEX OBJECT FILTERS!
+    # TODO MORE COMPLEX OBJECT FILTERS!

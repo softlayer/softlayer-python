@@ -8,6 +8,7 @@
 
 import importlib
 
+
 class FixtureTransport(object):
     """Implements a transport which returns fixtures."""
 
