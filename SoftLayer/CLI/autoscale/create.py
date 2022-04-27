@@ -1,7 +1,8 @@
-"""Order/create a dedicated server."""
+"""Order/Create a scale group."""
 # :license: MIT, see LICENSE for more details.
 
 import click
+from SoftLayer import utils
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -36,12 +37,9 @@ from SoftLayer.managers.autoscale import AutoScaleManager
 @helpers.multi_option('--disk', help="Disk sizes")
 @environment.pass_env
 def cli(env, **args):
-    """Order/create autoscale."""
+    """Order/Create a scale group."""
     scale = AutoScaleManager(env.client)
     network = SoftLayer.NetworkManager(env.client)
-
-    pods = network.get_closed_pods()
-    closure = []
 
     datacenter = network.get_datacenter(args.get('datacenter'))
 
@@ -102,16 +100,10 @@ def cli(env, **args):
         'balancedTerminationFlag': False,
         'virtualGuestMemberTemplate': virt_template,
         'virtualGuestMemberCount': 0,
-        'policies': policies.append(clean_dict(policy_template)),
+        'policies': policies.append(utils.clean_dict(policy_template)),
         'terminationPolicyId': args['termination_policy']
     }
 
-    # print(virt_template)
-
-    for pod in pods:
-        if args.get('datacenter') in str(pod['name']):
-            closure.append(pod['name'])
-    click.secho(click.style('Warning: Closed soon: %s' % (', '.join(closure)), fg='yellow'))
     if not (env.skip_confirmations or formatting.confirm(
             "This action will incur charges on your account. Continue?")):
         raise exceptions.CLIAbort('Aborting scale group order.')
@@ -130,8 +122,3 @@ def cli(env, **args):
         output = table
 
     env.fout(output)
-
-
-def clean_dict(dictionary):
-    """Removes any `None` entires from the dictionary"""
-    return {k: v for k, v in dictionary.items() if v}

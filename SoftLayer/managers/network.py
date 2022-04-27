@@ -830,8 +830,6 @@ class NetworkManager(object):
 
         returns datacenter list.
         """
-        _filter = None
-
         if datacenter:
             _filter = {"name": {"operation": datacenter}}
 
