@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://api.service.softlayer.com/soap/v3.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SOAP-ENV:Body>
+        <ns1:getObjectResponse>
+            <getObjectReturn xsi:type="ns1:SoftLayer_Virtual_Guest">
+                <domain xsi:type="xsd:string">ibm.com</domain>
+                <hostname xsi:type="xsd:string">KVM-Test</hostname>
+                <id xsi:type="xsd:int">121401696</id>
+            </getObjectReturn>
+        </ns1:getObjectResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

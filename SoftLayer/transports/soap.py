@@ -95,7 +95,7 @@ class SoapTransport(object):
             headers.append(xsd_filter(**request.filter))
 
         if request.identifier:
-            init_param = f"{request.service}init_parameters"
+            init_param = f"{request.service}InitParameters"
             init_paramtype = client.get_type(f"{{{self.soapns}}}{init_param}")
             xsdinit_param = xsd.Element(
                 f"{{{self.soapns}}}{init_param}", init_paramtype

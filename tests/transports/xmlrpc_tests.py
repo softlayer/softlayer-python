@@ -43,7 +43,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         )
         self.response = get_xmlrpc_response()
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_call(self, request):
         request.return_value = self.response
 
@@ -95,7 +95,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             warnings.warn("Incorrect Exception raised. Expected a "
                           "SoftLayer.TransportError error")
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_valid_proxy(self, request):
         request.return_value = self.response
         self.transport.proxy = 'http://localhost:3128'
@@ -117,7 +117,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             verify=True,
             auth=None)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_identifier(self, request):
         request.return_value = self.response
 
@@ -135,7 +135,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 <value><int>1234</int></value>
 </member>""".encode(), kwargs['data'])
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_filter(self, request):
         request.return_value = self.response
 
@@ -153,7 +153,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 <value><string>^= prefix</string></value>
 </member>""".encode(), kwargs['data'])
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_limit_offset(self, request):
         request.return_value = self.response
 
@@ -173,7 +173,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 <value><int>10</int></value>
 </member>""".encode(), kwargs['data'])
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_old_mask(self, request):
         request.return_value = self.response
 
@@ -195,7 +195,7 @@ class TestXmlRpcAPICall(testing.TestCase):
 </struct></value>
 </member>""".encode(), kwargs['data'])
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_mask_call_no_mask_prefix(self, request):
         request.return_value = self.response
 
@@ -211,7 +211,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             "<value><string>mask[something.nested]</string></value>".encode(),
             kwargs['data'])
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_mask_call_v2(self, request):
         request.return_value = self.response
 
@@ -227,7 +227,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             "<value><string>mask[something[nested]]</string></value>".encode(),
             kwargs['data'])
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_mask_call_filteredMask(self, request):
         request.return_value = self.response
 
@@ -243,7 +243,7 @@ class TestXmlRpcAPICall(testing.TestCase):
             "<value><string>filteredMask[something[nested]]</string></value>".encode(),
             kwargs['data'])
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_mask_call_v2_dot(self, request):
         request.return_value = self.response
 
@@ -258,7 +258,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertIn("<value><string>mask.something.nested</string></value>".encode(),
                       kwargs['data'])
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_request_exception(self, request):
         # Test Text Error
         e = requests.HTTPError('error')
@@ -281,7 +281,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         output_text = self.transport.print_reproduceable(req)
         self.assertIn("https://test.com", output_text)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     @mock.patch('requests.auth.HTTPBasicAuth')
     def test_ibm_id_call(self, auth, request):
         request.return_value = self.response
@@ -325,7 +325,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertIsInstance(resp, transports.SoftLayerListResult)
         self.assertEqual(resp.total_count, 10)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_call_large_number_response(self, request):
         response = requests.Response()
         body = b'''<?xml version="1.0" encoding="utf-8"?>
@@ -359,7 +359,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         resp = self.transport(req)
         self.assertEqual(resp[0]['bytesUsed'], 2666148982056)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_nonascii_characters(self, request):
         request.return_value = self.response
         hostname = 'testé'
@@ -411,7 +411,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertEqual(resp.total_count, 10)
 
 
-@mock.patch('SoftLayer.transports.requests.Session.request')
+@mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
 @pytest.mark.parametrize(
     "transport_verify,request_verify,expected",
     [
