@@ -25,10 +25,11 @@ def cli(env, identifier):
         raise exceptions.CLIAbort(reasons)
     item = mgr.get_vlan(identifier).get('billingItem')
     if item:
-        mgr.cancel_item(item.get('id'),
-                        True,
-                        'Cancel by cli command',
-                        'Cancel by cli command')
+        if mgr.cancel_item(item.get('id'),
+                           True,
+                           'Cancel by cli command',
+                           'Cancel by cli command'):
+            env.fout("VLAN {} was cancelled.".format(identifier))
     else:
         raise exceptions.CLIAbort(
             "VLAN is an automatically assigned and free of charge VLAN,"

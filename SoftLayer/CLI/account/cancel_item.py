@@ -15,4 +15,5 @@ def cli(env, identifier):
     manager = AccountManager(env.client)
     item = manager.cancel_item(identifier)
 
-    env.fout(item)
+    if item:
+        env.fout("Item: {} was cancelled.".format(identifier))

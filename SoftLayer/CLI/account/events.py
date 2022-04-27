@@ -11,8 +11,14 @@ from SoftLayer import utils
 @click.command()
 @click.option('--ack-all', is_flag=True, default=False,
               help="Acknowledge every upcoming event. Doing so will turn off the popup in the control portal")
+@click.option('--planned', is_flag=True, default=False,
+              help="Show only planned events")
+@click.option('--unplanned', is_flag=True, default=False,
+              help="Show only unplanned events")
+@click.option('--announcement', is_flag=True, default=False,
+              help="Show only announcement events")
 @environment.pass_env
-def cli(env, ack_all):
+def cli(env, ack_all, planned, unplanned, announcement):
     """Summary and acknowledgement of upcoming and ongoing maintenance events"""
 
     manager = AccountManager(env.client)
@@ -21,13 +27,22 @@ def cli(env, ack_all):
     announcement_events = manager.get_upcoming_events("ANNOUNCEMENT")
 
     add_ack_flag(planned_events, manager, ack_all)
-    env.fout(planned_event_table(planned_events))
-
     add_ack_flag(unplanned_events, manager, ack_all)
-    env.fout(unplanned_event_table(unplanned_events))
-
     add_ack_flag(announcement_events, manager, ack_all)
-    env.fout(announcement_event_table(announcement_events))
+
+    if planned:
+        env.fout(planned_event_table(planned_events))
+
+    if unplanned:
+        env.fout(unplanned_event_table(unplanned_events))
+
+    if announcement:
+        env.fout(announcement_event_table(announcement_events))
+
+    if not planned and not unplanned and not announcement:
+        env.fout(planned_event_table(planned_events))
+        env.fout(unplanned_event_table(unplanned_events))
+        env.fout(announcement_event_table(announcement_events))
 
 
 def add_ack_flag(events, manager, ack_all):

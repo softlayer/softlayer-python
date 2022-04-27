@@ -506,7 +506,7 @@ class NetworkManager(object):
         kwargs['iter'] = True
         return self.client.call('Account', 'getSubnets', **kwargs)
 
-    def list_vlans(self, datacenter=None, vlan_number=None, name=None, **kwargs):
+    def list_vlans(self, datacenter=None, vlan_number=None, name=None, limit=100, **kwargs):
         """Display a list of all VLANs on the account.
 
         This provides a quick overview of all VLANs including information about
@@ -522,6 +522,8 @@ class NetworkManager(object):
 
         """
         _filter = utils.NestedDict(kwargs.get('filter') or {})
+
+        _filter['networkVlans']['id'] = utils.query_filter_orderby()
 
         if vlan_number:
             _filter['networkVlans']['vlanNumber'] = (
@@ -540,7 +542,10 @@ class NetworkManager(object):
             kwargs['mask'] = DEFAULT_VLAN_MASK
 
         kwargs['iter'] = True
-        return self.account.getNetworkVlans(**kwargs)
+        if limit > 0:
+            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), limit=limit)
+        else:
+            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), iter=True)
 
     def list_securitygroups(self, **kwargs):
         """List security groups."""
@@ -824,6 +829,16 @@ class NetworkManager(object):
         mask = """mask[name, datacenterLongName, frontendRouterId, capabilities, datacenterId, backendRouterId,
                 backendRouterName, frontendRouterName]"""
         return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', mask=mask, filter=closing_filter)
+
+    def route(self, subnet_id, type_serv, target):
+        """Assigns a subnet to a specified target.
+
+        :param int subnet_id: The ID of the global IP being assigned
+        :param string type_serv: The type service to assign
+        :param string target: The instance to assign
+        """
+        return self.client.call('SoftLayer_Network_Subnet', 'route',
+                                type_serv, target, id=subnet_id, )
 
     def get_datacenter(self, _filter=None, datacenter=None):
         """Calls SoftLayer_Location::getDatacenters()

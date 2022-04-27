@@ -1,4 +1,4 @@
-"""Assigns the global IP to a target."""
+"""allows you to change the route of your Account Owned subnets."""
 # :license: MIT, see LICENSE for more details.
 
 import click

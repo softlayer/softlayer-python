@@ -30,3 +30,6 @@ Subnets
 .. click:: SoftLayer.CLI.subnet.edit_ip:cli
     :prog: subnet edit-ip
     :show-nested:
+.. click:: SoftLayer.CLI.subnet.route:cli
+    :prog: subnet route
+    :show-nested:
