@@ -107,18 +107,18 @@ def cli(env, **args):
     if not (env.skip_confirmations or formatting.confirm(
             "This action will incur charges on your account. Continue?")):
         raise exceptions.CLIAbort('Aborting scale group order.')
-    else:
-        result = scale.create(order)
 
-        table = formatting.KeyValueTable(['name', 'value'])
-        table.align['name'] = 'r'
-        table.align['value'] = 'l'
-        table.add_row(['Id', result['id']])
-        table.add_row(['Created', result['createDate']])
-        table.add_row(['Name', result['name']])
-        table.add_row(['Virtual Guest Id', result['virtualGuestMembers'][0]['virtualGuest']['id']])
-        table.add_row(['Virtual Guest domain', result['virtualGuestMembers'][0]['virtualGuest']['domain']])
-        table.add_row(['Virtual Guest hostname', result['virtualGuestMembers'][0]['virtualGuest']['hostname']])
-        output = table
+    result = scale.create(order)
+
+    table = formatting.KeyValueTable(['name', 'value'])
+    table.align['name'] = 'r'
+    table.align['value'] = 'l'
+    table.add_row(['Id', result['id']])
+    table.add_row(['Created', result['createDate']])
+    table.add_row(['Name', result['name']])
+    table.add_row(['Virtual Guest Id', result['virtualGuestMembers'][0]['virtualGuest']['id']])
+    table.add_row(['Virtual Guest domain', result['virtualGuestMembers'][0]['virtualGuest']['domain']])
+    table.add_row(['Virtual Guest hostname', result['virtualGuestMembers'][0]['virtualGuest']['hostname']])
+    output = table
 
     env.fout(output)
