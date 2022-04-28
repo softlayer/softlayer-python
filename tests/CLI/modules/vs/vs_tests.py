@@ -947,3 +947,13 @@ class VirtTests(testing.TestCase):
     def test_monitoring_vs(self):
         result = self.run_command(['vs', 'monitoring', '1234'])
         self.assert_no_fail(result)
+
+    def test_last_transaction_empty(self):
+        vg_return = SoftLayer_Virtual_Guest.getObject
+        transaction = []
+
+        vg_return['lastTransaction'] = transaction
+        mock = self.set_mock('SoftLayer_Virtual_Guest', 'getObject')
+        mock.return_value = vg_return
+        result = self.run_command(['vs', 'detail', '100'])
+        self.assert_no_fail(result)

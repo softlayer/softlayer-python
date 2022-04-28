@@ -69,11 +69,13 @@ def cli(env, identifier, passwords=False, price=False):
     table.add_row(['transient', result.get('transientGuestFlag', False)])
     table.add_row(['created', result['createDate']])
     table.add_row(['modified', result['modifyDate']])
-    last_transaction = "{} ({})".format(utils.lookup(result, 'lastTransaction', 'transactionGroup', 'name'),
-                                        utils.clean_time(utils.lookup(result, 'lastTransaction', 'modifyDate')))
+    last_transaction = ''
+    if result.get('lastTransaction'):
+        last_transaction = "{} ({})".format(utils.lookup(result, 'lastTransaction', 'transactionGroup', 'name'),
+                                            utils.clean_time(utils.lookup(result, 'lastTransaction', 'modifyDate')))
 
     table.add_row(['last_transaction', last_transaction])
-    table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else'Monthly'])
+    table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else 'Monthly'])
     table.add_row(['preset', utils.lookup(result, 'billingItem',
                                           'orderItem',
                                           'preset',
