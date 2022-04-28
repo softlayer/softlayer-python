@@ -1,2 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://api.service.softlayer.com/soap/v3.1/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Header><ns1:totalItems><amount>109</amount></ns1:totalItems></SOAP-ENV:Header><SOAP-ENV:Body><ns1:getAllObjectsResponse><getAllObjectsReturn SOAP-ENC:arrayType="ns1:SoftLayer_Product_Package[5]" xsi:type="ns1:SoftLayer_Product_PackageArray"><item xsi:type="ns1:SoftLayer_Product_Package"><id xsi:type="xsd:int">56</id><keyName xsi:type="xsd:string">2U_QUAD_PROCESSOR_MULTI_CORE_NEHALEM_EX</keyName><name xsi:type="xsd:string">Quad Processor Multi Core Nehalem EX</name><type xsi:type="ns1:SoftLayer_Product_Package_Type" id="ref1"><id xsi:type="xsd:int">2</id><keyName xsi:type="xsd:string">BARE_METAL_CPU</keyName></type></item><item xsi:type="ns1:SoftLayer_Product_Package"><id xsi:type="xsd:int">126</id><keyName xsi:type="xsd:string">SINGLE_XEON_1200_SANDY_BRIDGE_HASWELL</keyName><name xsi:type="xsd:string">Single Xeon 1200 Series (Sandy Bridge / Haswell)</name><type href="#ref1"/></item><item xsi:type="ns1:SoftLayer_Product_Package"><id xsi:type="xsd:int">142</id><keyName xsi:type="xsd:string">SINGLE_XEON_2000_SANDY_BRIDGE</keyName><name xsi:type="xsd:string">Single Xeon 2000 Series (Sandy Bridge)</name><type href="#ref1"/></item><item xsi:type="ns1:SoftLayer_Product_Package"><id xsi:type="xsd:int">143</id><keyName xsi:type="xsd:string">DUAL_XEON_2000_SANDY_BRIDGE</keyName><name xsi:type="xsd:string">Dual Xeon 2000 Series (Sandy Bridge)</name><type href="#ref1"/></item><item xsi:type="ns1:SoftLayer_Product_Package"><id xsi:type="xsd:int">144</id><keyName xsi:type="xsd:string">3U_GPU</keyName><name xsi:type="xsd:string">Specialty Server: GPU</name><type href="#ref1"/></item></getAllObjectsReturn></ns1:getAllObjectsResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>
+<SOAP-ENV:Envelope SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://api.service.softlayer.com/soap/v3.1/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <SOAP-ENV:Header>
+        <ns1:totalItems>
+            <amount>109</amount>
+        </ns1:totalItems>
+    </SOAP-ENV:Header>
+    <SOAP-ENV:Body>
+        <ns1:getAllObjectsResponse>
+            <getAllObjectsReturn SOAP-ENC:arrayType="ns1:SoftLayer_Product_Package[5]" xsi:type="ns1:SoftLayer_Product_PackageArray">
+                <item xsi:type="ns1:SoftLayer_Product_Package">
+                    <id xsi:type="xsd:int">56</id>
+                    <keyName xsi:type="xsd:string">2U_QUAD_PROCESSOR_MULTI_CORE_NEHALEM_EX</keyName>
+                    <name xsi:type="xsd:string">Quad Processor Multi Core Nehalem EX</name>
+                    <type id="ref1" xsi:type="ns1:SoftLayer_Product_Package_Type">
+                        <id xsi:type="xsd:int">2</id>
+                        <keyName xsi:type="xsd:string">BARE_METAL_CPU</keyName>
+                    </type>
+                </item>
+                <item xsi:type="ns1:SoftLayer_Product_Package">
+                    <id xsi:type="xsd:int">126</id>
+                    <keyName xsi:type="xsd:string">SINGLE_XEON_1200_SANDY_BRIDGE_HASWELL</keyName>
+                    <name xsi:type="xsd:string">Single Xeon 1200 Series (Sandy Bridge / Haswell)</name>
+                    <type href="#ref1"/>
+                </item>
+                <item xsi:type="ns1:SoftLayer_Product_Package">
+                    <id xsi:type="xsd:int">142</id>
+                    <keyName xsi:type="xsd:string">SINGLE_XEON_2000_SANDY_BRIDGE</keyName>
+                    <name xsi:type="xsd:string">Single Xeon 2000 Series (Sandy Bridge)</name>
+                    <type href="#ref1"/>
+                </item>
+                <item xsi:type="ns1:SoftLayer_Product_Package">
+                    <id xsi:type="xsd:int">143</id>
+                    <keyName xsi:type="xsd:string">DUAL_XEON_2000_SANDY_BRIDGE</keyName>
+                    <name xsi:type="xsd:string">Dual Xeon 2000 Series (Sandy Bridge)</name>
+                    <type href="#ref1"/>
+                </item>
+                <item xsi:type="ns1:SoftLayer_Product_Package">
+                    <id xsi:type="xsd:int">144</id>
+                    <keyName xsi:type="xsd:string">3U_GPU</keyName>
+                    <name xsi:type="xsd:string">Specialty Server: GPU</name>
+                    <type href="#ref1"/>
+                </item>
+            </getAllObjectsReturn>
+        </ns1:getAllObjectsResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

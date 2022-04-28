@@ -21,7 +21,7 @@ class TestRestAPICall(testing.TestCase):
             endpoint_url='http://something9999999999999999999999.com',
         )
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_basic(self, request):
         request().content = '[]'
         request().text = '[]'
@@ -48,7 +48,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_http_and_json_error(self, request):
         # Test JSON Error
         e = requests.HTTPError('error')
@@ -65,7 +65,7 @@ class TestRestAPICall(testing.TestCase):
         req.method = 'Resource'
         self.assertRaises(SoftLayer.SoftLayerAPIError, self.transport, req)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_http_and_empty_error(self, request):
         # Test JSON Error
         e = requests.HTTPError('error')
@@ -79,7 +79,7 @@ class TestRestAPICall(testing.TestCase):
         req.method = 'Resource'
         self.assertRaises(SoftLayer.SoftLayerAPIError, self.transport, req)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_empty_error(self, request):
         # Test empty response error.
         request().text = ''
@@ -89,7 +89,7 @@ class TestRestAPICall(testing.TestCase):
         req.method = 'Resource'
         self.assertRaises(SoftLayer.SoftLayerAPIError, self.transport, req)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_json_error(self, request):
         # Test non-json response error.
         request().text = 'Not JSON'
@@ -109,7 +109,7 @@ class TestRestAPICall(testing.TestCase):
         except AssertionError:
             warnings.warn("AssertionError raised instead of a SoftLayer.TransportError error")
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_valid_proxy(self, request):
         request().text = '{}'
         self.transport.proxy = 'http://localhost:3128'
@@ -132,7 +132,7 @@ class TestRestAPICall(testing.TestCase):
             timeout=mock.ANY,
             headers=mock.ANY)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_with_id(self, request):
         request().text = '{}'
 
@@ -156,7 +156,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_with_args(self, request):
         request().text = '{}'
 
@@ -180,7 +180,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_with_args_bytes(self, request):
         request().text = '{}'
 
@@ -204,7 +204,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_with_filter(self, request):
         request().text = '{}'
 
@@ -229,7 +229,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_with_mask(self, request):
         request().text = '{}'
 
@@ -274,7 +274,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_with_limit_offset(self, request):
         request().text = '{}'
 
@@ -300,7 +300,7 @@ class TestRestAPICall(testing.TestCase):
             proxies=None,
             timeout=None)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_unknown_error(self, request):
         e = requests.RequestException('error')
         e.response = mock.MagicMock()
@@ -314,7 +314,7 @@ class TestRestAPICall(testing.TestCase):
 
         self.assertRaises(SoftLayer.TransportError, self.transport, req)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     @mock.patch('requests.auth.HTTPBasicAuth')
     def test_with_special_auth(self, auth, request):
         request().text = '{}'

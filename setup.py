@@ -39,8 +39,7 @@ setup(
         'requests >= 2.20.0',
         'prompt_toolkit >= 2',
         'pygments >= 2.0.0',
-        'urllib3 >= 1.24',
-        'zeep'
+        'urllib3 >= 1.24'
     ],
     keywords=['softlayer', 'cloud', 'slcli'],
     classifiers=[

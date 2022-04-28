@@ -56,7 +56,7 @@ class TestDebugTransport(testing.TestCase):
         self.assertIn("https://test.com", output_text)
         self.assertIn("-X POST", output_text)
 
-    @mock.patch('SoftLayer.transports.requests.Session.request')
+    @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_error(self, request):
         # Test JSON Error
         e = requests.HTTPError('error')
