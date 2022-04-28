@@ -70,7 +70,7 @@ def cli(env, identifier, passwords=False, price=False):
     table.add_row(['created', result['createDate']])
     table.add_row(['modified', result['modifyDate']])
     last_transaction = ''
-    if result.get('lastTransaction') != []:
+    if result.get('lastTransaction'):
         last_transaction = "{} ({})".format(utils.lookup(result, 'lastTransaction', 'transactionGroup', 'name'),
                                             utils.clean_time(utils.lookup(result, 'lastTransaction', 'modifyDate')))
 
