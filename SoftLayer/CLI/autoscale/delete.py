@@ -1,7 +1,7 @@
 """Delete autoscale."""
 # :license: MIT, see LICENSE for more details.
-
 import click
+import SoftLayer
 
 from SoftLayer.CLI import environment
 from SoftLayer.managers.autoscale import AutoScaleManager
@@ -18,7 +18,9 @@ def cli(env, identifier):
     """
 
     autoscale = AutoScaleManager(env.client)
-    result = autoscale.delete(identifier)
 
-    if result:
+    try:
+        autoscale.delete(identifier)
         click.secho("%s deleted successfully" % identifier, fg='green')
+    except SoftLayer.SoftLayerAPIError as ex:
+        click.secho("Failed to delete %s\n%s" % (identifier, ex), fg='red')
