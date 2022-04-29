@@ -35,7 +35,7 @@ For making changes to the triggers or the autoscale group itself, see the `Autos
     :show-nested:
 
 .. click:: SoftLayer.CLI.autoscale.delete:cli
-    :prog: autoscale delte
+    :prog: autoscale delete
     :show-nested:
 
 
