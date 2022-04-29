@@ -11,11 +11,9 @@ from SoftLayer.managers.autoscale import AutoScaleManager
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Sets a user's status to CANCEL_PENDING, which will immediately disable the account,
+    """Delete this group and destroy all members of it.
 
-    and will eventually be fully removed from the account by an automated internal process.
-
-    Example: slcli user delete userId
+    Example: slcli autoscale delete autoscaleId
 
     """
 
@@ -24,5 +22,3 @@ def cli(env, identifier):
 
     if result:
         click.secho("%s deleted successfully" % identifier, fg='green')
-    else:
-        click.secho("Failed to delete %s" % identifier, fg='red')
