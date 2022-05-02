@@ -37,14 +37,14 @@ def cli(env, identifier, scale_up, scale_by, amount):
 
     try:
         # Check if the first guest has a cancellation date, assume we are removing guests if it is.
-        cancel_date = result[0]['virtualGuest']['billingItem']['cancellationDate'] or False
+        status = result[0]['virtualGuest']['status']['keyName'] or False
     except (IndexError, KeyError, TypeError):
-        cancel_date = False
+        status = False
 
-    if cancel_date:
-        member_table = formatting.Table(['Id', 'Hostname', 'Created'], title="Cancelled Guests")
-    else:
+    if status == 'ACTIVE':
         member_table = formatting.Table(['Id', 'Hostname', 'Created'], title="Added Guests")
+    else:
+        member_table = formatting.Table(['Id', 'Hostname', 'Created'], title="Cancelled Guests")
 
     for guest in result:
         real_guest = guest.get('virtualGuest')
