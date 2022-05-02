@@ -455,3 +455,4 @@ getLogs = [
 ]
 
 editObject = True
+forceDeleteObject = True
