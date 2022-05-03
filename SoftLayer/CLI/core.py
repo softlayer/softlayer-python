@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import inspect
 import logging
 import os
 import sys
@@ -15,6 +16,15 @@ import types
 import click
 
 import requests
+from rich.console import Console, RenderableType
+from rich.markup import escape
+from rich.text import Text
+from rich.highlighter import RegexHighlighter
+from rich.panel import Panel
+from rich.table import Table
+from rich.theme import Theme
+
+
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
@@ -40,12 +50,35 @@ if sys.stdout.isatty():
     DEFAULT_FORMAT = 'table'
 
 
+class OptionHighlighter(RegexHighlighter):
+    highlights = [
+        r"(?P<switch>\-\w)", # single options like -v
+        r"(?P<option>\-\-[\w\-]+)", # long options like --verbose
+        r"(?P<default_option>\[[^\]]+\])", # anything between [], usually default options
+
+    ]
+
+SLCLI_THEME = Theme(
+    {
+        "option": "bold cyan",
+        "switch": "bold green",
+        "default_option": "light_pink1",
+        "option_keyword": "bold cyan",
+        "args_keyword": "bold green"
+    }
+)
+
 class CommandLoader(click.MultiCommand):
     """Loads module for click."""
 
     def __init__(self, *path, **attrs):
         click.MultiCommand.__init__(self, **attrs)
         self.path = path
+
+        self.highlighter = OptionHighlighter()
+        self.console = Console(
+            theme=SLCLI_THEME
+        )
 
     def list_commands(self, ctx):
         """List all sub-commands."""
@@ -71,6 +104,78 @@ class CommandLoader(click.MultiCommand):
         else:
             return module
 
+    def format_usage(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
+        """Formats and colorizes the usage information."""
+        pieces = self.collect_usage_pieces(ctx)
+        for index, piece in enumerate(pieces):
+            if piece == "[OPTIONS]":
+                pieces[index] = "[bold cyan][OPTIONS][/bold cyan]"
+            elif piece == "COMMAND [ARGS]...":
+                pieces[index] = "[orange1]COMMAND[/orange1] [bold cyan][ARGS][/bold cyan] ..."
+            else:
+                # print(f"OK this was {piece}")
+                continue
+        self.console.print(f"[bold red]{ctx.command_path}[/bold red] {' '.join(pieces)}")
+
+    def format_help_text(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
+        """Writes the help text to the formatter if it exists."""
+        text = self.help if self.help is not None else ""
+
+        if self.deprecated:
+            text = _("(Deprecated) {text}").format(text=text)
+
+        if text:
+            text = inspect.cleandoc(text).partition("\f")[0]
+            formatter.write_paragraph()
+
+            with formatter.indentation():
+                formatter.write_text(text)
+
+    def format_epilog(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
+        """Writes the epilog into the formatter if it exists."""
+        if self.epilog:
+            epilog = inspect.cleandoc(self.epilog)
+            formatter.write_paragraph()
+
+            with formatter.indentation():
+                formatter.write_text(epilog)
+
+    def format_options(self, ctx, formatter):
+
+        options_table = Table(highlight=True, box=None, show_header=False)
+
+        for param in self.get_params(ctx):
+            if len(param.opts) == 2:
+                opt1 = self.highlighter(param.opts[1])
+                opt2 = self.highlighter(param.opts[0])
+            else:
+                opt2 = self.highlighter(param.opts[0])
+                opt1 = Text("")
+
+            # Ensures the short option is always in opt1.
+            if len(opt2) == 2:
+                opt1, opt2 = opt2, opt1
+
+            if param.metavar:
+                opt2 += Text(f" {param.metavar}", style="bold yellow")
+
+            options = Text(" ".join(reversed(param.opts)))
+            help_record = param.get_help_record(ctx)
+            help_message = ""
+            if help_record:
+                help_message = param.get_help_record(ctx)[-1]
+
+            if param.metavar:
+                options += f" {param.metavar}"
+            options_table.add_row(opt1, opt2, self.highlighter(help_message))
+
+        self.console.print(options_table)
+        self.format_commands(ctx, formatter)
+
+        # click.echo(click.style('Hello World!', fg='green'))
+        # print("HEEEELP")
+
+
 
 def get_latest_version():
     """Gets the latest version of the Softlayer library."""
@@ -83,6 +188,11 @@ def get_latest_version():
     return latest
 
 
+CONTEXT_SETTINGS = dict(
+    help_option_names=['--help', '-h'],
+    auto_envvar_prefix='SLCLI',
+    max_content_width=999
+)
 def get_version_message(ctx, param, value):
     """Gets current and latest release versions message."""
     if not value or ctx.resilient_parsing:
@@ -99,15 +209,13 @@ def get_version_message(ctx, param, value):
 username and api_key need to be configured. The easiest way to do that is to
 use: 'slcli setup'""",
              cls=CommandLoader,
-             context_settings={'help_option_names': ['-h', '--help'],
-                               'auto_envvar_prefix': 'SLCLI',
-                               'max_content_width': 999})
+             context_settings=CONTEXT_SETTINGS)
 @click.option('--format',
               default=DEFAULT_FORMAT,
               show_default=True,
               help="Output format",
               type=click.Choice(VALID_FORMATS))
-@click.option('--config', '-C',
+@click.option('-C',
               required=False,
               default=click.get_app_dir('softlayer', force_posix=True),
               show_default=True,
@@ -119,7 +227,7 @@ use: 'slcli setup'""",
               count=True)
 @click.option('--proxy',
               required=False,
-              help="HTTP[S] proxy to be use to make API calls")
+              help="HTTPS or HTTP proxy to be use to make API calls")
 @click.option('--really / --not-really', '-y',
               is_flag=True,
               required=False,
@@ -162,7 +270,7 @@ def cli(env,
     env.client.transport = env.vars['_timings']
 
 
-@cli.resultcallback()
+@cli.result_callback()
 @environment.pass_env
 def output_diagnostics(env, result, verbose=0, **kwargs):
     """Output diagnostic information."""
