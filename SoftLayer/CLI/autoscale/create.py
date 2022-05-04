@@ -40,7 +40,15 @@ from SoftLayer.managers.autoscale import AutoScaleManager
 @helpers.multi_option('--disk', required=True, prompt=True, help="Disk sizes")
 @environment.pass_env
 def cli(env, **args):
-    """Order/Create a scale group."""
+    """Order/Create a scale group.
+
+    E.g.
+
+    'slcli autoscale create --name test --cooldown 3600 --min 1 --max 2 -o CENTOS_7_64 --datacenter dal10
+    --termination-policy 2 -H testvs -D test.com --cpu 2 --memory 1024 --policy-relative absolute
+    --policy-name policytest --policy-amount 3 --regional 102 --disk 25 --disk 30 --disk 25'
+
+    """
     scale = AutoScaleManager(env.client)
     network = SoftLayer.NetworkManager(env.client)
 
@@ -67,6 +75,8 @@ def cli(env, **args):
     block = []
     number_disk = 0
     for guest_disk in args['disk']:
+        if number_disk == 1:
+            number_disk = 2
         disks = {'diskImage': {'capacity': guest_disk}, 'device': number_disk}
         block.append(disks)
         number_disk += 1
@@ -114,14 +124,16 @@ def cli(env, **args):
     result = scale.create(order)
 
     table = formatting.KeyValueTable(['name', 'value'])
+    vsi_table = formatting.KeyValueTable(['Id', 'Domain', 'Hostmane'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'
     table.add_row(['Id', result['id']])
     table.add_row(['Created', result['createDate']])
     table.add_row(['Name', result['name']])
-    table.add_row(['Virtual Guest Id', result['virtualGuestMembers'][0]['virtualGuest']['id']])
-    table.add_row(['Virtual Guest domain', result['virtualGuestMembers'][0]['virtualGuest']['domain']])
-    table.add_row(['Virtual Guest hostname', result['virtualGuestMembers'][0]['virtualGuest']['hostname']])
+    for vsi in result['virtualGuestMembers']:
+        vsi_table.add_row([vsi['virtualGuest']['id'], vsi['virtualGuest']['domain'], vsi['virtualGuest']['hostname']])
+
+    table.add_row(['VirtualGuests', vsi_table])
     output = table
 
     env.fout(output)
