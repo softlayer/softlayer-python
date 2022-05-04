@@ -455,6 +455,7 @@ getLogs = [
 ]
 
 editObject = True
+forceDeleteObject = True
 
 createObject = {
     "accountId": 307608,

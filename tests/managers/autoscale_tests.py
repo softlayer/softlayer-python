@@ -174,3 +174,7 @@ class AutoScaleTests(testing.TestCase):
             'SoftLayer_Scale_Group',
             'createObject',
             args=(template,))
+
+    def test_delete_object(self):
+        self.autoscale.delete(12345)
+        self.assert_called_with('SoftLayer_Scale_Group', 'forceDeleteObject')

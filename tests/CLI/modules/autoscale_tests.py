@@ -111,3 +111,7 @@ class AutoscaleTests(testing.TestCase):
                                    '--disk=25'])
         self.assert_no_fail(result)
         self.assertEqual(result.exit_code, 0)
+
+    def test_autoscale_delete(self):
+        result = self.run_command(['autoscale', 'delete', '12345'])
+        self.assert_no_fail(result)

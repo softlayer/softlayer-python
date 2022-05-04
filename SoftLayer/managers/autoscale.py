@@ -127,3 +127,13 @@ class AutoScaleManager(object):
                 .. _SoftLayer_Scale_Group: https://sldn.softlayer.com/reference/datatypes/SoftLayer_Scale_Group/
                 """
         return self.client.call('SoftLayer_Scale_Group', 'createObject', template)
+
+    def delete(self, identifier):
+        """Calls `SoftLayer_Scale_Group::forceDeleteObject()`_
+
+        :param identifier: SoftLayer_Scale_Group id
+
+        .. _SoftLayer_Scale_Group::forceDeleteObject():
+            https://sldn.softlayer.com/reference/services/SoftLayer_Scale_Group/forceDeleteObject/
+        """
+        return self.client.call('SoftLayer_Scale_Group', 'forceDeleteObject', id=identifier)
