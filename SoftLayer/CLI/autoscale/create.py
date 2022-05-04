@@ -13,28 +13,31 @@ from SoftLayer.managers.autoscale import AutoScaleManager
 
 
 @click.command()
-@click.option('--name', help="Scale group's name.")
-@click.option('--cooldown', type=click.INT,
+@click.option('--name', required=True, prompt=True, help="Scale group's name.")
+@click.option('--cooldown', required=True, prompt=True, type=click.INT,
               help="The number of seconds this group will wait after lastActionDate before performing another action.")
-@click.option('--min', 'minimum', type=click.INT, help="Set the minimum number of guests")
-@click.option('--max', 'maximum', type=click.INT, help="Set the maximum number of guests")
-@click.option('--regional', type=click.INT,
+@click.option('--min', 'minimum', required=True, prompt=True, type=click.INT, help="Set the minimum number of guests")
+@click.option('--max', 'maximum', required=True, prompt=True, type=click.INT, help="Set the maximum number of guests")
+@click.option('--regional', required=True, prompt=True, type=click.INT,
               help="The identifier of the regional group this scaling group is assigned to.")
 @click.option('--postinstall', '-i', help="Post-install script to download")
-@click.option('--os', '-o', help="OS install code. Tip: you can specify <OS>_LATEST")
+@click.option('--os', '-o', required=True, prompt=True, help="OS install code. Tip: you can specify <OS>_LATEST")
 @click.option('--datacenter', '-d', required=True, prompt=True, help="Datacenter shortname")
 @click.option('--hostname', '-H', required=True, prompt=True, help="Host portion of the FQDN")
 @click.option('--domain', '-D', required=True, prompt=True, help="Domain portion of the FQDN")
-@click.option('--cpu', type=click.INT, help="Number of CPUs for new guests (existing not effected")
-@click.option('--memory', type=click.INT, help="RAM in MB or GB for new guests (existing not effected")
-@click.option('--policy-relative', help="The type of scale to perform(ABSOLUTE, PERCENT, RELATIVE).")
+@click.option('--cpu', required=True, prompt=True, type=click.INT,
+              help="Number of CPUs for new guests (existing not effected")
+@click.option('--memory', required=True, prompt=True, type=click.INT,
+              help="RAM in MB or GB for new guests (existing not effected")
+@click.option('--policy-relative', required=True, prompt=True,
+              help="The type of scale to perform(ABSOLUTE, PERCENT, RELATIVE).")
 @click.option('--termination-policy',
               help="The termination policy for the group(CLOSEST_TO_NEXT_CHARGE=1, NEWEST=2, OLDEST=3).")
 @click.option('--policy-name', help="Collection of policies for this group. This can be empty.")
 @click.option('--policy-amount', help="The number to scale by. This number has different meanings based on type.")
 @click.option('--userdata', help="User defined metadata string")
 @helpers.multi_option('--key', '-k', help="SSH keys to add to the root user")
-@helpers.multi_option('--disk', help="Disk sizes")
+@helpers.multi_option('--disk', required=True, prompt=True, help="Disk sizes")
 @environment.pass_env
 def cli(env, **args):
     """Order/Create a scale group."""
