@@ -2,8 +2,8 @@
 
 import click
 
-from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import columns as column_helper
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager

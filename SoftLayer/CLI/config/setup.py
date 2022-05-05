@@ -47,7 +47,7 @@ def get_api_key(client, username, secret):  # pylint: disable=inconsistent-retur
         return api_keys[0]['authenticationKey']
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.option('-a', '--auth', type=click.Choice(['ibmid', 'cloud_key', 'classic_key', 'sso']),
               help="Select a method of authentication.", default='classic_key', show_default=True)
 @environment.pass_env

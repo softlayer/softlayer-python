@@ -5,15 +5,14 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import click
-
 import logging
 import os
-import requests
 import sys
 import time
 import traceback
-import types
+
+import click
+import requests
 
 import SoftLayer
 from SoftLayer.CLI.command import CommandLoader
@@ -57,6 +56,8 @@ CONTEXT_SETTINGS = dict(
     auto_envvar_prefix='SLCLI',
     max_content_width=999
 )
+
+
 def get_version_message(ctx, param, value):
     """Gets current and latest release versions message."""
     if not value or ctx.resilient_parsing:

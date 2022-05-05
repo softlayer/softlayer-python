@@ -1,28 +1,36 @@
-import click
-import types
+"""
+    SoftLayer.CLI.command
+    ~~~~~~~~~~~~~~~~~~~~~
+    Command interface for the SoftLayer CLI. Basically the Click commands, with fancy help text
+
+    :license: MIT, see LICENSE for more details.
+"""
 import inspect
+import types
+
+import click
 
 from rich import box
-from rich.console import Console, RenderableType
-from rich.markup import escape
-from rich.text import Text
+from rich.console import Console
 from rich.highlighter import RegexHighlighter
-from rich.panel import Panel
 from rich.table import Table
+from rich.text import Text
 from rich.theme import Theme
-
 
 from SoftLayer.CLI import environment
 
+
 class OptionHighlighter(RegexHighlighter):
+    """Provides highlighter regex for the Command help"""
     highlights = [
-        r"(?P<switch>\-\w)", # single options like -v
-        r"(?P<option>\-\-[\w\-]+)", # long options like --verbose
-        r"(?P<default_option>\[[^\]]+\])", # anything between [], usually default options
+        r"(?P<switch>\-\w)",  # single options like -v
+        r"(?P<option>\-\-[\w\-]+)",  # long options like --verbose
+        r"(?P<default_option>\[[^\]]+\])",  # anything between [], usually default options
 
     ]
 
-# Colors defined in https://rich.readthedocs.io/en/latest/_modules/rich/color.html#ColorType
+
+#  Colors defined in https://rich.readthedocs.io/en/latest/_modules/rich/color.html#ColorType
 SLCLI_THEME = Theme(
     {
         "option": "bold cyan",
@@ -86,7 +94,7 @@ class CommandLoader(click.MultiCommand):
         text = self.help if self.help is not None else ""
 
         if self.deprecated:
-            text = _("(Deprecated) {text}").format(text=text)
+            text = f"(Deprecated) {text}"
 
         if text:
             text = inspect.cleandoc(text).partition("\f")[0]
@@ -99,7 +107,6 @@ class CommandLoader(click.MultiCommand):
             epilog = epilog.replace("\n", " ")
             self.console.print(epilog)
         self.format_commands(ctx, formatter)
-
 
     def format_options(self, ctx, formatter):
         """Prints out the options in a table format"""
@@ -151,16 +158,16 @@ class CommandLoader(click.MultiCommand):
         self.console.print("\n[bold orange1]Commands:[/]")
         self.console.print(command_table)
 
+
 class SLCommand(click.Command):
     """Overloads click.Command to control how the help message is formatted."""
 
-    def __init__(self, *path, **attrs):
+    def __init__(self, **attrs):
         click.Command.__init__(self, **attrs)
         self.highlighter = OptionHighlighter()
         self.console = Console(
             theme=SLCLI_THEME
         )
-
 
     def format_usage(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
         """Formats and colorizes the usage information."""
@@ -178,7 +185,7 @@ class SLCommand(click.Command):
         text = self.help if self.help is not None else ""
 
         if self.deprecated:
-            text = _("(Deprecated) {text}").format(text=text)
+            text = f"(Deprecated) {text}"
 
         if text:
             text = inspect.cleandoc(text)
@@ -195,8 +202,8 @@ class SLCommand(click.Command):
     def format_options(self, ctx, formatter):
         """Prints out the options in a table format"""
 
-        ## TODO support binary options --yes/--no
-        ## SUPPORT color for IDENTIFIER and such
+        # NEXT support binary options --yes/--no
+        # NEXT SUPPORT color for IDENTIFIER and such
         options_table = Table(highlight=True, box=box.SQUARE, show_header=False)
 
         for param in self.get_params(ctx):

@@ -1,7 +1,6 @@
 """Create a Reserved Capacity instance."""
 
 import click
-from rich.text import Text
 
 from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment

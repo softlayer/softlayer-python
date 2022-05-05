@@ -4,9 +4,8 @@
 import click
 
 import SoftLayer
-
-from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import columns as column_helper
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
