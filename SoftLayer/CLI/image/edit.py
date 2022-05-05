@@ -9,7 +9,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--name', help="Name of the image")
 @click.option('--note', help="Additional note for the image")

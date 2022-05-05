@@ -9,7 +9,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('name')
 @click.argument('uri')
 @click.option('--note',

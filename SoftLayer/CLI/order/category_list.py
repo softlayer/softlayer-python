@@ -3,6 +3,7 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
@@ -10,7 +11,7 @@ from SoftLayer.managers import ordering
 COLUMNS = ['name', 'categoryCode', 'isRequired']
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('package_keyname')
 @click.option('--required',
               is_flag=True,

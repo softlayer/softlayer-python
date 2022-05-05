@@ -3,6 +3,7 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import account
@@ -10,7 +11,7 @@ from SoftLayer.managers import hardware
 from SoftLayer.managers import network
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('location', required=False)
 @click.option('--prices', '-p', is_flag=True,
               help='Use --prices to list the server item prices, and to list the Item Prices by location,'

@@ -10,7 +10,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer.CLI import storage_utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
 @click.option('--sortby', help='Column to sort by', default='name')
 @click.option('--columns',

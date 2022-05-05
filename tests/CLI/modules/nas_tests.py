@@ -9,7 +9,7 @@ from SoftLayer import testing
 import json
 
 
-class RWhoisTests(testing.TestCase):
+class NASTests(testing.TestCase):
     def test_list_nas(self):
         result = self.run_command(['nas', 'list'])
 

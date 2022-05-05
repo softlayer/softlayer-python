@@ -3,12 +3,13 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @environment.pass_env
 def cli(env):
     """List options for creating a placement group."""

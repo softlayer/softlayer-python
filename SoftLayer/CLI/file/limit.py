@@ -13,7 +13,7 @@ DEFAULT_COLUMNS = [
 ]
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--sortby', help='Column to sort by', default='Datacenter')
 @environment.pass_env
 def cli(env, sortby):

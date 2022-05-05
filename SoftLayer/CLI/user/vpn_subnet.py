@@ -9,7 +9,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--add/--remove', default=True,
               help="Add or remove access to subnets.")
 @click.argument('user', nargs=1, required=True)

@@ -7,7 +7,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
 @click.option('--hardware-id', '-h', multiple=True,
               help='The id of one SoftLayer_Hardware to authorize')

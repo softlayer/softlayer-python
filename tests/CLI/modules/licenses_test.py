@@ -31,5 +31,8 @@ class LicensesTests(testing.TestCase):
                                    'cancel',
                                    'ABCDE-6CJ8L-J8R9H-000R0-CDR70',
                                    '--immediate'])
+        self.assert_no_fail(result)
+
+    def test_create_options(self):
         result = self.run_command(['licenses', 'create-options'])
         self.assert_no_fail(result)

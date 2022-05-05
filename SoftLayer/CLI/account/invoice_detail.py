@@ -3,13 +3,14 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('identifier')
 @click.option('--details', is_flag=True, default=False, show_default=True,
               help="Shows a very detailed list of charges")

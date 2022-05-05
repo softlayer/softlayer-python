@@ -6,7 +6,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume-id')
 @environment.pass_env
 def cli(env, volume_id):

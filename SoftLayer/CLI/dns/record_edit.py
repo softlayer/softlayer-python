@@ -9,7 +9,7 @@ from SoftLayer.CLI import helpers
 # pylint: disable=redefined-builtin
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('zone-id')
 @click.option('--by-record', help='Edit by host record, such as www')
 @click.option('--by-id', help='Edit a single record by its ID')

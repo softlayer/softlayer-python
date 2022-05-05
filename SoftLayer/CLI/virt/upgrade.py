@@ -11,7 +11,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer.CLI import virt
 
 
-@click.command(epilog="""Note: SoftLayer automatically reboots the VS once
+@click.command(cls=SoftLayer.CLI.command.SLCommand, epilog="""Note: SoftLayer automatically reboots the VS once
 upgrade request is placed. The VS is halted until the Upgrade transaction is
 completed. However for Network, no reboot is required.""")
 @click.argument('identifier')

@@ -5,27 +5,18 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import inspect
+import click
+
 import logging
 import os
+import requests
 import sys
 import time
 import traceback
 import types
 
-import click
-
-import requests
-from rich.console import Console, RenderableType
-from rich.markup import escape
-from rich.text import Text
-from rich.highlighter import RegexHighlighter
-from rich.panel import Panel
-from rich.table import Table
-from rich.theme import Theme
-
-
 import SoftLayer
+from SoftLayer.CLI.command import CommandLoader
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
@@ -48,133 +39,6 @@ DEFAULT_FORMAT = 'raw'
 
 if sys.stdout.isatty():
     DEFAULT_FORMAT = 'table'
-
-
-class OptionHighlighter(RegexHighlighter):
-    highlights = [
-        r"(?P<switch>\-\w)", # single options like -v
-        r"(?P<option>\-\-[\w\-]+)", # long options like --verbose
-        r"(?P<default_option>\[[^\]]+\])", # anything between [], usually default options
-
-    ]
-
-SLCLI_THEME = Theme(
-    {
-        "option": "bold cyan",
-        "switch": "bold green",
-        "default_option": "light_pink1",
-        "option_keyword": "bold cyan",
-        "args_keyword": "bold green"
-    }
-)
-
-class CommandLoader(click.MultiCommand):
-    """Loads module for click."""
-
-    def __init__(self, *path, **attrs):
-        click.MultiCommand.__init__(self, **attrs)
-        self.path = path
-
-        self.highlighter = OptionHighlighter()
-        self.console = Console(
-            theme=SLCLI_THEME
-        )
-
-    def list_commands(self, ctx):
-        """List all sub-commands."""
-        env = ctx.ensure_object(environment.Environment)
-        env.load()
-
-        return sorted(env.list_commands(*self.path))
-
-    def get_command(self, ctx, cmd_name):
-        """Get command for click."""
-        env = ctx.ensure_object(environment.Environment)
-        env.load()
-
-        # Do alias lookup (only available for root commands)
-        if len(self.path) == 0:
-            cmd_name = env.resolve_alias(cmd_name)
-
-        new_path = list(self.path)
-        new_path.append(cmd_name)
-        module = env.get_command(*new_path)
-        if isinstance(module, types.ModuleType):
-            return CommandLoader(*new_path, help=module.__doc__ or '')
-        else:
-            return module
-
-    def format_usage(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
-        """Formats and colorizes the usage information."""
-        pieces = self.collect_usage_pieces(ctx)
-        for index, piece in enumerate(pieces):
-            if piece == "[OPTIONS]":
-                pieces[index] = "[bold cyan][OPTIONS][/bold cyan]"
-            elif piece == "COMMAND [ARGS]...":
-                pieces[index] = "[orange1]COMMAND[/orange1] [bold cyan][ARGS][/bold cyan] ..."
-            else:
-                # print(f"OK this was {piece}")
-                continue
-        self.console.print(f"[bold red]{ctx.command_path}[/bold red] {' '.join(pieces)}")
-
-    def format_help_text(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
-        """Writes the help text to the formatter if it exists."""
-        text = self.help if self.help is not None else ""
-
-        if self.deprecated:
-            text = _("(Deprecated) {text}").format(text=text)
-
-        if text:
-            text = inspect.cleandoc(text).partition("\f")[0]
-            formatter.write_paragraph()
-
-            with formatter.indentation():
-                formatter.write_text(text)
-
-    def format_epilog(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
-        """Writes the epilog into the formatter if it exists."""
-        if self.epilog:
-            epilog = inspect.cleandoc(self.epilog)
-            formatter.write_paragraph()
-
-            with formatter.indentation():
-                formatter.write_text(epilog)
-
-    def format_options(self, ctx, formatter):
-
-        options_table = Table(highlight=True, box=None, show_header=False)
-
-        for param in self.get_params(ctx):
-            if len(param.opts) == 2:
-                opt1 = self.highlighter(param.opts[1])
-                opt2 = self.highlighter(param.opts[0])
-            else:
-                opt2 = self.highlighter(param.opts[0])
-                opt1 = Text("")
-
-            # Ensures the short option is always in opt1.
-            if len(opt2) == 2:
-                opt1, opt2 = opt2, opt1
-
-            if param.metavar:
-                opt2 += Text(f" {param.metavar}", style="bold yellow")
-
-            options = Text(" ".join(reversed(param.opts)))
-            help_record = param.get_help_record(ctx)
-            help_message = ""
-            if help_record:
-                help_message = param.get_help_record(ctx)[-1]
-
-            if param.metavar:
-                options += f" {param.metavar}"
-            options_table.add_row(opt1, opt2, self.highlighter(help_message))
-
-        self.console.print(options_table)
-        self.format_commands(ctx, formatter)
-
-        # click.echo(click.style('Hello World!', fg='green'))
-        # print("HEEEELP")
-
 
 
 def get_latest_version():
@@ -205,9 +69,8 @@ def get_version_message(ctx, param, value):
 
 
 @click.group(help="SoftLayer Command-line Client",
-             epilog="""To use most commands your SoftLayer
-username and api_key need to be configured. The easiest way to do that is to
-use: 'slcli setup'""",
+             epilog="""To use most commands your SoftLayer username and api_key need to be configured.
+The easiest way to do that is to use: 'slcli setup'""",
              cls=CommandLoader,
              context_settings=CONTEXT_SETTINGS)
 @click.option('--format',
@@ -215,7 +78,7 @@ use: 'slcli setup'""",
               show_default=True,
               help="Output format",
               type=click.Choice(VALID_FORMATS))
-@click.option('-C',
+@click.option('-C', '--config',
               required=False,
               default=click.get_app_dir('softlayer', force_posix=True),
               show_default=True,

@@ -2,6 +2,8 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
+
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI.email.list import build_statistics_table
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
@@ -9,7 +11,7 @@ from SoftLayer.managers.email import EmailManager
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):

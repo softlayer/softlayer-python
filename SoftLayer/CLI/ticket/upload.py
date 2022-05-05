@@ -11,7 +11,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--path', help="The path of the attachment to be uploaded")
 @click.option('--name', help="The name of the attachment shown in the ticket")

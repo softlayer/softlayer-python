@@ -9,7 +9,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer.CLI import ticket
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--count',
               type=click.INT,

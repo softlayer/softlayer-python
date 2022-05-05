@@ -12,7 +12,7 @@ from SoftLayer import utils
 # pylint: disable=R0915
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--passwords', is_flag=True, help='Show passwords (check over your shoulder!)')
 @click.option('--price', is_flag=True, help='Show associated prices')

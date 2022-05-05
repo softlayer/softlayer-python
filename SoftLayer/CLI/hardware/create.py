@@ -11,7 +11,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer.CLI import template
 
 
-@click.command(epilog="See 'slcli server create-options' for valid options.")
+@click.command(cls=SoftLayer.CLI.command.SLCommand, epilog="See 'slcli server create-options' for valid options.")
 @click.option('--hostname', '-H', required=True, prompt=True, help="Host portion of the FQDN")
 @click.option('--domain', '-D', required=True, prompt=True, help="Domain portion of the FQDN")
 @click.option('--size', '-s', required=True, prompt=True, help="Hardware size")

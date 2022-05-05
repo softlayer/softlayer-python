@@ -9,7 +9,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('ip_address')
 @environment.pass_env
 def cli(env, ip_address):

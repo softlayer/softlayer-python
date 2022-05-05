@@ -1,12 +1,13 @@
 """Report on Resources in closing datacenters"""
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
 
-@click.command(short_help="""Report on Resources in closing datacenters""")
+@click.command(cls=SLCommand, short_help="""Report on Resources in closing datacenters""")
 @environment.pass_env
 def cli(env):
     """Report on Resources in closing datacenters

@@ -9,7 +9,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier', type=int)
 @click.option('--hardware', 'hardware_identifier',
               help="The identifier for hardware to attach")

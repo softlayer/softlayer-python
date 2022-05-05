@@ -10,7 +10,7 @@ from SoftLayer.CLI.exceptions import ArgumentError
 from SoftLayer.CLI.exceptions import CLIHalt
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('context_id', type=int)
 @click.option('-s',
               '--subnet-id',

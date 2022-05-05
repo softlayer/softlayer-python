@@ -3,12 +3,13 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI.tags.list import detailed_table
 from SoftLayer.managers.tags import TagManager
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('identifier')
 @click.option('--name', required=False, default=False, is_flag=True, show_default=False,
               help='Assume identifier is a tag name. Useful if your tag name is a number.')

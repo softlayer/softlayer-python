@@ -3,13 +3,14 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager as AccountManager
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.option('--limit', default=50, show_default=True,
               help="How many invoices to get back.")
 @click.option('--closed', is_flag=True, default=False, show_default=True,

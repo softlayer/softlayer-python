@@ -7,7 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--crt',
               type=click.Path(exists=True),
               help="Certificate file")

@@ -21,7 +21,7 @@ def parse_proto(ctx, param, value):
     return proto
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--name', '-n', help='Label for this loadbalancer.', required=True)
 @click.option('--datacenter', '-d', help='Datacenter shortname (dal13).', required=True)
 @click.option('--label', '-l', help='A descriptive label for this loadbalancer.')
@@ -79,7 +79,7 @@ def parse_receipt(receipt):
     return table
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--datacenter', '-d', help="Show only selected datacenter, use shortname (dal13) format.")
 @environment.pass_env
 def order_options(env, datacenter):
@@ -145,7 +145,7 @@ def order_options(env, datacenter):
             env.fout(subnet_table)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def cancel(env, identifier):

@@ -7,7 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--note', help="set ip address note of subnet")
 @environment.pass_env

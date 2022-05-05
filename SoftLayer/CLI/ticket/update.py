@@ -9,7 +9,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer.CLI import ticket
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--body', help="Text to add to the ticket. STDIN or the default text editor will be used otherwise.")
 @environment.pass_env

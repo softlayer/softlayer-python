@@ -10,7 +10,7 @@ from SoftLayer.CLI import exceptions
 CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 
 
-@click.command(context_settings=CONTEXT_SETTINGS)
+@click.command(cls=SoftLayer.CLI.command.SLCommand, context_settings=CONTEXT_SETTINGS)
 @click.argument('origin-volume-id')
 @click.option('--origin-snapshot-id', '-o',
               type=int,

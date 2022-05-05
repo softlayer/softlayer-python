@@ -1,15 +1,15 @@
 """Create a Reserved Capacity instance."""
 
 import click
+from rich.text import Text
 
-
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
 
 
-@click.command(epilog=click.style("""WARNING: Reserved Capacity is on a yearly contract"""
-                                  """ and not cancelable until the contract is expired.""", fg='red'))
+@click.command(cls=SLCommand)
 @click.option('--name', '-n', required=True, prompt=True,
               help="Name for your new reserved capacity")
 @click.option('--backend_router_id', '-b', required=True, prompt=True, type=int,
@@ -24,7 +24,8 @@ from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
 def cli(env, name, backend_router_id, flavor, instances, test=False):
     """Create a Reserved Capacity instance.
 
-    *WARNING*: Reserved Capacity is on a yearly contract and not cancelable until the contract is expired.
+    [red underline]*WARNING*[/]
+    [red]Reserved Capacity is on a yearly contract and not cancelable until the contract is expired.[/]
     """
     manager = CapacityManager(env.client)
 

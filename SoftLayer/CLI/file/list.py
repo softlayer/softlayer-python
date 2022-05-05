@@ -53,7 +53,7 @@ DEFAULT_COLUMNS = [
 DEFAULT_NOTES_SIZE = 20
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--username', '-u', help='Volume username')
 @click.option('--datacenter', '-d', help='Datacenter shortname')
 @click.option('--order', '-o', type=int, help='Filter by ID of the order that purchased the block storage')

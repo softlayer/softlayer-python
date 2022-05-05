@@ -8,7 +8,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('unique_id')
 @click.option('--history',
               default=30, type=click.IntRange(1, 89),

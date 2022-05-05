@@ -7,7 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('unique_id')
 @click.argument('origin_path')
 @environment.pass_env

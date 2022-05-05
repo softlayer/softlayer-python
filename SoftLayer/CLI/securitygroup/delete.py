@@ -7,7 +7,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('securitygroup_id')
 @environment.pass_env
 def cli(env, securitygroup_id):

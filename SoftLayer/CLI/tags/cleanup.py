@@ -3,11 +3,12 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.managers.tags import TagManager
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.option('--dry-run', '-d', is_flag=True, default=False,
               help="Don't delete, just show what will be deleted.")
 @environment.pass_env

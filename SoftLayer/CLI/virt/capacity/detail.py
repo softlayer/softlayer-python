@@ -2,6 +2,7 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
@@ -24,7 +25,7 @@ DEFAULT_COLUMNS = [
 ]
 
 
-@click.command(epilog="Once provisioned, virtual guests can be managed with the slcli vs commands")
+@click.command(cls=SLCommand, epilog="Once provisioned, virtual guests can be managed with the slcli vs commands")
 @click.argument('identifier')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),

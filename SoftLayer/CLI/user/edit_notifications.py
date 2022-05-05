@@ -7,7 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--enable/--disable', default=True,
               help="Enable (DEFAULT) or Disable selected notification")
 @click.argument('notification', nargs=-1, required=True)

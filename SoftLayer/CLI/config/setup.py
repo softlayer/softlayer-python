@@ -10,6 +10,7 @@ import requests
 import click
 
 import SoftLayer
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import config
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions

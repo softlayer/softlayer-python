@@ -3,6 +3,7 @@ import json
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
@@ -101,7 +102,7 @@ def _validate_parameters(ctx, param, value):  # pylint: disable=unused-argument
     return validated_values
 
 
-@click.command('call', short_help="Call arbitrary API endpoints.")
+@click.command('call', short_help="Call arbitrary API endpoints.", cls=SLCommand)
 @click.argument('service')
 @click.argument('method')
 @click.argument('parameters', nargs=-1, callback=_validate_parameters)

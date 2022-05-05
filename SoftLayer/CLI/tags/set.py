@@ -3,11 +3,12 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.managers.tags import TagManager
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.option('--tags', '-t', type=click.STRING, required=True,
               help='Comma seperated list of tags, enclosed in quotes. "tag1, tag2"')
 @click.option('--key-name', '-k', type=click.STRING, required=True,

@@ -4,14 +4,14 @@
 import click
 
 from SoftLayer.CLI.account.invoice_detail import get_invoice_table
-
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('identifier')
 @click.option('--details', is_flag=True, default=False, show_default=True,
               help="Shows a very detailed list of charges")

@@ -10,7 +10,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import template
 
 
-@click.command(
+@click.command(cls=SoftLayer.CLI.command.SLCommand, 
     epilog="See 'slcli dedicatedhost create-options' for valid options.")
 @click.option('--hostname', '-H',
               help="Host portion of the FQDN",

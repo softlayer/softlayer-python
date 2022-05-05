@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
@@ -12,7 +13,7 @@ COLUMNS_ITEM_PRICES = ['keyName', 'priceId', 'Hourly', 'Monthly', 'Restriction']
 COLUMNS_ITEM_PRICES_LOCATION = ['keyName', 'priceId', 'Hourly', 'Monthly', 'Restriction']
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('package_keyname')
 @click.option('--keyword', '-k', help="A word (or string) used to filter item names.")
 @click.option('--category', '-c', help="Category code to filter items by")

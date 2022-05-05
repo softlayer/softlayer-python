@@ -12,7 +12,7 @@ target_types = {'vlan': 'SoftLayer_Network_Vlan',
                 'vsi': 'SoftLayer_Virtual_Guest'}
 
 
-@click.command(epilog="More information about types and identifiers "
+@click.command(cls=SoftLayer.CLI.command.SLCommand, epilog="More information about types and identifiers "
                       "on https://sldn.softlayer.com/reference/services/SoftLayer_Network_Subnet/route/")
 @click.argument('identifier')
 @click.option('--target', type=click.Choice(['vlan', 'ip', 'hardware', 'vsi']),

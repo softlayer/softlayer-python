@@ -7,7 +7,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--discrete', is_flag=True, default=False, help='Show discrete units associated hardware sensor')
 @environment.pass_env

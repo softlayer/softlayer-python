@@ -3,6 +3,7 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
@@ -11,7 +12,7 @@ from SoftLayer.CLI.virt.create import _update_with_like_args as _update_with_lik
 from SoftLayer.managers.vs_capacity import CapacityManager as CapacityManager
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.option('--capacity-id', type=click.INT, help="Reserve capacity Id to provision this guest into.")
 @click.option('--primary-disk', type=click.Choice(['25', '100']), default='25', help="Size of the main drive.")
 @click.option('--hostname', '-H', required=True, prompt=True, help="Host portion of the FQDN.")

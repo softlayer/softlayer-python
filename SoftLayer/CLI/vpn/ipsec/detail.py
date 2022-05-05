@@ -8,7 +8,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('context_id', type=int)
 @click.option('-i',
               '--include',

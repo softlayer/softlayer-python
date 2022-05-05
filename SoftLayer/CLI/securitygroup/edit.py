@@ -8,7 +8,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('group_id')
 @click.option('--name', '-n',
               help="The name of the security group")

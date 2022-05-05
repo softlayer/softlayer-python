@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
@@ -61,7 +62,7 @@ def _parse_create_args(client, args):
     return data
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('quote')
 @click.option('--verify', is_flag=True, default=False, show_default=True,
               help="If specified, will only show what the quote will order, will NOT place an order")

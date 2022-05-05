@@ -40,7 +40,7 @@ DEFAULT_COLUMNS = [
 ]
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--cpu', '-c', help='Filter by number of CPU cores')
 @click.option('--domain', '-D', help='Filter by domain')
 @click.option('--datacenter', '-d', help='Filter by datacenter')

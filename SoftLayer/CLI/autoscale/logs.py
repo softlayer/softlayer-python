@@ -3,13 +3,14 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.autoscale import AutoScaleManager
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('identifier')
 @click.option('--date-min', '-d', 'date_min', type=click.DateTime(formats=["%Y-%m-%d", "%m/%d/%Y"]),
               help='Earliest date to retreive logs for.')

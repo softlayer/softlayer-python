@@ -12,7 +12,7 @@ from SoftLayer.CLI import formatting
 COLUMNS = ['event', 'label', 'date', 'metadata']
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('request_id')
 @environment.pass_env
 def get_by_request_id(env, request_id):

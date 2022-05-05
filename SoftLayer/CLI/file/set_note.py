@@ -7,7 +7,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume-id')
 @click.option('--note', '-n',
               type=str,

@@ -9,7 +9,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
 @environment.pass_env
 def cli(env, volume_id):

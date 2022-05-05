@@ -9,7 +9,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--domain', '-D', help="Domain portion of the FQDN")
 @click.option('--hostname', '-H',

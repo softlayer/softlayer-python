@@ -23,7 +23,7 @@ REQUEST_BOOL_COLUMNS = ['requestId', 'response']
 REQUEST_RULES_COLUMNS = ['requestId', 'rules']
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('securitygroup_id')
 @click.option('--sortby',
               help='Column to sort by',
@@ -62,7 +62,7 @@ def rule_list(env, securitygroup_id, sortby):
     env.fout(table)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('securitygroup_id')
 @click.option('--remote-ip', '-r',
               help='The remote IP/CIDR to enforce')
@@ -118,7 +118,7 @@ def add(env, securitygroup_id, remote_ip, remote_group,
     env.fout(table)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('securitygroup_id')
 @click.argument('rule_id')
 @click.option('--remote-ip', '-r',
@@ -168,7 +168,7 @@ def edit(env, securitygroup_id, rule_id, remote_ip, remote_group,
     env.fout(table)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('securitygroup_id')
 @click.argument('rule_id')
 @environment.pass_env

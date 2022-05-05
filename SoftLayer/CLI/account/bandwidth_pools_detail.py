@@ -3,12 +3,13 @@
 import click
 
 from SoftLayer import AccountManager
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):

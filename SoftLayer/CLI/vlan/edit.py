@@ -8,7 +8,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--name', '-n',
               help="The optional name for this VLAN")

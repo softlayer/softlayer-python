@@ -3,12 +3,13 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.tags import TagManager
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @environment.pass_env
 def cli(env):
     """List everything that could be tagged."""

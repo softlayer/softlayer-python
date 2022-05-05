@@ -9,7 +9,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('label')
 @click.option('--in-file', '-f',
               type=click.Path(exists=True),

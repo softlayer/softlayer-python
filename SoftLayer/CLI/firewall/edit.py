@@ -132,7 +132,7 @@ def get_formatted_rule(rule=None):
                rule.get('version', 4)))
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):

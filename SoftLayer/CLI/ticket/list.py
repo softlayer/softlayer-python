@@ -8,7 +8,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--open / --closed', 'is_open', default=True,
               help="Display only open or closed tickets")
 @environment.pass_env

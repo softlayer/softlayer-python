@@ -9,7 +9,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
 
-@click.command(short_help="Get options to use for creating virtual servers.")
+@click.command(cls=SoftLayer.CLI.command.SLCommand, short_help="Get options to use for creating virtual servers.")
 @click.argument('location', required=False)
 @click.option('--vsi-type', required=False, show_default=True, default='PUBLIC_CLOUD_SERVER',
               type=click.Choice(['PUBLIC_CLOUD_SERVER', 'TRANSIENT_CLOUD_SERVER', 'SUSPEND_CLOUD_SERVER',

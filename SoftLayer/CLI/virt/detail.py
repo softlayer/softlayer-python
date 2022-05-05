@@ -15,7 +15,7 @@ from SoftLayer import utils
 LOGGER = logging.getLogger(__name__)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--passwords',
               is_flag=True,

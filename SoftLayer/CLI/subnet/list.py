@@ -9,7 +9,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--sortby',
               help='Column to sort by',
               type=click.Choice(['id',

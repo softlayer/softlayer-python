@@ -25,7 +25,7 @@ DEFAULT_COLUMNS = [
 ]
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
 @click.option('--sortby', help='Column to sort by',
               default='created')

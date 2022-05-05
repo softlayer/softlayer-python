@@ -11,7 +11,7 @@ from SoftLayer.CLI import helpers
 
 # pylint: disable=redefined-builtin
 
-@click.command(short_help="Capture SoftLayer image.")
+@click.command(cls=SoftLayer.CLI.command.SLCommand, short_help="Capture SoftLayer image.")
 @click.argument('identifier')
 @click.option('--name', '-n', required=True, help="Name of the image")
 @click.option('--all', help="Capture all disks belonging to the VS")

@@ -3,11 +3,12 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.managers.autoscale import AutoScaleManager
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('identifier')
 @click.option('--name', help="Scale group's name.")
 @click.option('--min', 'minimum', type=click.INT, help="Set the minimum number of guests")

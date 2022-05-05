@@ -10,7 +10,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--start_date', '-s', type=click.STRING, required=True,
               help="Start Date YYYY-MM-DD, YYYY-MM-DDTHH:mm:ss,")

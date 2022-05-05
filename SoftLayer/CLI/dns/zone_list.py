@@ -9,7 +9,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.utils import clean_time
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @environment.pass_env
 def cli(env):
     """List all zones."""

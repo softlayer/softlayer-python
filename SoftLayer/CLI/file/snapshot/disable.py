@@ -7,7 +7,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
 @click.option('--schedule-type',
               help='Snapshot schedule [INTERVAL|HOURLY|DAILY|WEEKLY]',

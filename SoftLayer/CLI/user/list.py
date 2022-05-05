@@ -33,7 +33,7 @@ DEFAULT_COLUMNS = [
 ]
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
               help='Columns to display. [options: %s]' % ', '.join(column.name for column in COLUMNS),

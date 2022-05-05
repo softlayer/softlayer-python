@@ -10,7 +10,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--no-vs',
               is_flag=True,

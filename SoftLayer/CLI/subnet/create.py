@@ -9,7 +9,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
-@click.command(short_help="Add a new subnet to your account")
+@click.command(cls=SoftLayer.CLI.command.SLCommand, short_help="Add a new subnet to your account")
 @click.argument('network', type=click.Choice(['static', 'public', 'private']))
 @click.argument('quantity', type=click.INT)
 @click.argument('endpoint-id', type=click.INT)

@@ -10,7 +10,7 @@ from SoftLayer.CLI import helpers
 # pylint: disable=redefined-builtin, redefined-argument-from-local
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('zone')
 @click.option('--data', help='Record data, such as an IP address')
 @click.option('--record', help='Host record, such as www')

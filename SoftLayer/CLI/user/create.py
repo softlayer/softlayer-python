@@ -14,7 +14,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('username')
 @click.option('--email', '-e', required=True,
               help="Email address for this user. Required for creation.")

@@ -7,7 +7,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @environment.pass_env
 def cli(env):
     """List active Netscaler devices."""

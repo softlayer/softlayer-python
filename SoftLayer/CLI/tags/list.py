@@ -3,6 +3,7 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.exceptions import SoftLayerAPIError
@@ -12,7 +13,7 @@ from SoftLayer import utils
 # pylint: disable=unnecessary-lambda
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.option('--detail', '-d', is_flag=True, default=False,
               help="Show information about the resources using this tag.")
 @environment.pass_env

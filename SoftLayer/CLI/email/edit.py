@@ -3,12 +3,13 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.managers.email import EmailManager
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('identifier')
 @click.option('--username', help="Sets username for this account")
 @click.option('--email', help="Sets the contact email for this account")

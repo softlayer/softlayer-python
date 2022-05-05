@@ -12,7 +12,7 @@ from SoftLayer import utils
 CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 
 
-@click.command(context_settings=CONTEXT_SETTINGS)
+@click.command(cls=SoftLayer.CLI.command.SLCommand, context_settings=CONTEXT_SETTINGS)
 @click.argument('volume_id')
 @click.option('--snapshot-schedule', '-s',
               help='Snapshot schedule to use for replication, '
