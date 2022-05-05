@@ -143,7 +143,7 @@ class LoadBalancerTests(testing.TestCase):
                                 args=(uuid, [listener]))
 
     def test_order_lbaas(self):
-        datacenter = 'tes01'
+        datacenter = {'id': 1854895}
         name = 'test-lb'
         desc = 'my lb'
         protocols = {'frontendPort': 80, 'frontendProtocol': 'HTTP'}
@@ -174,7 +174,7 @@ class LoadBalancerTests(testing.TestCase):
             'complexType': 'SoftLayer_Container_Product_Order_Network_LoadBalancer_AsAService',
             'name': name,
             'description': desc,
-            'location': datacenter,
+            'locationObject': {'id': 1854895},
             'packageId': package[0]['id'],
             'useHourlyPricing': True,  # Required since LBaaS is an hourly service
             'prices': [{'id': package[0]['itemPrices'][0]['id']}],
