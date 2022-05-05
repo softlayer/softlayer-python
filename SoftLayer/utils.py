@@ -427,3 +427,8 @@ def format_comment(comment, max_line_length=60):
 
             comment_length = len(word) + 1
     return formatted_comment
+
+
+def clean_dict(dictionary):
+    """Removes any `None` entires from the dictionary"""
+    return {k: v for k, v in dictionary.items() if v}
