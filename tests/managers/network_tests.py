@@ -633,3 +633,7 @@ class NetworkTests(testing.TestCase):
     def test_route(self):
         self.network.route('SoftLayer_Hardware_Server', 123456, 100)
         self.assert_called_with('SoftLayer_Network_Subnet', 'route')
+
+    def test_get_all_datacenter(self):
+        self.network.get_datacenter()
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters')
