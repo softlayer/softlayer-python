@@ -32,9 +32,9 @@ setup(
             'sl = SoftLayer.CLI.deprecated:main',
         ],
     },
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     install_requires=[
-        'prettytable >= 3.2.0',
+        'prettytable >= 2.5.0',
         'click == 8.1.3',
         'requests >= 2.20.0',
         'prompt_toolkit >= 2',

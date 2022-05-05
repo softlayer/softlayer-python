@@ -4,7 +4,7 @@ pytest
 pytest-cov
 mock
 sphinx
-prettytable == 3.2.0
+prettytable >= 2.5.0
 click == 8.1.3
 requests >= 2.20.0
 prompt_toolkit >= 2
