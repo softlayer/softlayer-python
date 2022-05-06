@@ -2,7 +2,6 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
-from SoftLayer import utils
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -67,11 +66,11 @@ def cli(env, **args):
     ]
     policy_template = {
         'name': args['policy_name'],
-        'policies': scale_actions
+        'scaleActions': scale_actions
 
     }
     policies = []
-
+    policies.append(policy_template)
     block = []
     number_disk = 0
     for guest_disk in args['disk']:
@@ -113,7 +112,7 @@ def cli(env, **args):
         'balancedTerminationFlag': False,
         'virtualGuestMemberTemplate': virt_template,
         'virtualGuestMemberCount': 0,
-        'policies': policies.append(utils.clean_dict(policy_template)),
+        'policies': policies,
         'terminationPolicyId': args['termination_policy']
     }
 
