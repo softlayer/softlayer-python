@@ -43,8 +43,12 @@ def order(env, **args):
     mgr = SoftLayer.LoadBalancerManager(env.client)
     network = SoftLayer.NetworkManager(env.client)
 
-    datacenter = network.get_datacenter(args.get('datacenter'))
-    location = {'id': datacenter[0]['id']}
+    datacenter = network.get_datacenter(datacenter=args.get('datacenter'))
+    if datacenter:
+        location = {'id': datacenter[0]['id']}
+    else:
+        raise exceptions.CLIHalt('Missing the datacenter')
+
     name = args.get('name')
     description = args.get('label', None)
 
