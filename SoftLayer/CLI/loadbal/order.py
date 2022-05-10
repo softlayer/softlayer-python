@@ -47,7 +47,7 @@ def order(env, **args):
     if datacenter:
         location = {'id': datacenter[0]['id']}
     else:
-        raise exceptions.CLIHalt('Missing the datacenter')
+        raise exceptions.CLIHalt('Datacenter {} was not found'.format(datacenter))
 
     name = args.get('name')
     description = args.get('label', None)
