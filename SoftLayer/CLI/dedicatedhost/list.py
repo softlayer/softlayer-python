@@ -31,7 +31,7 @@ DEFAULT_COLUMNS = [
 ]
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--cpu', '-c', help='Number of CPU cores', type=click.INT)
 @helpers.multi_option('--tag', help='Filter by tags')
 @click.option('--sortby', help='Column to sort by',

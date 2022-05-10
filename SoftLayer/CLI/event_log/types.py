@@ -10,7 +10,7 @@ from SoftLayer.CLI import formatting
 COLUMNS = ['types']
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @environment.pass_env
 def cli(env):
     """Get Event Log Types"""

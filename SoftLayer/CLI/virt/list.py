@@ -5,6 +5,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import columns as column_helper
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
@@ -42,7 +43,7 @@ DEFAULT_COLUMNS = [
 ]
 
 
-@click.command(short_help="List virtual servers.")
+@click.command(cls=SLCommand, short_help="List virtual servers.")
 @click.option('--cpu', '-c', help='Number of CPU cores', type=click.INT)
 @click.option('--domain', '-D', help='Domain portion of the FQDN')
 @click.option('--datacenter', '-d', help='Datacenter shortname')

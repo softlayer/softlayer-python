@@ -12,7 +12,7 @@ COLUMNS = ['id',
            'description', ]
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--sortby',
               help='Column to sort by',
               type=click.Choice(COLUMNS))

@@ -7,7 +7,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('key')
 @click.option('--immediate', is_flag=True, help='Immediate cancellation')
 @environment.pass_env

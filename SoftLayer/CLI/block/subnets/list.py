@@ -16,7 +16,7 @@ COLUMNS = [
 ]
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('access_id', type=int)
 @environment.pass_env
 def cli(env, access_id):

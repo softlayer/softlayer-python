@@ -8,7 +8,7 @@ from SoftLayer.CLI import environment
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--date-min', '-d',
               help='The earliest date we want to search for event logs in mm/dd/yyyy format.')
 @click.option('--date-max', '-D',

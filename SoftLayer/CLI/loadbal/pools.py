@@ -34,7 +34,7 @@ def parse_server(ctx, param, values):
     return servers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--frontProtocol', '-P', default='HTTP', type=click.Choice(['HTTP', 'HTTPS', 'TCP']), show_default=True,
               help="Protocol type to use for incoming connections")
@@ -72,7 +72,7 @@ def add(env, identifier, **args):
         click.secho("ERROR: {}".format(exception.faultString), fg='red')
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.argument('listener')
 @click.option('--frontProtocol', '-P', type=click.Choice(['HTTP', 'HTTPS', 'TCP']),
@@ -125,7 +125,7 @@ def edit(env, identifier, listener, **args):
         click.secho("ERROR: {}".format(exception.faultString), fg='red')
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.argument('listener')
 @environment.pass_env
@@ -144,7 +144,7 @@ def delete(env, identifier, listener):
         click.secho("ERROR: {}".format(exception.faultString), fg='red')
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 # https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_LBaaS_L7Pool/
 @click.option('--name', '-n', required=True, help="Name for this L7 pool.")
@@ -200,7 +200,7 @@ def l7pool_add(env, identifier, **args):
         click.secho("ERROR: {}".format(exception.faultString), fg='red')
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def l7pool_del(env, identifier):

@@ -2,13 +2,14 @@
 # :license: MIT, see LICENSE for more details.
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 from SoftLayer.utils import clean_time
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @environment.pass_env
 def cli(env):
     """List all active quotes on an account"""

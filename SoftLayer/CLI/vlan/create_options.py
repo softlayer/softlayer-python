@@ -8,7 +8,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
 
-@click.command(short_help="Get options to use for creating Vlan servers.")
+@click.command(cls=SoftLayer.CLI.command.SLCommand, short_help="Get options to use for creating Vlan servers.")
 @environment.pass_env
 def cli(env):
     """List all the options for creating VLAN"""

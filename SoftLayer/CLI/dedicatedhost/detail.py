@@ -13,7 +13,7 @@ from SoftLayer import utils
 LOGGER = logging.getLogger(__name__)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--price', is_flag=True, help='Show associated prices')
 @click.option('--guests', is_flag=True, help='Show guests on dedicated host')

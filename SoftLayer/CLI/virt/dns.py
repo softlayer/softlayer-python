@@ -11,7 +11,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
 
-@click.command(epilog="""If you don't specify any
+@click.command(cls=SoftLayer.CLI.command.SLCommand, epilog="""If you don't specify any
 arguments, it will attempt to update both the A and PTR records. If you don't
 want to update both records, you may use the -a or --ptr arguments to limit
 the records updated.""")

@@ -4,12 +4,13 @@ import click
 
 from SoftLayer import utils
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import account
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @environment.pass_env
 def cli(env):
     """Show all licenses."""

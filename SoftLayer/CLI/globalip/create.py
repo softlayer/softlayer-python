@@ -9,7 +9,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('-v6', '--ipv6', is_flag=True, help='Order a IPv6 IP')
 @click.option('--test', help='test order')
 @environment.pass_env

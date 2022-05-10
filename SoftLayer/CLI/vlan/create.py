@@ -9,7 +9,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--name', required=False, prompt=True, help="Vlan name")
 @click.option('--datacenter', '-d', required=False, help="Datacenter shortname")
 @click.option('--pod', '-p', required=False, help="Pod name. E.g dal05.pod01")

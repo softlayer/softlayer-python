@@ -6,7 +6,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.exceptions import SoftLayerAPIError
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--member', '-m', required=True, help="Member UUID")
 @environment.pass_env
@@ -28,7 +28,7 @@ def remove(env, identifier, member):
         click.secho("ERROR: {}".format(exception.faultString), fg='red')
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--private/--public', default=True, required=True, help="Private or public IP of the new member.")
 @click.option('--member', '-m', required=True, help="Member IP address.")

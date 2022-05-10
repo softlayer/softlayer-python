@@ -17,7 +17,7 @@ RECORD_REGEX = re.compile(r"""^((?P<domain>(([\w-]+|\*)(\.)?)*|\@)?\s+
 RECORD_FMT = "type={type}, record={record}, data={data}, ttl={ttl}"
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('zonefile',
                 type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--dry-run', is_flag=True, help="Don't actually create records")

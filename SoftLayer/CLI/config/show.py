@@ -3,11 +3,12 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import config
 from SoftLayer.CLI import environment
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @environment.pass_env
 def cli(env):
     """Show current configuration."""

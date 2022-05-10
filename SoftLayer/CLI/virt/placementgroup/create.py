@@ -2,12 +2,13 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import helpers
 from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.option('--name', type=click.STRING, required=True, prompt=True, help="Name for this new placement group.")
 @click.option('--backend_router', '-b', required=True, prompt=True,
               help="backendRouter, can be either the hostname or id.")

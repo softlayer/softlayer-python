@@ -11,7 +11,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--memory', type=click.INT, help="Memory Size in GB")
 @click.option('--network', help="Network port speed in Mbps",

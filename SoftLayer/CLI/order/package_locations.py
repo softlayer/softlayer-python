@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import network
@@ -10,7 +11,7 @@ from SoftLayer.managers import ordering
 COLUMNS = ['id', 'dc', 'description', 'keyName', 'Note']
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('package_keyname')
 @environment.pass_env
 def cli(env, package_keyname):

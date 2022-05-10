@@ -37,7 +37,7 @@ HELP = """Find details about the machine making these API calls.
 """.format(choices="\n    ".join(META_CHOICES))
 
 
-@click.command(help=HELP,
+@click.command(cls=SoftLayer.CLI.command.SLCommand, help=HELP,
                short_help="Find details about this machine.",
                epilog="These commands only work on devices on the backend "
                       "SoftLayer network. This allows for self-discovery for "

@@ -10,7 +10,7 @@ from SoftLayer.CLI import helpers
 # pylint: disable=redefined-builtin
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('record')
 @click.argument('record_type')
 @click.argument('data')

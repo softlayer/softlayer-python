@@ -19,7 +19,7 @@ COLUMNS = ['id',
            'public_ips']
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--sortby',
               help='Column to sort by',
               type=click.Choice(COLUMNS))

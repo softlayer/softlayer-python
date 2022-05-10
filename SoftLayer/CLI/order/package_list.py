@@ -3,6 +3,7 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
@@ -13,7 +14,7 @@ COLUMNS = ['id',
            'type']
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.option('--keyword', help="A word (or string) used to filter package names.")
 @click.option('--package_type', help="The keyname for the type of package. BARE_METAL_CPU for example")
 @environment.pass_env

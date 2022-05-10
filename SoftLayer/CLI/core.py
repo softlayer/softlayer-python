@@ -10,12 +10,12 @@ import os
 import sys
 import time
 import traceback
-import types
 
 import click
-
 import requests
+
 import SoftLayer
+from SoftLayer.CLI.command import CommandLoader
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
@@ -40,38 +40,6 @@ if sys.stdout.isatty():
     DEFAULT_FORMAT = 'table'
 
 
-class CommandLoader(click.MultiCommand):
-    """Loads module for click."""
-
-    def __init__(self, *path, **attrs):
-        click.MultiCommand.__init__(self, **attrs)
-        self.path = path
-
-    def list_commands(self, ctx):
-        """List all sub-commands."""
-        env = ctx.ensure_object(environment.Environment)
-        env.load()
-
-        return sorted(env.list_commands(*self.path))
-
-    def get_command(self, ctx, cmd_name):
-        """Get command for click."""
-        env = ctx.ensure_object(environment.Environment)
-        env.load()
-
-        # Do alias lookup (only available for root commands)
-        if len(self.path) == 0:
-            cmd_name = env.resolve_alias(cmd_name)
-
-        new_path = list(self.path)
-        new_path.append(cmd_name)
-        module = env.get_command(*new_path)
-        if isinstance(module, types.ModuleType):
-            return CommandLoader(*new_path, help=module.__doc__ or '')
-        else:
-            return module
-
-
 def get_latest_version():
     """Gets the latest version of the Softlayer library."""
     try:
@@ -81,6 +49,13 @@ def get_latest_version():
     except Exception:
         latest = "Unable to get version from pypi."
     return latest
+
+
+CONTEXT_SETTINGS = dict(
+    help_option_names=['--help', '-h'],
+    auto_envvar_prefix='SLCLI',
+    max_content_width=999
+)
 
 
 def get_version_message(ctx, param, value):
@@ -95,19 +70,16 @@ def get_version_message(ctx, param, value):
 
 
 @click.group(help="SoftLayer Command-line Client",
-             epilog="""To use most commands your SoftLayer
-username and api_key need to be configured. The easiest way to do that is to
-use: 'slcli setup'""",
+             epilog="""To use most commands your SoftLayer username and api_key need to be configured.
+The easiest way to do that is to use: 'slcli setup'""",
              cls=CommandLoader,
-             context_settings={'help_option_names': ['-h', '--help'],
-                               'auto_envvar_prefix': 'SLCLI',
-                               'max_content_width': 999})
+             context_settings=CONTEXT_SETTINGS)
 @click.option('--format',
               default=DEFAULT_FORMAT,
               show_default=True,
               help="Output format",
               type=click.Choice(VALID_FORMATS))
-@click.option('--config', '-C',
+@click.option('-C', '--config',
               required=False,
               default=click.get_app_dir('softlayer', force_posix=True),
               show_default=True,
@@ -119,7 +91,7 @@ use: 'slcli setup'""",
               count=True)
 @click.option('--proxy',
               required=False,
-              help="HTTP[S] proxy to be use to make API calls")
+              help="HTTPS or HTTP proxy to be use to make API calls")
 @click.option('--really / --not-really', '-y',
               is_flag=True,
               required=False,
@@ -162,7 +134,7 @@ def cli(env,
     env.client.transport = env.vars['_timings']
 
 
-@cli.resultcallback()
+@cli.result_callback()
 @environment.pass_env
 def output_diagnostics(env, result, verbose=0, **kwargs):
     """Output diagnostic information."""

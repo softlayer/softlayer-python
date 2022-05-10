@@ -8,7 +8,7 @@ from SoftLayer.exceptions import SoftLayerAPIError
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--uuid', required=True, help="Health check UUID to modify.")
 @click.option('--interval', '-i', type=click.IntRange(2, 60), help="Seconds between checks. [2-60]")

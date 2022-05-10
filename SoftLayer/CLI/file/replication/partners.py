@@ -12,7 +12,7 @@ COLUMNS = storage_utils.REPLICATION_PARTNER_COLUMNS
 DEFAULT_COLUMNS = storage_utils.REPLICATION_PARTNER_DEFAULT
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume-id')
 @click.option('--sortby', help='Column to sort by', default='Username')
 @click.option('--columns',

@@ -25,15 +25,15 @@ class AutoscaleTests(testing.TestCase):
         self.assert_no_fail(result)
 
     def test_scale_down(self):
-        result = self.run_command(['autoscale', 'scale', '123456', '--down', '--amount', '2'])
+        result = self.run_command(['autoscale', 'scale', '123456', '--down', '--by', '--amount', '2'])
         self.assert_no_fail(result)
 
     def test_scale_up(self):
-        result = self.run_command(['autoscale', 'scale', '123456', '--up', '--amount', '2'])
+        result = self.run_command(['autoscale', 'scale', '123456', '--up', '--to', '--amount', '2'])
         self.assert_no_fail(result)
 
     def test_scale_to(self):
-        result = self.run_command(['autoscale', 'scale', '789654123', '--down', '--amount', '2'])
+        result = self.run_command(['autoscale', 'scale', '789654123', '--down', '--to', '--amount', '2'])
         self.assert_no_fail(result)
 
     def test_scale_by_up(self):

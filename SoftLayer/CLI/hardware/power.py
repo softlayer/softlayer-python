@@ -10,7 +10,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def power_off(env, identifier):
@@ -26,7 +26,7 @@ def power_off(env, identifier):
     env.client['Hardware_Server'].powerOff(id=hw_id)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--hard/--soft',
               default=None,
@@ -51,7 +51,7 @@ def reboot(env, identifier, hard):
         hardware_server.rebootDefault(id=hw_id)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def power_on(env, identifier):
@@ -62,7 +62,7 @@ def power_on(env, identifier):
     env.client['Hardware_Server'].powerOn(id=hw_id)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def power_cycle(env, identifier):
@@ -79,7 +79,7 @@ def power_cycle(env, identifier):
     env.client['Hardware_Server'].powerCycle(id=hw_id)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def rescue(env, identifier):

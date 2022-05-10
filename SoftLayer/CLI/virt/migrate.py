@@ -8,7 +8,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--guest', '-g', type=click.INT, help="Guest ID to immediately migrate.")
 @click.option('--all', '-a', 'migrate_all', is_flag=True, default=False,
               help="Migrate ALL guests that require migration immediately.")

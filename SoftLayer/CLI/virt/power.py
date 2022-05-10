@@ -10,7 +10,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def rescue(env, identifier):
@@ -25,7 +25,7 @@ def rescue(env, identifier):
     vsi.rescue(vs_id)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--hard/--soft',
               default=None,
@@ -50,7 +50,7 @@ def reboot(env, identifier, hard):
         virtual_guest.rebootDefault(id=vs_id)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--hard/--soft', help="Perform a hard shutdown")
 @environment.pass_env
@@ -71,7 +71,7 @@ def power_off(env, identifier, hard):
         virtual_guest.powerOffSoft(id=vs_id)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def power_on(env, identifier):
@@ -82,7 +82,7 @@ def power_on(env, identifier):
     env.client['Virtual_Guest'].powerOn(id=vs_id)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def pause(env, identifier):
@@ -99,7 +99,7 @@ def pause(env, identifier):
     env.client['Virtual_Guest'].pause(id=vs_id)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def resume(env, identifier):

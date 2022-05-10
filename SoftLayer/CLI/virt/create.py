@@ -151,7 +151,7 @@ def _parse_create_args(client, args):
     return data
 
 
-@click.command(epilog="See 'slcli vs create-options' for valid options")
+@click.command(cls=SoftLayer.CLI.command.SLCommand, epilog="See 'slcli vs create-options' for valid options")
 @click.option('--hostname', '-H', required=True, prompt=True, help="Host portion of the FQDN")
 @click.option('--domain', '-D', required=True, prompt=True, help="Domain portion of the FQDN")
 @click.option('--cpu', '-c', type=click.INT, help="Number of CPU cores (not available with flavors)")

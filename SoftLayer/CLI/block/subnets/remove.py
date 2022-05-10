@@ -6,7 +6,7 @@ import SoftLayer
 from SoftLayer.CLI import environment
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('access_id', type=int)
 @click.option('--subnet-id', multiple=True, type=int,
               help="ID of the subnets to remove; e.g.: --subnet-id 1234")

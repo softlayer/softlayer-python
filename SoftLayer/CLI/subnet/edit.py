@@ -8,7 +8,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import helpers
 
 
-@click.command(short_help="Edit note and tags of a subnet")
+@click.command(cls=SoftLayer.CLI.command.SLCommand, short_help="Edit note and tags of a subnet")
 @click.argument('identifier')
 @click.option('--tags', '-t', type=click.STRING,
               help='Comma separated list of tags, enclosed in quotes. "tag1, tag2"')

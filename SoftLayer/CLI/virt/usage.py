@@ -11,7 +11,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer.utils import clean_time
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--start_date', '-s', type=click.STRING, required=True, help="Start Date e.g. 2019-3-4 (yyyy-MM-dd)")
 @click.option('--end_date', '-e', type=click.STRING, required=True, help="End Date e.g. 2019-4-2 (yyyy-MM-dd)")

@@ -5,6 +5,7 @@ import sys
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import utils
@@ -173,7 +174,7 @@ def _get_virtual_bandwidth(env, start, end):
             }
 
 
-@click.command(short_help="Bandwidth report for every pool/server")
+@click.command(cls=SLCommand, short_help="Bandwidth report for every pool/server")
 @click.option('--start', callback=_validate_datetime,
               default=(datetime.datetime.now() - datetime.timedelta(days=30)).strftime('%Y-%m-%d'),
               help="datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'")

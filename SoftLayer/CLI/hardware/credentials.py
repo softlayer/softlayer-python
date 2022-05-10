@@ -10,7 +10,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer import exceptions
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):

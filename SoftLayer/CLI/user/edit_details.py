@@ -12,7 +12,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('user')
 @click.option('--template', '-t', required=True,
               help="A json string describing https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/")

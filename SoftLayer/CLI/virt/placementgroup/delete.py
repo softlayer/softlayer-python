@@ -2,6 +2,7 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
@@ -10,7 +11,7 @@ from SoftLayer.managers.vs import VSManager as VSManager
 from SoftLayer.managers.vs_placement import PlacementManager as PlacementManager
 
 
-@click.command(epilog="Once provisioned, virtual guests can be managed with the slcli vs commands")
+@click.command(cls=SLCommand, epilog="Once provisioned, virtual guests can be managed with the slcli vs commands")
 @click.argument('identifier')
 @click.option('--purge', is_flag=True,
               help="Delete all guests in this placement group. "

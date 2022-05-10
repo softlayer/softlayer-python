@@ -10,7 +10,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--keys', '-k', is_flag=True, default=False,
               help="Show the users API key.")

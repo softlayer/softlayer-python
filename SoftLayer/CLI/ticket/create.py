@@ -9,7 +9,7 @@ from SoftLayer.CLI import helpers
 from SoftLayer.CLI import ticket
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--title', required=True, help="The title of the ticket")
 @click.option('--subject-id', type=int, required=True,
               help="""The subject id to use for the ticket, run 'slcli ticket subjects' to get the list""")

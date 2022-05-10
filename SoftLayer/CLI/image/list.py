@@ -10,7 +10,7 @@ from SoftLayer.CLI import image as image_mod
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--name', default=None, help='Filter on image name')
 @click.option('--public/--private', is_flag=True, default=None,
               help='Display only public or private images')

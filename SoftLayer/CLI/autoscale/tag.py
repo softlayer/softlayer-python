@@ -3,12 +3,13 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.managers.autoscale import AutoScaleManager
 from SoftLayer.managers.vs import VSManager
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('identifier')
 @click.option('--tags', '-g', help="Tags to set for each guest in this group. Existing tags are overwritten. "
                                    "An empty string will remove all tags")

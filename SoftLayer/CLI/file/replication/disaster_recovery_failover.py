@@ -8,7 +8,8 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
-@click.command(epilog="""Failover an inaccessible file volume to its available replicant volume.
+@click.command(cls=SoftLayer.CLI.command.SLCommand,
+               epilog="""Failover an inaccessible file volume to its available replicant volume.
 If a volume (with replication) becomes inaccessible due to a disaster event, this method can be used to immediately
 failover to an available replica in another location. This method does not allow for failback via API.
 After using this method, to failback to the original volume, please open a support ticket.

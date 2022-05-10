@@ -3,11 +3,12 @@
 import click
 import SoftLayer
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.managers.autoscale import AutoScaleManager
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):

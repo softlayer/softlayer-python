@@ -9,7 +9,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('user')
 @click.option('--enable/--disable', default=True,
               help="Enable or disable vpn subnets manual config.")

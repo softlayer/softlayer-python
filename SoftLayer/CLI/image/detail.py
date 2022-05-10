@@ -11,7 +11,7 @@ from SoftLayer.CLI import image as image_mod
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):

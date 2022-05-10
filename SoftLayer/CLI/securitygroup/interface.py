@@ -17,7 +17,7 @@ COLUMNS = ['networkComponentId',
 REQUEST_COLUMNS = ['requestId']
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('securitygroup_id')
 @click.option('--sortby',
               help='Column to sort by',
@@ -75,7 +75,7 @@ def interface_list(env, securitygroup_id, sortby):
     env.fout(table)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('securitygroup_id')
 @click.option('--network-component', '-n',
               help=('The network component to associate '
@@ -103,7 +103,7 @@ def add(env, securitygroup_id, network_component, server, interface):
     env.fout(table)
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('securitygroup_id')
 @click.option('--network-component', '-n',
               help=('The network component to remove from '

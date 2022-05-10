@@ -10,7 +10,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--postinstall', '-i',
               help=("Post-install script to download (Only HTTPS executes, HTTP leaves file in /root"))

@@ -9,7 +9,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
 
-@click.command()
+@click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--key', '-k', required=True, prompt=True,
               help="The VMware License Key. "
                    "To get could use the product_package::getItems id=301 with name Software License Package"

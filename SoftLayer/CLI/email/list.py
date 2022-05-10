@@ -3,6 +3,7 @@
 
 import click
 
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.account import AccountManager
@@ -10,7 +11,7 @@ from SoftLayer.managers.email import EmailManager
 from SoftLayer import utils
 
 
-@click.command()
+@click.command(cls=SLCommand)
 @environment.pass_env
 def cli(env):
     """Lists Email Delivery Service """
