@@ -1067,8 +1067,8 @@ class VSManager(utils.IdentifierMixin, object):
                 category = {'categories': [{
                     'categoryCode': 'guest_disk' + str(disk_number),
                     'complexType': "SoftLayer_Product_Item_Category"}],
-                            'complexType': 'SoftLayer_Product_Item_Price',
-                            'id': price_id}
+                    'complexType': 'SoftLayer_Product_Item_Price',
+                    'id': price_id}
 
                 prices.append(category)
             order['prices'] = prices

@@ -7,13 +7,13 @@ getObject = {
     'vlanNumber': 4444,
     'firewallInterfaces': None,
     'billingItem': {
-            'allowCancellationFlag': 1,
-            'categoryCode': 'network_vlan',
-            'description': 'Private Network Vlan',
-            'id': 235689,
-            'notes': 'test cli',
-            'orderItemId': 147258,
-        }
+        'allowCancellationFlag': 1,
+        'categoryCode': 'network_vlan',
+        'description': 'Private Network Vlan',
+        'id': 235689,
+        'notes': 'test cli',
+        'orderItemId': 147258,
+    }
 }
 
 editObject = True
