@@ -41,8 +41,14 @@ def order(env, **args):
     """Creates a LB. Protocols supported are TCP, HTTP, and HTTPS."""
 
     mgr = SoftLayer.LoadBalancerManager(env.client)
+    network = SoftLayer.NetworkManager(env.client)
 
-    location = args.get('datacenter')
+    datacenter = network.get_datacenter(datacenter=args.get('datacenter'))
+    if datacenter:
+        location = {'id': datacenter[0]['id']}
+    else:
+        raise exceptions.CLIHalt('Datacenter {} was not found'.format(datacenter))
+
     name = args.get('name')
     description = args.get('label', None)
 
