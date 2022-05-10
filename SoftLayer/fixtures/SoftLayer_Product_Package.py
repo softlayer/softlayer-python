@@ -2137,7 +2137,7 @@ getItemsVLAN = [{
             "recurringFee": "0",
             "setupFee": "0",
             "sort": 10,
-        }]
+    }]
 }, {
     "description": "Public Network Vlan",
     "id": 1071,
@@ -2168,6 +2168,6 @@ getItemsVLAN = [{
             "recurringFee": "0",
             "setupFee": "0",
             "sort": 10,
-        }]
+    }]
 }
 ]

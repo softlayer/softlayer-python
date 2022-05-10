@@ -1173,7 +1173,7 @@ getActiveAccountLicenses = [{
             "virtualizationPlatform": 0,
             "requiredUser": "administrator@vsphere.local"
         }
-    }
+}
 ]
 
 getActiveVirtualLicenses = [{
