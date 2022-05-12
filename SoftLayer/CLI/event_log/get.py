@@ -47,7 +47,7 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
     row_count = 0
     click.secho(", ".join(columns))
     for log in logs:
-        if log is None:
+        if len(log) == 0 or log is None:
             click.secho('No logs available for filter %s.' % request_filter, fg='red')
             return
 
