@@ -317,7 +317,7 @@ getCreateObjectOptions = {
                     'item': {'description': '2 GB'},
                     'hourlyRecurringFee': '.06',
                     'recurringFee': '42'
-                },
+            },
             'template': {'maxMemory': 2048}
         },
         {

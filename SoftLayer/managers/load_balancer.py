@@ -245,7 +245,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
             'complexType': 'SoftLayer_Container_Product_Order_Network_LoadBalancer_AsAService',
             'name': name,
             'description': desc,
-            'location': datacenter,
+            'locationObject': datacenter,
             'packageId': package.get('id'),
             'useHourlyPricing': True,  # Required since LBaaS is an hourly service
             'prices': [{'id': price_id} for price_id in prices],
