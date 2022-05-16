@@ -166,13 +166,11 @@ class BlockTests(testing.TestCase):
         list_mock.return_value = [
             {'notes': note_mock}
         ]
-        expected_table = formatting.Table(['notes'])
-        expected_table.add_row([expected_reduced_note])
-        expected_output = formatting.format_output(expected_table)+'\n'
         result = self.run_command(['--format', 'table', 'block', 'volume-list', '--columns', 'notes'])
 
         self.assert_no_fail(result)
-        self.assertEqual(expected_output, result.output)
+        self.assertIn(expected_reduced_note, result.output)
+        self.assertNotIn(note_mock, result.output)
 
     def test_volume_list_order(self):
         result = self.run_command(['block', 'volume-list', '--order=1234567'])

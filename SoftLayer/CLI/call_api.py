@@ -172,7 +172,7 @@ def cli(env, service, method, parameters, _id, _filters, mask, limit, offset, or
     }
 
     if output_python:
-        env.out(_build_python_example(args, kwargs))
+        env.python_output(_build_python_example(args, kwargs))
     else:
         result = env.client.call(*args, **kwargs)
         env.fout(formatting.iter_to_table(result))

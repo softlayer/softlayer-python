@@ -25,8 +25,10 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
     :param data: One of: String, Table, FormattedItem, List, Tuple, SequentialOutput
     :param string fmt (optional): One of: table, raw, json, python
     """
-    if fmt in ('json', 'jsonraw'):
+    if fmt == 'json':
         return json.dumps(data, indent=4, cls=CLIJSONEncoder)
+    elif fmt == 'jsonraw':
+        return json.dumps(data, cls=CLIJSONEncoder)
 
     if isinstance(data, str) or isinstance(data, rTable):    
         return data
@@ -65,7 +67,7 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
         return output
 
     # fallback, convert this odd object to a string
-    print(f"Casting this to string {data}")
+    # print(f"Casting this to string {data}")
     return str(data)
 
 

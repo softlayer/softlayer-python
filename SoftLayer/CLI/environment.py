@@ -10,6 +10,7 @@ import importlib
 import click
 import pkg_resources
 from rich.console import Console
+from rich.syntax import Syntax
 
 import SoftLayer
 from SoftLayer.CLI import formatting
@@ -33,6 +34,7 @@ class Environment(object):
         self.vars = {}
 
         self.client = None
+        self.console = Console()
         self.format = 'table'
         self.skip_confirmations = False
         self.config_file = None
@@ -41,16 +43,19 @@ class Environment(object):
 
     def out(self, output):
         """Outputs a string to the console (stdout)."""
-        console = Console()
-        if self.format in ('json', 'jsonraw'):
-            console.print_json(output)
+        if self.format == 'json':
+            self.console.print_json(output)
+        elif self.format == 'jsonraw':
+            #  Using Rich here is problematic because in the unit tests it thinks the terminal is 80 characters wide
+            #  and only prints out that many characters.
+            click.echo(output)
         else:
             # If we want to print a list of tables, Rich doens't handle that well.
             if isinstance(output, list):
                 for line in output:
-                    console.print(line)
+                    self.console.print(line)
             else:
-                console.print(output)
+                self.console.print(output)
 
     def err(self, output, newline=True):
         """Outputs an error string to the console (stderr)."""
@@ -74,6 +79,10 @@ class Environment(object):
             except UnicodeEncodeError:
                 # If we hit an undecodeable entry, just try outputting as json.
                 self.out(self.fmt(output, 'json'))
+
+    def python_output(self, output):
+        """Prints out python code"""
+        self.console.print(Syntax(output, "python"))
 
     def input(self, prompt, default=None, show_default=True):
         """Provide a command prompt."""
