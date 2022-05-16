@@ -88,12 +88,11 @@ class FileTests(testing.TestCase):
             {'notes': note_mock}
         ]
         expected_table = formatting.Table(['notes'])
-        expected_table.add_row([expected_reduced_note])
-        expected_output = formatting.format_output(expected_table) + '\n'
         result = self.run_command(['--format', 'table', 'file', 'volume-list', '--columns', 'notes'])
 
         self.assert_no_fail(result)
-        self.assertEqual(expected_output, result.output)
+        self.assertIn(expected_reduced_note, result.output)
+        self.assertNotIn(note_mock, result.output)
 
     @mock.patch('SoftLayer.FileStorageManager.list_file_volumes')
     def test_volume_count(self, list_mock):

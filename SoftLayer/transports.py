@@ -430,7 +430,7 @@ class RestTransport(object):
 
         :param request request: Request object
         """
-        command = "curl -u $SL_USER:$SL_APIKEY -X {method} -H {headers} {data} '{uri}'"
+        command = "curl -u $SL_USER:$SL_APIKEY -X {method} -H {headers} [red]{data}[/red] [yellow]'{uri}'[/yellow]"
 
         method = REST_SPECIAL_METHODS.get(request.method)
 

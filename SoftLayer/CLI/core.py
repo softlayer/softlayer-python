@@ -13,6 +13,7 @@ import traceback
 
 import click
 import requests
+from rich.markup import escape
 
 import SoftLayer
 from SoftLayer.CLI.command import CommandLoader
@@ -143,9 +144,9 @@ def output_diagnostics(env, result, verbose=0, **kwargs):
         diagnostic_table = formatting.Table(['name', 'value'])
         diagnostic_table.add_row(['execution_time', '%fs' % (time.time() - START_TIME)])
 
-        api_call_value = []
+        api_call_value = formatting.Table(['API Calls'], title=None, align="left")
         for call in env.client.transport.get_last_calls():
-            api_call_value.append("%s::%s (%fs)" % (call.service, call.method, call.end_time - call.start_time))
+            api_call_value.add_row(["%s::%s (%fs)" % (call.service, call.method, call.end_time - call.start_time)])
 
         diagnostic_table.add_row(['api_calls', api_call_value])
         diagnostic_table.add_row(['version', consts.USER_AGENT])
@@ -156,13 +157,13 @@ def output_diagnostics(env, result, verbose=0, **kwargs):
 
     if verbose > 1:
         for call in env.client.transport.get_last_calls():
-            call_table = formatting.Table(['', '{}::{}'.format(call.service, call.method)])
+            call_table = formatting.Table(['', '{}::{}'.format(call.service, call.method)], align="left")
             nice_mask = ''
             if call.mask is not None:
                 nice_mask = call.mask
-
             call_table.add_row(['id', call.identifier])
-            call_table.add_row(['mask', nice_mask])
+            #  Need to escape this so Rich doesn't think the mask is a tag and hide it.
+            call_table.add_row(['mask', escape(nice_mask)])
             call_table.add_row(['filter', call.filter])
             call_table.add_row(['limit', call.limit])
             call_table.add_row(['offset', call.offset])

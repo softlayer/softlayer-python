@@ -93,8 +93,7 @@ def b_to_gb(_bytes):
 
     :param int _bytes: number of bytes
     """
-    return FormattedItem(_bytes,
-                         "%.2fG" % (float(_bytes) / 1024 / 1024 / 1024))
+    return FormattedItem(_bytes, "%.2fG" % (float(_bytes) / 1024 / 1024 / 1024))
 
 
 def gb(gigabytes):  # pylint: disable=C0103
@@ -102,8 +101,7 @@ def gb(gigabytes):  # pylint: disable=C0103
 
     :param int gigabytes: number of gigabytes
     """
-    return FormattedItem(int(float(gigabytes)) * 1024,
-                         "%dG" % int(float(gigabytes)))
+    return FormattedItem(int(float(gigabytes)) * 1024, "%dG" % int(float(gigabytes)))
 
 
 def blank():
@@ -233,7 +231,7 @@ class Table(object):
     :param list columns: a list of column names
     """
 
-    def __init__(self, columns, title=None):
+    def __init__(self, columns, title=None, align={}):
         duplicated_cols = [col for col, count
                            in collections.Counter(columns).items()
                            if count > 1]
@@ -243,7 +241,7 @@ class Table(object):
 
         self.columns = columns
         self.rows = []
-        self.align = {}
+        self.align = align
         self.sortby = None
         self.title = title
 

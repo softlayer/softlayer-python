@@ -53,13 +53,14 @@ class Environment(object):
             # If we want to print a list of tables, Rich doens't handle that well.
             if isinstance(output, list):
                 for line in output:
-                    self.console.print(line)
+                    self.console.print(line, overflow='ignore')
             else:
-                self.console.print(output)
+                self.console.print(output,  overflow='ignore')
 
     def err(self, output, newline=True):
         """Outputs an error string to the console (stderr)."""
-        click.echo(output, nl=newline, err=True)
+        error_console = Console(stderr=True)
+        error_console.print(output)
 
     def fmt(self, output, fmt=None):
         """Format output based on current the environment format."""
