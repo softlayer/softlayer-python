@@ -1,4 +1,4 @@
-"""Create new firewall."""
+"""Add a server to the firewall"""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -36,16 +36,14 @@ def cli(env, target, firewall_type, high_availability):
             pkg = mgr.get_standard_package(target, is_virt=False)
 
         if not pkg:
-            exceptions.CLIAbort(
-                "Unable to add firewall - Is network public enabled?")
+            exceptions.CLIAbort("Unable to add firewall - Is network public enabled?")
 
-        env.out("******************")
-        env.out("Product: %s" % pkg[0]['description'])
-        env.out("Price: $%s monthly" % pkg[0]['prices'][0]['recurringFee'])
-        env.out("******************")
+        click.echo("******************")
+        click.echo("Product: %s" % pkg[0]['description'])
+        click.echo("Price: $%s monthly" % pkg[0]['prices'][0]['recurringFee'])
+        click.echo("******************")
 
-        if not formatting.confirm("This action will incur charges on your "
-                                  "account. Continue?"):
+        if not formatting.confirm("This action will incur charges on your account. Continue?"):
             raise exceptions.CLIAbort('Aborted.')
 
     if firewall_type == 'vlan':
@@ -55,4 +53,4 @@ def cli(env, target, firewall_type, high_availability):
     elif firewall_type == 'server':
         mgr.add_standard_firewall(target, is_virt=False)
 
-    env.fout("Firewall is being created!")
+    click.echo("Firewall is being created!")

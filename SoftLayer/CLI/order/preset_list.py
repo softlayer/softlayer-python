@@ -35,9 +35,6 @@ def cli(env, package_keyname, keyword, prices):
         slcli order preset-list BARE_METAL_SERVER --keyword gpu
 
     """
-
-    tables = []
-    table = formatting.Table(COLUMNS)
     manager = ordering.OrderingManager(env.client)
 
     _filter = {}
@@ -46,7 +43,7 @@ def cli(env, package_keyname, keyword, prices):
     presets = manager.list_presets(package_keyname, filter=_filter)
 
     if prices:
-        table_prices = formatting.Table(['keyName', 'priceId', 'Hourly', 'Monthly', 'Restriction', 'Location'])
+        table = formatting.Table(['keyName', 'priceId', 'Hourly', 'Monthly', 'Restriction', 'Location'])
         for price in presets:
             locations = []
             if price['locations'] != []:
@@ -55,21 +52,21 @@ def cli(env, package_keyname, keyword, prices):
             cr_max = get_item_price_data(price['prices'][0], 'capacityRestrictionMaximum')
             cr_min = get_item_price_data(price['prices'][0], 'capacityRestrictionMinimum')
             cr_type = get_item_price_data(price['prices'][0], 'capacityRestrictionType')
-            table_prices.add_row([price['keyName'], price['id'],
-                                  get_item_price_data(price['prices'][0], 'hourlyRecurringFee'),
-                                  get_item_price_data(price['prices'][0], 'recurringFee'),
-                                  "%s - %s %s" % (cr_min, cr_max, cr_type), str(locations)])
-        tables.append(table_prices)
+            table.add_row([price['keyName'], price['id'],
+                          get_item_price_data(price['prices'][0], 'hourlyRecurringFee'),
+                          get_item_price_data(price['prices'][0], 'recurringFee'),
+                          "%s - %s %s" % (cr_min, cr_max, cr_type), str(locations)])
 
     else:
+        table = formatting.Table(COLUMNS)
         for preset in presets:
             table.add_row([
                 str(preset['name']).strip(),
                 str(preset['keyName']).strip(),
                 str(preset['description']).strip()
             ])
-        tables.append(table)
-    env.fout(tables)
+
+    env.fout(table)
 
 
 def get_item_price_data(price, item_attribute):

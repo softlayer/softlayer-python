@@ -39,7 +39,6 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
 
     # responds to .to_python()
     if hasattr(data, 'to_python'):
-        print("to_python()")
         if fmt == 'json':
             return json.dumps(format_output(data, fmt='python'), indent=4, cls=CLIJSONEncoder)
         elif fmt == 'jsonraw':
@@ -49,13 +48,11 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
 
     # responds to .formatted
     if hasattr(data, 'formatted'):
-        print("formatted()")
         if fmt == 'table':
             return data.formatted
 
     # responds to .separator
     if hasattr(data, 'separator'):
-        print("FUCKING THISNGS UP HERE")
         output = [format_output(d, fmt=fmt) for d in data if d]
         return str(SequentialOutput(data.separator, output))
 
