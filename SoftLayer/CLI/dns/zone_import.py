@@ -8,7 +8,6 @@ import SoftLayer
 from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
 RECORD_REGEX = re.compile(r"""^((?P<domain>(([\w-]+|\*)(\.)?)*|\@)?\s+

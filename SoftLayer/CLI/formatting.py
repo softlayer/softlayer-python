@@ -30,7 +30,7 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
     elif fmt == 'jsonraw':
         return json.dumps(data, cls=CLIJSONEncoder)
 
-    if isinstance(data, str) or isinstance(data, rTable):    
+    if isinstance(data, str) or isinstance(data, rTable):
         return data
 
     # responds to .prettytable()
@@ -228,7 +228,7 @@ class Table(object):
     :param list columns: a list of column names
     """
 
-    def __init__(self, columns, title=None, align={}):
+    def __init__(self, columns, title=None, align=None):
         duplicated_cols = [col for col, count
                            in collections.Counter(columns).items()
                            if count > 1]
@@ -238,12 +238,9 @@ class Table(object):
 
         self.columns = columns
         self.rows = []
-        self.align = align
+        self.align = align or {}
         self.sortby = None
         self.title = title
-
-    def __str__(self):
-        print("OK")
 
     def add_row(self, row):
         """Add a row to the table.
@@ -264,6 +261,16 @@ class Table(object):
     def prettytable(self):
         """Returns a RICH table instance."""
         table = rTable(title=self.title, box=box.SQUARE, header_style="bright_cyan")
+        if self.sortby:
+            try:
+                # https://docs.python.org/3/howto/sorting.html#key-functions
+                sort_index = self.columns.index(self.sortby)
+                # All the values in `rows` are strings, so we need to cast to int for sorting purposes.
+                self.rows.sort(key=lambda the_row: the_row[sort_index] if not the_row[sort_index].isdigit()
+                               else int(the_row[sort_index]))
+            except ValueError as ex:
+                msg = "Column (%s) doesn't exist to sort by" % self.sortby
+                raise exceptions.CLIAbort(msg) from ex
 
         for col in self.columns:
             justify = "center"
@@ -322,7 +329,7 @@ class FormattedItem(object):
         """returns the formatted value."""
         # If the original value is None, represent this as 'NULL'
         if self.original is None:
-            return self.formatted or "NULL"
+            return "NULL"
 
         try:
             return str(self.original)

@@ -6,7 +6,6 @@
 """
 
 import click
-from rich.console import Console
 from unittest import mock as mock
 
 from SoftLayer.CLI import environment

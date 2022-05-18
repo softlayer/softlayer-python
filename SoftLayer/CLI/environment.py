@@ -49,7 +49,7 @@ class Environment(object):
             try:
                 self.console.print_json(output)
             # Tried to print not-json, so just print it out normally...
-            except JSONDecodeError as ex:
+            except JSONDecodeError:
                 click.echo(output)
         elif self.format == 'jsonraw':
             #  Using Rich here is problematic because in the unit tests it thinks the terminal is 80 characters wide
@@ -66,7 +66,7 @@ class Environment(object):
     def err(self, output, newline=True):
         """Outputs an error string to the console (stderr)."""
 
-        self.err_console.print(output, overflow='ignore', new_line_start=newline)
+        self.err_console.print(output, new_line_start=newline)
 
     def fmt(self, output, fmt=None):
         """Format output based on current the environment format."""

@@ -7,7 +7,7 @@
 """
 import collections
 import datetime
-from json import JSONDecoder, JSONDecodeError
+from json import JSONDecoder
 import re
 import time
 
@@ -437,6 +437,8 @@ def clean_dict(dictionary):
 
 
 NOT_WHITESPACE = re.compile(r'[^\s]')
+
+
 def decode_stacked(document, pos=0, decoder=JSONDecoder()):
     """Used for converting CLI output to JSON datastructures. Specially for unit tests
 
@@ -452,10 +454,6 @@ def decode_stacked(document, pos=0, decoder=JSONDecoder()):
         if not match:
             return
         pos = match.start()
-        
-        try:
-            obj, pos = decoder.raw_decode(document, pos)
-        except JSONDecodeError:
-            # do something sensible if there's some error
-            raise
+        obj, pos = decoder.raw_decode(document, pos)
+
         yield obj

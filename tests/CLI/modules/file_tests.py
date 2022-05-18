@@ -5,7 +5,6 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
 from SoftLayer import SoftLayerError
 from SoftLayer import testing
 
@@ -87,7 +86,6 @@ class FileTests(testing.TestCase):
         list_mock.return_value = [
             {'notes': note_mock}
         ]
-        expected_table = formatting.Table(['notes'])
         result = self.run_command(['--format', 'table', 'file', 'volume-list', '--columns', 'notes'])
 
         self.assert_no_fail(result)

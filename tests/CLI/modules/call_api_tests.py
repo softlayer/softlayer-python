@@ -314,9 +314,11 @@ result = client.call(u'Service',
                                                     'value': ['DESC']}]},
                                             'typeId': {'operation': 1}}
                                 })
+
     def test_very_verbose(self):
-        result = self.run_command(['call-api', '-vvv', 'Account', 'getObject'])
+        result = self.run_command(['-vvv', 'call-api', 'Account', 'getObject'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getObject')
-        print(result.output)
-        self.assertEqual(result.output, "soething")
+        self.assertIn("ORIGIN_PULL", result.output)
+        self.assertIn("python_version", result.output)
+        self.assertIn("offset", result.output)
