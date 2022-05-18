@@ -501,6 +501,7 @@ getNetworkVlans = [{
     'totalPrimaryIpAddressCount': 1,
     'subnetCount': 0,
     'subnets': [],
+    'tagReferences': [],
     'firewallInterfaces': [
         {
             'id': 1,
@@ -538,6 +539,7 @@ getNetworkVlans = [{
     'firewallInterfaces': [],
 
     'subnetCount': 0,
+    'tagReferences': [],
     'subnets': [],
 }, {
     'id': 3,
@@ -561,6 +563,7 @@ getNetworkVlans = [{
     'totalPrimaryIpAddressCount': 3,
     'subnetCount': 0,
     'subnets': [],
+    'tagReferences': [],
     'virtualGuestCount': 1,
     'virtualGuests': [{'id': 3}]
 }]
@@ -1173,7 +1176,7 @@ getActiveAccountLicenses = [{
             "virtualizationPlatform": 0,
             "requiredUser": "administrator@vsphere.local"
         }
-}
+    }
 ]
 
 getActiveVirtualLicenses = [{
