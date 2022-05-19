@@ -16,7 +16,9 @@ COLUMNS = ['id',
            'datacenter',
            'hardware',
            'virtual_servers',
-           'public_ips']
+           'public_ips',
+           'premium',
+           'tag']
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -45,6 +47,8 @@ def cli(env, sortby, datacenter, number, name, limit):
                            name=name,
                            limit=limit)
     for vlan in vlans:
+        billing = 'Yes' if vlan.get('billingItem') else 'No'
+
         table.add_row([
             vlan.get('id'),
             vlan.get('vlanNumber'),
@@ -54,6 +58,8 @@ def cli(env, sortby, datacenter, number, name, limit):
             vlan.get('hardwareCount'),
             vlan.get('virtualGuestCount'),
             vlan.get('totalPrimaryIpAddressCount'),
+            billing,
+            formatting.tags(vlan['tagReferences'])
         ])
 
     env.fout(table)
