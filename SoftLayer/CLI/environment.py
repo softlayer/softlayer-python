@@ -6,9 +6,12 @@
     :license: MIT, see LICENSE for more details.
 """
 import importlib
+from json.decoder import JSONDecodeError
 
 import click
 import pkg_resources
+from rich.console import Console
+from rich.syntax import Syntax
 
 import SoftLayer
 from SoftLayer.CLI import formatting
@@ -32,19 +35,38 @@ class Environment(object):
         self.vars = {}
 
         self.client = None
+        self.console = Console()
+        self.err_console = Console(stderr=True)
         self.format = 'table'
         self.skip_confirmations = False
         self.config_file = None
 
         self._modules_loaded = False
 
-    def out(self, output, newline=True):
+    def out(self, output):
         """Outputs a string to the console (stdout)."""
-        click.echo(output, nl=newline)
+        if self.format == 'json':
+            try:
+                self.console.print_json(output)
+            # Tried to print not-json, so just print it out normally...
+            except JSONDecodeError:
+                click.echo(output)
+        elif self.format == 'jsonraw':
+            #  Using Rich here is problematic because in the unit tests it thinks the terminal is 80 characters wide
+            #  and only prints out that many characters.
+            click.echo(output)
+        else:
+            # If we want to print a list of tables, Rich doens't handle that well.
+            if isinstance(output, list):
+                for line in output:
+                    self.console.print(line, overflow='ignore')
+            else:
+                self.console.print(output,  overflow='ignore')
 
     def err(self, output, newline=True):
         """Outputs an error string to the console (stderr)."""
-        click.echo(output, nl=newline, err=True)
+
+        self.err_console.print(output, new_line_start=newline)
 
     def fmt(self, output, fmt=None):
         """Format output based on current the environment format."""
@@ -56,14 +78,18 @@ class Environment(object):
         """Return True if format output is json or jsonraw"""
         return 'json' in self.format
 
-    def fout(self, output, newline=True):
+    def fout(self, output):
         """Format the input and output to the console (stdout)."""
         if output is not None:
             try:
-                self.out(self.fmt(output), newline=newline)
+                self.out(self.fmt(output))
             except UnicodeEncodeError:
                 # If we hit an undecodeable entry, just try outputting as json.
-                self.out(self.fmt(output, 'json'), newline=newline)
+                self.out(self.fmt(output, 'json'))
+
+    def python_output(self, output):
+        """Prints out python code"""
+        self.console.print(Syntax(output, "python"))
 
     def input(self, prompt, default=None, show_default=True):
         """Provide a command prompt."""

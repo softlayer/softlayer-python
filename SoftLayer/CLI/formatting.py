@@ -10,8 +10,8 @@ import json
 import os
 
 import click
-
-import prettytable
+from rich import box
+from rich.table import Table as rTable
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import utils
@@ -22,32 +22,27 @@ FALSE_VALUES = ['0', 'false', 'FALSE', 'no', 'False']
 def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
     """Given some data, will format it for console output.
 
-    :param data: One of: String, Table, FormattedItem, List, Tuple,
-                 SequentialOutput
+    :param data: One of: String, Table, FormattedItem, List, Tuple, SequentialOutput
     :param string fmt (optional): One of: table, raw, json, python
     """
-    if isinstance(data, str):
-        if fmt in ('json', 'jsonraw'):
-            return json.dumps(data)
+    if fmt == 'json':
+        return json.dumps(data, indent=4, cls=CLIJSONEncoder)
+    elif fmt == 'jsonraw':
+        return json.dumps(data, cls=CLIJSONEncoder)
+
+    if isinstance(data, str) or isinstance(data, rTable):
         return data
 
     # responds to .prettytable()
-    if hasattr(data, 'prettytable'):
-        if fmt == 'table':
-            return str(format_prettytable(data))
-        elif fmt == 'raw':
-            return str(format_no_tty(data))
+    if hasattr(data, 'prettytable') and fmt in ('table', 'raw'):
+        return format_prettytable(data)
 
     # responds to .to_python()
     if hasattr(data, 'to_python'):
         if fmt == 'json':
-            return json.dumps(
-                format_output(data, fmt='python'),
-                indent=4,
-                cls=CLIJSONEncoder)
+            return json.dumps(format_output(data, fmt='python'), indent=4, cls=CLIJSONEncoder)
         elif fmt == 'jsonraw':
-            return json.dumps(format_output(data, fmt='python'),
-                              cls=CLIJSONEncoder)
+            return json.dumps(format_output(data, fmt='python'), cls=CLIJSONEncoder)
         elif fmt == 'python':
             return data.to_python()
 
@@ -66,10 +61,11 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
         output = [format_output(d, fmt=fmt) for d in data]
         if fmt == 'python':
             return output
-        return format_output(listing(output, separator=os.linesep))
+        return output
 
     # fallback, convert this odd object to a string
-    return data
+    # print(f"Casting this to string {data}")
+    return str(data)
 
 
 def format_prettytable(table):
@@ -77,31 +73,7 @@ def format_prettytable(table):
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
             table.rows[i][j] = format_output(item)
-
     ptable = table.prettytable()
-    ptable.hrules = prettytable.FRAME
-    ptable.horizontal_char = '.'
-    ptable.vertical_char = ':'
-    ptable.junction_char = ':'
-    return ptable
-
-
-def format_no_tty(table):
-    """Converts SoftLayer.CLI.formatting.Table instance to a prettytable."""
-
-    for i, row in enumerate(table.rows):
-        for j, item in enumerate(row):
-            table.rows[i][j] = format_output(item, fmt='raw')
-    ptable = table.prettytable()
-
-    for col in table.columns:
-        ptable.align[col] = 'l'
-
-    ptable.hrules = prettytable.NONE
-    ptable.border = False
-    ptable.header = False
-    ptable.left_padding_width = 0
-    ptable.right_padding_width = 2
     return ptable
 
 
@@ -118,8 +90,7 @@ def b_to_gb(_bytes):
 
     :param int _bytes: number of bytes
     """
-    return FormattedItem(_bytes,
-                         "%.2fG" % (float(_bytes) / 1024 / 1024 / 1024))
+    return FormattedItem(_bytes, "%.2fG" % (float(_bytes) / 1024 / 1024 / 1024))
 
 
 def gb(gigabytes):  # pylint: disable=C0103
@@ -127,8 +98,7 @@ def gb(gigabytes):  # pylint: disable=C0103
 
     :param int gigabytes: number of gigabytes
     """
-    return FormattedItem(int(float(gigabytes)) * 1024,
-                         "%dG" % int(float(gigabytes)))
+    return FormattedItem(int(float(gigabytes)) * 1024, "%dG" % int(float(gigabytes)))
 
 
 def blank():
@@ -238,6 +208,7 @@ class SequentialOutput(list):
         return self
 
     def __str__(self):
+        print("CASTSDFSDFSDFSDFSDF")
         return self.separator.join(str(x) for x in self)
 
 
@@ -257,7 +228,7 @@ class Table(object):
     :param list columns: a list of column names
     """
 
-    def __init__(self, columns, title=None):
+    def __init__(self, columns, title=None, align=None):
         duplicated_cols = [col for col, count
                            in collections.Counter(columns).items()
                            if count > 1]
@@ -267,7 +238,7 @@ class Table(object):
 
         self.columns = columns
         self.rows = []
-        self.align = {}
+        self.align = align or {}
         self.sortby = None
         self.title = title
 
@@ -288,28 +259,40 @@ class Table(object):
         return items
 
     def prettytable(self):
-        """Returns a new prettytable instance."""
-        table = prettytable.PrettyTable(self.columns)
-
+        """Returns a RICH table instance."""
+        table = rTable(title=self.title, box=box.SQUARE, header_style="bright_cyan")
         if self.sortby:
-            if self.sortby in self.columns:
-                table.sortby = self.sortby
-            else:
+            try:
+                # https://docs.python.org/3/howto/sorting.html#key-functions
+                sort_index = self.columns.index(self.sortby)
+                # All the values in `rows` are strings, so we need to cast to int for sorting purposes.
+                self.rows.sort(key=lambda the_row: the_row[sort_index] if not the_row[sort_index].isdigit()
+                               else int(the_row[sort_index]))
+            except ValueError as ex:
                 msg = "Column (%s) doesn't exist to sort by" % self.sortby
-                raise exceptions.CLIAbort(msg)
+                raise exceptions.CLIAbort(msg) from ex
 
-        if isinstance(self.align, str):
-            table.align = self.align
-        else:
-            # Required because PrettyTable has a strict setter function for alignment
-            for a_col, alignment in self.align.items():
-                table.align[a_col] = alignment
+        for col in self.columns:
+            justify = "center"
+            style = None
+            # This case aligns all columns in a table
+            if isinstance(self.align, str):
+                justify = self.align
+            # This case alings a specific column
+            elif isinstance(self.align, dict) and self.align.get(col, False):
+                justify = self.align.get(col)
+            # Backwards compatibility with PrettyTable style alignments
+            if justify == 'r':
+                justify = 'right'
+            if justify == 'l':
+                justify = 'left'
+            # Special coloring for some columns
+            if col in ('id', 'Id', 'ID'):
+                style = "pale_violet_red1"
+            table.add_column(col, justify=justify, style=style)
 
-        if self.title:
-            table.title = self.title
-        # Adding rows
         for row in self.rows:
-            table.add_row(row)
+            table.add_row(*row)
         return table
 
 
@@ -346,7 +329,7 @@ class FormattedItem(object):
         """returns the formatted value."""
         # If the original value is None, represent this as 'NULL'
         if self.original is None:
-            return 'NULL'
+            return "NULL"
 
         try:
             return str(self.original)

@@ -44,11 +44,14 @@ class AccountCLITests(testing.TestCase):
         command = '--format jsonraw account events'
         command_params = command.split()
         result = self.run_command(command_params)
+
         json_text_tables = result.stdout.split('\n')
+        print("RESULT: {}".format(result.output))
         # removing an extra item due to an additional Newline at the end of the output
         json_text_tables.pop()
         # each item in the json_text_tables should be a list
         for json_text_table in json_text_tables:
+            print("TESTING THIS: \n{}\n".format(json_text_table))
             json_table = json.loads(json_text_table)
             self.assertIsInstance(json_table, list)
 

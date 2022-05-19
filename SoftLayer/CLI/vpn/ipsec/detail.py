@@ -38,26 +38,19 @@ def cli(env, context_id, include):
     manager = SoftLayer.IPSECManager(env.client)
     context = manager.get_tunnel_context(context_id, mask=mask)
 
-    env.out('Context Details:')
     env.fout(_get_context_table(context))
 
     for relation in include:
         if relation == 'at':
-            env.out('Address Translations:')
-            env.fout(_get_address_translations_table(
-                context.get('addressTranslations', [])))
+            env.fout(_get_address_translations_table(context.get('addressTranslations', [])))
         elif relation == 'is':
-            env.out('Internal Subnets:')
-            env.fout(_get_subnets_table(context.get('internalSubnets', [])))
+            env.fout(_get_subnets_table(context.get('internalSubnets', []), title="Internal Subnets"))
         elif relation == 'rs':
-            env.out('Remote Subnets:')
-            env.fout(_get_subnets_table(context.get('customerSubnets', [])))
+            env.fout(_get_subnets_table(context.get('customerSubnets', []), title="Remote Subnets"))
         elif relation == 'sr':
-            env.out('Static Subnets:')
-            env.fout(_get_subnets_table(context.get('staticRouteSubnets', [])))
+            env.fout(_get_subnets_table(context.get('staticRouteSubnets', []), title="Static Subnets"))
         elif relation == 'ss':
-            env.out('Service Subnets:')
-            env.fout(_get_subnets_table(context.get('serviceSubnets', [])))
+            env.fout(_get_subnets_table(context.get('serviceSubnets', []), title="Service Subnets"))
 
 
 def _get_address_translations_table(address_translations):
@@ -71,29 +64,24 @@ def _get_address_translations_table(address_translations):
                               'static IP address id',
                               'remote IP address',
                               'remote IP address id',
-                              'note'])
+                              'note'], title="Address Translations")
     for address_translation in address_translations:
         table.add_row([address_translation.get('id', ''),
-                       address_translation.get('internalIpAddressRecord', {})
-                       .get('ipAddress', ''),
+                       address_translation.get('internalIpAddressRecord', {}).get('ipAddress', ''),
                        address_translation.get('internalIpAddressId', ''),
-                       address_translation.get('customerIpAddressRecord', {})
-                       .get('ipAddress', ''),
+                       address_translation.get('customerIpAddressRecord', {}).get('ipAddress', ''),
                        address_translation.get('customerIpAddressId', ''),
                        address_translation.get('notes', '')])
     return table
 
 
-def _get_subnets_table(subnets):
+def _get_subnets_table(subnets, title):
     """Yields a formatted table to print subnet details.
 
     :param List[dict] subnets: List of subnets.
     :return Table: Formatted for subnet output.
     """
-    table = formatting.Table(['id',
-                              'network identifier',
-                              'cidr',
-                              'note'])
+    table = formatting.Table(['id', 'network identifier', 'cidr', 'note'], title=title)
     for subnet in subnets:
         table.add_row([subnet.get('id', ''),
                        subnet.get('networkIdentifier', ''),
@@ -163,34 +151,26 @@ def _get_context_table(context):
     :param dict context: The tunnel context
     :return Table: Formatted for tunnel context output
     """
-    table = formatting.KeyValueTable(['name', 'value'])
+    table = formatting.KeyValueTable(['name', 'value'], title='Context Details')
     table.align['name'] = 'r'
     table.align['value'] = 'l'
 
     table.add_row(['id', context.get('id', '')])
     table.add_row(['name', context.get('name', '')])
     table.add_row(['friendly name', context.get('friendlyName', '')])
-    table.add_row(['internal peer IP address',
-                   context.get('internalPeerIpAddress', '')])
-    table.add_row(['remote peer IP address',
-                   context.get('customerPeerIpAddress', '')])
-    table.add_row(['advanced configuration flag',
-                   context.get('advancedConfigurationFlag', '')])
+    table.add_row(['internal peer IP address', context.get('internalPeerIpAddress', '')])
+    table.add_row(['remote peer IP address', context.get('customerPeerIpAddress', '')])
+    table.add_row(['advanced configuration flag', context.get('advancedConfigurationFlag', '')])
     table.add_row(['preshared key', context.get('presharedKey', '')])
-    table.add_row(['phase 1 authentication',
-                   context.get('phaseOneAuthentication', '')])
-    table.add_row(['phase 1 diffie hellman group',
-                   context.get('phaseOneDiffieHellmanGroup', '')])
+    table.add_row(['phase 1 authentication', context.get('phaseOneAuthentication', '')])
+    table.add_row(['phase 1 diffie hellman group', context.get('phaseOneDiffieHellmanGroup', '')])
     table.add_row(['phase 1 encryption', context.get('phaseOneEncryption', '')])
     table.add_row(['phase 1 key life', context.get('phaseOneKeylife', '')])
-    table.add_row(['phase 2 authentication',
-                   context.get('phaseTwoAuthentication', '')])
-    table.add_row(['phase 2 diffie hellman group',
-                   context.get('phaseTwoDiffieHellmanGroup', '')])
+    table.add_row(['phase 2 authentication', context.get('phaseTwoAuthentication', '')])
+    table.add_row(['phase 2 diffie hellman group', context.get('phaseTwoDiffieHellmanGroup', '')])
     table.add_row(['phase 2 encryption', context.get('phaseTwoEncryption', '')])
     table.add_row(['phase 2 key life', context.get('phaseTwoKeylife', '')])
-    table.add_row(['phase 2 perfect forward secrecy',
-                   context.get('phaseTwoPerfectForwardSecrecy', '')])
+    table.add_row(['phase 2 perfect forward secrecy', context.get('phaseTwoPerfectForwardSecrecy', '')])
     table.add_row(['created', context.get('createDate')])
     table.add_row(['modified', context.get('modifyDate')])
     return table

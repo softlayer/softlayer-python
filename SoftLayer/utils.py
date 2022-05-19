@@ -7,8 +7,10 @@
 """
 import collections
 import datetime
+from json import JSONDecoder
 import re
 import time
+
 
 # pylint: disable=no-member, invalid-name
 
@@ -432,3 +434,26 @@ def format_comment(comment, max_line_length=60):
 def clean_dict(dictionary):
     """Removes any `None` entires from the dictionary"""
     return {k: v for k, v in dictionary.items() if v}
+
+
+NOT_WHITESPACE = re.compile(r'[^\s]')
+
+
+def decode_stacked(document, pos=0, decoder=JSONDecoder()):
+    """Used for converting CLI output to JSON datastructures. Specially for unit tests
+
+    https://stackoverflow.com/questions/27907633/how-to-extract-multiple-json-objects-from-one-file
+    Example::
+        split_output = []
+        # Converts Rich JSON output to actual JSON data. JSON UTIL
+        for table in utils.decode_stacked(result.output):
+            split_output.append(table)
+    """
+    while True:
+        match = NOT_WHITESPACE.search(document, pos)
+        if not match:
+            return
+        pos = match.start()
+        obj, pos = decoder.raw_decode(document, pos)
+
+        yield obj

@@ -24,8 +24,6 @@ def cli(env, context_id):
 
     succeeded = manager.apply_configuration(context_id)
     if succeeded:
-        env.out('Configuration request received for context #{}'
-                .format(context_id))
+        click.echo('Configuration request received for context #{}'.format(context_id))
     else:
-        raise CLIHalt('Failed to enqueue configuration request for context #{}'
-                      .format(context_id))
+        raise CLIHalt('Failed to enqueue configuration request for context #{}'.format(context_id))

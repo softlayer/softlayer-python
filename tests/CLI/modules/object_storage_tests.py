@@ -52,7 +52,7 @@ class ObjectStorageTests(testing.TestCase):
     def test_delete_credential(self):
         result = self.run_command(['object-storage', 'credential', 'delete', '-c', 100, '100'])
         self.assert_no_fail(result)
-        self.assertEqual(result.output, 'True\n')
+        self.assertEqual(result.output, 'true\n')
 
     @mock.patch('SoftLayer.CLI.helpers.resolve_id')
     def test_delete_credential_by_username(self, resolve_id_mock):
