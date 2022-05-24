@@ -88,7 +88,7 @@ def cli(env):
                                  gatewalls['networkFirewall']['datacenter']['name'],
                                  gatewalls['publicIpAddress']['ipAddress'],
                                  gatewalls['privateIpAddress']['ipAddress'],
-                                 len(gatewalls['insideVlans']), gatewalls['status']['keyName']]),
+                                 len(gatewalls['insideVlans']), gatewalls['status']['keyName']])
     env.fout(table)
     env.fout(table_gatewalls)
 
