@@ -16,23 +16,7 @@ class FirewallTests(testing.TestCase):
         result = self.run_command(['firewall', 'list'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         [{'features': ['HA'],
-                           'firewall id': 'vlan:1234',
-                           'server/vlan id': 1,
-                           'type': 'VLAN - dedicated'},
-                          {'features': ['HA'],
-                           'firewall id': 'vlan:23456',
-                           'server/vlan id': 3,
-                           'type': 'VLAN - dedicated'},
-                          {'features': '-',
-                           'firewall id': 'vs:1234',
-                           'server/vlan id': 1,
-                           'type': 'Virtual Server - standard'},
-                          {'features': '-',
-                           'firewall id': 'server:1234',
-                           'server/vlan id': 1,
-                           'type': 'Server - standard'}])
+        self.assert_called_with('SoftLayer_Account', 'getNetworkGateways')
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_add_vs(self, confirm_mock):

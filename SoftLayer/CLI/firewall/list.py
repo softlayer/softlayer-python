@@ -18,7 +18,7 @@ def cli(env):
     table = formatting.Table(['firewall id',
                               'type',
                               'features',
-                              'server/vlan id'])
+                              'server/vlan id'], title='Single Server Firewalls')
     fwvlans = mgr.get_firewalls()
     dedicated_firewalls = [firewall for firewall in fwvlans
                            if firewall['dedicatedFirewallFlag']]
@@ -70,7 +70,27 @@ def cli(env):
                              'hardwareId')
             ])
 
+    table_gatewalls = formatting.Table(['firewall id',
+                                        'firewall',
+                                        'type',
+                                        'Hostname',
+                                        'Location',
+                                        'Public Ip',
+                                        'Private Ip',
+                                        'Associated vlan',
+                                        'status'], title='Multi Vlan Firewall')
+    fw_gatewwalls = mgr.get_firewalls_gatewalls()
+
+    for gatewalls in fw_gatewwalls:
+        table_gatewalls.add_row([gatewalls.get('id'), gatewalls.get('name'),
+                                 gatewalls['networkFirewall']['firewallType'],
+                                 gatewalls['members'][0]['hardware']['hostname'],
+                                 gatewalls['networkFirewall']['datacenter']['name'],
+                                 gatewalls['publicIpAddress']['ipAddress'],
+                                 gatewalls['privateIpAddress']['ipAddress'],
+                                 len(gatewalls['insideVlans']), gatewalls['status']['keyName']]),
     env.fout(table)
+    env.fout(table_gatewalls)
 
 
 def has_firewall_component(server):
