@@ -16,13 +16,20 @@ from SoftLayer import utils
               help="Display FortiGate username and FortiGate password to multi vlans.")
 @environment.pass_env
 def cli(env, identifier, credentials):
-    """Detail firewall."""
+    """Detail firewall.
+
+    EXAMPLES:
+
+        slcli firewall detail vs:12345
+
+        slcli firewall detail --credentials true multiVlan:456789
+    """
 
     mgr = SoftLayer.FirewallManager(env.client)
 
     firewall_type, firewall_id = firewall.parse_id(identifier)
 
-    if firewall_type == 'vs' or firewall_type == 'server' or firewall_type == 'vlan' or firewall_type == 'multiVlan':
+    if firewall_type in ('vs', 'server', 'vlan', 'multiVlan'):
 
         if firewall_type == 'vlan':
             _firewall = mgr.get_instance(firewall_id)
