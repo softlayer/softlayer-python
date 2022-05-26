@@ -70,7 +70,7 @@ def cli(env):
                              'hardwareId')
             ])
 
-    table_gatewalls = formatting.Table(['firewall id',
+    table_gatewalls = formatting.Table(['Id',
                                         'firewall',
                                         'type',
                                         'Hostname',

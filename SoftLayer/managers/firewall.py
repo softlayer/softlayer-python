@@ -304,9 +304,9 @@ class FirewallManager(utils.IdentifierMixin, object):
         return svc.getObject(id=firewall_id, mask=mask)
 
     def get_firewalls_gatewalls(self):
-        """Returns a list of all firewalls on the account.
+        """Returns a list of all gateway firewalls (gatewalls) on the account.
 
-        returns: A list of firewalls on the current account.
+        returns: A list of gateway firewalls (gatewalls) on the current account.
         """
         mask = 'mask[id,networkSpace,name,' \
                'networkFirewall[id,firewallType,datacenter[name]],' \
