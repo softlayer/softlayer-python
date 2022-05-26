@@ -57,11 +57,14 @@ def cli(env, identifier, credentials):
             table.add_row(['type', _firewall.get('firewallType')])
 
             if credentials:
-                table.add_row(['FortiGate username', utils.lookup(_firewall, 'managementCredentials', 'username')])
-                table.add_row(['FortiGate password', utils.lookup(_firewall, 'managementCredentials', 'password')])
+                table.add_row(['fortiGate username', utils.lookup(_firewall, 'managementCredentials', 'username')])
+                table.add_row(['fortiGate password', utils.lookup(_firewall, 'managementCredentials', 'password')])
 
             rules = mgr.get_dedicated_fwl_rules(firewall_id)
-            table.add_row(['rules', get_rules_table(rules)])
+            if len(rules) != 0:
+                table.add_row(['rules', get_rules_table(rules)])
+            else:
+                table.add_row(['rules', '-'])
 
         if firewall_type == 'vs' or firewall_type == 'server':
             rules = mgr.get_standard_fwl_rules(firewall_id)
