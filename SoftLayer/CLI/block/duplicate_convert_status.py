@@ -30,6 +30,3 @@ def cli(env, volume_id):
     )
 
     env.fout(table)
-
-
-
