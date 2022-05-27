@@ -32,17 +32,11 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
 
     Example::
 
-        slcli hw bandwidth 1234 -s 2019-05-01T00:01 -e 2019-05-02T00:00:01.00000-12:00
+        slcli vs bandwidth 1234 -s 2019-05-01T00:01 -e 2019-05-02T00:00:01.00000-12:00
     """
     vsi = SoftLayer.VSManager(env.client)
     vsi_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
 
-    # Summary period is broken for virtual guests, check VIRT-11733 for a resolution.
-    # For now, we are going to ignore summary_period and set it to the default the API imposes
-    if summary_period != 300:
-        click.secho("""The Summary Period option is currently set to the 300s as the backend API will throw an exception
-any other value. This should be resolved in the next version of the slcli.""", fg='yellow')
-    summary_period = 300
     data = vsi.get_bandwidth_data(vsi_id, start_date, end_date, None, None)
 
     title = "Bandwidth Report: %s - %s" % (start_date, end_date)

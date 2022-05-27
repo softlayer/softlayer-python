@@ -10,6 +10,7 @@ import json
 from SoftLayer.CLI.exceptions import ArgumentError
 from SoftLayer.CLI.exceptions import CLIHalt
 from SoftLayer import testing
+from SoftLayer import utils
 
 
 class IPSECTests(testing.TestCase):
@@ -60,8 +61,7 @@ class IPSECTests(testing.TestCase):
                  'addressTranslations[internalIpAddressRecord[ipAddress],'
                  'customerIpAddressRecord[ipAddress]],internalSubnets,'
                  'customerSubnets,staticRouteSubnets,serviceSubnets]]')
-        mock = self.set_mock('SoftLayer_Account',
-                             'getNetworkTunnelContexts')
+        mock = self.set_mock('SoftLayer_Account', 'getNetworkTunnelContexts')
         mock.return_value = [{
             'id': 445,
             'name': 'der tunnel',
@@ -114,19 +114,16 @@ class IPSECTests(testing.TestCase):
                 'note': 'Static Network'
             }]
         }]
-        result = self.run_command(['ipsec', 'detail', '445', '-iat', '-iis',
-                                   '-irs', '-isr', '-iss'])
-        empty, output = result.output.split('Context Details:\n')
-        context, output = output.split('Address Translations:\n')
-        translations, output = output.split('Internal Subnets:\n')
-        internal_subnets, output = output.split('Remote Subnets:\n')
-        remote_subnets, output = output.split('Static Subnets:\n')
-        static_subnets, service_subnets = output.split('Service Subnets:\n')
+        result = self.run_command(['ipsec', 'detail', '445', '-iat', '-iis', '-irs', '-isr', '-iss'])
 
+        split_output = []
+        # Converts Rich JSON output to actual JSON data. JSON UTIL
+        for table in utils.decode_stacked(result.output):
+            split_output.append(table)
+
+        self.assertEqual(6, len(split_output))
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Account',
-                                'getNetworkTunnelContexts',
-                                mask=_mask)
+        self.assert_called_with('SoftLayer_Account', 'getNetworkTunnelContexts', mask=_mask)
         self.assertEqual({'id': 445,
                           'name': 'der tunnel',
                           'friendly name': 'the tunnel',
@@ -145,34 +142,34 @@ class IPSECTests(testing.TestCase):
                           'phase 2 perfect forward secrecy': 0,
                           'created': '2017-05-17T12:00:00-06:00',
                           'modified': '2017-05-17T12:01:00-06:00'},
-                         json.loads(context))
+                         split_output[0])
         self.assertEqual([{'id': 872341,
                            'remote IP address': '50.0.0.1',
                            'remote IP address id': 872422,
                            'static IP address': '10.0.0.1',
                            'static IP address id': 982341,
                            'note': 'surprise!'}],
-                         json.loads(translations))
+                         split_output[1])
         self.assertEqual([{'id': 324113,
                            'network identifier': '10.20.0.0',
                            'cidr': 29,
                            'note': 'Private Network'}],
-                         json.loads(internal_subnets))
+                         split_output[2])
         self.assertEqual([{'id': 873411,
                            'network identifier': '50.0.0.0',
                            'cidr': 26,
                            'note': 'Offsite Network'}],
-                         json.loads(remote_subnets))
+                         split_output[3])
         self.assertEqual([{'id': 998232,
                            'network identifier': '50.50.0.0',
                            'cidr': 29,
                            'note': 'Static Network'}],
-                         json.loads(static_subnets))
+                         split_output[4])
         self.assertEqual([{'id': 565312,
                            'network identifier': '100.10.0.0',
                            'cidr': 26,
                            'note': 'Service Network'}],
-                         json.loads(service_subnets))
+                         split_output[5])
 
     def test_ipsec_list(self):
         mock = self.set_mock('SoftLayer_Account', 'getNetworkTunnelContexts')

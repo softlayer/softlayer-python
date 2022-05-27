@@ -5,6 +5,7 @@ import re
 import click
 
 import SoftLayer
+from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
@@ -17,9 +18,8 @@ RECORD_REGEX = re.compile(r"""^((?P<domain>(([\w-]+|\*)(\.)?)*|\@)?\s+
 RECORD_FMT = "type={type}, record={record}, data={data}, ttl={ttl}"
 
 
-@click.command(cls=SoftLayer.CLI.command.SLCommand, )
-@click.argument('zonefile',
-                type=click.Path(exists=True, readable=True, resolve_path=True))
+@click.command(cls=SLCommand)
+@click.argument('zonefile', type=click.Path(exists=True, readable=True, resolve_path=True))
 @click.option('--dry-run', is_flag=True, help="Don't actually create records")
 @environment.pass_env
 def cli(env, zonefile, dry_run):
@@ -31,12 +31,12 @@ def cli(env, zonefile, dry_run):
 
     zone, records, bad_lines = parse_zone_details(zone_contents)
 
-    env.out("Parsed: zone=%s" % zone)
+    click.secho("Parsed: zone=%s" % zone)
     for record in records:
-        env.out("Parsed: %s" % RECORD_FMT.format(**record))
+        click.secho("Parsed: %s" % RECORD_FMT.format(**record), fg="green")
 
     for line in bad_lines:
-        env.out("Unparsed: %s" % line)
+        click.secho("Unparsed: %s" % line, fg="yellow")
 
     if dry_run:
         return
@@ -47,25 +47,19 @@ def cli(env, zonefile, dry_run):
                                      name='zone')
     except exceptions.CLIAbort:
         zone_id = manager.create_zone(zone)['id']
-        env.out(click.style("Created: %s" % zone, fg='green'))
+        click.secho(click.style("Created: %s" % zone, fg='green'))
 
     # Attempt to create each record
     for record in records:
         try:
-            manager.create_record(zone_id,
-                                  record['record'],
-                                  record['type'],
-                                  record['data'],
-                                  record['ttl'])
+            manager.create_record(zone_id, record['record'], record['type'], record['data'], record['ttl'])
 
-            env.out(click.style("Created: %s" % RECORD_FMT.format(**record),
-                                fg='green'))
+            click.secho(click.style("Created: %s" % RECORD_FMT.format(**record), fg='green'))
         except SoftLayer.SoftLayerAPIError as ex:
-            env.out(click.style("Failed: %s" % RECORD_FMT.format(**record),
-                                fg='red'))
-            env.out(click.style(str(ex), fg='red'))
+            click.secho(click.style("Failed: %s" % RECORD_FMT.format(**record), fg='red'))
+            click.secho(click.style(str(ex), fg='red'))
 
-    env.out(click.style("Finished", fg='green'))
+    click.secho(click.style("Finished", fg='green'))
 
 
 def parse_zone_details(zone_contents):
@@ -75,7 +69,10 @@ def parse_zone_details(zone_contents):
     zone_lines = [line.strip() for line in zone_contents.split('\n')]
 
     zone_search = re.search(r'^\$ORIGIN (?P<zone>.*)\.', zone_lines[0])
-    zone = zone_search.group('zone')
+    if zone_search:
+        zone = zone_search.group('zone')
+    else:
+        raise exceptions.ArgumentError("Invalid Zone File")
 
     for line in zone_lines[1:]:
         record_search = re.search(RECORD_REGEX, line)

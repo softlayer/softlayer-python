@@ -9,6 +9,7 @@ import click
 from unittest import mock as mock
 
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import formatting
 from SoftLayer import testing
 
 
@@ -44,9 +45,7 @@ class EnvironmentTests(testing.TestCase):
     @mock.patch('click.prompt')
     def test_input(self, prompt_mock):
         r = self.env.input('input')
-        prompt_mock.assert_called_with('input',
-                                       default=None,
-                                       show_default=True)
+        prompt_mock.assert_called_with('input', default=None, show_default=True)
         self.assertEqual(prompt_mock(), r)
 
     @mock.patch('click.prompt')
@@ -71,17 +70,18 @@ class EnvironmentTests(testing.TestCase):
         r = self.env.resolve_alias('realname')
         self.assertEqual(r, 'realname')
 
-    @mock.patch('click.echo')
-    def test_print_unicode(self, echo):
-        output = "\u3010TEST\u3011 image"
-        # https://docs.python.org/3.6/library/exceptions.html#UnicodeError
-        echo.side_effect = [
-            UnicodeEncodeError('utf8', output, 0, 1, "Test Exception"),
-            output
-        ]
-        self.env.fout(output)
-        self.assertEqual(2, echo.call_count)
-
     def test_format_output_is_json(self):
         self.env.format = 'jsonraw'
         self.assertTrue(self.env.format_output_is_json())
+
+    @mock.patch('rich.console.Console.print')
+    def test_multiple_tables(self, console):
+        tables = []
+        table1 = formatting.Table(["First", "Second"])
+        table1.add_row(["1", 2])
+        table2 = formatting.Table(["T2-1", "T2-2"])
+        table2.add_row(["zzzzzzz", "123123123"])
+        tables.append(table1)
+        tables.append(table2)
+        self.env.out(tables)
+        self.assertEqual(2, len(console.call_args_list))

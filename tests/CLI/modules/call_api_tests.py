@@ -93,8 +93,9 @@ class CallCliTests(testing.TestCase):
                                    '--id=100',
                                    '-f nested.property=5432',
                                    '--output-python'])
-
+        print("OUTPUT: \n{}".format(result.exception))
         self.assert_no_fail(result)
+
         self.assertIsNotNone(result.output, """import SoftLayer
 
 client = SoftLayer.create_client_from_env()
@@ -162,14 +163,12 @@ result = client.call(u'Service',
 
         self.assert_no_fail(result)
         # NOTE(kmcdonald): Order is not guaranteed
-        self.assertIn(":........:........:", result.output)
-        self.assertIn(":   name : value  :", result.output)
-        self.assertIn(":    int : 10     :", result.output)
-        self.assertIn(":   None : None   :", result.output)
-        self.assertIn(":  float : 1.0    :", result.output)
-        self.assertIn(":   Bool : True   :", result.output)
-        self.assertIn(": string : string :", result.output)
-        self.assertIn(":........:........:", result.output)
+        self.assertIn("│   name │ value  │", result.output)
+        self.assertIn("│    int │ 10     │", result.output)
+        self.assertIn("│   None │ None   │", result.output)
+        self.assertIn("│  float │ 1.0    │", result.output)
+        self.assertIn("│   Bool │ True   │", result.output)
+        self.assertIn("│ string │ string │", result.output)
 
     def test_object_nested(self):
         mock = self.set_mock('SoftLayer_Service', 'method')
@@ -210,11 +209,11 @@ result = client.call(u'Service',
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,
-                         """:......:......:.......:.....:........:
-: Bool : None : float : int : string :
-:......:......:.......:.....:........:
-: True : None :  1.0  :  10 : string :
-:......:......:.......:.....:........:
+                         """┌──────┬──────┬───────┬─────┬────────┐
+│ Bool │ None │ float │ int │ string │
+├──────┼──────┼───────┼─────┼────────┤
+│ True │ None │  1.0  │ 10  │ string │
+└──────┴──────┴───────┴─────┴────────┘
 """)
 
     def test_parameters(self):
@@ -294,7 +293,6 @@ result = client.call(u'Service',
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_json_filter(self):
-        pass
         result = self.run_command(['call-api', 'Account', 'getObject', '--json-filter={"test":"something"}'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getObject', filter={"test": "something"})
@@ -316,3 +314,11 @@ result = client.call(u'Service',
                                                     'value': ['DESC']}]},
                                             'typeId': {'operation': 1}}
                                 })
+
+    def test_very_verbose(self):
+        result = self.run_command(['-vvv', 'call-api', 'Account', 'getObject'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getObject')
+        self.assertIn("ORIGIN_PULL", result.output)
+        self.assertIn("python_version", result.output)
+        self.assertIn("offset", result.output)

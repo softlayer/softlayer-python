@@ -13,7 +13,8 @@ getObject = {
         'id': 235689,
         'notes': 'test cli',
         'orderItemId': 147258,
-    }
+    },
+    'tagReferences': [],
 }
 
 editObject = True

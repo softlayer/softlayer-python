@@ -141,9 +141,8 @@ class OrderTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
-        self.assertEqual('Warning: Closed soon: ams01.pod01, wdc07.pod01, TEST00.pod2\n'
-                         '{\n    "id": 1234,\n    "created": "2017-04-04 07:39:20",\n    "status": "APPROVED"\n}\n',
-                         str(result.output))
+        self.assertIn('Warning: Closed soon: ams01.pod01, wdc07.pod01, TEST00.pod2', result.output)
+        self.assertIn('"status": "APPROVED"', result.output)
 
     def test_place_with_quantity(self):
         order_date = '2017-04-04 07:39:20'
@@ -161,9 +160,8 @@ class OrderTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
-        self.assertEqual('Warning: Closed soon: ams01.pod01, wdc07.pod01, TEST00.pod2\n'
-                         '{\n    "id": 1234,\n    "created": "2017-04-04 07:39:20",\n    "status": "APPROVED"\n}\n',
-                         str(result.output))
+        self.assertIn('Warning: Closed soon: ams01.pod01, wdc07.pod01, TEST00.pod2', result.output)
+        self.assertIn('"status": "APPROVED"', result.output)
 
     def test_place_extras_parameter_fail(self):
         result = self.run_command(['-y', 'order', 'place', 'package', 'DALLAS13', 'ITEM1',
@@ -279,8 +277,7 @@ class OrderTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getActivePresets')
-        self.assert_called_with('SoftLayer_Product_Package',
-                                'getAccountRestrictedActivePresets')
+        self.assert_called_with('SoftLayer_Product_Package', 'getAccountRestrictedActivePresets')
         self.assertEqual([{'name': 'active1',
                            'keyName': 'PRESET1',
                            'description': 'description1'},

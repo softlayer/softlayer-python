@@ -11,6 +11,7 @@ import sys
 import tempfile
 
 import click
+from rich.table import Table
 from unittest import mock as mock
 
 from SoftLayer.CLI import core
@@ -266,19 +267,6 @@ class TestFormatOutput(testing.TestCase):
         t = formatting.format_output('just a string', 'raw')
         self.assertEqual('just a string', t)
 
-        t = formatting.format_output(b'just a string', 'raw')
-        self.assertEqual(b'just a string', t)
-
-    def test_format_output_raw(self):
-        t = formatting.Table(['nothing'])
-        t.align['nothing'] = 'c'
-        t.add_row(['testdata'])
-        t.sortby = 'nothing'
-        ret = formatting.format_output(t, 'raw')
-
-        self.assertNotIn('nothing', str(ret))
-        self.assertIn('testdata', str(ret))
-
     def test_format_output_json(self):
         t = formatting.Table(['nothing'])
         t.align['nothing'] = 'c'
@@ -342,7 +330,7 @@ class TestFormatOutput(testing.TestCase):
     def test_format_output_list(self):
         item = ['this', 'is', 'a', 'list']
         ret = formatting.format_output(item, 'table')
-        self.assertEqual(os.linesep.join(item), ret)
+        self.assertEqual("['this', 'is', 'a', 'list']", str(ret))
 
     def test_format_output_table(self):
         t = formatting.Table(['nothing'])
@@ -350,13 +338,11 @@ class TestFormatOutput(testing.TestCase):
         t.add_row(['testdata'])
         t.sortby = 'nothing'
         ret = formatting.format_output(t, 'table')
-
-        self.assertIn('nothing', str(ret))
-        self.assertIn('testdata', str(ret))
+        self.assertIsInstance(ret, Table)
 
     def test_unknown(self):
         t = formatting.format_output({}, 'raw')
-        self.assertEqual({}, t)
+        self.assertEqual('{}', t)
 
     def test_sequentialoutput(self):
         # specifying the separator prevents windows from using \n\r
@@ -380,7 +366,7 @@ class TestFormatOutput(testing.TestCase):
         self.assertEqual(['just a string'], t)
 
         t = formatting.format_output({'test_key': 'test_value'}, 'python')
-        self.assertEqual({'test_key': 'test_value'}, t)
+        self.assertEqual("{'test_key': 'test_value'}", t)
 
     def test_format_output_python_keyvaluetable(self):
         t = formatting.KeyValueTable(['key', 'value'])

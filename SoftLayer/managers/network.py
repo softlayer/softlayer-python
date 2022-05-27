@@ -40,11 +40,13 @@ DEFAULT_VLAN_MASK = ','.join([
     'hardwareCount',
     'primaryRouter[id, fullyQualifiedDomainName, datacenter]',
     'subnetCount',
+    'billingItem',
     'totalPrimaryIpAddressCount',
     'virtualGuestCount',
     'networkSpace',
     'networkVlanFirewall[id,fullyQualifiedDomainName,primaryIpAddress]',
     'attachedNetworkGateway[id,name,networkFirewall]',
+    'tagReferences[tag[name]]',
 ])
 DEFAULT_GET_VLAN_MASK = ','.join([
     'firewallInterfaces',

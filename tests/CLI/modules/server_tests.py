@@ -17,6 +17,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.fixtures import SoftLayer_Product_Order
 from SoftLayer import SoftLayerError
 from SoftLayer import testing
+from SoftLayer import utils
 
 
 class ServerCLITests(testing.TestCase):
@@ -397,9 +398,8 @@ class ServerCLITests(testing.TestCase):
                                    ])
 
         self.assert_no_fail(result)
-        self.assertEqual(
-            str(result.output),
-            'Warning: Closed soon: TEST00.pod2\n{\n    "id": 98765,\n    "created": "2013-08-02 15:23:47"\n}\n')
+        self.assertIn('Warning: Closed soon: TEST00.pod2', result.output)
+        self.assertIn('"id": 98765', result.output)
 
     @mock.patch('SoftLayer.CLI.template.export_to_template')
     def test_create_server_with_export(self, export_mock):
@@ -622,13 +622,13 @@ class ServerCLITests(testing.TestCase):
         mock.return_value = True
         result = self.run_command(['server', 'toggle-ipmi', '--enable', '12345'])
         self.assert_no_fail(result)
-        self.assertEqual(result.output, 'True\n')
+        self.assertEqual(result.output, 'true\n')
 
     def test_toggle_ipmi_off(self):
         mock.return_value = True
         result = self.run_command(['server', 'toggle-ipmi', '--disable', '12345'])
         self.assert_no_fail(result)
-        self.assertEqual(result.output, 'True\n')
+        self.assertEqual(result.output, 'true\n')
 
     def test_bandwidth_hw(self):
         if sys.version_info < (3, 6):
@@ -637,17 +637,17 @@ class ServerCLITests(testing.TestCase):
         self.assert_no_fail(result)
 
         date = '2019-05-20 23:00'
-        # number of characters from the end of output to break so json can parse properly
-        pivot = 157
         # only pyhon 3.7 supports the timezone format slapi uses
         if sys.version_info < (3, 7):
             date = '2019-05-20T23:00:00-06:00'
-            pivot = 166
-        # Since this is 2 tables, it gets returned as invalid json like "[{}][{}]"" instead of "[[{}],[{}]]"
-        # so we just do some hacky string substitution to pull out the respective arrays that can be jsonifyied
 
-        output_summary = json.loads(result.output[0:-pivot])
-        output_list = json.loads(result.output[-pivot:])
+        split_output = []
+        for table in utils.decode_stacked(result.output):
+            split_output.append(table)
+
+        self.assertEqual(len(split_output), 2)
+        output_summary = split_output[0]
+        output_list = split_output[1]
 
         self.assertEqual(output_summary[0]['Average MBps'], 0.3841)
         self.assertEqual(output_summary[1]['Max Date'], date)
