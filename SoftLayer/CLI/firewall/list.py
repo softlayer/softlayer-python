@@ -82,7 +82,7 @@ def cli(env):
     fw_gatewwalls = mgr.get_firewalls_gatewalls()
 
     for gatewalls in fw_gatewwalls:
-        table_gatewalls.add_row([gatewalls.get('id'), gatewalls.get('name'),
+        table_gatewalls.add_row([gatewalls['networkFirewall']['id'], gatewalls.get('name'),
                                  gatewalls['networkFirewall']['firewallType'],
                                  gatewalls['members'][0]['hardware']['hostname'],
                                  gatewalls['networkFirewall']['datacenter']['name'],
