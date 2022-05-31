@@ -13,13 +13,11 @@ from SoftLayer.CLI import formatting
 @environment.pass_env
 def cli(env, volume_id):
     """Get status for split or move completed percentage of a given block duplicate volume."""
-    table = formatting.Table(['username', 'active_conversion_start_time', 'completed_percentage'])
+    table = formatting.Table(['Username', 'Active Conversion Start Timestamp', 'Completed Percentage'])
 
     block_manager = SoftLayer.BlockStorageManager(env.client)
 
-    value = block_manager.split_percentage(
-        volume_id
-    )
+    value = block_manager.convert_dupe_status(volume_id)
 
     table.add_row(
         [

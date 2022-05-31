@@ -578,7 +578,7 @@ class StorageManager(utils.IdentifierMixin, object):
                                 'convertCloneDependentToIndependent',
                                 id=volume_id)
 
-    def split_percentage(self, volume_id):
+    def convert_dupe_status(self, volume_id):
         """Get the Clone split/move status completion of a duplicate volume
 
         :param integer volume_id: The id of the volume.
