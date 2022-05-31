@@ -198,7 +198,7 @@ class Environment(object):
             )
         else:
             # Create SL Client
-            client = SoftLayer.create_client_from_env(
+            client = SoftLayer.employee_client(
                 proxy=proxy,
                 config_file=config_file,
             )

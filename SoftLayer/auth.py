@@ -143,7 +143,7 @@ class EmployeeAuthentication(AuthenticationBase):
     """Token-based authentication class.
 
         :param username str: a user's username
-        :param api_key str: a user's API key
+        :param user_hash str: a user's Authentication hash
     """
     def __init__(self, user_id, user_hash):
         self.user_id = user_id

@@ -6,6 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=invalid-name
+import os
 import time
 import warnings
 
@@ -144,7 +145,8 @@ def create_client_from_env(username=None,
 
 
 def employee_client(username=None,
-                    api_key=None,
+                    access_token=None,
+                    password=None,
                     endpoint_url=None,
                     timeout=None,
                     auth=None,
@@ -159,7 +161,8 @@ def employee_client(username=None,
     config file.
 
     :param username: your user ID
-    :param api_key: hash from SoftLayer_User_Employee::performExternalAuthentication(username, password, 2fa_string)
+    :param access_token: hash from SoftLayer_User_Employee::performExternalAuthentication(username, password, 2fa_string)
+    :param password: password to use for employee authentication
     :param endpoint_url: the API endpoint base URL you wish to connect to.
         Set this to API_PRIVATE_ENDPOINT to connect via SoftLayer's private
         network.
@@ -185,15 +188,21 @@ def employee_client(username=None,
 
     """
     settings = config.get_client_settings(username=username,
-                                          api_key=api_key,
+                                          api_key=None,
                                           endpoint_url=endpoint_url,
                                           timeout=timeout,
                                           proxy=proxy,
                                           verify=verify,
                                           config_file=config_file)
 
+    url = settings.get('endpoint_url') or consts.API_EMPLOYEE_ENDPOINT
+
+    if 'internal' not in url:
+        raise exceptions.SoftLayerError("{} does not look like an Internal Employee url. Try {}".format(
+                                         url, consts.API_EMPLOYEE_ENDPOINT))
+
     if transport is None:
-        url = settings.get('endpoint_url')
+        
         if url is not None and '/rest' in url:
             # If this looks like a rest endpoint, use the rest transport
             transport = transports.RestTransport(
@@ -214,15 +223,18 @@ def employee_client(username=None,
             )
 
 
-    if auth is None and settings.get('username') and settings.get('api_key'):
-        real_transport = getattr(transport, 'transport', transport)
-        if isinstance(real_transport, transports.XmlRpcTransport):
-            auth = slauth.EmployeeAuthentication(
-                settings.get('username'),
-                settings.get('api_key'),
-            )
+    if access_token is None:
+        access_token = settings.get('access_token')
 
-    return BaseClient(auth=auth, transport=transport)
+    user_id = settings.get('user_id')
+
+    # Assume access_token is valid for now, user has logged in before at least.
+    if access_token and user_id:
+        auth = slauth.EmployeeAuthentication(user_id, access_token)
+        return EmployeeClient(auth=auth, transport=transport)
+    else:
+        return EmployeeClient(auth=None, transport=transport)
+
 
 
 def Client(**kwargs):
@@ -230,8 +242,7 @@ def Client(**kwargs):
 
     Deprecated in favor of create_client_from_env()
     """
-    warnings.warn("use SoftLayer.create_client_from_env() instead",
-                  DeprecationWarning)
+    warnings.warn("use SoftLayer.create_client_from_env() instead", DeprecationWarning)
     return create_client_from_env(**kwargs)
 
 
