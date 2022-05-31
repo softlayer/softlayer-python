@@ -153,10 +153,15 @@ If you are using the library directly in python, you can do something like this.
 
 System Requirements
 -------------------
-* Python 3.5, 3.6, 3.7, 3.8, or 3.9.
+* Python 3.8, 3.9, or 3.10.
 * A valid SoftLayer API username and key.
 * A connection to SoftLayer's private network is required to use
   our private network API endpoints.
+
+Python 3.6 Support
+------------------
+As of version 6.0.0 SoftLayer-Python will no longer support python3.6, which is `End of Life as of 2022 <https://endoflife.date/python>`_.
+If you cannot install python 3.8+ for some reason, you will need to use a version of softlayer-python <= 6.0.0
 
 Python 2.7 Support
 ------------------
@@ -167,12 +172,15 @@ If you cannot install python 3.6+ for some reason, you will need to use a versio
 
 Python Packages
 ---------------
-* prettytable >= 2.0.0
-* click >= 7
+* prettytable >= 2.5.0
+* click >= 8.0.4
 * requests >= 2.20.0
 * prompt_toolkit >= 2
 * pygments >= 2.0.0
 * urllib3 >= 1.24
+* rich == 12.3.0
+
+*NOTE* If `ptable` (not prettytable) is installed, this will cause issues rendering tables.
 
 Copyright
 ---------
