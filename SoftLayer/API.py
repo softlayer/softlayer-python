@@ -665,7 +665,7 @@ class EmployeeClient(BaseClient):
 
 
         self.settings['softlayer']['access_token'] = auth_result['hash']
-        self.settings['softlayer']['userId'] = auth_result['userId']
+        self.settings['softlayer']['userId'] = str(auth_result['userId'])
         # self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
 
         config.write_config(self.settings, self.config_file)
@@ -708,7 +708,7 @@ class EmployeeClient(BaseClient):
                 raise ex
 
     def __repr__(self):
-        return "IAMClient(transport=%r, auth=%r)" % (self.transport, self.auth)
+        return "EmployeeClient(transport=%r, auth=%r)" % (self.transport, self.auth)
 
 class Service(object):
     """A SoftLayer Service.
