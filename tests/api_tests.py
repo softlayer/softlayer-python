@@ -4,12 +4,15 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import io
 from unittest import mock as mock
+import requests
 
 import SoftLayer
 import SoftLayer.API
 from SoftLayer import testing
 from SoftLayer import transports
+from SoftLayer import exceptions
 
 
 class Initialization(testing.TestCase):
@@ -310,3 +313,47 @@ class UnauthenticatedAPIClient(testing.TestCase):
         self.assertIsNotNone(self.client.auth)
         self.assertEqual(self.client.auth.user_id, 12345)
         self.assertEqual(self.client.auth.auth_token, 'TOKEN')
+
+
+class EmployeeClientTests(testing.TestCase):
+
+    @staticmethod
+    def failed_log():
+        response = requests.Response()
+        list_body = b'''<?xml version="1.0" encoding="iso-8859-1"?>
+    <methodResponse>
+    <fault>
+     <value>
+      <struct>
+       <member>
+        <name>faultCode</name>
+        <value>
+         <string>SoftLayer_Exception_Public</string>
+        </value>
+       </member>
+       <member>
+        <name>faultString</name>
+        <value>
+         <string>Invalid username/password</string>
+        </value>
+       </member>
+      </struct>
+     </value>
+    </fault>
+    </methodResponse>'''
+        response.raw = io.BytesIO(list_body)
+        response.status_code = 200
+        return response
+
+    def set_up(self):
+        self.client = SoftLayer.API.EmployeeClient(config_file='./tests/testconfig')
+
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
+    def test_auth_with_pass(self, api_response):
+        api_response.return_value = self.failed_log()
+        exception = self.assertRaises(
+            exceptions.SoftLayerAPIError,
+            self.client.authenticate_with_password, 'testUser', 'testPassword', '123456')
+
+
+        self.assertEqual(exception.faultCode, "SoftLayer_Exception_Public")

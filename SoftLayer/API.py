@@ -704,6 +704,11 @@ class EmployeeClient(BaseClient):
             if ex.faultCode == 401:
                 LOGGER.warning("Token has expired, trying to refresh. %s", ex.faultString)
                 return ex
+            if ex.faultCode == "SoftLayer_Exception_EncryptedToken_Expired":
+                userId = self.settings['softlayer'].get('userId')
+                access_token = self.settings['softlayer'].get('access_token')
+                LOGGER.warning("Token has expired2, trying to refresh. %s", ex.faultString)
+                self.refresh_token()
             else:
                 raise ex
 
