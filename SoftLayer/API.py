@@ -646,6 +646,11 @@ class EmployeeClient(BaseClient):
     :param transport: An object that's callable with this signature: transport(SoftLayer.transports.Request)
     """
 
+    def __init__(self, auth=None, transport=None, config_file=None, account_id=None):
+        BaseClient.__init__(self, auth, transport, config_file)
+        self.account_id = account_id
+
+
     def authenticate_with_password(self, username, password, security_token=None):
         """Performs IBM IAM Username/Password Authentication
 
@@ -687,14 +692,16 @@ class EmployeeClient(BaseClient):
         """Refreshes the login token"""
 
         self.auth = None
-        auth_result = self.call('SoftLayer_User_Employee', 'refreshEncryptedToken', auth_token, id=userId)
+
+        # Go directly to base client, to avoid infite loop if the token is super expired.
+        auth_result = BaseClient.call(self, 'SoftLayer_User_Employee', 'refreshEncryptedToken', auth_token, id=userId)
         if len(auth_result) > 1:
             for returned_data in auth_result:
                 # Access tokens should be 188 characters, but just incase its longer or something.
                 if len(returned_data) > 180:
                     self.settings['softlayer']['access_token'] = returned_data
         else:
-            message = "Excepted 2 properties from refreshEncryptedToken, got |{}|".format(auth_result)
+            message = "Excepted 2 properties from refreshEncryptedToken, got {}|".format(auth_result)
             raise exceptions.SoftLayerAPIError(message)
 
         config.write_config(self.settings, self.config_file)
@@ -702,19 +709,23 @@ class EmployeeClient(BaseClient):
         return auth_result
 
     def call(self, service, method, *args, **kwargs):
-        """Handles refreshing IAM tokens in case of a HTTP 401 error"""
-        try:
-            return super().call(service, method, *args, **kwargs)
-        except exceptions.SoftLayerAPIError as ex:
+        """Handles refreshing Employee tokens in case of a HTTP 401 error"""
+        if (service == 'SoftLayer_Account' or service == 'Account') and not kwargs.get('id'):
+            if not self.account_id:
+                raise exceptions.SoftLayerError("SoftLayer_Account service requires an ID")
+            kwargs['id'] = self.account_id
 
-            if ex.faultCode == 401:
-                LOGGER.warning("Token has expired, trying to refresh. %s", ex.faultString)
-                return ex
+        try:
+            return BaseClient.call(self, service, method, *args, **kwargs)
+        except exceptions.SoftLayerAPIError as ex:
             if ex.faultCode == "SoftLayer_Exception_EncryptedToken_Expired":
                 userId = self.settings['softlayer'].get('userId')
                 access_token = self.settings['softlayer'].get('access_token')
-                LOGGER.warning("Token has expired2, trying to refresh. %s", ex.faultString)
-                self.refresh_token()
+                LOGGER.warning("Token has expired, trying to refresh. %s", ex.faultString)
+                self.refresh_token(userId, access_token)
+                # Try the Call again this time....
+                return BaseClient.call(self, service, method, *args, **kwargs)
+
             else:
                 raise ex
 

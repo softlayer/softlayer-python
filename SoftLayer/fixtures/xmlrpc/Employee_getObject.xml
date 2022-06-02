@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<params>
+    <param>
+        <value>
+            <struct>
+                <member>
+                    <name>id</name>
+                    <value>
+                        <int>5555</int>
+                    </value>
+                </member>
+                <member>
+                    <name>username</name>
+                    <value>
+                        <string>testUser</string>
+                    </value>
+                </member>
+            </struct>
+        </value>
+    </param>
+</params>
