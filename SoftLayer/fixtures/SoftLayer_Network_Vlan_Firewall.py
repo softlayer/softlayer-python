@@ -85,7 +85,32 @@ getObject = {
             'action': 'permit',
             'sourceIpAddress': '0.0.0.0'
         }
-    ]
+    ],
+    "metricTrackingObject": {
+        "id": 147258369,
+        "resourceTableId": 17438,
+        "startDate": "2022-05-17T14:01:48-06:00",
+        "type": {
+            "keyname": "FIREWALL_CONTEXT",
+            "name": "Firewall Module Context"
+        }
+    },
+    "networkGateway": {
+        "id": 615448,
+        "name": "testFirewall",
+        "networkSpace": "BOTH",
+        "privateIpAddressId": 1234569,
+        "privateVlanId": 369852,
+        "publicIpAddressId": 136985,
+        "publicIpv6AddressId": 1987456,
+        "publicVlanId": 256874,
+        "statusId": 1,
+        "status": {
+            "description": "Gateway is ready to accept commands and actions",
+            "id": 1,
+            "keyName": "ACTIVE",
+            "name": "Active"
+        }}
 
 }
 

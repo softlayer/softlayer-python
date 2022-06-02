@@ -46,7 +46,6 @@ class FirewallTests(testing.TestCase):
                                 identifier=1234)
 
     def test_get_dedicated_fwl_rules(self):
-
         rules = self.firewall.get_dedicated_fwl_rules(1234)
 
         self.assertEqual(rules,

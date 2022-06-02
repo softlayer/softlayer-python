@@ -297,8 +297,25 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param integer firewall_id: the instance ID of the standard firewall
         """
         if not mask:
-            mask = 'mask[datacenter,networkVlan]'
+            mask = 'mask[datacenter,networkVlan,metricTrackingObject[data,type],networkGateway[status]]'
 
         svc = self.client['Network_Vlan_Firewall']
 
         return svc.getObject(id=firewall_id, mask=mask)
+
+    def get_summary(self, identifier, start_date, end_date):
+        """Returns the metric data for the date range provided
+
+        :param integer metric_tracking_id
+        """
+        body = [{
+            "keyName": "PUBLICIN",
+            "summaryType": "sum"
+
+        }, {
+            "keyName": "PUBLICOUT",
+            "summaryType": "sum"
+        }]
+
+        return self.client['Metric_Tracking_Object'].getSummaryData(start_date,
+                                                                    end_date, body, 1800, id=identifier)
