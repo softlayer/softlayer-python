@@ -688,8 +688,14 @@ class EmployeeClient(BaseClient):
 
         self.auth = None
         auth_result = self.call('SoftLayer_User_Employee', 'refreshEncryptedToken', auth_token, id=userId)
-        print(auth_result)
-        self.settings['softlayer']['access_token'] = auth_result[0]
+        if len(auth_result) > 1:
+            for returned_data in auth_result:
+                # Access tokens should be 188 characters, but just incase its longer or something.
+                if len(returned_data) > 180:
+                    self.settings['softlayer']['access_token'] = returned_data
+        else:
+            message = "Excepted 2 properties from refreshEncryptedToken, got |{}|".format(auth_result)
+            raise exceptions.SoftLayerAPIError(message)
 
         config.write_config(self.settings, self.config_file)
         self.auth = slauth.EmployeeAuthentication(userId, auth_result[0])

@@ -42,21 +42,14 @@ def cli(env):
         try:
             employee = client.call('SoftLayer_User_Employee', 'getObject', id=settings.get('userid'), mask="mask[id,username]")
             print(employee)
+            client.refresh_token(settings.get('userid'), settings.get('access_token'))
             refresh = client.call('SoftLayer_User_Employee', 'refreshEncryptedToken', settings.get('access_token'), id=settings.get('userid'))
-            print("REFRESH:\n{}\n".format(refresh))
-            # we expect 2 results, a hash and a timeout 
-            if len(refresh) > 1:
-                for returned_data in refresh:
-                    # Access tokens should be 188 characters, but just incase.
-                    if len(returned_data) > 180:
-                        settings['access_token'] = returned_data
-            else:
-                raise Exception("Got unexpected data. Expected 2 properties: {}".format(refresh))
+
             config_settings['softlayer'] = settings
             config.write_config(config_settings, env.config_file)
             return
         except Exception as ex:
-            print("Error with Hash, try with password: {}".format(ex))
+            print("Error with Hash Authentication, try with password: {}".format(ex))
 
 
     url = settings.get('endpoint_url') or consts.API_EMPLOYEE_ENDPOINT

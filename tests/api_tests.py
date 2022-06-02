@@ -5,6 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import io
+import os
 from unittest import mock as mock
 import requests
 
@@ -317,43 +318,52 @@ class UnauthenticatedAPIClient(testing.TestCase):
 
 class EmployeeClientTests(testing.TestCase):
 
+
     @staticmethod
-    def failed_log():
+    def setup_response(filename, status_code=200, total_items=1):
+        basepath = os.path.dirname(__file__)
+        body = b''
+        print(f"Base Path: {basepath}")
+        with open(f"{basepath}/../SoftLayer/fixtures/xmlrpc/{filename}.xml", 'rb') as fixture:
+            body = fixture.read()
         response = requests.Response()
-        list_body = b'''<?xml version="1.0" encoding="iso-8859-1"?>
-    <methodResponse>
-    <fault>
-     <value>
-      <struct>
-       <member>
-        <name>faultCode</name>
-        <value>
-         <string>SoftLayer_Exception_Public</string>
-        </value>
-       </member>
-       <member>
-        <name>faultString</name>
-        <value>
-         <string>Invalid username/password</string>
-        </value>
-       </member>
-      </struct>
-     </value>
-    </fault>
-    </methodResponse>'''
+        list_body = body
         response.raw = io.BytesIO(list_body)
-        response.status_code = 200
+        response.headers['SoftLayer-Total-Items'] = total_items
+        response.status_code = status_code
         return response
+
 
     def set_up(self):
         self.client = SoftLayer.API.EmployeeClient(config_file='./tests/testconfig')
 
     @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
-    def test_auth_with_pass(self, api_response):
-        api_response.return_value = self.failed_log()
+    def test_auth_with_pass_failure(self, api_response):
+        api_response.return_value = self.setup_response('invalidLogin')
         exception = self.assertRaises(
             exceptions.SoftLayerAPIError,
             self.client.authenticate_with_password, 'testUser', 'testPassword', '123456')
-
-
         self.assertEqual(exception.faultCode, "SoftLayer_Exception_Public")
+
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
+    def test_auth_with_pass_success(self, api_response):
+        api_response.return_value = self.setup_response('successLogin')
+        result = self.client.authenticate_with_password('testUser', 'testPassword', '123456')
+        print(result)
+        self.assertEqual(result['userId'], 1234)
+        self.assertEqual(self.client.settings['softlayer']['userid'], '1234')
+        self.assertIn('x'*200, self.client.settings['softlayer']['access_token'])
+
+    def test_auth_with_hash(self):
+        self.client.auth = None
+        self.client.authenticate_with_hash(5555, 'abcdefg')
+        self.assertEqual(self.client.auth.user_id, 5555)
+        self.assertEqual(self.client.auth.hash, 'abcdefg')
+
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
+    def test_refresh_token(self, api_response):
+        api_response.return_value = self.setup_response('refreshSuccess')
+        result = self.client.refresh_token(9999, 'qweasdzxcqweasdzxcqweasdzxc')
+        self.assertEqual(self.client.auth.user_id, 9999)
+        self.assertIn('REFRESHEDTOKENaaaa', self.client.auth.hash)
+        
