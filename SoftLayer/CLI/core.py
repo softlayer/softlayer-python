@@ -102,7 +102,7 @@ def get_version_message(ctx, param, value):
               help="Use demo data instead of actually making API calls")
 @click.option('--version', is_flag=True, expose_value=False, is_eager=True, callback=get_version_message,
               help="Show version information.",  allow_from_autoenv=False,)
-@click.option('-a', '--account', help="Account Id")
+@click.option('--account', '-a', help="Account Id")
 @environment.pass_env
 def cli(env,
         format='table',
@@ -111,7 +111,7 @@ def cli(env,
         proxy=None,
         really=False,
         demo=False,
-        account_id=None,
+        account=None,
         **kwargs):
     """Main click CLI entry-point."""
 
@@ -134,7 +134,8 @@ def cli(env,
     env.vars['_timings'] = SoftLayer.DebugTransport(env.client.transport)
     env.vars['verbose'] = verbose
     env.client.transport = env.vars['_timings']
-    env.client.account_id = account_id
+    print("Account ID is now: {}".format(account))
+    env.client.account_id = account
 
 
 @cli.result_callback()
