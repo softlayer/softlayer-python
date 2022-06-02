@@ -226,13 +226,15 @@ def employee_client(username=None,
     if access_token is None:
         access_token = settings.get('access_token')
 
-    user_id = settings.get('user_id')
+    user_id = settings.get('userid')
 
     # Assume access_token is valid for now, user has logged in before at least.
     if access_token and user_id:
         auth = slauth.EmployeeAuthentication(user_id, access_token)
         return EmployeeClient(auth=auth, transport=transport)
     else:
+        # This is for logging in mostly.
+        LOGGER.info("No access_token or userid found in settings, creating a No Auth client for now.")
         return EmployeeClient(auth=None, transport=transport)
 
 
@@ -670,7 +672,7 @@ class EmployeeClient(BaseClient):
 
 
         self.settings['softlayer']['access_token'] = auth_result['hash']
-        self.settings['softlayer']['userId'] = str(auth_result['userId'])
+        self.settings['softlayer']['userid'] = str(auth_result['userId'])
         # self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
 
         config.write_config(self.settings, self.config_file)
@@ -690,8 +692,6 @@ class EmployeeClient(BaseClient):
 
     def refresh_token(self, userId, auth_token):
         """Refreshes the login token"""
-
-        self.auth = None
 
         # Go directly to base client, to avoid infite loop if the token is super expired.
         auth_result = BaseClient.call(self, 'SoftLayer_User_Employee', 'refreshEncryptedToken', auth_token, id=userId)
@@ -719,7 +719,7 @@ class EmployeeClient(BaseClient):
             return BaseClient.call(self, service, method, *args, **kwargs)
         except exceptions.SoftLayerAPIError as ex:
             if ex.faultCode == "SoftLayer_Exception_EncryptedToken_Expired":
-                userId = self.settings['softlayer'].get('userId')
+                userId = self.settings['softlayer'].get('userid')
                 access_token = self.settings['softlayer'].get('access_token')
                 LOGGER.warning("Token has expired, trying to refresh. %s", ex.faultString)
                 self.refresh_token(userId, access_token)
