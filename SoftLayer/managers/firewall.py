@@ -297,11 +297,29 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param integer firewall_id: the instance ID of the standard firewall
         """
         if not mask:
-            mask = 'mask[datacenter,networkVlan,metricTrackingObject[data,type],networkGateway[status]]'
+            mask = 'mask[firewallType,datacenter,managementCredentials,networkVlan,' \
+                   'metricTrackingObject[data,type],networkGateway[insideVlans,members,privateIpAddress,' \
+                   'publicIpAddress,publicIpv6Address,privateVlan,publicVlan,status]]'
 
         svc = self.client['Network_Vlan_Firewall']
 
         return svc.getObject(id=firewall_id, mask=mask)
+
+    def get_firewalls_gatewalls(self):
+        """Returns a list of all gateway firewalls (gatewalls) on the account.
+
+        returns: A list of gateway firewalls (gatewalls) on the current account.
+        """
+        mask = 'mask[id,networkSpace,name,' \
+               'networkFirewall[id,firewallType,datacenter[name]],' \
+               'status[keyName],' \
+               'insideVlans[id],' \
+               'privateIpAddress[ipAddress],' \
+               'publicVlan[id,primaryRouter[hostname]],' \
+               'publicIpAddress[ipAddress],members[id,hardware[hostname]]]'
+        _filter = {"networkGateways": {"networkFirewall": {"operation": "not null"}}}
+
+        return self.account.getNetworkGateways(mask=mask, filter=_filter)
 
     def get_summary(self, identifier, start_date, end_date):
         """Returns the metric data for the date range provided

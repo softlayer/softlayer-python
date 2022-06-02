@@ -1228,3 +1228,41 @@ getBandwidthAllotments = [{
     'projectedPublicBandwidthUsage': 9.88,
     'totalBandwidthAllocated': 3361
 }]
+
+getNetworkGateways = [{
+    'id': 615448,
+    'name': 'testFirewall-cgallo',
+    'networkSpace': 'BOTH',
+    'insideVlans': [],
+    'members': [
+        {
+            'id': 687820,
+            'hardware': {
+                'hostname': 'dft03.pod03.dal13'
+            }
+        }
+    ],
+    'networkFirewall': {
+        'id': 17438,
+        'datacenter': {
+            'name': 'dal13'
+        },
+        'firewallType': 'fortigate-security-appliance-10gb',
+        'rules': []
+    },
+    'privateIpAddress': {
+        'ipAddress': '10.37.115.70'
+    },
+    'publicIpAddress': {
+        'ipAddress': '67.228.206.245'
+    },
+    'publicVlan': {
+        'id': 3228726,
+        'primaryRouter': {
+            'hostname': 'fcr03a.dal13'
+        }
+    },
+    'status': {
+        'keyName': 'ACTIVE'
+    }
+}]
