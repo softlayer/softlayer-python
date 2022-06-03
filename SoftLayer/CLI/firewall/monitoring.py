@@ -25,10 +25,10 @@ def cli(env, identifier):
 
     end = datetime.date.today()
     start = end.replace(day=1)
-    lastMonth = start - datetime.timedelta(days=30)
+    last_month = start - datetime.timedelta(days=30)
 
     monitoring = mgr.get_summary(_firewall['metricTrackingObject']['id'],
-                                 lastMonth.strftime('%Y-%m-%d'), end.strftime('%Y-%m-%d'))
+                                 last_month.strftime('%Y-%m-%d'), end.strftime('%Y-%m-%d'))
     public_out = 0
     public_in = 0
     for monitor in monitoring:
@@ -41,7 +41,7 @@ def cli(env, identifier):
 
     table.add_row(['Id', _firewall.get('id')])
     table.add_row(['Name', _firewall['networkGateway']['name']])
-    table.add_row(['Stard Date', lastMonth.strftime('%Y-%m-%d')])
+    table.add_row(['Stard Date', last_month.strftime('%Y-%m-%d')])
     table.add_row(['End Date', end.strftime('%Y-%m-%d')])
     table.add_row(['Out', public_out])
     table.add_row(['In', public_in])
