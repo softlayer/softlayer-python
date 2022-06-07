@@ -17,7 +17,7 @@ import SoftLayer
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import routes
 
-# pylint: disable=too-many-instance-attributes, invalid-name, no-self-use
+# pylint: disable=too-many-instance-attributes, invalid-name
 
 # Calling pkg_resources.iter_entry_points shows a false-positive
 # pylint: disable=no-member
