@@ -577,3 +577,12 @@ class StorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage',
                                 'convertCloneDependentToIndependent',
                                 id=volume_id)
+
+    def convert_dupe_status(self, volume_id):
+        """Get the Clone split/move status completion of a duplicate volume
+
+        :param integer volume_id: The id of the volume.
+        """
+        return self.client.call('Network_Storage',
+                                'getDuplicateConversionStatus',
+                                id=volume_id)
