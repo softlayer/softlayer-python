@@ -18,7 +18,7 @@ Install via pip:
 
 .. code-block:: bash
 
-	$ git clone https://github.ibm.com/SoftLayer/internal-softlayer-cli
+  $ git clone https://github.ibm.com/SoftLayer/internal-softlayer-cli
   $ cd internal-softlayer-cli
   $ python setup.py install
   $ ./islcli login
