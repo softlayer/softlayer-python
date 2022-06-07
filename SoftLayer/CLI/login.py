@@ -33,7 +33,6 @@ def cli(env):
     username = settings.get('username') or os.environ.get('SLCLI_USER', None)
     password = os.environ.get('SLCLI_PASSWORD', '')
     yubi = None
-#    client = EmployeeClient(config_file=env.config_file)
     client = env.client
 
     # Might already be logged in, try and refresh token

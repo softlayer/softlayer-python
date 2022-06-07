@@ -1,43 +1,16 @@
 SoftLayer API Python Client
 ===========================
-.. image:: https://github.com/softlayer/softlayer-python/workflows/Tests/badge.svg
-    :target: https://github.com/softlayer/softlayer-python/actions?query=workflow%3ATests
 
-.. image:: https://github.com/softlayer/softlayer-python/workflows/documentation/badge.svg
-    :target: https://github.com/softlayer/softlayer-python/actions?query=workflow%3Adocumentation
-
-.. image:: https://landscape.io/github/softlayer/softlayer-python/master/landscape.svg
-    :target: https://landscape.io/github/softlayer/softlayer-python/master
-
-.. image:: https://badge.fury.io/py/SoftLayer.svg
-    :target: http://badge.fury.io/py/SoftLayer
-
-.. image:: https://coveralls.io/repos/github/softlayer/softlayer-python/badge.svg?branch=master
-    :target: https://coveralls.io/github/softlayer/softlayer-python?branch=master
-
-.. image:: https://snapcraft.io//slcli/badge.svg
-    :target: https://snapcraft.io/slcli
+This library is provided `as is` to make internal IMS API calls. You are responsible for your API usage, and any abuse, intentional or accidental, will result in your employee account being locked or limited.
 
 
-This library provides a simple Python client to interact with `SoftLayer's
-XML-RPC API <https://softlayer.github.io/reference/softlayerapi>`_.
-
-A command-line interface is also included and can be used to manage various
-SoftLayer products and services.
-
+Make sure you use the HTTPS url `https://internal.app0lb.dal10.softlayer.local/v3/internal/xmlrpc/`
 
 Documentation
 -------------
-Documentation for the Python client is available at `Read the Docs <https://softlayer-python.readthedocs.io/en/latest/index.html>`_ .
+DThis project is based off the  `SLCLI <https://github.com/softlayer/softlayer-python>`_ , and most things that work there will work here.
 
-Additional API documentation can be found on the SoftLayer Development Network:
-
-* `SoftLayer API reference
-  <https://sldn.softlayer.com/reference/softlayerapi>`_
-* `Object mask information and examples
-  <https://sldn.softlayer.com/article/object-masks>`_
-* `Code Examples
-  <https://sldn.softlayer.com/python/>`_
+There is no internal API documentation like SLDN.
 
 Installation
 ------------
@@ -45,41 +18,36 @@ Install via pip:
 
 .. code-block:: bash
 
-	$ pip install softlayer
+	$ git clone https://github.ibm.com/SoftLayer/internal-softlayer-cli
+  $ cd internal-softlayer-cli
+  $ python setup.py install
+  $ ./islcli login
 
 
-Or you can install from source. Download source and run:
+Configuration
+-------------
+
+The config file is located at `~/.softlayer` or `~/AppData/Roaming/softlayer` for Windows systems.
+
+Your config file should look something like this for using the islcli. Beware the `islcli` and `slcli` use the same config for the moment. You need to set `verify = False` in the config because the internal endpoint uses a self-signed SSL certificate.
 
 .. code-block:: bash
-
-	$ python setup.py install
-
-Another (safer) method of installation is to use the published snap. Snaps are available for any Linux OS running snapd, the service that runs and manage snaps. Snaps are "auto-updating" packages and will not disrupt the current versions of libraries and software packages on your Linux-based system. To learn more, please visit: https://snapcraft.io/ 
-
-To install the slcli snap:
-
-.. code-block:: bash
-
-	$ sudo snap install slcli 
-	
-	(or to get the latest release)
-	
-	$ sudo snap install slcli --edge
-	
-	
+  
+  [softlayer]
+  username = imsUsername
+  verify = False
+  endpoint_url = https://internal.app0lb.dal10.softlayer.local/v3/internal/xmlrpc/
 
 
-The most up-to-date version of this library can be found on the SoftLayer
-GitHub public repositories at http://github.com/softlayer. For questions regarding the use of this library please post to Stack Overflow at https://stackoverflow.com/ and  your posts with “SoftLayer” so our team can easily find your post. To report a bug with this library please create an Issue on github.
-
-InsecurePlatformWarning Notice
-------------------------------
-This library relies on the `requests <http://docs.python-requests.org/>`_ library to make HTTP requests. On Python versions below Python 2.7.9, requests has started emitting a security warning (InsecurePlatformWarning) due to insecurities with creating SSL connections. To resolve this, upgrade to Python 2.7.9+ or follow the instructions here: http://stackoverflow.com/a/29099439.
 
 Basic Usage
 -----------
 
-- `The Complete Command Directory <https://softlayer-python.readthedocs.io/en/latest/cli_directory/>`_
+.. code-block:: bash
+
+  $ islcli login
+  $ islcli -a <account_id> vs list
+
 
 Advanced Usage
 --------------
@@ -90,25 +58,39 @@ You can automatically set some parameters via environment variables with by usin
 
   $ export SLCLI_VERBOSE=3
   $ export SLCLI_FORMAT=json
-  $ slcli vs list
+  $ slcli -a <account_id> vs list
 
 is equivalent to 
 
 .. code-block:: bash
 
-  $ slcli -vvv --format=json vs list
+  $ slcli -vvv --format=json -a <account_id> vs list
 
 Getting Help
 ------------
-Bugs and feature requests about this library should have a `GitHub issue <https://github.com/softlayer/softlayer-python/issues>`_ opened about them. 
 
-Issues with the Softlayer API itself should be addressed by opening a ticket.
+Feel free to open an issue if you think there is a bug, or a feature you want. Or asking in #sl-api on IBM slack. This is considered an unofficial project however, so questions might take some time to get answered.
 
 
 Examples
 --------
 
 A curated list of examples on how to use this library can be found at `SLDN <https://softlayer.github.io/python/>`_
+
+
+.. code-block:: python
+
+  import SoftLayer
+  client = SoftLayer.employee_client()
+  username = input("Username:")
+  password = input("Password:")
+  yubikey = input("Yubi key:")
+  client.authenticate_with_password(username, password, yubikey)
+  result = client.call('SoftLayer_Account', 'getObject', id="12345", mask="mask[id]")
+
+
+After logging in with `authenticate_with_password` the EmployeeClient will try to automatically refresh the login token when it gets a TokenExpired exception. It will also record the token in the config file for future use in the CLI.
+  
 
 Debugging
 ---------
@@ -131,7 +113,7 @@ If you are using the library directly in python, you can do something like this.
   class invoices():
 
       def __init__(self):
-          self.client = SoftLayer.Client()
+          self.client = SoftLayer.EmployeeClient()
           debugger = SoftLayer.DebugTransport(self.client.transport)
           self.client.transport = debugger
 
@@ -153,16 +135,13 @@ If you are using the library directly in python, you can do something like this.
 
 System Requirements
 -------------------
-* Python 3.5, 3.6, 3.7, 3.8, or 3.9.
-* A valid SoftLayer API username and key.
-* A connection to SoftLayer's private network is required to use
-  our private network API endpoints.
+* Python 3.7, 3.8, or 3.9.
+* A valid SoftLayer Employee  API username, password, Yubi Key
+* A connection to SoftLayer's Employee VPN 
 
 Python 2.7 Support
 ------------------
-As of version 5.8.0 SoftLayer-Python will no longer support python2.7, which is `End Of Life as of 2020 <https://www.python.org/dev/peps/pep-0373/>`_ .
-If you cannot install python 3.6+ for some reason, you will need to use a version of softlayer-python <= 5.7.2
-
+Python 2.7 is  `End Of Life as of 2020 <https://www.python.org/dev/peps/pep-0373/>`_ . Its not supported, you will need to upgrade to python 3.7 at least.
 
 
 Python Packages
@@ -173,6 +152,7 @@ Python Packages
 * prompt_toolkit >= 2
 * pygments >= 2.0.0
 * urllib3 >= 1.24
+* Rich
 
 Copyright
 ---------
