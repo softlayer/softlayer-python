@@ -9,6 +9,7 @@ from SoftLayer.managers.storage import StorageManager
 from SoftLayer.managers import storage_utils
 from SoftLayer import utils
 
+
 # pylint: disable=too-many-public-methods
 
 
@@ -196,3 +197,9 @@ class BlockStorageManager(StorageManager):
         if results:
             return [result['id'] for result in results]
         return []
+
+    def get_cloud_list(self):
+
+        mask = 'mask[id,username,billingItem,storageType, notes]'
+
+        return self.client.call('Account', 'getHubNetworkStorage', mask=mask)

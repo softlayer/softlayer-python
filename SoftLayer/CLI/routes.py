@@ -125,6 +125,7 @@ ALL_ROUTES = [
     ('block:volume-refresh', 'SoftLayer.CLI.block.refresh:cli'),
     ('block:volume-convert', 'SoftLayer.CLI.block.convert:cli'),
     ('block:volume-set-note', 'SoftLayer.CLI.block.set_note:cli'),
+    ('block:object-list', 'SoftLayer.CLI.block.object_list:cli'),
 
     ('email', 'SoftLayer.CLI.email'),
     ('email:list', 'SoftLayer.CLI.email.list:cli'),

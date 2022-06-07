@@ -452,22 +452,22 @@ class BlockTests(testing.TestCase):
             'SoftLayer_Product_Order',
             'placeOrder',
             args=({
-                'complexType': 'SoftLayer_Container_Product_Order_'
-                'Network_Storage_AsAService',
-                'packageId': 759,
-                'prices': [
-                    {'id': 189433},
-                    {'id': 189443},
-                    {'id': 190113},
-                    {'id': 190173}
-                ],
-                'volumeSize': 1000,
-                'quantity': 1,
-                'location': 449494,
-                'iops': 2000,
-                'useHourlyPricing': False,
-                'osFormatType': {'keyName': 'LINUX'}
-            },)
+                      'complexType': 'SoftLayer_Container_Product_Order_'
+                                     'Network_Storage_AsAService',
+                      'packageId': 759,
+                      'prices': [
+                          {'id': 189433},
+                          {'id': 189443},
+                          {'id': 190113},
+                          {'id': 190173}
+                      ],
+                      'volumeSize': 1000,
+                      'quantity': 1,
+                      'location': 449494,
+                      'iops': 2000,
+                      'useHourlyPricing': False,
+                      'osFormatType': {'keyName': 'LINUX'}
+                  },)
         )
 
     def test_order_block_volume_endurance(self):
@@ -496,21 +496,21 @@ class BlockTests(testing.TestCase):
             'SoftLayer_Product_Order',
             'placeOrder',
             args=({
-                'complexType': 'SoftLayer_Container_Product_Order_'
-                'Network_Storage_AsAService',
-                'packageId': 759,
-                'prices': [
-                    {'id': 189433},
-                    {'id': 189443},
-                    {'id': 194763},
-                    {'id': 194703}
-                ],
-                'volumeSize': 1000,
-                'quantity': 1,
-                'location': 449494,
-                'useHourlyPricing': False,
-                'osFormatType': {'keyName': 'LINUX'}
-            },)
+                      'complexType': 'SoftLayer_Container_Product_Order_'
+                                     'Network_Storage_AsAService',
+                      'packageId': 759,
+                      'prices': [
+                          {'id': 189433},
+                          {'id': 189443},
+                          {'id': 194763},
+                          {'id': 194703}
+                      ],
+                      'volumeSize': 1000,
+                      'quantity': 1,
+                      'location': 449494,
+                      'useHourlyPricing': False,
+                      'osFormatType': {'keyName': 'LINUX'}
+                  },)
         )
 
     def test_authorize_host_to_volume(self):
@@ -657,17 +657,17 @@ class BlockTests(testing.TestCase):
             'SoftLayer_Product_Order',
             'placeOrder',
             args=({
-                'complexType': 'SoftLayer_Container_Product_Order_Network_'
-                'Storage_Enterprise_SnapshotSpace_Upgrade',
-                'packageId': 759,
-                'prices': [
-                    {'id': 193853}
-                ],
-                'quantity': 1,
-                'location': 449500,
-                'volumeId': 102,
-                'useHourlyPricing': False
-            },)
+                      'complexType': 'SoftLayer_Container_Product_Order_Network_'
+                                     'Storage_Enterprise_SnapshotSpace_Upgrade',
+                      'packageId': 759,
+                      'prices': [
+                          {'id': 193853}
+                      ],
+                      'quantity': 1,
+                      'location': 449500,
+                      'volumeId': 102,
+                      'useHourlyPricing': False
+                  },)
         )
 
     def test_order_block_snapshot_space(self):
@@ -686,17 +686,17 @@ class BlockTests(testing.TestCase):
             'SoftLayer_Product_Order',
             'placeOrder',
             args=({
-                'complexType': 'SoftLayer_Container_Product_Order_Network_'
-                'Storage_Enterprise_SnapshotSpace',
-                'packageId': 759,
-                'prices': [
-                    {'id': 193613}
-                ],
-                'quantity': 1,
-                'location': 449500,
-                'volumeId': 102,
-                'useHourlyPricing': False
-            },)
+                      'complexType': 'SoftLayer_Container_Product_Order_Network_'
+                                     'Storage_Enterprise_SnapshotSpace',
+                      'packageId': 759,
+                      'prices': [
+                          {'id': 193613}
+                      ],
+                      'quantity': 1,
+                      'location': 449500,
+                      'volumeId': 102,
+                      'useHourlyPricing': False
+                  },)
         )
 
     def test_order_block_replicant_os_type_not_found(self):
@@ -745,26 +745,26 @@ class BlockTests(testing.TestCase):
             'SoftLayer_Product_Order',
             'placeOrder',
             args=({
-                'complexType': 'SoftLayer_Container_Product_Order_'
-                'Network_Storage_AsAService',
-                'packageId': 759,
-                'prices': [
-                    {'id': 189433},
-                    {'id': 189443},
-                    {'id': 189993},
-                    {'id': 190053},
-                    {'id': 191193},
-                    {'id': 192033}
-                ],
-                'volumeSize': 500,
-                'quantity': 1,
-                'location': 449494,
-                'iops': 1000,
-                'originVolumeId': 102,
-                'originVolumeScheduleId': 978,
-                'useHourlyPricing': False,
-                'osFormatType': {'keyName': 'XEN'}
-            },)
+                      'complexType': 'SoftLayer_Container_Product_Order_'
+                                     'Network_Storage_AsAService',
+                      'packageId': 759,
+                      'prices': [
+                          {'id': 189433},
+                          {'id': 189443},
+                          {'id': 189993},
+                          {'id': 190053},
+                          {'id': 191193},
+                          {'id': 192033}
+                      ],
+                      'volumeSize': 500,
+                      'quantity': 1,
+                      'location': 449494,
+                      'iops': 1000,
+                      'originVolumeId': 102,
+                      'originVolumeScheduleId': 978,
+                      'useHourlyPricing': False,
+                      'osFormatType': {'keyName': 'XEN'}
+                  },)
         )
 
     def test_order_block_replicant_endurance(self):
@@ -786,25 +786,25 @@ class BlockTests(testing.TestCase):
             'SoftLayer_Product_Order',
             'placeOrder',
             args=({
-                'complexType': 'SoftLayer_Container_Product_Order_'
-                'Network_Storage_AsAService',
-                'packageId': 759,
-                'prices': [
-                    {'id': 189433},
-                    {'id': 189443},
-                    {'id': 193433},
-                    {'id': 193373},
-                    {'id': 193613},
-                    {'id': 194693}
-                ],
-                'volumeSize': 500,
-                'quantity': 1,
-                'location': 449494,
-                'originVolumeId': 102,
-                'originVolumeScheduleId': 978,
-                'useHourlyPricing': False,
-                'osFormatType': {'keyName': 'LINUX'}
-            },)
+                      'complexType': 'SoftLayer_Container_Product_Order_'
+                                     'Network_Storage_AsAService',
+                      'packageId': 759,
+                      'prices': [
+                          {'id': 189433},
+                          {'id': 189443},
+                          {'id': 193433},
+                          {'id': 193373},
+                          {'id': 193613},
+                          {'id': 194693}
+                      ],
+                      'volumeSize': 500,
+                      'quantity': 1,
+                      'location': 449494,
+                      'originVolumeId': 102,
+                      'originVolumeScheduleId': 978,
+                      'useHourlyPricing': False,
+                      'osFormatType': {'keyName': 'LINUX'}
+                  },)
         )
 
     def test_order_block_duplicate_origin_os_type_not_found(self):
@@ -844,23 +844,23 @@ class BlockTests(testing.TestCase):
             'SoftLayer_Product_Order',
             'placeOrder',
             args=({
-                'complexType': 'SoftLayer_Container_Product_Order_'
-                'Network_Storage_AsAService',
-                'packageId': 759,
-                'prices': [
-                    {'id': 189433},
-                    {'id': 189443},
-                    {'id': 189993},
-                    {'id': 190053}
-                ],
-                'volumeSize': 500,
-                'quantity': 1,
-                'location': 449500,
-                'duplicateOriginVolumeId': 102,
-                'osFormatType': {'keyName': 'LINUX'},
-                'iops': 1000,
-                'useHourlyPricing': False
-            },))
+                      'complexType': 'SoftLayer_Container_Product_Order_'
+                                     'Network_Storage_AsAService',
+                      'packageId': 759,
+                      'prices': [
+                          {'id': 189433},
+                          {'id': 189443},
+                          {'id': 189993},
+                          {'id': 190053}
+                      ],
+                      'volumeSize': 500,
+                      'quantity': 1,
+                      'location': 449500,
+                      'duplicateOriginVolumeId': 102,
+                      'osFormatType': {'keyName': 'LINUX'},
+                      'iops': 1000,
+                      'useHourlyPricing': False
+                  },))
 
     def test_order_block_duplicate_performance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
@@ -886,25 +886,25 @@ class BlockTests(testing.TestCase):
             'SoftLayer_Product_Order',
             'placeOrder',
             args=({
-                'complexType': 'SoftLayer_Container_Product_Order_'
-                'Network_Storage_AsAService',
-                'packageId': 759,
-                'prices': [
-                    {'id': 189433},
-                    {'id': 189443},
-                    {'id': 190113},
-                    {'id': 190173},
-                    {'id': 191193}
-                ],
-                'volumeSize': 1000,
-                'quantity': 1,
-                'location': 449500,
-                'duplicateOriginVolumeId': 102,
-                'osFormatType': {'keyName': 'LINUX'},
-                'duplicateOriginSnapshotId': 470,
-                'iops': 2000,
-                'useHourlyPricing': False
-            },))
+                      'complexType': 'SoftLayer_Container_Product_Order_'
+                                     'Network_Storage_AsAService',
+                      'packageId': 759,
+                      'prices': [
+                          {'id': 189433},
+                          {'id': 189443},
+                          {'id': 190113},
+                          {'id': 190173},
+                          {'id': 191193}
+                      ],
+                      'volumeSize': 1000,
+                      'quantity': 1,
+                      'location': 449500,
+                      'duplicateOriginVolumeId': 102,
+                      'osFormatType': {'keyName': 'LINUX'},
+                      'duplicateOriginSnapshotId': 470,
+                      'iops': 2000,
+                      'useHourlyPricing': False
+                  },))
 
     def test_order_block_duplicate_depdupe(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
@@ -931,26 +931,26 @@ class BlockTests(testing.TestCase):
             'SoftLayer_Product_Order',
             'placeOrder',
             args=({
-                'complexType': 'SoftLayer_Container_Product_Order_'
-                'Network_Storage_AsAService',
-                'packageId': 759,
-                'prices': [
-                    {'id': 189433},
-                    {'id': 189443},
-                    {'id': 190113},
-                    {'id': 190173},
-                    {'id': 191193}
-                ],
-                'volumeSize': 1000,
-                'quantity': 1,
-                'location': 449500,
-                'duplicateOriginVolumeId': 102,
-                'osFormatType': {'keyName': 'LINUX'},
-                'duplicateOriginSnapshotId': 470,
-                'iops': 2000,
-                'useHourlyPricing': False,
-                'isDependentDuplicateFlag': 1
-            },))
+                      'complexType': 'SoftLayer_Container_Product_Order_'
+                                     'Network_Storage_AsAService',
+                      'packageId': 759,
+                      'prices': [
+                          {'id': 189433},
+                          {'id': 189443},
+                          {'id': 190113},
+                          {'id': 190173},
+                          {'id': 191193}
+                      ],
+                      'volumeSize': 1000,
+                      'quantity': 1,
+                      'location': 449500,
+                      'duplicateOriginVolumeId': 102,
+                      'osFormatType': {'keyName': 'LINUX'},
+                      'duplicateOriginSnapshotId': 470,
+                      'iops': 2000,
+                      'useHourlyPricing': False,
+                      'isDependentDuplicateFlag': 1
+                  },))
 
     def test_order_block_duplicate_endurance_no_duplicate_snapshot(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
@@ -970,22 +970,22 @@ class BlockTests(testing.TestCase):
             'SoftLayer_Product_Order',
             'placeOrder',
             args=({
-                'complexType': 'SoftLayer_Container_Product_Order_'
-                'Network_Storage_AsAService',
-                'packageId': 759,
-                'prices': [
-                    {'id': 189433},
-                    {'id': 189443},
-                    {'id': 193433},
-                    {'id': 193373}
-                ],
-                'volumeSize': 500,
-                'quantity': 1,
-                'location': 449500,
-                'duplicateOriginVolumeId': 102,
-                'osFormatType': {'keyName': 'LINUX'},
-                'useHourlyPricing': False
-            },))
+                      'complexType': 'SoftLayer_Container_Product_Order_'
+                                     'Network_Storage_AsAService',
+                      'packageId': 759,
+                      'prices': [
+                          {'id': 189433},
+                          {'id': 189443},
+                          {'id': 193433},
+                          {'id': 193373}
+                      ],
+                      'volumeSize': 500,
+                      'quantity': 1,
+                      'location': 449500,
+                      'duplicateOriginVolumeId': 102,
+                      'osFormatType': {'keyName': 'LINUX'},
+                      'useHourlyPricing': False
+                  },))
 
     def test_order_block_duplicate_endurance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
@@ -1010,24 +1010,24 @@ class BlockTests(testing.TestCase):
             'SoftLayer_Product_Order',
             'placeOrder',
             args=({
-                'complexType': 'SoftLayer_Container_Product_Order_'
-                'Network_Storage_AsAService',
-                'packageId': 759,
-                'prices': [
-                    {'id': 189433},
-                    {'id': 189443},
-                    {'id': 194763},
-                    {'id': 194703},
-                    {'id': 194943}
-                ],
-                'volumeSize': 1000,
-                'quantity': 1,
-                'location': 449500,
-                'duplicateOriginVolumeId': 102,
-                'osFormatType': {'keyName': 'LINUX'},
-                'duplicateOriginSnapshotId': 470,
-                'useHourlyPricing': False
-            },))
+                      'complexType': 'SoftLayer_Container_Product_Order_'
+                                     'Network_Storage_AsAService',
+                      'packageId': 759,
+                      'prices': [
+                          {'id': 189433},
+                          {'id': 189443},
+                          {'id': 194763},
+                          {'id': 194703},
+                          {'id': 194943}
+                      ],
+                      'volumeSize': 1000,
+                      'quantity': 1,
+                      'location': 449500,
+                      'duplicateOriginVolumeId': 102,
+                      'osFormatType': {'keyName': 'LINUX'},
+                      'duplicateOriginSnapshotId': 470,
+                      'useHourlyPricing': False
+                  },))
 
     def test_order_block_modified_performance(self):
         mock = self.set_mock('SoftLayer_Product_Package', 'getAllObjects')
@@ -1115,3 +1115,7 @@ class BlockTests(testing.TestCase):
             'convertCloneDependentToIndependent',
             identifier=123
         )
+
+    def test_get_cloud_list(self):
+        self.block.get_cloud_list()
+        self.assert_called_with('SoftLayer_Account', 'getHubNetworkStorage')

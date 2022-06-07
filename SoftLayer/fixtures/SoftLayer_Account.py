@@ -647,8 +647,36 @@ getBalance = 40
 
 getNextInvoiceTotalAmount = 2
 
-getHubNetworkStorage = [{'id': 12345, 'username': 'SLOS12345-1', 'serviceResource': {'name': 'Cleversafe - US Region'}},
-                        {'id': 12346, 'username': 'SLOS12345-2', 'vendorName': 'Swift'}]
+getHubNetworkStorage = [
+    {
+        "id": 12345,
+        "username": "SLOS12345-1",
+        "billingItem": {
+            "createDate": "2020-10-08T11:45:17-06:00"
+        },
+        "serviceResource": {
+            "name": "Cleversafe - US Region"
+        },
+        "storageType": {
+            "description": "Object Storage Standard Account",
+            "id": 24,
+            "keyName": "OBJECT_STORAGE_STANDARD"
+        }
+    },
+    {
+        "id": 12346,
+        "username": "SLOS12345-2",
+        "vendorName": "Swift",
+        "billingItem": {
+            "createDate": "2020-10-08T11:45:17-06:00"
+        },
+        "storageType": {
+            "description": "Object Storage Standard Account",
+            "id": 24,
+            "keyName": "OBJECT_STORAGE_STANDARD"
+        }
+    }
+]
 
 getIscsiNetworkStorage = [{
     'accountId': 1234,
