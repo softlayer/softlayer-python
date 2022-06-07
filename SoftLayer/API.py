@@ -6,6 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=invalid-name
+import os
 import time
 import warnings
 
@@ -27,6 +28,7 @@ CONFIG_FILE = consts.CONFIG_FILE
 
 __all__ = [
     'create_client_from_env',
+    'employee_client',
     'Client',
     'BaseClient',
     'API_PUBLIC_ENDPOINT',
@@ -142,13 +144,107 @@ def create_client_from_env(username=None,
     return BaseClient(auth=auth, transport=transport, config_file=config_file)
 
 
+def employee_client(username=None,
+                    access_token=None,
+                    password=None,
+                    endpoint_url=None,
+                    timeout=None,
+                    auth=None,
+                    config_file=None,
+                    proxy=None,
+                    user_agent=None,
+                    transport=None,
+                    verify=True):
+    """Creates an INTERNAL SoftLayer API client using your environment.
+
+    Settings are loaded via keyword arguments, environemtal variables and
+    config file.
+
+    :param username: your user ID
+    :param access_token: hash from SoftLayer_User_Employee::performExternalAuthentication(username, password, 2fa_string)
+    :param password: password to use for employee authentication
+    :param endpoint_url: the API endpoint base URL you wish to connect to.
+        Set this to API_PRIVATE_ENDPOINT to connect via SoftLayer's private
+        network.
+    :param proxy: proxy to be used to make API calls
+    :param integer timeout: timeout for API requests
+    :param auth: an object which responds to get_headers() to be inserted into
+        the xml-rpc headers. Example: `BasicAuthentication`
+    :param config_file: A path to a configuration file used to load settings
+    :param user_agent: an optional User Agent to report when making API
+        calls if you wish to bypass the packages built in User Agent string
+    :param transport: An object that's callable with this signature:
+                      transport(SoftLayer.transports.Request)
+    :param bool verify: decide to verify the server's SSL/TLS cert. DO NOT SET
+                        TO FALSE WITHOUT UNDERSTANDING THE IMPLICATIONS.
+
+    Usage:
+
+        >>> import SoftLayer
+        >>> client = SoftLayer.create_client_from_env()
+        >>> resp = client.call('Account', 'getObject')
+        >>> resp['companyName']
+        'Your Company'
+
+    """
+    settings = config.get_client_settings(username=username,
+                                          api_key=None,
+                                          endpoint_url=endpoint_url,
+                                          timeout=timeout,
+                                          proxy=proxy,
+                                          verify=verify,
+                                          config_file=config_file)
+
+    url = settings.get('endpoint_url') or consts.API_EMPLOYEE_ENDPOINT
+
+    if 'internal' not in url:
+        raise exceptions.SoftLayerError("{} does not look like an Internal Employee url. Try {}".format(
+                                         url, consts.API_EMPLOYEE_ENDPOINT))
+
+    if transport is None:
+        
+        if url is not None and '/rest' in url:
+            # If this looks like a rest endpoint, use the rest transport
+            transport = transports.RestTransport(
+                endpoint_url=settings.get('endpoint_url'),
+                proxy=settings.get('proxy'),
+                timeout=settings.get('timeout'),
+                user_agent=user_agent,
+                verify=verify,
+            )
+        else:
+            # Default the transport to use XMLRPC
+            transport = transports.XmlRpcTransport(
+                endpoint_url=settings.get('endpoint_url'),
+                proxy=settings.get('proxy'),
+                timeout=settings.get('timeout'),
+                user_agent=user_agent,
+                verify=verify,
+            )
+
+
+    if access_token is None:
+        access_token = settings.get('access_token')
+
+    user_id = settings.get('userid')
+
+    # Assume access_token is valid for now, user has logged in before at least.
+    if access_token and user_id:
+        auth = slauth.EmployeeAuthentication(user_id, access_token)
+        return EmployeeClient(auth=auth, transport=transport)
+    else:
+        # This is for logging in mostly.
+        LOGGER.info("No access_token or userid found in settings, creating a No Auth client for now.")
+        return EmployeeClient(auth=None, transport=transport)
+
+
+
 def Client(**kwargs):
     """Get a SoftLayer API Client using environmental settings.
 
     Deprecated in favor of create_client_from_env()
     """
-    warnings.warn("use SoftLayer.create_client_from_env() instead",
-                  DeprecationWarning)
+    warnings.warn("use SoftLayer.create_client_from_env() instead", DeprecationWarning)
     return create_client_from_env(**kwargs)
 
 
@@ -544,6 +640,97 @@ class IAMClient(BaseClient):
     def __repr__(self):
         return "IAMClient(transport=%r, auth=%r)" % (self.transport, self.auth)
 
+
+class EmployeeClient(BaseClient):
+    """Internal SoftLayer Client
+
+    :param auth: auth driver that looks like SoftLayer.auth.AuthenticationBase
+    :param transport: An object that's callable with this signature: transport(SoftLayer.transports.Request)
+    """
+
+    def __init__(self, auth=None, transport=None, config_file=None, account_id=None):
+        BaseClient.__init__(self, auth, transport, config_file)
+        self.account_id = account_id
+
+
+    def authenticate_with_password(self, username, password, security_token=None):
+        """Performs IBM IAM Username/Password Authentication
+
+        :param string username: your softlayer username
+        :param string password: your softlayer password
+        :param int security_token: your 2FA token, prompt if None
+        """
+
+        self.auth = None
+        if security_token is None:
+            security_token = input("Enter your 2FA Token now: ")
+            if len(security_token) != 6:
+                raise Exception("Invalid security token: {}".format(security_token))
+
+        auth_result = self.call('SoftLayer_User_Employee', 'performExternalAuthentication',
+                                username, password, security_token)
+
+
+        self.settings['softlayer']['access_token'] = auth_result['hash']
+        self.settings['softlayer']['userid'] = str(auth_result['userId'])
+        # self.settings['softlayer']['refresh_token'] = tokens['refresh_token']
+
+        config.write_config(self.settings, self.config_file)
+        self.auth = slauth.EmployeeAuthentication(auth_result['userId'], auth_result['hash'])
+
+        return auth_result
+
+
+
+    def authenticate_with_hash(self, userId, access_token):
+        """Authenticates to the Internal SL API with an employee userid + token
+
+        :param string userId: Employee UserId
+        :param string access_token: Employee Hash Token
+        """
+        self.auth = slauth.EmployeeAuthentication(userId, access_token)
+
+    def refresh_token(self, userId, auth_token):
+        """Refreshes the login token"""
+
+        # Go directly to base client, to avoid infite loop if the token is super expired.
+        auth_result = BaseClient.call(self, 'SoftLayer_User_Employee', 'refreshEncryptedToken', auth_token, id=userId)
+        if len(auth_result) > 1:
+            for returned_data in auth_result:
+                # Access tokens should be 188 characters, but just incase its longer or something.
+                if len(returned_data) > 180:
+                    self.settings['softlayer']['access_token'] = returned_data
+        else:
+            message = "Excepted 2 properties from refreshEncryptedToken, got {}|".format(auth_result)
+            raise exceptions.SoftLayerAPIError(message)
+
+        config.write_config(self.settings, self.config_file)
+        self.auth = slauth.EmployeeAuthentication(userId, auth_result[0])
+        return auth_result
+
+    def call(self, service, method, *args, **kwargs):
+        """Handles refreshing Employee tokens in case of a HTTP 401 error"""
+        if (service == 'SoftLayer_Account' or service == 'Account') and not kwargs.get('id'):
+            if not self.account_id:
+                raise exceptions.SoftLayerError("SoftLayer_Account service requires an ID")
+            kwargs['id'] = self.account_id
+
+        try:
+            return BaseClient.call(self, service, method, *args, **kwargs)
+        except exceptions.SoftLayerAPIError as ex:
+            if ex.faultCode == "SoftLayer_Exception_EncryptedToken_Expired":
+                userId = self.settings['softlayer'].get('userid')
+                access_token = self.settings['softlayer'].get('access_token')
+                LOGGER.warning("Token has expired, trying to refresh. %s", ex.faultString)
+                self.refresh_token(userId, access_token)
+                # Try the Call again this time....
+                return BaseClient.call(self, service, method, *args, **kwargs)
+
+            else:
+                raise ex
+
+    def __repr__(self):
+        return "EmployeeClient(transport=%r, auth=%r)" % (self.transport, self.auth)
 
 class Service(object):
     """A SoftLayer Service.

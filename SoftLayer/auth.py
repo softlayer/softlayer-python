@@ -12,6 +12,7 @@ __all__ = [
     'TokenAuthentication',
     'BasicHTTPAuthentication',
     'AuthenticationBase',
+    'EmployeeAuthentication'
 ]
 
 
@@ -137,3 +138,24 @@ class BearerAuthentication(AuthenticationBase):
 
     def __repr__(self):
         return "BearerAuthentication(username={}, token={})".format(self.username, self.api_key)
+
+class EmployeeAuthentication(AuthenticationBase):
+    """Token-based authentication class.
+
+        :param username str: a user's username
+        :param user_hash str: a user's Authentication hash
+    """
+    def __init__(self, user_id, user_hash):
+        self.user_id = user_id
+        self.hash = user_hash
+
+    def get_request(self, request):
+        """Sets token-based auth headers."""
+        request.headers['employeesession'] = {
+            'userId': self.user_id,
+            'authToken': self.hash,
+        }
+        return request
+
+    def __repr__(self):
+        return "EmployeeAuthentication(userId=%r,hash=%s)" % (self.user_id, self.hash)

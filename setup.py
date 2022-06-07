@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 # pylint: disable=inconsistent-return-statements
 
-DESCRIPTION = "A library for SoftLayer's API"
+DESCRIPTION = "A library for SoftLayer's IMS API"
 
 if os.path.exists('README.rst'):
     with codecs.open('README.rst', 'r', 'utf-8') as readme_file:
@@ -15,7 +15,7 @@ else:
     LONG_DESCRIPTION = DESCRIPTION
 
 setup(
-    name='SoftLayer',
+    name='SoftLayer-Internal',
     version='6.0.2',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
@@ -25,14 +25,13 @@ setup(
     packages=find_packages(exclude=['tests']),
     license='MIT',
     zip_safe=False,
-    url='http://github.com/softlayer/softlayer-python',
+    url='https://github.ibm.com/SoftLayer/internal-softlayer-cli',
     entry_points={
         'console_scripts': [
-            'slcli = SoftLayer.CLI.core:main',
-            'sl = SoftLayer.CLI.deprecated:main',
+            'islcli = SoftLayer.CLI.core:main',
         ],
     },
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     install_requires=[
         'prettytable >= 2.5.0',
         'click >= 8.0.4',
@@ -42,7 +41,7 @@ setup(
         'urllib3 >= 1.24',
         'rich == 12.3.0'
     ],
-    keywords=['softlayer', 'cloud', 'slcli'],
+    keywords=['islcli'],
     classifiers=[
         'Environment :: Console',
         'Environment :: Web Environment',
@@ -51,8 +50,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',

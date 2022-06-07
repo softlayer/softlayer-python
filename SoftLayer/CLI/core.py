@@ -70,9 +70,8 @@ def get_version_message(ctx, param, value):
     ctx.exit()
 
 
-@click.group(help="SoftLayer Command-line Client",
-             epilog="""To use most commands your SoftLayer username and api_key need to be configured.
-The easiest way to do that is to use: 'slcli setup'""",
+@click.group(help="SoftLayer Employee Command-line Client",
+             epilog="""Run 'islcli login' to authenticate""",
              cls=CommandLoader,
              context_settings=CONTEXT_SETTINGS)
 @click.option('--format',
@@ -103,6 +102,7 @@ The easiest way to do that is to use: 'slcli setup'""",
               help="Use demo data instead of actually making API calls")
 @click.option('--version', is_flag=True, expose_value=False, is_eager=True, callback=get_version_message,
               help="Show version information.",  allow_from_autoenv=False,)
+@click.option('--account', '-a', help="Account Id")
 @environment.pass_env
 def cli(env,
         format='table',
@@ -111,6 +111,7 @@ def cli(env,
         proxy=None,
         really=False,
         demo=False,
+        account=None,
         **kwargs):
     """Main click CLI entry-point."""
 
@@ -133,6 +134,8 @@ def cli(env,
     env.vars['_timings'] = SoftLayer.DebugTransport(env.client.transport)
     env.vars['verbose'] = verbose
     env.client.transport = env.vars['_timings']
+    print("Account ID is now: {}".format(account))
+    env.client.account_id = account
 
 
 @cli.result_callback()
