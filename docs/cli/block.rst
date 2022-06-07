@@ -155,3 +155,7 @@ Block Commands
 .. click:: SoftLayer.CLI.block.snapshot.get_notify_status:cli
     :prog: block snapshot-get-notification-status
     :show-nested:
+
+.. click:: SoftLayer.CLI.block.object_list:cli
+    :prog: block object-list
+    :show-nested:
