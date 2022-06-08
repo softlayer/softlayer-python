@@ -135,3 +135,7 @@ File Commands
     :prog: file snapshot-get-notification-status
     :show-nested:
 
+.. click:: SoftLayer.CLI.file.duplicate_convert_status:cli
+    :prog: file duplicate-convert-status
+    :show-nested:
+

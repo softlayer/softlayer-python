@@ -10,7 +10,7 @@ from SoftLayer import utils
 
 
 # Invalid names are ignored due to long method names and short argument names
-# pylint: disable=invalid-name, no-self-use
+# pylint: disable=invalid-name
 
 
 class EmailManager(utils.IdentifierMixin, object):

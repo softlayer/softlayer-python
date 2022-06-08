@@ -20,7 +20,7 @@ from SoftLayer import utils
 LOGGER = logging.getLogger(__name__)
 
 # Invalid names are ignored due to long method names and short argument names
-# pylint: disable=invalid-name, no-self-use, too-many-lines
+# pylint: disable=invalid-name, too-many-lines
 
 EXTRA_CATEGORIES = ['pri_ipv6_addresses',
                     'static_ipv6_addresses',

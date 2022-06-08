@@ -25,7 +25,7 @@ class StorageManager(utils.IdentifierMixin, object):
         self.client = client
         self.resolvers = [self._get_ids_from_username]
 
-    def _get_ids_from_username(self, username):  # pylint: disable=unused-argument,no-self-use
+    def _get_ids_from_username(self, username):  # pylint: disable=unused-argument
         """Should only be actually called from the block/file manager"""
         return []
 
@@ -576,4 +576,13 @@ class StorageManager(utils.IdentifierMixin, object):
         """
         return self.client.call('Network_Storage',
                                 'convertCloneDependentToIndependent',
+                                id=volume_id)
+
+    def convert_dupe_status(self, volume_id):
+        """Get the Clone split/move status completion of a duplicate volume
+
+        :param integer volume_id: The id of the volume.
+        """
+        return self.client.call('Network_Storage',
+                                'getDuplicateConversionStatus',
                                 id=volume_id)

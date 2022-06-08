@@ -155,3 +155,8 @@ Block Commands
 .. click:: SoftLayer.CLI.block.snapshot.get_notify_status:cli
     :prog: block snapshot-get-notification-status
     :show-nested:
+
+.. click:: SoftLayer.CLI.block.duplicate_convert_status:cli
+    :prog: block duplicate-convert-status
+    :show-nested:
+
