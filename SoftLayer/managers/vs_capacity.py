@@ -14,7 +14,7 @@ from SoftLayer.managers.vs import VSManager
 from SoftLayer import utils
 
 # Invalid names are ignored due to long method names and short argument names
-# pylint: disable=invalid-name, no-self-use
+# pylint: disable=invalid-name
 
 LOGGER = logging.getLogger(__name__)
 

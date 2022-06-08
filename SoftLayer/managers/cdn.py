@@ -9,7 +9,7 @@ import SoftLayer
 from SoftLayer import utils
 
 
-# pylint: disable=no-self-use,too-many-lines,too-many-instance-attributes
+# pylint: disable=too-many-lines,too-many-instance-attributes
 
 
 class CDNManager(utils.IdentifierMixin, object):
