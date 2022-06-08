@@ -13,7 +13,7 @@ def cli(env):
     """Report on Resources in closing datacenters
 
     Displays a list of Datacenters soon to be shutdown, and any resources on the account
-in those locations
+    in those locations
     """
 
     closing_filter = {

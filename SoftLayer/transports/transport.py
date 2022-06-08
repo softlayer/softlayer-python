@@ -30,7 +30,7 @@ def get_session(user_agent):
 
 
 # transports.Request does have a lot of instance attributes. :(
-# pylint: disable=too-many-instance-attributes, no-self-use
+# pylint: disable=too-many-instance-attributes
 class Request(object):
     """Transport request object."""
 

@@ -28,7 +28,7 @@ EXTRA_CATEGORIES = ['pri_ipv6_addresses',
                     'software_guard_extensions']
 
 
-# pylint: disable=no-self-use,too-many-lines
+# pylint: disable=,too-many-lines
 
 
 class VSManager(utils.IdentifierMixin, object):
@@ -360,7 +360,7 @@ class VSManager(utils.IdentifierMixin, object):
                     'prices': get_item_price(item['prices'], location_group_id)
                 })
 
-            elif category.__contains__('guest_disk'):
+            elif 'guest_disk' in category:
                 local_disk.append({
                     'name': item['description'],
                     'capacity': item['capacity'],
@@ -1043,7 +1043,7 @@ class VSManager(utils.IdentifierMixin, object):
             disk_number = 0
             vsi_disk = self.get_instance(instance_id)
             for item in vsi_disk.get('billingItem').get('children'):
-                if item.get('categoryCode').__contains__('guest_disk'):
+                if 'guest_disk' in item.get('categoryCode'):
                     if disk_number < int("".join(filter(str.isdigit, item.get('categoryCode')))):
                         disk_number = int("".join(filter(str.isdigit, item.get('categoryCode'))))
             for disk_guest in disk:

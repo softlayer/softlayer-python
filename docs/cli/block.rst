@@ -159,3 +159,8 @@ Block Commands
 .. click:: SoftLayer.CLI.block.object_list:cli
     :prog: block object-list
     :show-nested:
+
+.. click:: SoftLayer.CLI.block.duplicate_convert_status:cli
+    :prog: block duplicate-convert-status
+    :show-nested:
+

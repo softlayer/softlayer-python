@@ -199,6 +199,10 @@ class BlockStorageManager(StorageManager):
         return []
 
     def get_cloud_list(self):
+        """Returns a list cloud object storage.
+
+        return: Returns a list cloud object storage.
+        """
 
         mask = 'mask[id,username,billingItem,storageType, notes]'
 
