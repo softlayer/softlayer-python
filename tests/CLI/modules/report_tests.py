@@ -183,7 +183,7 @@ class ReportTests(testing.TestCase):
         stripped_output = '[' + result.output.split('[', 1)[1]
         json_output = json.loads(stripped_output)
         self.assertEqual(json_output[0]['hostname'], 'pool1')
-        self.assertEqual(json_output[1]['private_in'], 0)
+        self.assertEqual(json_output[1]['private_out'], 40)
         self.assertEqual(json_output[2]['private_in'], 30)
         self.assertEqual(json_output[3]['type'], 'virtual')
 
@@ -266,7 +266,7 @@ class ReportTests(testing.TestCase):
         stripped_output = '[' + result.output.split('[', 1)[1]
         json_output = json.loads(stripped_output)
         self.assertEqual(json_output[0]['hostname'], 'pool1')
-        self.assertEqual(json_output[1]['private_in'], 0)
+        self.assertEqual(json_output[1]['private_out'], 40)
         self.assertEqual(json_output[2]['private_in'], 30)
         self.assertEqual(json_output[3]['type'], 'hardware')
 
