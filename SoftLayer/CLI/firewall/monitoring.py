@@ -13,7 +13,7 @@ from SoftLayer.CLI import formatting
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Get details for a firewall monitors device."""
+    """Get details for a multi vlan firewall monitors device."""
 
     mgr = SoftLayer.FirewallManager(env.client)
 
