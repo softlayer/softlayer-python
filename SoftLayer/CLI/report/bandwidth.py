@@ -48,23 +48,27 @@ def _get_pooled_bandwidth(env, start, end):
                            label='Calculating for bandwidth pools',
                            file=sys.stderr) as pools:
         for pool in pools:
+            metric_tracking_id = pool.get('metricTrackingObjectId')
+
+            if metric_tracking_id is None:
+                continue
+
             pool_detail = {
                 'id': pool.get('id'),
                 'type': 'pool',
                 'name': pool.get('name'),
                 'data': []
             }
-            if pool.get('metricTrackingObjectId'):
-                bw_data = env.client.call(
-                    'Metric_Tracking_Object',
-                    'getSummaryData',
-                    start.strftime('%Y-%m-%d %H:%M:%S %Z'),
-                    end.strftime('%Y-%m-%d %H:%M:%S %Z'),
-                    types,
-                    300,
-                    id=pool.get('metricTrackingObjectId'),
-                )
-                pool_detail['data'] = bw_data
+            bw_data = env.client.call(
+                'Metric_Tracking_Object',
+                'getSummaryData',
+                start.strftime('%Y-%m-%d %H:%M:%S %Z'),
+                end.strftime('%Y-%m-%d %H:%M:%S %Z'),
+                types,
+                300,
+                id=metric_tracking_id,
+            )
+            pool_detail['data'] = bw_data
 
             yield pool_detail
 
@@ -74,7 +78,7 @@ def _get_hardware_bandwidth(env, start, end):
         'Account', 'getHardware',
         iter=True,
         mask='id,hostname,metricTrackingObject.id,'
-             'virtualRack[id,bandwidthAllotmentTypeId]')
+             'virtualRack[id,bandwidthAllotmentTypeId,name]')
     types = [
         {'keyName': 'PUBLICIN',
          'name': 'publicIn',
@@ -125,7 +129,7 @@ def _get_virtual_bandwidth(env, start, end):
         'Account', 'getVirtualGuests',
         iter=True,
         mask='id,hostname,metricTrackingObjectId,'
-             'virtualRack[id,bandwidthAllotmentTypeId]')
+             'virtualRack[id,bandwidthAllotmentTypeId,name]')
     types = [
         {'keyName': 'PUBLICIN_NET_OCTET',
          'name': 'publicIn_net_octet',
@@ -155,7 +159,7 @@ def _get_virtual_bandwidth(env, start, end):
             if utils.lookup(instance,
                             'virtualRack',
                             'bandwidthAllotmentTypeId') == 2:
-                pool_name = utils.lookup(instance, 'virtualRack', 'id')
+                pool_name = utils.lookup(instance, 'virtualRack', 'name')
 
             yield {
                 'id': instance['id'],
