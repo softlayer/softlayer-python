@@ -43,9 +43,9 @@ def cli(env, identifier):
     table.add_row(['Name', _firewall['networkGateway']['name']])
     table.add_row(['Stard Date', last_month.strftime('%Y-%m-%d')])
     table.add_row(['End Date', end.strftime('%Y-%m-%d')])
-    table.add_row(['Out', public_out])
-    table.add_row(['In', public_in])
-    table.add_row(['Total', public_out + public_in])
+    table.add_row(['Out', formatting.b_to_gb(public_out)])
+    table.add_row(['In', formatting.b_to_gb(public_in)])
+    table.add_row(['Total', formatting.b_to_gb(public_out + public_in)])
     table.add_row(['Status', _firewall['networkGateway']['status']['name']])
 
     env.fout(table)

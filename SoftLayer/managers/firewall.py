@@ -336,4 +336,4 @@ class FirewallManager(utils.IdentifierMixin, object):
         }]
 
         return self.client['Metric_Tracking_Object'].getSummaryData(start_date,
-                                                                    end_date, body, 1800, id=identifier)
+                                                                    end_date, body, 86400, id=identifier)
