@@ -819,3 +819,9 @@ class BlockTests(testing.TestCase):
             result = self.run_command(['block', 'snapshot-get-notification-status', '999'])
             self.assert_no_fail(result)
             self.assertIn(expect, result.output)
+
+    def test_object_list(self):
+        result = self.run_command(['block', 'object-list'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getHubNetworkStorage')
