@@ -180,6 +180,7 @@ ALL_ROUTES = [
     ('firewall:detail', 'SoftLayer.CLI.firewall.detail:cli'),
     ('firewall:edit', 'SoftLayer.CLI.firewall.edit:cli'),
     ('firewall:list', 'SoftLayer.CLI.firewall.list:cli'),
+    ('firewall:monitoring', 'SoftLayer.CLI.firewall.monitoring:cli'),
 
     ('globalip', 'SoftLayer.CLI.globalip'),
     ('globalip:assign', 'SoftLayer.CLI.globalip.assign:cli'),

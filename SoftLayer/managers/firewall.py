@@ -297,8 +297,9 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param integer firewall_id: the instance ID of the standard firewall
         """
         if not mask:
-            mask = 'mask[firewallType,networkGateway[insideVlans,members,privateIpAddress,publicIpAddress,' \
-                   'publicIpv6Address,privateVlan,publicVlan],datacenter,managementCredentials,networkVlan]'
+            mask = 'mask[firewallType,datacenter,managementCredentials,networkVlan,' \
+                   'metricTrackingObject[data,type],networkGateway[insideVlans,members,privateIpAddress,' \
+                   'publicIpAddress,publicIpv6Address,privateVlan,publicVlan,status]]'
 
         svc = self.client['Network_Vlan_Firewall']
 
@@ -319,3 +320,20 @@ class FirewallManager(utils.IdentifierMixin, object):
         _filter = {"networkGateways": {"networkFirewall": {"operation": "not null"}}}
 
         return self.account.getNetworkGateways(mask=mask, filter=_filter)
+
+    def get_summary(self, identifier, start_date, end_date):
+        """Returns the metric data for the date range provided
+
+        :param integer metric_tracking_id
+        """
+        body = [{
+            "keyName": "PUBLICIN",
+            "summaryType": "sum"
+
+        }, {
+            "keyName": "PUBLICOUT",
+            "summaryType": "sum"
+        }]
+
+        return self.client['Metric_Tracking_Object'].getSummaryData(start_date,
+                                                                    end_date, body, 86400, id=identifier)

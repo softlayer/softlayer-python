@@ -154,3 +154,7 @@ class FirewallTests(testing.TestCase):
         confirm_mock.return_value = True
         result = self.run_command(['firewall', 'edit', 'vlan:1234'])
         print(result.output)
+
+    def test_monitoring(self):
+        result = self.run_command(['firewall', 'monitoring', '123456'])
+        print(result.output)
