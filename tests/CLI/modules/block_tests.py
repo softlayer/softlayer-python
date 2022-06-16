@@ -444,7 +444,7 @@ class BlockTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(result.output, 'Block volume 12345678 is being'
-                         ' restored using snapshot 87654321\n')
+                                        ' restored using snapshot 87654321\n')
 
     @mock.patch('SoftLayer.BlockStorageManager.order_snapshot_space')
     def test_snapshot_order_order_not_placed(self, order_mock):
@@ -825,3 +825,10 @@ class BlockTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getHubNetworkStorage')
+
+    def test_object_permissions(self):
+        result = self.run_command(['block', 'object-storage-permission', '1234'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getObject')
+        self.assert_called_with('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getEndpoints')

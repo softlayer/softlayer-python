@@ -164,3 +164,7 @@ Block Commands
     :prog: block duplicate-convert-status
     :show-nested:
 
+.. click:: SoftLayer.CLI.block.object_storage_permission:cli
+    :prog: block object-storage-permission
+    :show-nested:
+
