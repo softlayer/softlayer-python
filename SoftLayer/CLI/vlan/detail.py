@@ -51,7 +51,7 @@ def cli(env, identifier, no_vs, no_hardware):
         subnet_table.add_row(['usable ips', subnet.get('usableIpAddressCount')])
         subnets.append(subnet_table)
 
-    table.add_row(['subnets', subnets])
+    table.add_row(['subnets', *subnets])
 
     server_columns = ['hostname', 'domain', 'public_ip', 'private_ip']
 
@@ -63,7 +63,7 @@ def cli(env, identifier, no_vs, no_hardware):
                                   vsi.get('domain'),
                                   vsi.get('primaryIpAddress'),
                                   vsi.get('primaryBackendIpAddress')])
-            table.add_row(['vs', vs_table])
+            table.add_row(['vs', *vs_table])
         else:
             table.add_row(['vs', 'none'])
 
@@ -75,7 +75,7 @@ def cli(env, identifier, no_vs, no_hardware):
                                   hardware.get('domain'),
                                   hardware.get('primaryIpAddress'),
                                   hardware.get('primaryBackendIpAddress')])
-            table.add_row(['hardware', hw_table])
+            table.add_row(['hardware', *hw_table])
         else:
             table.add_row(['hardware', 'none'])
 
