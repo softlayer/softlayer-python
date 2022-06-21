@@ -37,17 +37,17 @@ def cli(env, identifier):
         inbound = '-'
     table.add_row(['Inbound   Usage', inbound])
     if bandwidths['hardware'] != []:
-        table.add_row(['hardware', _bw_table(bandwidths['hardware'])])
+        table.add_row(['hardware', *(_bw_table(bandwidths['hardware']))])
     else:
         table.add_row(['hardware', 'Not Found'])
 
     if bandwidths['virtualGuests'] != []:
-        table.add_row(['virtualGuests', _virtual_table(bandwidths['virtualGuests'])])
+        table.add_row(['virtualGuests', *(_virtual_table(bandwidths['virtualGuests']))])
     else:
         table.add_row(['virtualGuests', 'Not Found'])
 
     if bandwidths['bareMetalInstances'] != []:
-        table.add_row(['Netscaler', _bw_table(bandwidths['bareMetalInstances'])])
+        table.add_row(['Netscaler', *(_bw_table(bandwidths['bareMetalInstances']))])
     else:
         table.add_row(['Netscaler', 'Not Found'])
 

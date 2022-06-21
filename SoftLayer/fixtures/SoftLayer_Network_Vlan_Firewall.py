@@ -174,6 +174,12 @@ getObject = {
             "modifyDate": "2022-05-17T14:00:42-06:00",
             "primarySubnetId": 2623338,
             "vlanNumber": 1255
+        },
+        "status": {
+            "description": "Gateway is ready to accept commands and actions",
+            "id": 1,
+            "keyName": "ACTIVE",
+            "name": "Active"
         }
     },
     "rules": [
@@ -212,7 +218,16 @@ getObject = {
             'action': 'permit',
             'sourceIpAddress': '0.0.0.0'
         }
-    ]
+    ],
+    "metricTrackingObject": {
+        "id": 147258369,
+        "resourceTableId": 17438,
+        "startDate": "2022-05-17T14:01:48-06:00",
+        "type": {
+            "keyname": "FIREWALL_CONTEXT",
+            "name": "Firewall Module Context"
+        }
+    }
 
 }
 

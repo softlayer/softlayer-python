@@ -160,6 +160,10 @@ Block Commands
     :prog: block object-list
     :show-nested:
 
+.. click:: SoftLayer.CLI.block.object_storage_detail:cli
+    :prog: block object-storage-detail
+    :show-nested:
+
 .. click:: SoftLayer.CLI.block.duplicate_convert_status:cli
     :prog: block duplicate-convert-status
     :show-nested:

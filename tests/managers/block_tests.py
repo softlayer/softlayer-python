@@ -1120,6 +1120,10 @@ class BlockTests(testing.TestCase):
         self.block.get_cloud_list()
         self.assert_called_with('SoftLayer_Account', 'getHubNetworkStorage')
 
+    def test_get_bucket(self):
+        self.block.get_buckets(1234)
+        self.assert_called_with('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getBuckets')
+
     def test_get_cloud_endPoints(self):
         self.block.get_end_points(123456)
         self.assert_called_with('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getEndpoints')
