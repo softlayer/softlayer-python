@@ -127,6 +127,7 @@ ALL_ROUTES = [
     ('block:volume-convert', 'SoftLayer.CLI.block.convert:cli'),
     ('block:volume-set-note', 'SoftLayer.CLI.block.set_note:cli'),
     ('block:object-list', 'SoftLayer.CLI.block.object_list:cli'),
+    ('block:object-storage-detail', 'SoftLayer.CLI.block.object_storage_detail:cli'),
 
     ('email', 'SoftLayer.CLI.email'),
     ('email:list', 'SoftLayer.CLI.email.list:cli'),
@@ -180,6 +181,7 @@ ALL_ROUTES = [
     ('firewall:detail', 'SoftLayer.CLI.firewall.detail:cli'),
     ('firewall:edit', 'SoftLayer.CLI.firewall.edit:cli'),
     ('firewall:list', 'SoftLayer.CLI.firewall.list:cli'),
+    ('firewall:monitoring', 'SoftLayer.CLI.firewall.monitoring:cli'),
 
     ('globalip', 'SoftLayer.CLI.globalip'),
     ('globalip:assign', 'SoftLayer.CLI.globalip.assign:cli'),

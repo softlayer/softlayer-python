@@ -207,3 +207,13 @@ class BlockStorageManager(StorageManager):
         mask = 'mask[id,username,billingItem,storageType, notes]'
 
         return self.client.call('Account', 'getHubNetworkStorage', mask=mask)
+
+    def get_buckets(self, object_id):
+        """Return  buckets data of the cloud storage.
+
+        :param object_id cloud object storage identifier
+
+        Returns: Get buckets
+
+        """
+        return self.client.call('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getBuckets', id=object_id)

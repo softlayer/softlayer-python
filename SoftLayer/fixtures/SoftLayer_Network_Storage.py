@@ -149,7 +149,11 @@ getObject = {
         }
     ],
     'serviceProviderId': 1,
-    'serviceResource': {'datacenter': {'id': 449500, 'name': 'dal05'}},
+    'serviceResource': {'datacenter': {'id': 449500, 'name': 'dal05'},
+                        'name': 'Cleversafe - US Region',
+                        'type': {
+                            'type': 'CLEVERSAFE_SVC_API'
+                        }},
     'serviceResourceBackendIpAddress': '10.1.2.3',
     'serviceResourceName': 'Storage Type 01 Aggregate staaspar0101_pc01',
     'snapshotCapacityGb': '10',
