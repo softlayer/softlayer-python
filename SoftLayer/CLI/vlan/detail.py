@@ -38,20 +38,20 @@ def cli(env, identifier, no_vs, no_hardware):
     table.add_row(['primary_router',
                    utils.lookup(vlan, 'primaryRouter', 'fullyQualifiedDomainName')])
     table.add_row(['Gateway/Firewall', get_gateway_firewall(vlan)])
-    subnets = []
-    for subnet in vlan.get('subnets', []):
-        subnet_table = formatting.KeyValueTable(['name', 'value'])
-        subnet_table.align['name'] = 'r'
-        subnet_table.align['value'] = 'l'
-        subnet_table.add_row(['id', subnet.get('id')])
-        subnet_table.add_row(['identifier', subnet.get('networkIdentifier')])
-        subnet_table.add_row(['netmask', subnet.get('netmask')])
-        subnet_table.add_row(['gateway', subnet.get('gateway', formatting.blank())])
-        subnet_table.add_row(['type', subnet.get('subnetType')])
-        subnet_table.add_row(['usable ips', subnet.get('usableIpAddressCount')])
-        subnets.append(subnet_table)
 
-    table.add_row(['subnets', subnets])
+    if vlan.get('subnets'):
+        subnet_table = formatting.Table(['id', 'identifier', 'netmask', 'gateway', 'type', 'usable ips'])
+        for subnet in vlan.get('subnets'):
+            subnet_table.add_row([subnet.get('id'),
+                                  subnet.get('networkIdentifier'),
+                                  subnet.get('netmask'),
+                                  subnet.get('gateway') or formatting.blank(),
+                                  subnet.get('subnetType'),
+                                  subnet.get('usableIpAddressCount')])
+        # subnets.append(subnet_table)
+        table.add_row(['subnets', subnet_table])
+    else:
+        table.add_row(['subnets', 'none'])
 
     server_columns = ['hostname', 'domain', 'public_ip', 'private_ip']
 
