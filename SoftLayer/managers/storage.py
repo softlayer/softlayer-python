@@ -9,6 +9,7 @@ from SoftLayer import exceptions
 from SoftLayer.managers import storage_utils
 from SoftLayer import utils
 
+
 # pylint: disable=too-many-public-methods
 
 
@@ -586,3 +587,22 @@ class StorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage',
                                 'getDuplicateConversionStatus',
                                 id=volume_id)
+
+    def get_network_message_delivery_accounts(self, object_id):
+        """Return  object data of the cloud storage.
+
+        :param object_id cloud object storage identifier
+        Returns: Get instances
+        """
+        object_mask = 'mask[uuid,credentials]'
+        return self.client.call('SoftLayer_Network_Storage_Hub_Cleversafe_Account',
+                                'getObject', mask=object_mask, id=object_id)
+
+    def get_end_points(self, object_id):
+        """Returns a collection of endpoint URLs available to this IBM Cloud Object Storage account.
+
+        :param object_id cloud object storage identifier
+        Returns: Returns a collection of endpoint URLs.
+        """
+        return self.client.call('SoftLayer_Network_Storage_Hub_Cleversafe_Account',
+                                'getEndpoints',  id=object_id)

@@ -47,6 +47,47 @@ getBuckets = [
     }
 ]
 
+getEndpoints = [
+    {
+        'legacy': False,
+        'region': 'us-geo',
+        'type': 'public',
+        'url': 's3.us.cloud-object-storage.appdomain.cloud'
+    },
+    {
+        'legacy': False,
+        'region': 'us-geo',
+        'type': 'private',
+        'url': 's3.private.us.cloud-object-storage.appdomain.cloud'
+    }
+]
 getCredentialLimit = 2
 
 credentialDelete = True
+
+getObject = {
+    'id': 123456,
+    'username': 'SLOSC307608-1',
+    'credentials': [
+        {
+            'id': 1933496,
+            'password': 'Um1Bp420FIFNvAg2QHjn5Sci2c2x4RNDXpVDDvnf',
+            'username': 'Kv9aNIhtNa7ZRceCTgep',
+            'type': {
+                'description': 'A credential for generating S3 Compatible Signatures.',
+                'keyName': 'S3_COMPATIBLE_SIGNATURE'
+            }
+        },
+        {
+
+            'id': 1732820,
+            'password': 'q6NtwqeuXDaRqGc0Jrugg2sDgbatyNsoN9sPEmjo',
+            'username': '252r9BN8ibuDSQAXLOeL',
+            'type': {
+                'description': 'A credential for generating S3 Compatible Signatures.',
+                'keyName': 'S3_COMPATIBLE_SIGNATURE',
+            }
+        }
+    ],
+    'uuid': '01c449c484ae4a58a42d9b79d4c5e4ed'
+}
