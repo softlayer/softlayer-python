@@ -32,12 +32,12 @@ The config file is located at `~/.softlayer` or `~/AppData/Roaming/softlayer` fo
 Your config file should look something like this for using the islcli. Beware the `islcli` and `slcli` use the same config for the moment. You need to set `verify = False` in the config because the internal endpoint uses a self-signed SSL certificate.
 
 .. code-block:: bash
-  
   [softlayer]
-  username = imsUsername
+  timeout = 600
   verify = False
-  endpoint_url = https://internal.app0lb.dal10.softlayer.local/v3/internal/xmlrpc/
-
+  username = imsUsername
+  endpoint_url = http://internal.applb.dal10.softlayer.local/v3.1/internal/xmlrpc/
+  userid = imsUserId
 
 
 Basic Usage

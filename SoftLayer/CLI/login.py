@@ -56,7 +56,7 @@ def cli(env):
     if username is None:
         username = input("Username: ")
     click.echo("Username: {}".format(username))
-    if password is None:
+    if not password:
         password = env.getpass("Password: ")
     click.echo("Password: {}".format(censor_password(password)))
     yubi = input("Yubi: ")
