@@ -17,7 +17,7 @@ COLUMNS_ITEM_PRICES_LOCATION = ['KeyName', 'Price Id', 'Hourly', 'Monthly', 'Res
 @click.argument('package_keyname')
 @click.option('--keyword', '-k', help="A word (or string) used to filter item names.")
 @click.option('--category', '-c', help="Category code to filter items by")
-@click.option('--prices', '-p', is_flag=True, 
+@click.option('--prices', '-p', is_flag=True,
               help='Use --prices to list the server item prices, and to list the '
                    'Item Prices by location, add it to the --prices option using '
                    'location KeyName, e.g. --prices AMSTERDAM02')
