@@ -8,18 +8,19 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 from SoftLayer.utils import lookup
 
-COLUMNS = ['category', 'keyName', 'description', 'priceId']
-COLUMNS_ITEM_PRICES = ['keyName', 'priceId', 'Hourly', 'Monthly', 'Restriction']
-COLUMNS_ITEM_PRICES_LOCATION = ['keyName', 'priceId', 'Hourly', 'Monthly', 'Restriction']
+COLUMNS = ['Category', 'KeyName', 'Description', 'Price Id']
+COLUMNS_ITEM_PRICES = ['KeyName', 'Price Id', 'Hourly', 'Monthly', 'Restriction']
+COLUMNS_ITEM_PRICES_LOCATION = ['KeyName', 'Price Id', 'Hourly', 'Monthly', 'Restriction']
 
 
 @click.command(cls=SLCommand)
 @click.argument('package_keyname')
 @click.option('--keyword', '-k', help="A word (or string) used to filter item names.")
 @click.option('--category', '-c', help="Category code to filter items by")
-@click.option('--prices', '-p', is_flag=True, help='Use --prices to list the server item prices, and to list the '
-                                                   'Item Prices by location, add it to the --prices option using '
-                                                   'location KeyName, e.g. --prices AMSTERDAM02')
+@click.option('--prices', '-p', is_flag=True, 
+              help='Use --prices to list the server item prices, and to list the '
+                   'Item Prices by location, add it to the --prices option using '
+                   'location KeyName, e.g. --prices AMSTERDAM02')
 @click.argument('location', required=False)
 @environment.pass_env
 def cli(env, package_keyname, keyword, category, prices, location=None):
@@ -66,7 +67,7 @@ def cli(env, package_keyname, keyword, category, prices, location=None):
             for item in sorted_items[category_name]:
                 table_items_detail.add_row([category_name, item['keyName'], item['description'], get_price(item)])
         tables.append(table_items_detail)
-    env.fout(formatting.listing(tables, separator='\n'))
+    env.fout(tables)
 
 
 def sort_items(items):
