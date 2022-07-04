@@ -9,4 +9,4 @@ getDataCenters = [
         "longName": "San Jose 1",
         "name": "sjc01"
     }]
-getDatacenters = [{'id': 1854895, 'name': 'dal13', 'regions': [{'keyname': 'DALLAS13'}]}]
+getDatacenters = [{'id': 1854895, 'longName': 'dallas 13', 'name': 'dal13', 'regions': [{'keyname': 'DALLAS13'}]}]

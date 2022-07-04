@@ -125,6 +125,7 @@ ALL_ROUTES = [
     ('block:volume-limits', 'SoftLayer.CLI.block.limit:cli'),
     ('block:volume-refresh', 'SoftLayer.CLI.block.refresh:cli'),
     ('block:volume-convert', 'SoftLayer.CLI.block.convert:cli'),
+    ('block:volume-options', 'SoftLayer.CLI.block.options:cli'),
     ('block:volume-set-note', 'SoftLayer.CLI.block.set_note:cli'),
     ('block:object-list', 'SoftLayer.CLI.block.object_list:cli'),
 
