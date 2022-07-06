@@ -46,6 +46,7 @@ jobs:
     - name: Publish 📦 to Test PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
-        password: ${{ secrets.CGALLO_TEST_PYPI }}
-        repository_url: https://test.pypi.org/legacy/
+        user: __token__
+        password: ${{ secrets.CGALLO_PYPI }}
+        repository_url: https://pypi.org/legacy/
 
