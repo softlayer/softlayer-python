@@ -174,6 +174,7 @@ ALL_ROUTES = [
     ('file:volume-limits', 'SoftLayer.CLI.file.limit:cli'),
     ('file:volume-refresh', 'SoftLayer.CLI.file.refresh:cli'),
     ('file:volume-convert', 'SoftLayer.CLI.file.convert:cli'),
+    ('file:volume-options', 'SoftLayer.CLI.file.options:cli'),
     ('file:volume-set-note', 'SoftLayer.CLI.file.set_note:cli'),
 
     ('firewall', 'SoftLayer.CLI.firewall'),

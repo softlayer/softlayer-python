@@ -123,6 +123,10 @@ File Commands
     :prog: file volume-set-note
     :show-nested:
 
+.. click:: SoftLayer.CLI.file.options:cli
+    :prog: file volume-options
+    :show-nested:
+
 .. click:: SoftLayer.CLI.file.replication.disaster_recovery_failover:cli
     :prog: file disaster-recovery-failover
     :show-nested:
