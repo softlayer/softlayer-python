@@ -22,22 +22,61 @@ class ObjectStorageTests(testing.TestCase):
                          )
 
     def test_list_endpoints(self):
-        accounts = self.set_mock('SoftLayer_Account', 'getHubNetworkStorage')
-        accounts.return_value = {
-            'storageNodes': [{
-                'datacenter': {'name': 'dal05'},
-                'frontendIpAddress': 'https://dal05/auth/v1.0/',
-                'backendIpAddress': 'https://dal05/auth/v1.0/'}
-            ],
-        }
+        accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getEndpoints')
+        accounts.return_value = [
+            {
+                'legacy': False,
+                'region': 'us-geo',
+                'type': 'public',
+                'url': 's3.us.cloud-object-storage.appdomain.cloud'
+            },
+            {
+                'legacy': False,
+                'region': 'us-geo',
+                'type': 'private',
+                'url': 's3.private.us.cloud-object-storage.appdomain.cloud'
+            },
+            {
+                'legacy': True,
+                'location': 'dal06',
+                'region': 'regional',
+                'type': 'public',
+                'url': 's3.dal.cloud-object-storage.appdomain.cloud'
+            },
+            {
+                'legacy': True,
+                'location': 'ams03',
+                'region': 'singleSite',
+                'type': 'private',
+                'url': 's3.ams.cloud-object-storage.appdomain.cloud'
+            },
+        ]
 
-        result = self.run_command(['object-storage', 'endpoints'])
+        result = self.run_command(['object-storage', 'endpoints', '123'])
 
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
-                         [{'datacenter': 'dal05',
-                           'private': 'https://dal05/auth/v1.0/',
-                           'public': 'https://dal05/auth/v1.0/'}])
+                         [{'Legacy': False,
+                           'EndPoint Type': 'Cross Region',
+                           'Public/Private': 'Public',
+                           'Location/Region': 'us-geo',
+                           'Url': 's3.us.cloud-object-storage.appdomain.cloud'},
+                          {'Legacy': False,
+                           'EndPoint Type': 'Cross Region',
+                           'Public/Private': 'Private',
+                           'Location/Region': 'us-geo',
+                           'Url': 's3.private.us.cloud-object-storage.appdomain.cloud'},
+                          {'Legacy': True,
+                           'EndPoint Type': 'Region',
+                           'Public/Private': 'Public',
+                           'Location/Region': 'dal06',
+                           'Url': 's3.dal.cloud-object-storage.appdomain.cloud'},
+                          {'Legacy': True,
+                           'EndPoint Type': 'Single Site',
+                           'Public/Private': 'Private',
+                           'Location/Region': 'ams03',
+                           'Url': 's3.ams.cloud-object-storage.appdomain.cloud'}
+                          ])
 
     def test_create_credential(self):
         result = self.run_command(['object-storage', 'credential', 'create', '100'])
