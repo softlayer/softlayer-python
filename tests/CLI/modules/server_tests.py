@@ -401,6 +401,17 @@ class ServerCLITests(testing.TestCase):
         self.assertIn('Warning: Closed soon: TEST00.pod2', result.output)
         self.assertIn('"id": 98765', result.output)
 
+        result = self.run_command(['--really', 'server', 'create',
+                                   '--size=S1270_8GB_2X1TBSATA_NORAID',
+                                   '--hostname=test',
+                                   '--domain=example.com',
+                                   '--datacenter=mex01',
+                                   '--os=OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+                                   ])
+
+        self.assert_no_fail(result)
+        self.assertNotIn('Warning: Closed soon: mex01', result.output)
+
     @mock.patch('SoftLayer.CLI.template.export_to_template')
     def test_create_server_with_export(self, export_mock):
 
@@ -1015,3 +1026,15 @@ class ServerCLITests(testing.TestCase):
     def test_monitoring(self):
         result = self.run_command(['hardware', 'monitoring', '100'])
         self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_check_for_closing(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'create', '--hostname', 'TEST', '--domain', 'TESTING',
+                                   '--flavor', 'B1_2X8X25', '--datacenter', 'ams01', '--os', 'UBUNTU_LATEST'])
+        self.assert_no_fail(result)
+        self.assertIn('Warning: Closed soon: ams01', result.output)
+        result = self.run_command(['vs', 'create', '--hostname', 'TEST', '--domain', 'TESTING',
+                                   '--flavor', 'B1_2X8X25', '--datacenter', 'mex01', '--os', 'UBUNTU_LATEST'])
+        self.assert_no_fail(result)
+        self.assertNotIn('Warning: Closed soon: mex01', result.output)

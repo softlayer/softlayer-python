@@ -851,3 +851,18 @@ class NetworkManager(object):
             _filter = {"name": {"operation": datacenter}}
 
         return self.client.call('SoftLayer_Location', 'getDatacenters', filter=_filter, limit=1)
+
+    def get_datacenter_by_keyname(self, keyname=None):
+        """Calls SoftLayer_Location::getDatacenters()
+
+        returns datacenter list.
+        """
+        mask = "mask[id,longName,name,regions[keyname,description]]"
+        _filter = {}
+        if keyname:
+            _filter = {"regions": {"keyname": {"operation": keyname}}}
+
+        result = self.client.call('SoftLayer_Location', 'getDatacenters', filter=_filter, limit=1, mask=mask)
+        if len(result) >= 1:
+            return result[0]
+        return {}

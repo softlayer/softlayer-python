@@ -637,3 +637,19 @@ class NetworkTests(testing.TestCase):
     def test_get_all_datacenter(self):
         self.network.get_datacenter()
         self.assert_called_with('SoftLayer_Location', 'getDatacenters')
+        self.network.get_datacenter(datacenter="dal11")
+        expected_filter = {"name": {"operation": "dal11"}}
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters', filter=expected_filter)
+
+    def test_get_datacenter_by_keyname(self):
+        # normal operation
+        result = self.network.get_datacenter_by_keyname("TEST01")
+        expected_filter = {"regions": {"keyname": {"operation": "TEST01"}}}
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters', filter=expected_filter)
+        self.assertEqual(result.get('name'), 'dal13')
+
+        # an "empty" result
+        SoftLayer_Location = self.set_mock('SoftLayer_Location', 'getDatacenters')
+        SoftLayer_Location.return_value = []
+        result = self.network.get_datacenter_by_keyname("TEST01")
+        self.assertEqual(result, {})
