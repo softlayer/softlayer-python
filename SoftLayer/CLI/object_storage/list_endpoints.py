@@ -19,10 +19,17 @@ def cli(env, identifier):
 
     final_end_points = []
 
-    table = formatting.Table(['Legacy', 'EndPoint Type', 'Public/Private', 'Location/Region', 'Url'])
+    table = formatting.Table(['Location/Region', 'Url', 'EndPoint Type', 'Public/Private', 'Legacy'])
+    table.align['Location/Region'] = 'l'
+    table.align['Url'] = 'l'
     for endpoint in endpoints:
-        data = [endpoint['legacy'], end_point_return(endpoint['region']), public_private(endpoint['type']),
-                location_region(endpoint), endpoint['url']]
+        data = {
+            'Location/Region': location_region(endpoint),
+            'Url': endpoint['url'],
+            'EndPoint Type': end_point_return(endpoint['region']),
+            'Public/Private': public_private(endpoint['type']),
+            'Legacy': endpoint['legacy']
+        }
         final_end_points.append(data)
 
     final_end_points = sort_endpoint(final_end_points)
@@ -34,7 +41,11 @@ def cli(env, identifier):
 def add_array_to_table(table, array_datas):
     """Add an array to a table"""
     for array in array_datas:
-        table.add_row([array[0], array[1], array[2], array[3], array[4]])
+        table.add_row([array['Location/Region'],
+                       array['Url'],
+                       array['EndPoint Type'],
+                       array['Public/Private'],
+                       array['Legacy']])
     return table
 
 
@@ -63,19 +74,20 @@ def location_region(endpoint):
 
 def sort_endpoint(endpoints):
     """Sort the all endpoints for public or private"""
+    first_data = 0
     endpoint_type = ''
     if len(endpoints) > 0:
-        endpoint_type = endpoints[0][1]
+        endpoint_type = endpoints[first_data]['EndPoint Type']
     public = []
     private = []
     array_final = []
     for endpoint in endpoints:
-        if endpoint[1] != endpoint_type:
-            endpoint_type = endpoint[1]
+        if endpoint['EndPoint Type'] != endpoint_type:
+            endpoint_type = endpoint['EndPoint Type']
             array_final = array_final + public + private
             public.clear()
             private.clear()
-        if endpoint[2] == 'Public':
+        if endpoint['Public/Private'] == 'Public':
             public.append(endpoint)
         else:
             private.append(endpoint)
