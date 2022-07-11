@@ -45,6 +45,10 @@ class Environment(object):
 
     def out(self, output):
         """Outputs a string to the console (stdout)."""
+
+        # If we output to a | or file, need to set default width so all output is printed.
+        if not self.console.is_terminal:
+            self.console.width = 1000000
         if self.format == 'json':
             try:
                 self.console.print_json(output)
