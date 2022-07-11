@@ -893,3 +893,11 @@ class OrderingTests(testing.TestCase):
         # Test None-existing price for term
         price_id = self.ordering.get_item_price_id("8", [price2, price1], 37)
         self.assertEqual(None, price_id)
+
+    def test_get_items(self):
+        self.ordering.get_items(123)
+        self.assert_called_with('SoftLayer_Product_Package', 'getItems')
+
+    def test_get_regions(self):
+        self.ordering.get_regions(123)
+        self.assert_called_with('SoftLayer_Product_Package', 'getRegions')
