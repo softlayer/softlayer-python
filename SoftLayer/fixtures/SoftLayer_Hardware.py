@@ -62,6 +62,8 @@ allowAccessToNetworkStorageList = True
 
 getSensorData = [
     {
+        "lowerCritical": "5.000",
+        "lowerNonCritical": "10.000",
         "sensorId": "Ambient 1 Temperature",
         "sensorReading": "25.000",
         "sensorUnits": "degrees C",
@@ -72,10 +74,13 @@ getSensorData = [
     },
     {
         "lowerCritical": "3500.000",
+        "lowerNonCritical": "3700.000",
         "sensorId": "Fan 1 Tach",
         "sensorReading": "6580.000",
         "sensorUnits": "RPM",
-        "status": "ok"
+        "status": "ok",
+        "upperCritical": "25400.000",
+        "upperNonCritical": "25300.000",
     }, {
         "sensorId": "IPMI Watchdog",
         "sensorReading": "0x0",
@@ -86,4 +91,16 @@ getSensorData = [
         "sensorReading": "70.000",
         "sensorUnits": "Watts",
         "status": "ok"
+    },
+    {
+        "lowerCritical": "10.536",
+        "lowerNonCritical": "10.780",
+        "lowerNonRecoverable": "10.170",
+        "sensorId": "12V",
+        "sensorReading": "12.305",
+        "sensorUnits": "Volts",
+        "status": "ok",
+        "upperCritical": "13.281",
+        "upperNonCritical": "12.915",
+        "upperNonRecoverable": "13.403"
     }]
