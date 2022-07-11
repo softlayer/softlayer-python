@@ -35,7 +35,7 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
 
     # responds to .prettytable()
     if hasattr(data, 'prettytable') and fmt in ('table', 'raw'):
-        return format_prettytable(data)
+        return format_prettytable(data, fmt)
 
     # responds to .to_python()
     if hasattr(data, 'to_python'):
@@ -68,12 +68,12 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
     return str(data)
 
 
-def format_prettytable(table):
+def format_prettytable(table, fmt='table'):
     """Converts SoftLayer.CLI.formatting.Table instance to a prettytable."""
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
             table.rows[i][j] = format_output(item)
-    ptable = table.prettytable()
+    ptable = table.prettytable(fmt)
     return ptable
 
 
@@ -258,9 +258,12 @@ class Table(object):
             items.append(dict(zip(self.columns, formatted_row)))
         return items
 
-    def prettytable(self):
+    def prettytable(self, fmt='table'):
         """Returns a RICH table instance."""
-        table = rTable(title=self.title, box=box.SQUARE, header_style="bright_cyan")
+        box_style = box.SQUARE
+        if fmt == 'raw':
+            box_style = None
+        table = rTable(title=self.title, box=box_style, header_style="bright_cyan")
         if self.sortby:
             try:
                 # https://docs.python.org/3/howto/sorting.html#key-functions
