@@ -25,8 +25,10 @@ def cli(env):
     storage_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Storage')
     datacenter_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Datacenter')
 
-    for dc in datacenters:
-        datacenter_table.add_row([dc['location']['locationId'], dc.get('description'), dc['keyname']])
+    for datacenter in datacenters:
+        datacenter_table.add_row([datacenter['location']['locationId'],
+                                  datacenter.get('description'),
+                                  datacenter['keyname']])
 
     for item in items:
         if item['itemCategory']['categoryCode'] == 'performance_storage_space':
