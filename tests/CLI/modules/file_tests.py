@@ -798,3 +798,7 @@ class FileTests(testing.TestCase):
             result = self.run_command(['file', 'snapshot-get-notification-status', '999'])
             self.assert_no_fail(result)
             self.assertIn(expect, result.output)
+
+    def test_volume_options(self):
+        result = self.run_command(['file', 'volume-options'])
+        self.assert_no_fail(result)
