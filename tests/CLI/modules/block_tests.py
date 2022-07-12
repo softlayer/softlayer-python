@@ -792,6 +792,11 @@ class BlockTests(testing.TestCase):
 
         self.assert_no_fail(result)
 
+    def test_volume_options(self):
+        result = self.run_command(['block', 'volume-options'])
+
+        self.assert_no_fail(result)
+
     @mock.patch('SoftLayer.BlockStorageManager.volume_set_note')
     def test_volume_set_note(self, set_note):
         set_note.return_value = True

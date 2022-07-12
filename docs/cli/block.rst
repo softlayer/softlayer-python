@@ -83,6 +83,10 @@ Block Commands
     :prog: block volume-count
     :show-nested:
 
+.. click:: SoftLayer.CLI.block.options:cli
+    :prog: block volume-options
+    :show-nested:
+
 .. click:: SoftLayer.CLI.block.detail:cli
     :prog: block volume-detail
     :show-nested:
