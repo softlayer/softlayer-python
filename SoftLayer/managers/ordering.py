@@ -731,7 +731,6 @@ class OrderingManager(object):
     def get_regions(self, package_id):
         """returns the all regions.
 
-
         :param int package_id: The package for which to get the items.
         """
         return self.client.call('SoftLayer_Product_Package', 'getRegions', id=package_id)
