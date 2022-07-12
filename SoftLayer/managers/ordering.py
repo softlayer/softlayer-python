@@ -6,7 +6,6 @@
     :license: MIT, see LICENSE for more details.
 """
 
-
 from re import match
 
 from SoftLayer import exceptions
@@ -717,3 +716,22 @@ class OrderingManager(object):
             if location.get('regions', default_regions)[index_first].get('keyname') == location_key:
                 return location_name
         raise exceptions.SoftLayerError("Location {} does not exist".format(location_key))
+
+    def get_items(self, package_id, storage_filter=None):
+        """"Returns the items .
+
+
+        :param int package_id: The package for which to get the items.
+        :param dict storage_filter: object filter.
+        """
+
+        return self.client.call('SoftLayer_Product_Package', 'getItems', filter=storage_filter,
+                                id=package_id)
+
+    def get_regions(self, package_id):
+        """returns the all regions.
+
+
+        :param int package_id: The package for which to get the items.
+        """
+        return self.client.call('SoftLayer_Product_Package', 'getRegions', id=package_id)
