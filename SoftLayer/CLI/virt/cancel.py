@@ -21,4 +21,7 @@ def cli(env, identifier):
     if not (env.skip_confirmations or formatting.no_going_back(vs_id)):
         raise exceptions.CLIAbort('Aborted')
 
-    vsi.cancel_instance(vs_id)
+    vs = vsi.cancel_instance(vs_id)
+
+    if vs:
+        env.fout("The virtual server instance: {} was cancelled.".format(vs_id))
