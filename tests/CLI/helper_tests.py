@@ -396,6 +396,12 @@ class TestFormatOutput(testing.TestCase):
             formatting.format_output, t, 'table',
         )
 
+    def test_format_raw_table(self):
+        test_table = formatting.Table(['col1', 'col2'])
+        test_table.add_row(['row1', 'row2'])
+        pretty_table = formatting.format_output(test_table, 'raw')
+        self.assertIsNone(pretty_table.box)
+
 
 class TestTemplateArgs(testing.TestCase):
 
