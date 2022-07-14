@@ -722,3 +722,15 @@ class VirtCreateTests(testing.TestCase):
         api_call = self.calls('SoftLayer_Product_Order', 'placeOrder')
         # Doing this because the placeOrder args are huge and mostly not needed to test
         self.assertEqual(api_call[0].args[0]['virtualGuests'], expected_guest)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_check_for_closing(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'create', '--hostname', 'TEST', '--domain', 'TESTING',
+                                   '--flavor', 'B1_2X8X25', '--datacenter', 'ams01', '--os', 'UBUNTU_LATEST'])
+        self.assert_no_fail(result)
+        self.assertIn('Warning: Closed soon: ams01', result.output)
+        result = self.run_command(['vs', 'create', '--hostname', 'TEST', '--domain', 'TESTING',
+                                   '--flavor', 'B1_2X8X25', '--datacenter', 'mex01', '--os', 'UBUNTU_LATEST'])
+        self.assert_no_fail(result)
+        self.assertNotIn('Warning: Closed soon: mex01', result.output)

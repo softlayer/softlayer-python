@@ -12,9 +12,8 @@ from SoftLayer.CLI import formatting
 from SoftLayer.managers import NetworkManager
 from SoftLayer.managers import ordering
 
-COLUMNS = ['keyName',
-           'description',
-           'cost', ]
+
+COLUMNS = ['keyName', 'description', 'cost']
 
 
 @click.command(cls=SLCommand)
@@ -22,17 +21,11 @@ COLUMNS = ['keyName',
 @click.argument('location')
 @click.option('--preset',
               help="The order preset (if required by the package)")
-@click.option('--verify',
-              is_flag=True,
+@click.option('--verify', is_flag=True,
               help="Flag denoting whether or not to only verify the order, not place it")
-@click.option('--quantity',
-              type=int,
-              default=1,
+@click.option('--quantity', type=int, default=1,
               help="The quantity of the item being ordered")
-@click.option('--billing',
-              type=click.Choice(['hourly', 'monthly']),
-              default='hourly',
-              show_default=True,
+@click.option('--billing', type=click.Choice(['hourly', 'monthly']), default='hourly', show_default=True,
               help="Billing rate")
 @click.option('--complex-type',
               help=("The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'."))
@@ -68,8 +61,12 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
     manager = ordering.OrderingManager(env.client)
     network = NetworkManager(env.client)
 
+    # Check if this location is going to be shutdown soon.
     pods = network.get_closed_pods()
-    closure = []
+    location_dc = network.get_datacenter_by_keyname(location)
+    for pod in pods:
+        if location_dc.get('name') in pod.get('name'):
+            click.secho('Warning: Closed soon: {}'.format(pod.get('name')), fg='yellow')
 
     if extras:
         try:
@@ -96,9 +93,6 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
             ])
 
     else:
-        for pod in pods:
-            closure.append(pod['name'])
-        click.secho(click.style('Warning: Closed soon: %s' % (', '.join(closure)), fg='yellow'))
         if not (env.skip_confirmations or formatting.confirm(
                 "This action will incur charges on your account. Continue?")):
             raise exceptions.CLIAbort("Aborting order.")

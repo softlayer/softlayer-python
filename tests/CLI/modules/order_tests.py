@@ -7,6 +7,8 @@ import json
 import sys
 import tempfile
 
+from unittest import mock as mock
+
 from SoftLayer.CLI import exceptions
 from SoftLayer import testing
 
@@ -141,10 +143,12 @@ class OrderTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
-        self.assertIn('Warning: Closed soon: ams01.pod01, wdc07.pod01, TEST00.pod2', result.output)
+        self.assertNotIn('Warning: Closed soon: dal13', result.output)
         self.assertIn('"status": "APPROVED"', result.output)
 
-    def test_place_with_quantity(self):
+    @mock.patch('SoftLayer.managers.network.NetworkManager.get_datacenter_by_keyname')
+    def test_place_with_quantity(self, keyname_mock):
+        keyname_mock.return_value = {"name": "ams01"}
         order_date = '2017-04-04 07:39:20'
         order = {'orderId': 1234, 'orderDate': order_date, 'placedOrder': {'status': 'APPROVED'}}
         verify_mock = self.set_mock('SoftLayer_Product_Order', 'verifyOrder')
@@ -155,12 +159,12 @@ class OrderTests(testing.TestCase):
         place_mock.return_value = order
         items_mock.return_value = self._get_order_items()
 
-        result = self.run_command(['-y', 'order', 'place', '--quantity=2', 'package', 'DALLAS13', 'ITEM1',
+        result = self.run_command(['-y', 'order', 'place', '--quantity=2', 'package', 'AMSTERDAM', 'ITEM1',
                                    '--complex-type', 'SoftLayer_Container_Product_Order_Thing'])
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
-        self.assertIn('Warning: Closed soon: ams01.pod01, wdc07.pod01, TEST00.pod2', result.output)
+        self.assertIn('Warning: Closed soon: ams01.pod01', result.output)
         self.assertIn('"status": "APPROVED"', result.output)
 
     def test_place_extras_parameter_fail(self):
