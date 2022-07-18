@@ -72,7 +72,12 @@ def format_prettytable(table, fmt='table'):
     """Converts SoftLayer.CLI.formatting.Table instance to a prettytable."""
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
-            table.rows[i][j] = format_output(item)
+            # Issue when adding items that evaulate to None (like empty lists) for Rich Tables
+            # so we just cast those to a str
+            if item:
+                table.rows[i][j] = format_output(item)
+            else:
+                table.rows[i][j] = str(item)
     ptable = table.prettytable(fmt)
     return ptable
 
