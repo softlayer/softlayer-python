@@ -851,12 +851,7 @@ getAllObjects = [{
                 "keyName": "LOAD_BALANCER_UPTIME",
             }
         }]
-}, {
-    "firstOrderStepId": 1,
-    "id": 0,
-    "isActive": 1,
-    "keyName": "ADDITIONAL_PRODUCTS",
-    "name": "Additional Products"}]
+}]
 
 getItems = [
     {

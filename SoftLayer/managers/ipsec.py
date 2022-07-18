@@ -287,7 +287,7 @@ class IPSECManager(utils.IdentifierMixin, object):
         return self.context.editObject(context, id=context_id)
 
     def order(self, datacenter, item_package):
-        """Create a ipsec 
+        """Create a ipsec.
 
         :param string datacenter: the datacenter shortname
         :param string[] item_package: items array
