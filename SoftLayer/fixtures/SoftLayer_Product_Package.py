@@ -851,7 +851,12 @@ getAllObjects = [{
                 "keyName": "LOAD_BALANCER_UPTIME",
             }
         }]
-}]
+}, {
+    "firstOrderStepId": 1,
+    "id": 0,
+    "isActive": 1,
+    "keyName": "ADDITIONAL_PRODUCTS",
+    "name": "Additional Products"}]
 
 getItems = [
     {
@@ -2171,3 +2176,48 @@ getItemsVLAN = [{
     }]
 }
 ]
+
+getAllObjectsIPSEC = [{
+    "firstOrderStepId": 1,
+    "id": 0,
+    "isActive": 1,
+    "keyName": "ADDITIONAL_PRODUCTS",
+    "name": "Additional Products"}]
+
+getItems_IPSEC = [{
+    "description": "IPSEC - Standard",
+    "id": 1092,
+    "keyName": "IPSEC_STANDARD",
+    "categories": [
+        {
+            "categoryCode": "network_tunnel",
+            "id": 117,
+            "name": "Network Tunnel",
+            "quantityLimit": 0,
+        },
+        {
+            "categoryCode": "one_time_charge",
+            "id": 33,
+            "name": "One Time Charge",
+            "quantityLimit": 0,
+        }
+    ],
+    "itemCategory": {
+        "categoryCode": "network_tunnel",
+        "id": 117,
+        "name": "Network Tunnel",
+        "quantityLimit": 0,
+    },
+    "prices": [
+        {
+            "id": 51379,
+            "itemId": 1092,
+            "laborFee": "0",
+            "locationGroupId": 503,
+            "oneTimeFee": "0",
+            "recurringFee": "102",
+            "setupFee": "0",
+            "sort": 0,
+        }
+    ]
+}]

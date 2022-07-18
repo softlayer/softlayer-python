@@ -7,6 +7,7 @@
 """
 
 from SoftLayer.exceptions import SoftLayerAPIError
+from SoftLayer.managers import ordering
 from SoftLayer import utils
 
 
@@ -284,3 +285,17 @@ class IPSECManager(utils.IdentifierMixin, object):
         if phase2_key_ttl is not None:
             context['phaseTwoKeylife'] = phase2_key_ttl
         return self.context.editObject(context, id=context_id)
+
+    def order(self, datacenter, item_package):
+        """Create a license
+
+        :param string datacenter: the datacenter shortname
+        :param string[] item_package: items array
+        """
+        complex_type = 'SoftLayer_Container_Product_Order_Network_Tunnel_Ipsec'
+        ordering_manager = ordering.OrderingManager(self.client)
+        return ordering_manager.place_order(package_keyname='ADDITIONAL_PRODUCTS',
+                                            location=datacenter,
+                                            item_keynames=item_package,
+                                            complex_type=complex_type,
+                                            hourly=False)
