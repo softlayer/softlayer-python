@@ -22,9 +22,12 @@ def cli(env):
 
     iops_table = formatting.Table(['Id', 'Description', 'KeyName'], title='IOPS')
     snapshot_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Snapshot')
-    storage_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Storage')
+    storage_table = formatting.Table(['Id', 'Description', 'KeyName', 'Capacity Minimum'], title='Storage')
     datacenter_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Datacenter')
 
+    storage_table.align['Description'] = 'l'
+    storage_table.align['KeyName'] = 'l'
+    storage_table.sortby = 'Id'
     for datacenter in datacenters:
         datacenter_table.add_row([datacenter['location']['locationId'],
                                   datacenter.get('description'),
@@ -33,7 +36,7 @@ def cli(env):
     for item in items:
         if item['itemCategory']['categoryCode'] == 'performance_storage_space':
             storage_table.add_row([item.get('id'), item.get('description'),
-                                   item.get('keyName')])
+                                   item.get('keyName'), item.get('capacityMinimum') or '-'])
 
         if item['itemCategory']['categoryCode'] == 'storage_tier_level':
             iops_table.add_row([item.get('id'), item.get('description'),
