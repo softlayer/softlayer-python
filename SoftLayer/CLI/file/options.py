@@ -8,7 +8,6 @@ from SoftLayer.CLI.command import SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 
-
 PACKAGE_STORAGE = 759
 
 
@@ -27,8 +26,12 @@ def cli(env):
 
     iops_table = formatting.Table(['Id', 'Description', 'KeyName'], title='IOPS')
     snapshot_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Snapshot')
-    storage_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Storage')
-    datacenter_table = formatting.Table(['Id', 'Description', 'KeyName', 'Notes'], title='Datacenter')
+    file_storage_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Storage')
+    datacenter_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Datacenter')
+
+    file_storage_table.align['Description'] = 'l'
+    file_storage_table.align['KeyName'] = 'l'
+    file_storage_table.sortby = 'Id'
 
     for datacenter in datacenters:
         closure = []
@@ -45,8 +48,8 @@ def cli(env):
 
     for item_file in items:
         if item_file['itemCategory']['categoryCode'] == 'performance_storage_space':
-            storage_table.add_row([item_file.get('id'), item_file.get('description'),
-                                   item_file.get('keyName')])
+            file_storage_table.add_row([item_file.get('id'), item_file.get('description'),
+                                        item_file.get('keyName')])
 
         if item_file['itemCategory']['categoryCode'] == 'storage_tier_level':
             iops_table.add_row([item_file.get('id'), item_file.get('description'),
@@ -58,5 +61,5 @@ def cli(env):
 
     env.fout(datacenter_table)
     env.fout(iops_table)
-    env.fout(storage_table)
+    env.fout(file_storage_table)
     env.fout(snapshot_table)

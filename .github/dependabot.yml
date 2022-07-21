@@ -1,0 +1,13 @@
+# Use `allow` to specify which dependencies to maintain
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-update
+
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "pip prod"
+      prefix-development: "pip dev"
+      include: "scope"

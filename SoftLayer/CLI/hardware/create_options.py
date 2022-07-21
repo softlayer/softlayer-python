@@ -51,9 +51,7 @@ def cli(env, prices, location=None):
     tables.append(_port_speed_prices_table(options['port_speeds'], prices))
     tables.append(_extras_prices_table(options['extras'], prices))
     tables.append(_get_routers(routers))
-
-    # since this is multiple tables, this is required for a valid JSON object to be rendered.
-    env.fout(formatting.listing(tables, separator='\n'))
+    env.fout(tables)
 
 
 def _preset_prices_table(sizes, prices=False):
