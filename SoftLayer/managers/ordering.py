@@ -728,9 +728,12 @@ class OrderingManager(object):
         return self.client.call('SoftLayer_Product_Package', 'getItems', filter=storage_filter,
                                 id=package_id)
 
-    def get_regions(self, package_id):
+    def get_regions(self, package_id, location=None):
         """returns the all regions.
 
         :param int package_id: The package for which to get the items.
         """
-        return self.client.call('SoftLayer_Product_Package', 'getRegions', id=package_id)
+        _filter = ''
+        if location:
+            _filter = {"regions": {"location": {"location": {"name": {"operation": location}}}}}
+        return self.client.call('SoftLayer_Product_Package', 'getRegions', id=package_id, filter=_filter)

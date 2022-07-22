@@ -12,41 +12,83 @@ PACKAGE_STORAGE = 759
 
 
 @click.command(cls=SLCommand)
+@click.argument('location', required=False)
+@click.option('--prices', '-p', is_flag=True,
+              help='Use --prices to list the server item prices, and to list the Item Prices by location,'
+                   'add it to the --prices option using location short name, e.g. --prices dal13')
 @environment.pass_env
-def cli(env):
+def cli(env, prices, location=None):
     """List all options for ordering a block storage"""
 
     order_manager = SoftLayer.OrderingManager(env.client)
     items = order_manager.get_items(PACKAGE_STORAGE)
-    datacenters = order_manager.get_regions(PACKAGE_STORAGE)
+    datacenters = order_manager.get_regions(PACKAGE_STORAGE, location)
 
-    iops_table = formatting.Table(['Id', 'Description', 'KeyName'], title='IOPS')
-    snapshot_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Snapshot')
-    storage_table = formatting.Table(['Id', 'Description', 'KeyName', 'Capacity Minimum'], title='Storage')
+    tables = []
     datacenter_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Datacenter')
 
-    storage_table.align['Description'] = 'l'
-    storage_table.align['KeyName'] = 'l'
-    storage_table.sortby = 'Id'
     for datacenter in datacenters:
         datacenter_table.add_row([datacenter['location']['locationId'],
                                   datacenter.get('description'),
                                   datacenter['keyname']])
 
-    for item in items:
-        if item['itemCategory']['categoryCode'] == 'performance_storage_space':
-            storage_table.add_row([item.get('id'), item.get('description'),
-                                   item.get('keyName'), item.get('capacityMinimum') or '-'])
+    tables.append(datacenter_table)
+    tables.append(_ios_get_table(items, prices))
+    tables.append(_storage_table(items, prices))
+    tables.append(_snapshot_get_table(items, prices))
+    env.fout(tables)
 
-        if item['itemCategory']['categoryCode'] == 'storage_tier_level':
-            iops_table.add_row([item.get('id'), item.get('description'),
-                                item.get('keyName')])
 
-        if item['itemCategory']['categoryCode'] == 'storage_snapshot_space':
-            snapshot_table.add_row([item.get('id'), item.get('description'),
-                                    item.get('keyName')])
+def _ios_get_table(items, prices):
+    if prices:
+        table = formatting.Table(['Id', 'Description', 'KeyName', 'Prices'], title='IOPS')
+        for item in items:
+            if item['itemCategory']['categoryCode'] == 'storage_tier_level':
+                table.add_row([item.get('id'), item.get('description'),
+                               item.get('keyName'), item['prices'][0]['recurringFee']])
+    else:
+        table = formatting.Table(['Id', 'Description', 'KeyName'], title='IOPS')
+        for item in items:
+            if item['itemCategory']['categoryCode'] == 'storage_tier_level':
+                table.add_row([item.get('id'), item.get('description'),
+                               item.get('keyName')])
+    table.sortby = 'Id'
+    table.align = 'l'
+    return table
 
-    env.fout(datacenter_table)
-    env.fout(iops_table)
-    env.fout(storage_table)
-    env.fout(snapshot_table)
+
+def _storage_table(items, prices):
+    if prices:
+        table = formatting.Table(['Id', 'Description', 'KeyName', 'Capacity Minimum', 'Prices'], title='Storage')
+        for item in items:
+            if item['itemCategory']['categoryCode'] == 'performance_storage_space':
+                table.add_row([item.get('id'), item.get('description'),
+                               item.get('keyName'), item.get('capacityMinimum') or '-',
+                               item['prices'][0]['recurringFee']])
+    else:
+        table = formatting.Table(['Id', 'Description', 'KeyName', 'Capacity Minimum'], title='Storage')
+        for item in items:
+            if item['itemCategory']['categoryCode'] == 'performance_storage_space':
+                table.add_row([item.get('id'), item.get('description'),
+                               item.get('keyName'), item.get('capacityMinimum') or '-', ])
+    table.sortby = 'Id'
+    table.align = 'l'
+    return table
+
+
+def _snapshot_get_table(items, prices):
+    if prices:
+        table = formatting.Table(['Id', 'Description', 'KeyName', 'Prices'], title='Snapshot')
+        for item in items:
+            if item['itemCategory']['categoryCode'] == 'storage_snapshot_space':
+                table.add_row([item.get('id'), item.get('description'),
+                               item.get('keyName'), item['prices'][0]['recurringFee']])
+    else:
+        table = formatting.Table(['Id', 'Description', 'KeyName'], title='Snapshot')
+        for item in items:
+            if item['itemCategory']['categoryCode'] == 'storage_snapshot_space':
+                table.add_row([item.get('id'), item.get('description'),
+                               item.get('keyName')])
+    table.sortby = 'Id'
+    table.align = 'l'
+    return table
