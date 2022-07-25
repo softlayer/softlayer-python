@@ -19,7 +19,16 @@ from SoftLayer.CLI import formatting
               help="Billing rate")
 @environment.pass_env
 def cli(env, name, datacenter, pod, network, billing):
-    """Order/create a VLAN instance."""
+    """Order/create a VLAN instance.
+
+    Example:
+        slcli vlan create --name myvlan --datacenter dal13
+        or
+        slcli vlan create --name myvlan --pod dal10.pod01
+    """
+
+    if not (datacenter or pod):
+        raise exceptions.CLIAbort("Is required Datacenter or Pod")
 
     item_package = ['PUBLIC_NETWORK_VLAN']
     complex_type = 'SoftLayer_Container_Product_Order_Network_Vlan'
