@@ -20,18 +20,31 @@ def cli(env):
     items = order_manager.get_items(PACKAGE_STORAGE)
     datacenters = order_manager.get_regions(PACKAGE_STORAGE)
 
+    network = SoftLayer.NetworkManager(env.client)
+
+    pods = network.get_closed_pods()
+
     iops_table = formatting.Table(['Id', 'Description', 'KeyName'], title='IOPS')
     snapshot_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Snapshot')
-    storage_table = formatting.Table(['Id', 'Description', 'KeyName', 'Capacity Minimum'], title='Storage')
+    storage_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Storage')
     datacenter_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Datacenter')
 
     storage_table.align['Description'] = 'l'
     storage_table.align['KeyName'] = 'l'
     storage_table.sortby = 'Id'
+
     for datacenter in datacenters:
+        closure = []
+        for pod in pods:
+            if datacenter['location']['location']['name'] in str(pod['name']):
+                closure.append(pod['name'])
+
+        notes = '-'
+        if len(closure) > 0:
+            notes = 'closed soon: %s' % (', '.join(closure))
         datacenter_table.add_row([datacenter['location']['locationId'],
                                   datacenter.get('description'),
-                                  datacenter['keyname']])
+                                  datacenter['keyname'], notes])
 
     for item in items:
         if item['itemCategory']['categoryCode'] == 'performance_storage_space':
