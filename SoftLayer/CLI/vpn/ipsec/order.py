@@ -6,6 +6,7 @@ import click
 import SoftLayer
 
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
@@ -16,6 +17,10 @@ def cli(env, datacenter):
     """Order/create a IPSec VPN tunnel instance."""
 
     ipsec_manager = SoftLayer.IPSECManager(env.client)
+
+    if not (env.skip_confirmations or formatting.confirm(
+            "This action will incur charges on your account. Continue?")):
+        raise exceptions.CLIAbort('Aborting ipsec order.')
 
     result = ipsec_manager.order(datacenter, ['IPSEC_STANDARD'])
 
