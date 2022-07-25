@@ -6,6 +6,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI.command import SLCommand
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 PACKAGE_STORAGE = 759
@@ -24,30 +25,29 @@ def cli(env, prices, location=None):
     items = order_manager.get_items(PACKAGE_STORAGE)
     datacenters = order_manager.get_regions(PACKAGE_STORAGE, location)
 
+    tables = []
     network = SoftLayer.NetworkManager(env.client)
-
     pods = network.get_closed_pods()
 
-    iops_table = formatting.Table(['Id', 'Description', 'KeyName'], title='IOPS')
-    snapshot_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Snapshot')
-    storage_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Storage')
-    tables = []
-    datacenter_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Datacenter')
+    if datacenters != []:
+        datacenter_table = formatting.Table(['Id', 'Description', 'KeyName'], title='Datacenter')
 
-    for datacenter in datacenters:
-        closure = []
-        for pod in pods:
-            if datacenter['location']['location']['name'] in str(pod['name']):
-                closure.append(pod['name'])
+        for datacenter in datacenters:
+            closure = []
+            for pod in pods:
+                if datacenter['location']['location']['name'] in str(pod['name']):
+                    closure.append(pod['name'])
 
-        notes = '-'
-        if len(closure) > 0:
-            notes = 'closed soon: %s' % (', '.join(closure))
-        datacenter_table.add_row([datacenter['location']['locationId'],
-                                  datacenter.get('description'),
-                                  datacenter['keyname'], notes])
+            notes = '-'
+            if len(closure) > 0:
+                notes = 'closed soon: %s' % (', '.join(closure))
+            datacenter_table.add_row([datacenter['location']['locationId'],
+                                      datacenter.get('description'),
+                                      datacenter['keyname'], notes])
+        tables.append(datacenter_table)
+    else:
+        raise exceptions.CLIAbort('Location does not exit.')
 
-    tables.append(datacenter_table)
     tables.append(_block_ios_get_table(items, prices))
     tables.append(_block_storage_table(items, prices))
     tables.append(_block_snapshot_get_table(items, prices))
