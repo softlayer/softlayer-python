@@ -866,3 +866,19 @@ class NetworkManager(object):
         if len(result) >= 1:
             return result[0]
         return {}
+
+    def get_pods_with_capabilities(self):
+        """Calls SoftLayer_Network_Pod::getAllObjects()
+
+        returns list of all pods with capabilities for see closing network pods.
+        """
+        order_filter = {
+            'name': {
+                'operation': 'orderBy',
+                'options': [{'name': 'sort', 'value': ['DESC']}]
+            }
+        }
+
+        mask = """mask[name, datacenterLongName, frontendRouterId, capabilities, datacenterId, backendRouterId,
+                backendRouterName, frontendRouterName]"""
+        return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', mask=mask, filter=order_filter)
