@@ -24,7 +24,7 @@ def cli(env, identifier):
 
     hardwares = mgr.get_user_hardware(identifier)
     dedicatedhosts = mgr.get_user_dedicated_host(identifier)
-    virtualGuests = mgr.get_user_virtuals(identifier)
+    virtual_guests = mgr.get_user_virtuals(identifier)
     hardware_table = formatting.KeyValueTable(['Id', 'Device Name', 'Device type', 'Public Ip', 'Private Ip', 'notes'])
     virtual_table = formatting.KeyValueTable(['Id', 'Device Name', 'Device type', 'Public Ip', 'Private Ip', 'notes'])
     dedicated_table = formatting.KeyValueTable(['Id', 'Device Name', 'Device type', 'notes'])
@@ -32,25 +32,25 @@ def cli(env, identifier):
     hardware_table.align['Device Name'] = 'l'
     dedicated_table.align['Device Name'] = 'l'
     virtual_table.align['Device Name'] = 'l'
-    for hw in hardwares:
-        hardware_table.add_row([hw.get('id'),
-                                hw.get('fullyQualifiedDomainName'),
+    for hardware in hardwares:
+        hardware_table.add_row([hardware.get('id'),
+                                hardware.get('fullyQualifiedDomainName'),
                                 'Bare Metal',
-                                hw.get('primaryIpAddress'),
-                                hw.get('primaryBackendIpAddress'),
-                                hw.get('notes') or '-'])
+                                hardware.get('primaryIpAddress'),
+                                hardware.get('primaryBackendIpAddress'),
+                                hardware.get('notes') or '-'])
     for host in dedicatedhosts:
         dedicated_table.add_row([host.get('id'),
                                  host.get('name'),
                                  'Dedicated Host',
                                  host.get('notes') or '-'])
-    for vs in virtualGuests:
-        virtual_table.add_row([vs.get('id'),
-                               vs.get('fullyQualifiedDomainName'),
+    for virtual in virtual_guests:
+        virtual_table.add_row([virtual.get('id'),
+                               virtual.get('fullyQualifiedDomainName'),
                                'virtual Guests',
-                               vs.get('primaryIpAddress'),
-                               vs.get('primaryBackendIpAddress'),
-                               vs.get('notes') or '-'])
+                               virtual.get('primaryIpAddress'),
+                               virtual.get('primaryBackendIpAddress'),
+                               virtual.get('notes') or '-'])
 
     table.add_row(['Permission', permission_table])
     table.add_row(['Hardware', hardware_table])
