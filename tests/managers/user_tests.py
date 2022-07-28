@@ -294,3 +294,15 @@ class UserManagerTests(testing.TestCase):
                                self.manager.gather_notifications,
                                ['Test not exit'])
         self.assertEqual("Test not exit is not a valid notification name", str(ex))
+
+    def test_get_hardware(self):
+        self.manager.get_user_hardware(1234)
+        self.assert_called_with('SoftLayer_User_Customer', 'getHardware')
+
+    def test_get_dedicated_host(self):
+        self.manager.get_user_dedicated_host(1234)
+        self.assert_called_with('SoftLayer_User_Customer', 'getDedicatedHosts')
+
+    def test_get_virtual(self):
+        self.manager.get_user_virtuals(1234)
+        self.assert_called_with('SoftLayer_User_Customer', 'getVirtualGuests')

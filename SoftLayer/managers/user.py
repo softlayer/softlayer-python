@@ -392,6 +392,30 @@ class UserManager(utils.IdentifierMixin, object):
 
         return overrides_list
 
+    def get_user_hardware(self, user_id):
+        """User Hardware list.
+
+        :param int user_id:
+        :return: List hardware relate to user
+        """
+        return self.user_service.getHardware(id=user_id)
+
+    def get_user_dedicated_host(self, user_id):
+        """User dedicate host list.
+
+        :param int user_id:
+        :return: List dedicated host relate to user
+        """
+        return self.user_service.getDedicatedHosts(id=user_id)
+
+    def get_user_virtuals(self, user_id):
+        """User virtual guest list.
+
+        :param int user_id:
+        :return: List virtual guest relate to user
+        """
+        return self.user_service.getVirtualGuests(id=user_id)
+
 
 def _keyname_search(haystack, needle):
     for item in haystack:
