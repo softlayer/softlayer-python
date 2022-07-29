@@ -272,3 +272,7 @@ The following is an example of updating an existing address translation entry.
 
     $ slcli ipsec translation-update 445 --translation-id 15924 --static-ip 10.1.249.86 --remote-ip 50.100.0.8 --note 'new email server'
     Updated translation #15924
+
+.. click:: SoftLayer.CLI.vpn.ipsec.order:cli
+    :prog: ipsec order
+    :show-nested:

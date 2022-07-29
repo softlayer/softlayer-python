@@ -7,8 +7,11 @@
 
 import json
 
+
 from SoftLayer.CLI.exceptions import ArgumentError
 from SoftLayer.CLI.exceptions import CLIHalt
+from SoftLayer.fixtures import SoftLayer_Product_Order
+from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
 from SoftLayer import utils
 
@@ -508,3 +511,12 @@ class IPSECTests(testing.TestCase):
                                        'internalIpAddress': '10.50.0.1',
                                        'customerIpAddress': '50.50.0.1',
                                        'notes': 'lost'},))
+
+    def test_ipsec_order(self):
+        _mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        _mock.return_value = SoftLayer_Product_Package.getItems_IPSEC
+
+        order_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
+        order_mock.return_value = SoftLayer_Product_Order.ipsec_placeOrder
+        result = self.run_command(['ipsec', 'order', '-d', 'dal13'])
+        self.assert_no_fail(result)
