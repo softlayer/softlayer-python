@@ -28,7 +28,7 @@ def cli(env, name, datacenter, pod, network, billing):
     """
 
     if not (datacenter or pod):
-        raise exceptions.CLIAbort("Is required Datacenter or Pod")
+        raise exceptions.CLIAbort("--datacenter or --pod is required to create a VLAN")
 
     item_package = ['PUBLIC_NETWORK_VLAN']
     complex_type = 'SoftLayer_Container_Product_Order_Network_Vlan'
