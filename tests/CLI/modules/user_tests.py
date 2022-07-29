@@ -336,3 +336,11 @@ class UserCLITests(testing.TestCase):
         click.secho.assert_called_with('Failed to update notifications: Test notification', fg='red')
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Email_Subscription', 'disable', identifier=111)
+
+    def test_devices_access(self):
+        result = self.run_command(['user', 'device-access', '111'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_User_Customer', 'getPermissions')
+        self.assert_called_with('SoftLayer_User_Customer', 'getHardware')
+        self.assert_called_with('SoftLayer_User_Customer', 'getDedicatedHosts')
+        self.assert_called_with('SoftLayer_User_Customer', 'getVirtualGuests')
