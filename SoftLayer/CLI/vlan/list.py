@@ -40,7 +40,7 @@ COLUMNS = ['Id',
 def cli(env, sortby, datacenter, number, name, limit):
     """List VLANs.
 
-    Note: In field Pod, if add (*) indicated that closed soon
+    Note: A * Indicates a POD is closing soon. Ex:[red] Pod01* [/red]
     """
 
     mgr = SoftLayer.NetworkManager(env.client)
@@ -53,7 +53,9 @@ def cli(env, sortby, datacenter, number, name, limit):
                            name=name,
                            limit=limit)
 
-    pods = mgr.get_pods_with_capabilities()
+    mask = """mask[name, datacenterLongName, frontendRouterId, capabilities, datacenterId, backendRouterId,
+                    backendRouterName, frontendRouterName]"""
+    pods = mgr.get_pods(mask=mask)
 
     for vlan in vlans:
         billing = 'Yes' if vlan.get('billingItem') else 'No'
@@ -84,7 +86,7 @@ def get_pod_with_closed_announcement(vlan, pods):
                 or utils.lookup(pod, 'frontendRouterId') == utils.lookup(vlan, 'primaryRouter', 'id'):
             if 'CLOSURE_ANNOUNCED' in utils.lookup(pod, 'capabilities'):
                 name_pod = utils.lookup(pod, 'name').split('.')[1] + '*'
-                return name_pod.capitalize()
+                return "[red]" + name_pod.capitalize() + "[/red]"
             else:
                 return utils.lookup(pod, 'name').split('.')[1].capitalize()
     return ''
