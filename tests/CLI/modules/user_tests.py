@@ -336,3 +336,15 @@ class UserCLITests(testing.TestCase):
         click.secho.assert_called_with('Failed to update notifications: Test notification', fg='red')
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Email_Subscription', 'disable', identifier=111)
+
+    def test_remove_access_hardware(self):
+        result = self.run_command(['user', 'remove-access', '123456', '--hardware', '147258'])
+        self.assert_no_fail(result)
+
+    def test_remove_access_virtual(self):
+        result = self.run_command(['user', 'remove-access', '123456', '--virtual', '987456'])
+        self.assert_no_fail(result)
+
+    def test_remove_access_dedicated(self):
+        result = self.run_command(['user', 'remove-access', '123456', '--dedicated', '369852'])
+        self.assert_no_fail(result)
