@@ -23,8 +23,8 @@ from SoftLayer.CLI import helpers
 def cli(env, identifier, name, note, tags):
     """Edit a vlan's details."""
 
-    if not (name or note or tags):
-        raise exceptions.CLIAbort("Is required Name or Note or Tags")
+    if not any([name, note, tags]):
+        raise exceptions.CLIAbort("At least one option is required")
 
     new_tags = None
 
