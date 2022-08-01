@@ -8,6 +8,9 @@ from unittest.mock import MagicMock as MagicMock
 
 import SoftLayer
 from SoftLayer.exceptions import SoftLayerAPIError
+from SoftLayer.fixtures import SoftLayer_Product_Order
+from SoftLayer.fixtures import SoftLayer_Product_Package
+
 from SoftLayer import testing
 
 
@@ -299,3 +302,20 @@ class IPSECTests(testing.TestCase):
                                        'phaseTwoKeylife': 240,
                                        'phaseTwoPerfectForwardSecrecy': 1},),
                                 identifier=445)
+
+    def test_order(self):
+        _mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        _mock.return_value = SoftLayer_Product_Package.getItems_IPSEC
+
+        _mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
+        _mock.return_value = SoftLayer_Product_Order.ipsec_placeOrder
+        result = self.ipsec.order('dal13', ['IPSEC_STANDARD'])
+        order = {
+            'orderDate': '2022-07-14T16:09:08-06:00',
+            'orderId': 123456, 'placedOrder': {'items': [
+                {'categoryCode': 'network_tunnel',
+                 'description': 'IPSEC - Standard',
+                 'id': 931479898,
+                 'itemId': 1092,
+                 'itemPriceId': '2048'}]}}
+        self.assertEqual(result, order)

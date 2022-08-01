@@ -212,6 +212,7 @@ ALL_ROUTES = [
     ('ipsec:translation-remove', 'SoftLayer.CLI.vpn.ipsec.translation.remove:cli'),
     ('ipsec:translation-update', 'SoftLayer.CLI.vpn.ipsec.translation.update:cli'),
     ('ipsec:update', 'SoftLayer.CLI.vpn.ipsec.update:cli'),
+    ('ipsec:order', 'SoftLayer.CLI.vpn.ipsec.order:cli'),
 
     ('loadbal', 'SoftLayer.CLI.loadbal'),
     ('loadbal:detail', 'SoftLayer.CLI.loadbal.detail:cli'),
@@ -362,6 +363,7 @@ ALL_ROUTES = [
     ('user:edit-details', 'SoftLayer.CLI.user.edit_details:cli'),
     ('user:create', 'SoftLayer.CLI.user.create:cli'),
     ('user:delete', 'SoftLayer.CLI.user.delete:cli'),
+    ('user:device-access', 'SoftLayer.CLI.user.device_access:cli'),
     ('user:vpn-manual', 'SoftLayer.CLI.user.vpn_manual:cli'),
     ('user:vpn-subnet', 'SoftLayer.CLI.user.vpn_subnet:cli'),
     ('user:remove-access', 'SoftLayer.CLI.user.remove_access:cli'),

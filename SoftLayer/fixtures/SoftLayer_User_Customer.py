@@ -89,3 +89,79 @@ updateVpnUser = True
 removeDedicatedHostAccess = True
 removeHardwareAccess = True
 removeVirtualGuestAccess = True
+
+getHardware = [{
+        "domain": "testedit.com",
+        "fullyQualifiedDomainName": "test.testedit.com",
+        "hardwareStatusId": 5,
+        "hostname": "test",
+        "id": 1403539,
+        "manufacturerSerialNumber": "J33H9TX",
+        "notes": "My golang note",
+        "provisionDate": "2020-04-27T16:10:56-06:00",
+        "serialNumber": "SL01FJUI",
+        "globalIdentifier": "81434794-af69-44d5-bb97-6b6f43454eee",
+        "hardwareStatus": {
+            "id": 5,
+            "status": "ACTIVE"
+        },
+        "networkManagementIpAddress": "10.93.138.222",
+        "primaryBackendIpAddress": "10.93.138.202",
+        "primaryIpAddress": "169.48.191.244",
+        "privateIpAddress": "10.93.138.202"
+    }]
+getDedicatedHosts = [
+    {
+        'createDate': '2021-11-18T15:13:57-06:00',
+        'diskCapacity': 1200,
+        'id': 656700,
+        'memoryCapacity': 242,
+        'modifyDate': '2022-04-26T10:49:48-06:00',
+        'name': 'dedicatedhost01'
+    },
+    {
+        'accountId': 307608,
+        'cpuCount': 56,
+        'createDate': '2022-02-18T12:47:30-06:00',
+        'diskCapacity': 1200,
+        'id': 691394,
+        'memoryCapacity': 242,
+        'modifyDate': '2022-04-18T11:24:20-06:00',
+        'name': 'test'
+    }
+]
+getVirtualGuests = [
+    {
+        "fullyQualifiedDomainName": "KVM-Test.cgallo.com",
+        "hostname": "KVM-Test",
+        "id": 121401696,
+        "maxCpu": 2,
+        "maxCpuUnits": "CORE",
+        "maxMemory": 4096,
+        "modifyDate": "2022-01-25T23:23:13-06:00",
+        "provisionDate": "2021-06-09T14:51:54-06:00",
+        "startCpus": 2,
+        "typeId": 1,
+        "uuid": "15951561-6171-0dfc-f3d2-be039e51cc10",
+        "globalIdentifier": "a245a7dd-acd1-4d1a-9356-cc1ac6b55b98",
+        "primaryBackendIpAddress": "10.208.73.53",
+        "primaryIpAddress": "169.48.96.27",
+    },
+    {
+        "createDate": "2020-11-16T09:01:57-06:00",
+        "deviceStatusId": 8,
+        "domain": "softlayer.test",
+        "fullyQualifiedDomainName": "SuspendVsTest.softlayer.test",
+        "hostname": "SuspendVsTest",
+        "id": 112238162,
+        "maxCpu": 8,
+        "maxCpuUnits": "CORE",
+        "maxMemory": 16384,
+        "modifyDate": "2022-01-25T14:15:37-06:00",
+        "provisionDate": "2020-11-16T09:09:04-06:00",
+        "startCpus": 8,
+        "typeId": 1,
+        "uuid": "d8908a64-f4d4-5637-49c7-650572d47120",
+        "globalIdentifier": "7fe777af-d38b-47c2-9f1c-b1ec26751b58",
+        "primaryBackendIpAddress": "10.74.54.76",
+    }]
