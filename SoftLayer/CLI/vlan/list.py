@@ -9,16 +9,19 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI.vlan.detail import get_gateway_firewall
 from SoftLayer import utils
 
-COLUMNS = ['id',
-           'number',
-           'name',
+COLUMNS = ['Id',
+           'Number',
+           'Fully qualified name',
+           'Name',
+           'Network',
+           'Data center',
+           'Pod',
            'Gateway/Firewall',
-           'datacenter',
-           'hardware',
-           'virtual_servers',
-           'public_ips',
-           'premium',
-           'tag']
+           'Hardware',
+           'Virtual servers',
+           'Public ips',
+           'Premium',
+           'Tags']
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -35,7 +38,10 @@ COLUMNS = ['id',
               show_default=True)
 @environment.pass_env
 def cli(env, sortby, datacenter, number, name, limit):
-    """List VLANs."""
+    """List VLANs.
+
+    Note: A * Indicates a POD is closing soon. Ex:[red] Pod01* [/red]
+    """
 
     mgr = SoftLayer.NetworkManager(env.client)
 
@@ -46,15 +52,23 @@ def cli(env, sortby, datacenter, number, name, limit):
                            vlan_number=number,
                            name=name,
                            limit=limit)
+
+    mask = """mask[name, datacenterLongName, frontendRouterId, capabilities, datacenterId, backendRouterId,
+                    backendRouterName, frontendRouterName]"""
+    pods = mgr.get_pods(mask=mask)
+
     for vlan in vlans:
         billing = 'Yes' if vlan.get('billingItem') else 'No'
 
         table.add_row([
             vlan.get('id'),
             vlan.get('vlanNumber'),
+            vlan.get('fullyQualifiedName'),
             vlan.get('name') or formatting.blank(),
-            get_gateway_firewall(vlan),
+            vlan.get('networkSpace').capitalize(),
             utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name'),
+            get_pod_with_closed_announcement(vlan, pods),
+            get_gateway_firewall(vlan),
             vlan.get('hardwareCount'),
             vlan.get('virtualGuestCount'),
             vlan.get('totalPrimaryIpAddressCount'),
@@ -63,3 +77,16 @@ def cli(env, sortby, datacenter, number, name, limit):
         ])
 
     env.fout(table)
+
+
+def get_pod_with_closed_announcement(vlan, pods):
+    """Gets pods with announcement to close"""
+    for pod in pods:
+        if utils.lookup(pod, 'backendRouterId') == utils.lookup(vlan, 'primaryRouter', 'id') \
+                or utils.lookup(pod, 'frontendRouterId') == utils.lookup(vlan, 'primaryRouter', 'id'):
+            if 'CLOSURE_ANNOUNCED' in utils.lookup(pod, 'capabilities'):
+                name_pod = utils.lookup(pod, 'name').split('.')[1] + '*'
+                return "[red]" + name_pod.capitalize() + "[/red]"
+            else:
+                return utils.lookup(pod, 'name').split('.')[1].capitalize()
+    return ''
