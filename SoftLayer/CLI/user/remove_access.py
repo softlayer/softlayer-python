@@ -17,7 +17,10 @@ from SoftLayer.CLI import environment
               help="dedicated host ID ")
 @environment.pass_env
 def cli(env, identifier, hardware, virtual, dedicated):
-    """User details."""
+    """Remove access from a user to an specific device.
+
+    Example: slcli user remove-access 123456 --hardware 123456789
+    """
 
     mgr = SoftLayer.UserManager(env.client)
     device = ''
@@ -36,3 +39,8 @@ def cli(env, identifier, hardware, virtual, dedicated):
 
     if result:
         click.secho("Remove to access to device: %s" % device, fg='green')
+    else:
+        raise SoftLayer.exceptions.SoftLayerError('You need argument a hardware, virtual or dedicated identifier.\n'
+                                                  'E.g slcli user 123456 --hardware 91803794\n'
+                                                  '    slcli user 123456 --dedicated 91803793\n'
+                                                  '    slcli user 123456 --virtual 91803792')
