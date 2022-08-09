@@ -523,7 +523,7 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['server', 'reflash-firmware', '1000'])
 
         self.assert_no_fail(result)
-        self.assertEqual(result.output, "")
+        self.assertEqual(result.output, 'Successfully device firmware reflashed\n')
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'createFirmwareReflashTransaction',
                                 args=((1, 1, 1)), identifier=1000)
