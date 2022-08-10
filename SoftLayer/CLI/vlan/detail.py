@@ -60,7 +60,7 @@ def cli(env, identifier, no_vs, no_hardware, no_trunks):
         # subnets.append(subnet_table)
         table.add_row(['subnets', subnet_table])
     else:
-        table.add_row(['subnets', 'none'])
+        table.add_row(['subnets', '-'])
 
     server_columns = ['hostname', 'domain', 'public_ip', 'private_ip']
 
@@ -74,7 +74,7 @@ def cli(env, identifier, no_vs, no_hardware, no_trunks):
                                   vsi.get('primaryBackendIpAddress')])
             table.add_row(['vs', vs_table])
         else:
-            table.add_row(['vs', 'none'])
+            table.add_row(['vs', '-'])
 
     if not no_hardware:
         if vlan.get('hardware'):
@@ -86,7 +86,7 @@ def cli(env, identifier, no_vs, no_hardware, no_trunks):
                                   hardware.get('primaryBackendIpAddress')])
             table.add_row(['hardware', hw_table])
         else:
-            table.add_row(['hardware', 'none'])
+            table.add_row(['hardware', '-'])
 
     if not no_trunks:
         if vlan.get('networkComponentTrunks'):
@@ -101,7 +101,7 @@ def cli(env, identifier, no_vs, no_hardware, no_trunks):
                                                                    'hardware', 'tagReferences'))])
             table.add_row(['trunks', trunks_table])
         else:
-            table.add_row(['trunks', 'none'])
+            table.add_row(['trunks', '-'])
 
     env.fout(table)
 

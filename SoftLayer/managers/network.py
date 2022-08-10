@@ -438,7 +438,6 @@ class NetworkManager(object):
                   the specified VLAN.
         """
 
-        _mask = None
         if mask:
             _mask = mask
         else:
