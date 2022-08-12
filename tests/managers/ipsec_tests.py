@@ -319,3 +319,9 @@ class IPSECTests(testing.TestCase):
                  'itemId': 1092,
                  'itemPriceId': '2048'}]}}
         self.assertEqual(result, order)
+
+    def test_cancel_item(self):
+        _mock = self.set_mock('SoftLayer_Billing_Item', 'cancelItem')
+        _mock.return_value = True
+        result = self.ipsec.cancel_item(443, True, 'test', 'test')
+        self.assertEqual(result, True)
