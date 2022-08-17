@@ -429,15 +429,21 @@ class NetworkManager(object):
 
         return self.subnet.getObject(id=subnet_id, **kwargs)
 
-    def get_vlan(self, vlan_id):
+    def get_vlan(self, vlan_id, mask=None):
         """Returns information about a single VLAN.
 
-        :param int id: The unique identifier for the VLAN
+        :param int vlan_id: The unique identifier for the VLAN
+        :param string mask: mask for request
         :returns: A dictionary containing a large amount of information about
                   the specified VLAN.
-
         """
-        return self.vlan.getObject(id=vlan_id, mask=DEFAULT_GET_VLAN_MASK)
+
+        if mask:
+            _mask = mask
+        else:
+            _mask = DEFAULT_GET_VLAN_MASK
+
+        return self.vlan.getObject(id=vlan_id, mask=_mask)
 
     def list_global_ips(self, version=None, identifier=None, **kwargs):
         """Returns a list of all global IP address records on the account.
