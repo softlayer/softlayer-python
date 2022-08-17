@@ -175,13 +175,14 @@ class CDNManager(utils.IdentifierMixin, object):
         """Retrieve the cdn usage metric end date."""
         return self._end_date
 
-    def edit(self, identifier, header=None, http_port=None, origin=None,
+    def edit(self, identifier, header=None, http_port=None, https_port=None, origin=None,
              respect_headers=None, cache=None, performance_configuration=None):
         """Edit the cdn object.
 
         :param string identifier: The CDN identifier.
         :param header: The cdn Host header.
         :param http_port: The cdn HTTP port.
+        :param https_port: The cdn HTTPS port.
         :param origin: The cdn Origin server address.
         :param respect_headers: The cdn Respect headers.
         :param cache: The cdn Cache key optimization.
@@ -199,16 +200,23 @@ class CDNManager(utils.IdentifierMixin, object):
             'vendorName': cdn_instance_detail.get('vendorName'),
             'cname': cdn_instance_detail.get('cname'),
             'domain': cdn_instance_detail.get('domain'),
-            'httpPort': cdn_instance_detail.get('httpPort'),
             'origin': cdn_instance_detail.get('originHost'),
             'header': cdn_instance_detail.get('header')
         }
+        if cdn_instance_detail.get('httpPort'):
+            config['httpPort'] = cdn_instance_detail.get('httpPort')
+
+        if cdn_instance_detail.get('httpsPort'):
+            config['httpsPort'] = cdn_instance_detail.get('httpsPort')
 
         if header:
             config['header'] = header
 
         if http_port:
             config['httpPort'] = http_port
+
+        if https_port:
+            config['httpsPort'] = https_port
 
         if origin:
             config['origin'] = origin
