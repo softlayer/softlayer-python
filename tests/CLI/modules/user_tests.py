@@ -344,3 +344,15 @@ class UserCLITests(testing.TestCase):
         self.assert_called_with('SoftLayer_User_Customer', 'getHardware')
         self.assert_called_with('SoftLayer_User_Customer', 'getDedicatedHosts')
         self.assert_called_with('SoftLayer_User_Customer', 'getVirtualGuests')
+
+    def test_remove_access_hardware(self):
+        result = self.run_command(['user', 'remove-access', '123456', '--hardware', '147258'])
+        self.assert_no_fail(result)
+
+    def test_remove_access_virtual(self):
+        result = self.run_command(['user', 'remove-access', '123456', '--virtual', '987456'])
+        self.assert_no_fail(result)
+
+    def test_remove_access_dedicated(self):
+        result = self.run_command(['user', 'remove-access', '123456', '--dedicated', '369852'])
+        self.assert_no_fail(result)

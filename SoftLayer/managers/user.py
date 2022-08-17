@@ -392,6 +392,36 @@ class UserManager(utils.IdentifierMixin, object):
 
         return overrides_list
 
+    def remove_hardware_access(self, user_id, hardware_id):
+        """Remove hardware from a portal user’s hardware access list.
+
+        :param int user_id:
+        :param int hardware_id
+
+        :returns: true
+        """
+        return self.user_service.removeHardwareAccess(hardware_id, id=user_id)
+
+    def remove_virtual_access(self, user_id, virtual_id):
+        """Remove hardware from a portal user’s virtual guests access list.
+
+        :param int user_id:
+        :param int hardware_id
+
+        :returns: true
+        """
+        return self.user_service.removeVirtualGuestAccess(virtual_id, id=user_id)
+
+    def remove_dedicated_access(self, user_id, dedicated_id):
+        """Remove hardware from a portal user’s dedicated host access list.
+
+        :param int user_id:
+        :param int dedicated_id
+
+        :returns: true
+        """
+        return self.user_service.removeDedicatedHostAccess(dedicated_id, id=user_id)
+
     def get_user_hardware(self, user_id):
         """User Hardware list.
 

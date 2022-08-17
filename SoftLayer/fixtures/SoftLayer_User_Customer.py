@@ -86,6 +86,9 @@ createObject = getObject
 editObject = True
 addApiAuthenticationKey = True
 updateVpnUser = True
+removeDedicatedHostAccess = True
+removeHardwareAccess = True
+removeVirtualGuestAccess = True
 
 getHardware = [{
         "domain": "testedit.com",
