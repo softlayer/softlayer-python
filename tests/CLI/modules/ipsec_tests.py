@@ -555,5 +555,5 @@ class IPSECTests(testing.TestCase):
 
         mock = self.set_mock('SoftLayer_Billing_Item', 'cancelItem')
         mock.return_value = True
-        result = self.run_command(['ipsec', 'cancel', '445', '--immediate', '--reason', 'test', '--comment', 'testcli'])
+        result = self.run_command(['ipsec', 'cancel', '445', '--immediate', '--reason', 'test'])
         self.assert_no_fail(result)

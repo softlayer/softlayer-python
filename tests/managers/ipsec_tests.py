@@ -323,5 +323,5 @@ class IPSECTests(testing.TestCase):
     def test_cancel_item(self):
         _mock = self.set_mock('SoftLayer_Billing_Item', 'cancelItem')
         _mock.return_value = True
-        result = self.ipsec.cancel_item(443, True, 'test', 'test')
+        result = self.ipsec.cancel_item(443, True, 'test')
         self.assertEqual(result, True)
