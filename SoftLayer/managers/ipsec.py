@@ -300,7 +300,7 @@ class IPSECManager(utils.IdentifierMixin, object):
                                             complex_type=complex_type,
                                             hourly=False)
 
-    def cancel_item(self, identifier, immediate, reason, comment):
+    def cancel_item(self, identifier, immediate, reason):
         """Cancels the specified billing item Ipsec.
 
         Example::
@@ -313,8 +313,7 @@ class IPSECManager(utils.IdentifierMixin, object):
                               :func:`get_cancellation_reasons`.
         :param bool immediate: If set to True, will automatically update the cancelation ticket to request
                                the resource be reclaimed asap. This request still has to be reviewed by a human
-        :param string comment: An optional comment to include with the cancellation
         :returns: True on success or an exception
         """
         return self.client.call('SoftLayer_Billing_Item', 'cancelItem',
-                                True, immediate, reason, comment, id=identifier)
+                                True, immediate, reason, id=identifier)
