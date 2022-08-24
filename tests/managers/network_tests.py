@@ -363,11 +363,11 @@ class NetworkTests(testing.TestCase):
                 'id': {
                     'operation': 'orderBy',
                     'options': [
-                           {'name': 'sort', 'value': ['ASC']}]},
+                        {'name': 'sort', 'value': ['ASC']}]},
                 'vlanNumber': {'operation': 5},
                 'name': {'operation': '_= primary-vlan'},
                 'primaryRouter': {
-                      'datacenter': {'name': {'operation': '_= dal00'}}}}
+                    'datacenter': {'name': {'operation': '_= dal00'}}}}
         }
         self.assert_called_with('SoftLayer_Account', 'getNetworkVlans',
                                 filter=_filter)
@@ -653,3 +653,9 @@ class NetworkTests(testing.TestCase):
         SoftLayer_Location.return_value = []
         result = self.network.get_datacenter_by_keyname("TEST01")
         self.assertEqual(result, {})
+
+    def test_clear_route(self):
+        result = self.network.clear_route(1234)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'clearRoute')
