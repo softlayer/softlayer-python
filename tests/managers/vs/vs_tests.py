@@ -939,10 +939,10 @@ class VSTests(testing.TestCase):
 
         self.assertEqual(result, True)
         args = ({
-            'hostname': 'new-host',
-            'domain': 'new.sftlyr.ws',
-            'notes': 'random notes',
-        },)
+                    'hostname': 'new-host',
+                    'domain': 'new.sftlyr.ws',
+                    'notes': 'random notes',
+                },)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'editObject',
                                 identifier=100,
                                 args=args)
@@ -1325,3 +1325,8 @@ class VSTests(testing.TestCase):
     def test_authorize_portable_storage(self):
         options = self.vs.attach_portable_storage(1234, 1234567)
         self.assertEqual(1234567, options['id'])
+
+    def test_browser_access_log(self):
+        result = self.vs.browser_access_log(1234)
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'getBrowserConsoleAccessLogs', identifier=1234)
