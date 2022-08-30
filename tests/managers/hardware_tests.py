@@ -809,38 +809,6 @@ class HardwareTests(testing.TestCase):
 
         self.assertEqual([], result)
 
-    def test_get_hardware_guests_empty_virtualHost(self):
-        mock = self.set_mock('SoftLayer_Hardware_Server', 'getVirtualHost')
-        mock.return_value = None
-
-        result = self.hardware.get_hardware_guests(1234)
-
-        self.assertEqual(None, result)
-
-    def test_get_hardware_guests(self):
-        mock = self.set_mock('SoftLayer_Virtual_Host', 'getGuests')
-        mock.return_value = [
-            {
-                "accountId": 11111,
-                "hostname": "NSX-T Manager",
-                "id": 22222,
-                "maxCpu": 16,
-                "maxCpuUnits": "CORE",
-                "maxMemory": 49152,
-                "powerState": {
-                    "keyName": "RUNNING",
-                    "name": "Running"
-                },
-                "status": {
-                    "keyName": "ACTIVE",
-                    "name": "Active"
-                }
-            }]
-
-        result = self.hardware.get_hardware_guests(1234)
-
-        self.assertEqual("NSX-T Manager", result[0]['hostname'])
-
     def test_authorize_storage(self):
         options = self.hardware.authorize_storage(1234, "SL01SEL301234-11")
 
