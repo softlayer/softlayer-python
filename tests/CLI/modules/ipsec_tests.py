@@ -7,7 +7,6 @@
 
 import json
 
-
 from SoftLayer.CLI.exceptions import ArgumentError
 from SoftLayer.CLI.exceptions import CLIHalt
 from SoftLayer.fixtures import SoftLayer_Product_Order
@@ -519,4 +518,42 @@ class IPSECTests(testing.TestCase):
         order_mock = self.set_mock('SoftLayer_Product_Order', 'placeOrder')
         order_mock.return_value = SoftLayer_Product_Order.ipsec_placeOrder
         result = self.run_command(['ipsec', 'order', '-d', 'dal13'])
+        self.assert_no_fail(result)
+
+    def test_ipsec_cancel(self):
+        mock = self.set_mock('SoftLayer_Account', 'getNetworkTunnelContexts')
+        mock.return_value = [{
+            "createDate": "2013-11-05T16:03:53-06:00",
+            "id": 445,
+            "internalPeerIpAddress": "184.172.127.9",
+            "modifyDate": "2022-07-19T09:34:53-06:00",
+            "name": "ipsec003",
+            "phaseOneAuthentication": "MD5",
+            "phaseOneDiffieHellmanGroup": 2,
+            "phaseOneEncryption": "3DES",
+            "phaseOneKeylife": 14400,
+            "phaseTwoAuthentication": "MD5",
+            "phaseTwoDiffieHellmanGroup": 2,
+            "phaseTwoEncryption": "3DES",
+            "phaseTwoKeylife": 3600,
+            "phaseTwoPerfectForwardSecrecy": 1,
+            "billingItem": {
+                "allowCancellationFlag": 1,
+                "categoryCode": "network_tunnel",
+                "createDate": "2022-07-19T09:34:52-06:00",
+                "cycleStartDate": "2022-08-03T23:07:43-06:00",
+                "description": "IPSEC - Standard",
+                "id": 977194617,
+                "lastBillDate": "2022-08-03T23:07:43-06:00",
+                "modifyDate": "2022-08-03T23:07:43-06:00",
+                "nextBillDate": "2022-09-03T23:00:00-06:00",
+                "oneTimeFee": "0",
+                "orderItemId": 932515967,
+                "recurringMonths": 1,
+                "serviceProviderId": 1,
+            }}]
+
+        mock = self.set_mock('SoftLayer_Billing_Item', 'cancelItem')
+        mock.return_value = True
+        result = self.run_command(['ipsec', 'cancel', '445', '--immediate', '--reason', 'test'])
         self.assert_no_fail(result)

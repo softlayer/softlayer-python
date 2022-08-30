@@ -213,6 +213,7 @@ ALL_ROUTES = [
     ('ipsec:translation-update', 'SoftLayer.CLI.vpn.ipsec.translation.update:cli'),
     ('ipsec:update', 'SoftLayer.CLI.vpn.ipsec.update:cli'),
     ('ipsec:order', 'SoftLayer.CLI.vpn.ipsec.order:cli'),
+    ('ipsec:cancel', 'SoftLayer.CLI.vpn.ipsec.cancel:cli'),
 
     ('loadbal', 'SoftLayer.CLI.loadbal'),
     ('loadbal:detail', 'SoftLayer.CLI.loadbal.detail:cli'),
