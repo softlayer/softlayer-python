@@ -272,7 +272,6 @@ ALL_ROUTES = [
     ('hardware:detail', 'SoftLayer.CLI.hardware.detail:cli'),
     ('hardware:billing', 'SoftLayer.CLI.hardware.billing:cli'),
     ('hardware:edit', 'SoftLayer.CLI.hardware.edit:cli'),
-    ('hardware:guests', 'SoftLayer.CLI.hardware.guests:cli'),
     ('hardware:list', 'SoftLayer.CLI.hardware.list:cli'),
     ('hardware:power-cycle', 'SoftLayer.CLI.hardware.power:power_cycle'),
     ('hardware:power-off', 'SoftLayer.CLI.hardware.power:power_off'),
