@@ -880,3 +880,10 @@ class NetworkManager(object):
         if len(result) >= 1:
             return result[0]
         return {}
+
+    def clear_route(self, identifier):
+        """Calls SoftLayer_Network_Subnet::clearRoute()
+
+        returns  true or false.
+        """
+        return self.client.call('SoftLayer_Network_Subnet', 'clearRoute', id=identifier)
