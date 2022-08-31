@@ -769,18 +769,6 @@ class HardwareManager(utils.IdentifierMixin, object):
         """
         return self.hardware.getHardDrives(id=instance_id)
 
-    def get_hardware_guests(self, instance_id):
-        """Returns the hardware server guests.
-
-        :param int instance_id: Id of the hardware server.
-        """
-        mask = "mask[id]"
-        virtual_host = self.hardware.getVirtualHost(mask=mask, id=instance_id)
-        if virtual_host:
-            return self.client.call('SoftLayer_Virtual_Host', 'getGuests', mask='mask[powerState]',
-                                    id=virtual_host['id'])
-        return virtual_host
-
     def get_hardware_item_prices(self, location):
         """Returns the hardware server item prices by location.
 

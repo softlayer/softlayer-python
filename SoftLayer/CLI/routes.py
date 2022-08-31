@@ -214,6 +214,7 @@ ALL_ROUTES = [
     ('ipsec:translation-update', 'SoftLayer.CLI.vpn.ipsec.translation.update:cli'),
     ('ipsec:update', 'SoftLayer.CLI.vpn.ipsec.update:cli'),
     ('ipsec:order', 'SoftLayer.CLI.vpn.ipsec.order:cli'),
+    ('ipsec:cancel', 'SoftLayer.CLI.vpn.ipsec.cancel:cli'),
 
     ('loadbal', 'SoftLayer.CLI.loadbal'),
     ('loadbal:detail', 'SoftLayer.CLI.loadbal.detail:cli'),
@@ -273,7 +274,6 @@ ALL_ROUTES = [
     ('hardware:detail', 'SoftLayer.CLI.hardware.detail:cli'),
     ('hardware:billing', 'SoftLayer.CLI.hardware.billing:cli'),
     ('hardware:edit', 'SoftLayer.CLI.hardware.edit:cli'),
-    ('hardware:guests', 'SoftLayer.CLI.hardware.guests:cli'),
     ('hardware:list', 'SoftLayer.CLI.hardware.list:cli'),
     ('hardware:power-cycle', 'SoftLayer.CLI.hardware.power:power_cycle'),
     ('hardware:power-off', 'SoftLayer.CLI.hardware.power:power_off'),
@@ -334,6 +334,7 @@ ALL_ROUTES = [
     ('subnet:lookup', 'SoftLayer.CLI.subnet.lookup:cli'),
     ('subnet:edit-ip', 'SoftLayer.CLI.subnet.edit_ip:cli'),
     ('subnet:route', 'SoftLayer.CLI.subnet.route:cli'),
+    ('subnet:clear-route', 'SoftLayer.CLI.subnet.clear_route:cli'),
 
     ('tags', 'SoftLayer.CLI.tags'),
     ('tags:cleanup', 'SoftLayer.CLI.tags.cleanup:cli'),

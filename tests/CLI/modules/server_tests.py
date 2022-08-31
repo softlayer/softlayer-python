@@ -910,18 +910,6 @@ class ServerCLITests(testing.TestCase):
 
         self.assertEqual(result.exit_code, 2)
 
-    def test_get_hardware_guests(self):
-        result = self.run_command(['hw', 'guests', '123456'])
-        self.assert_no_fail(result)
-
-    def test_hardware_guests_empty(self):
-        mock = self.set_mock('SoftLayer_Virtual_Host', 'getGuests')
-        mock.return_value = None
-
-        result = self.run_command(['hw', 'guests', '123456'])
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
-
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_authorize_hw_no_confirm(self, confirm_mock):
         confirm_mock.return_value = False

@@ -45,3 +45,4 @@ editNote = True
 setTags = True
 cancel = True
 route = True
+clearRoute = True

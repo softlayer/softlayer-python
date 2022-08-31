@@ -67,12 +67,12 @@ credentialDelete = True
 
 getObject = {
     'id': 123456,
-    'username': 'SLOSC307608-1',
+    'username': 'TEST307608-1',
     'credentials': [
         {
             'id': 1933496,
-            'password': 'Um1Bp420FIFNvAg2QHjn5Sci2c2x4RNDXpVDDvnf',
-            'username': 'Kv9aNIhtNa7ZRceCTgep',
+            'password': 'Um1Bp420FIFNvAg2QHjn5Sci2c2x4RNDXpVDDvnfsdsd1010',
+            'username': 'Kv9aNIhtNa7ZRceabecs',
             'type': {
                 'description': 'A credential for generating S3 Compatible Signatures.',
                 'keyName': 'S3_COMPATIBLE_SIGNATURE'

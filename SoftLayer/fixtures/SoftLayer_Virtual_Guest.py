@@ -929,7 +929,7 @@ getBrowserConsoleAccessLogs = [
         "message": "User connected",
         "sourceIp": "44.200.9.0",
         "sourcePort": 47097,
-        "username": "307608_sebastian.chaparro@ibm.com"
+        "username": "testuser@ibm.com@ibm.com"
     },
     {
         "createDate": "2022-03-07T07:58:27-06:00",
@@ -938,5 +938,5 @@ getBrowserConsoleAccessLogs = [
         "message": "User connected",
         "sourceIp": "44.200.9.0",
         "sourcePort": 41185,
-        "username": "307608_sebastian.chaparro@ibm.com"
+        "username": "testuser@ibm.com"
     }]

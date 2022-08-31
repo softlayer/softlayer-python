@@ -276,3 +276,7 @@ The following is an example of updating an existing address translation entry.
 .. click:: SoftLayer.CLI.vpn.ipsec.order:cli
     :prog: ipsec order
     :show-nested:
+
+.. click:: SoftLayer.CLI.vpn.ipsec.cancel:cli
+    :prog: ipsec cancel
+    :show-nested:

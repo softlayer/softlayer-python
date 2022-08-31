@@ -1,4 +1,4 @@
-"""Command lines which modify power states."""
+"""Get user access details a virtual server."""
 # :license: MIT, see LICENSE for more details.
 
 import click

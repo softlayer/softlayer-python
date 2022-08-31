@@ -44,7 +44,7 @@ if sys.stdout.isatty():
 def get_latest_version():
     """Gets the latest version of the Softlayer library."""
     try:
-        result = requests.get('https://pypi.org/pypi/SoftLayer/json')
+        result = requests.get('https://pypi.org/pypi/SoftLayer/json',  timeout=60)
         json_result = result.json()
         latest = 'v{}'.format(json_result['info']['version'])
     except Exception:
