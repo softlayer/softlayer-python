@@ -1447,3 +1447,14 @@ class VSManager(utils.IdentifierMixin, object):
                                   disk_id, id=vs_id)
 
         return result
+
+    def browser_access_log(self, identifier):
+        """A virtual guest’s browser access logs.
+
+        :param int identifier: Virtual server id.
+
+
+        :return: SoftLayer_Virtual_BrowserConsoleAccessLog.
+        """
+        mask = 'createDate,eventType,id,message,sourceIp,sourcePort,username'
+        return self.client.call('SoftLayer_Virtual_Guest', 'getBrowserConsoleAccessLogs', mask=mask, id=identifier)

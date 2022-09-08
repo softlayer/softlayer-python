@@ -52,6 +52,7 @@ ALL_ROUTES = [
     ('virtual:capacity', 'SoftLayer.CLI.virt.capacity:cli'),
     ('virtual:placementgroup', 'SoftLayer.CLI.virt.placementgroup:cli'),
     ('virtual:migrate', 'SoftLayer.CLI.virt.migrate:cli'),
+    ('virtual:access', 'SoftLayer.CLI.virt.access:cli'),
     ('virtual:monitoring', 'SoftLayer.CLI.virt.monitoring:cli'),
 
     ('dedicatedhost', 'SoftLayer.CLI.dedicatedhost'),

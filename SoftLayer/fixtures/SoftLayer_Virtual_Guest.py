@@ -317,7 +317,7 @@ getCreateObjectOptions = {
                     'item': {'description': '2 GB'},
                     'hourlyRecurringFee': '.06',
                     'recurringFee': '42'
-            },
+                },
             'template': {'maxMemory': 2048}
         },
         {
@@ -920,3 +920,23 @@ attachDiskImage = {
     "createDate": "2021-03-22T13:15:31-06:00",
     "id": 1234567
 }
+
+getBrowserConsoleAccessLogs = [
+    {
+        "createDate": "2022-03-07T05:32:23-06:00",
+        "eventType": "CONNECTED",
+        "id": 509636,
+        "message": "User connected",
+        "sourceIp": "44.200.9.0",
+        "sourcePort": 47097,
+        "username": "testuser@ibm.com@ibm.com"
+    },
+    {
+        "createDate": "2022-03-07T07:58:27-06:00",
+        "eventType": "CONNECTED",
+        "id": 509024,
+        "message": "User connected",
+        "sourceIp": "44.200.9.0",
+        "sourcePort": 41185,
+        "username": "testuser@ibm.com"
+    }]
