@@ -125,7 +125,7 @@ def _location_item_prices(location_prices, location, tables):
     :param list tables: Table list to add location prices table.
     """
     location_prices_table = formatting.Table(COLUMNS_ITEM_PRICES_LOCATION, title="Item Prices for %s" % location)
-    location_prices_table.sortby = 'keyName'
+    location_prices_table.sortby = 'KeyName'
     location_prices_table.align = 'l'
     for price in location_prices:
         cr_max = get_item_price_data(price, 'capacityRestrictionMaximum')
