@@ -36,8 +36,11 @@ class PlacementGroupCommands(click.MultiCommand):
         """Get command for click."""
         path = "%s.%s" % (__name__, cmd_name)
         path = path.replace("-", "_")
-        module = importlib.import_module(path)
-        return getattr(module, 'cli')
+        try:
+            module = importlib.import_module(path)
+            return getattr(module, 'cli')
+        except ModuleNotFoundError as ex:
+            print(ex.name)
 
 
 # Required to get the sub-sub-sub command to work.
