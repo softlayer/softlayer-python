@@ -43,6 +43,7 @@ class CapacityCommands(click.MultiCommand):
         except ModuleNotFoundError as ex:
             print(ex.name)
 
+
 # Required to get the sub-sub-sub command to work.
 @click.group(cls=CapacityCommands, context_settings=CONTEXT)
 def cli():
