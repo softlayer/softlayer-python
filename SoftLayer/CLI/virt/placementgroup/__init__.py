@@ -41,6 +41,7 @@ class PlacementGroupCommands(click.MultiCommand):
             return getattr(module, 'cli')
         except ModuleNotFoundError as ex:
             print(ex.name)
+            return None
 
 
 # Required to get the sub-sub-sub command to work.
