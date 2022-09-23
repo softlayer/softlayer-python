@@ -1,5 +1,25 @@
 # Change Log
 
+## [6.1.2] - 2022-09-23
+
+#### What's Changed
+* Snapcraft: Updated to Core22 and  add homeishome-launch by @kz6fittycent in https://github.com/softlayer/softlayer-python/pull/1740
+* Add status, create date and domain columns in `slcli vs list command` by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1728
+* New command: ipsec cancel by @caberos in https://github.com/softlayer/softlayer-python/pull/1729
+* New command: subnet clear-route by @caberos in https://github.com/softlayer/softlayer-python/pull/1738
+* Deprecate slcli hw guests by @caberos in https://github.com/softlayer/softlayer-python/pull/1736
+* Remove real usersnames from test fixtrues by @caberos in https://github.com/softlayer/softlayer-python/pull/1743
+* Fix tox request.get hangout issue by @caberos in https://github.com/softlayer/softlayer-python/pull/1746
+* add vs user-access command by @caberos in https://github.com/softlayer/softlayer-python/pull/1741
+* Update Help message for commands that take in multiple arguments by @caberos in https://github.com/softlayer/softlayer-python/pull/1748
+* Error with slcli order item-list by @caberos in https://github.com/softlayer/softlayer-python/pull/1751
+* deprecate sl `autoscale` by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1753
+* Unhandled error running a subcommand in slcli by @caberos in https://github.com/softlayer/softlayer-python/pull/1754
+
+
+**Full Changelog**: https://github.com/softlayer/softlayer-python/compare/v6.1.1...v6.1.2
+
+
 ## [6.1.1] - 2022-08-18
 
 #### What's Changed
