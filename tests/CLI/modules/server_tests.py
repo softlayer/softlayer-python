@@ -704,19 +704,19 @@ class ServerCLITests(testing.TestCase):
                                            'getResourceRecords')
         getResourceRecords.return_value = []
         createAargs = ({
-            'type': 'a',
-            'host': 'hardware-test1',
-            'domainId': 12345,  # from SoftLayer_Account::getDomains
-            'data': '172.16.1.100',
-            'ttl': 7200
-        },)
+                           'type': 'a',
+                           'host': 'hardware-test1',
+                           'domainId': 12345,  # from SoftLayer_Account::getDomains
+                           'data': '172.16.1.100',
+                           'ttl': 7200
+                       },)
         createPTRargs = ({
-            'type': 'ptr',
-            'host': '100',
-            'domainId': 123456,
-            'data': 'hardware-test1.test.sftlyr.ws',
-            'ttl': 7200
-        },)
+                             'type': 'ptr',
+                             'host': '100',
+                             'domainId': 123456,
+                             'data': 'hardware-test1.test.sftlyr.ws',
+                             'ttl': 7200
+                         },)
 
         result = self.run_command(['hw', 'dns-sync', '1000'])
 
@@ -759,12 +759,12 @@ class ServerCLITests(testing.TestCase):
             }
         }
         createV6args = ({
-            'type': 'aaaa',
-            'host': 'hardware-test1',
-            'domainId': 12345,  # from SoftLayer_Account::getDomains
-            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
-            'ttl': 7200
-        },)
+                            'type': 'aaaa',
+                            'host': 'hardware-test1',
+                            'domainId': 12345,  # from SoftLayer_Account::getDomains
+                            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
+                            'ttl': 7200
+                        },)
         server.return_value = test_server
         result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
         self.assert_no_fail(result)
@@ -1026,3 +1026,11 @@ class ServerCLITests(testing.TestCase):
                                    '--flavor', 'B1_2X8X25', '--datacenter', 'mex01', '--os', 'UBUNTU_LATEST'])
         self.assert_no_fail(result)
         self.assertNotIn('Warning: Closed soon: mex01', result.output)
+
+    def test_notifications(self):
+        result = self.run_command(['hardware', 'notifications', '100'])
+        self.assert_no_fail(result)
+
+    def test_add_notification(self):
+        result = self.run_command(['hardware', 'add-notification', '100', '--users', '123456'])
+        self.assert_no_fail(result)

@@ -1092,6 +1092,16 @@ class HardwareManager(utils.IdentifierMixin, object):
         """Returns Hardware sensor data"""
         return self.client.call('Hardware', 'getSensorData', id=hardware_id)
 
+    def get_notifications(self, hardware_id):
+        """Returns all hardware notifications."""
+        return self.client.call('SoftLayer_User_Customer_Notification_Hardware', 'findByHardwareId', hardware_id)
+
+    def add_notification(self, hardware_id, user_id):
+        """Create a user hardware notification entry"""
+
+        template = {"hardwareId": hardware_id, "userId": user_id}
+        return self.client.call('SoftLayer_User_Customer_Notification_Hardware', 'createObject', template)
+
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
     """Picks a valid Bandwidth Item, returns the KeyName"""
