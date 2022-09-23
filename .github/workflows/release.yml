@@ -48,5 +48,5 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.CGALLO_PYPI }}
-        repository_url: https://pypi.org/legacy/
+        repository_url: https://upload.pypi.org/legacy/
 
