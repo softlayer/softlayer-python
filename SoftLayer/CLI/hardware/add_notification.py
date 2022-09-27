@@ -11,7 +11,7 @@ from SoftLayer.CLI import formatting
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--users', multiple=True,
-              help='An IP address to authorize ')
+              help='UserId to be notified on monitoring failure.')
 @environment.pass_env
 def cli(env, identifier, users):
     """Create a user hardware notification entry."""
@@ -26,6 +26,6 @@ def cli(env, identifier, users):
         notification = hardware.add_notification(identifier, user)
         table.add_row([notification['id'], notification['hardware']['fullyQualifiedDomainName'],
                        notification['user']['username'], notification['user']['email'],
-                       notification['user']['lastName'], notification['user']['firstName']])
+                       notification['user']['firstName'], notification['user']['lastName']])
 
     env.fout(table)

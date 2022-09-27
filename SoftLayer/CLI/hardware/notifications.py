@@ -25,6 +25,6 @@ def cli(env, identifier):
     for notification in notifications:
         table.add_row([notification['hardware']['fullyQualifiedDomainName'], notification['hardware']['hostname'],
                        notification['user']['username'], notification['user']['email'],
-                       notification['user']['lastName'], notification['user']['firstName']])
+                       notification['user']['firstName'], notification['user']['lastName']])
 
     env.fout(table)
