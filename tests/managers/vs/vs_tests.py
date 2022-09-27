@@ -1330,3 +1330,11 @@ class VSTests(testing.TestCase):
         result = self.vs.browser_access_log(1234)
         self.assertTrue(result)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'getBrowserConsoleAccessLogs', identifier=1234)
+
+    def test_notification(self):
+        self.vs.get_notifications(100)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Virtual_Guest', 'findByGuestId')
+
+    def test_add_notification(self):
+        self.vs.add_notification(100, 123456)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Virtual_Guest', 'createObject')
