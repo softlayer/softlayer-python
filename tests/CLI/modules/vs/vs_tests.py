@@ -961,3 +961,11 @@ class VirtTests(testing.TestCase):
     def test_user_access(self):
         result = self.run_command(['vs', 'access', '100'])
         self.assert_no_fail(result)
+
+    def test_notifications(self):
+        result = self.run_command(['vs', 'notifications', '100'])
+        self.assert_no_fail(result)
+
+    def test_add_notification(self):
+        result = self.run_command(['vs', 'add-notification', '100', '--users', '123456'])
+        self.assert_no_fail(result)
