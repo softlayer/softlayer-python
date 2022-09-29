@@ -920,6 +920,14 @@ class HardwareTests(testing.TestCase):
         self.hardware.get_sensors(100)
         self.assert_called_with('SoftLayer_Hardware', 'getSensorData')
 
+    def test_notification(self):
+        self.hardware.get_notifications(100)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Hardware', 'findByHardwareId')
+
+    def test_add_notification(self):
+        self.hardware.add_notification(100, 123456)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Hardware', 'createObject')
+
 
 class HardwareHelperTests(testing.TestCase):
 
