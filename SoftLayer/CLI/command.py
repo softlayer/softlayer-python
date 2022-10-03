@@ -23,7 +23,7 @@ from SoftLayer.CLI import environment
 class OptionHighlighter(RegexHighlighter):
     """Provides highlighter regex for the Command help"""
     highlights = [
-        r"(?P<switch>\-\w)",  # single options like -v
+        r"(?P<switch>^\-\w)",  # single options like -v
         r"(?P<option>\-\-[\w\-]+)",  # long options like --verbose
         r"(?P<default_option>\[[^\]]+\])",  # anything between [], usually default options
 
