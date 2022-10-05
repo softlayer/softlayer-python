@@ -75,7 +75,7 @@ getObject = {
         'passwords': [{'username': 'user', 'password': 'pass'}],
         'softwareLicense': {
             'softwareDescription': {'version': '12.04-64 Minimal for VSI',
-                                    'name': 'Ubuntu'}}
+                                    'name': 'Ubuntu','referenceCode': 'UBUNTU_8_64',}}
     },
     'softwareComponents': [{
         'passwords': [{'username': 'user', 'password': 'pass'}],
