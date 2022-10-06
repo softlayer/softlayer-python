@@ -1458,3 +1458,15 @@ class VSManager(utils.IdentifierMixin, object):
         """
         mask = 'createDate,eventType,id,message,sourceIp,sourcePort,username'
         return self.client.call('SoftLayer_Virtual_Guest', 'getBrowserConsoleAccessLogs', mask=mask, id=identifier)
+
+    def get_notifications(self, vs_id):
+        """Returns all virtual notifications."""
+        return self.client.call('SoftLayer_User_Customer_Notification_Virtual_Guest', 'findByGuestId', vs_id)
+
+    def add_notification(self, virtual_id, user_id):
+        """Create a user virtual notification entry"""
+
+        template = {"guestId": virtual_id, "userId": user_id}
+        mask = 'user'
+        return self.client.call('SoftLayer_User_Customer_Notification_Virtual_Guest',
+                                'createObject', template, mask=mask)

@@ -54,6 +54,8 @@ ALL_ROUTES = [
     ('virtual:migrate', 'SoftLayer.CLI.virt.migrate:cli'),
     ('virtual:access', 'SoftLayer.CLI.virt.access:cli'),
     ('virtual:monitoring', 'SoftLayer.CLI.virt.monitoring:cli'),
+    ('virtual:notifications', 'SoftLayer.CLI.virt.notifications:cli'),
+    ('virtual:add-notification', 'SoftLayer.CLI.virt.add_notification:cli'),
 
     ('dedicatedhost', 'SoftLayer.CLI.dedicatedhost'),
     ('dedicatedhost:list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
@@ -292,6 +294,8 @@ ALL_ROUTES = [
     ('hardware:upgrade', 'SoftLayer.CLI.hardware.upgrade:cli'),
     ('hardware:sensor', 'SoftLayer.CLI.hardware.sensor:cli'),
     ('hardware:monitoring', 'SoftLayer.CLI.hardware.monitoring:cli'),
+    ('hardware:notifications', 'SoftLayer.CLI.hardware.notifications:cli'),
+    ('hardware:add-notification', 'SoftLayer.CLI.hardware.add_notification:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),

@@ -279,6 +279,14 @@ If no timezone is specified, IMS local time (CST) will be assumed, which might n
    :prog: virtual access
    :show-nested:
 
+.. click:: SoftLayer.CLI.virt.notifications:cli
+   :prog: virtual notifications
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.add_notification:cli
+   :prog: virtual add-notification
+   :show-nested:
+
 Manages the migration of virutal guests. Supports migrating virtual guests on Dedicated Hosts as well.
 
 Reserved Capacity
