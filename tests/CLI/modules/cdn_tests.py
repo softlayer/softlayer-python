@@ -4,7 +4,9 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import datetime
 import json
+from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import testing
@@ -25,7 +27,9 @@ class CdnTests(testing.TestCase):
                            'vendor': 'akamai'}]
                          )
 
-    def test_detail_account(self):
+    @mock.patch('SoftLayer.utils.days_to_datetime')
+    def test_detail_account(self, mock_now):
+        mock_now.return_value = datetime.datetime(2020, 1, 1)
         result = self.run_command(['cdn', 'detail', '--history=30', '1245'])
 
         self.assert_no_fail(result)
