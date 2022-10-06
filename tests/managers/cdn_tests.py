@@ -8,6 +8,8 @@
 from SoftLayer import fixtures
 from SoftLayer.managers import cdn
 from SoftLayer import testing
+from unittest import mock as mock
+import datetime
 
 
 class CDNTests(testing.TestCase):
@@ -28,7 +30,9 @@ class CDNTests(testing.TestCase):
                                 'listDomainMappingByUniqueId',
                                 args=args)
 
-    def test_detail_usage_metric(self):
+    @mock.patch('SoftLayer.utils.days_to_datetime')
+    def test_detail_usage_metric(self, mock_now):
+        mock_now.return_value = datetime.datetime(2020, 1, 1)
         self.cdn_client.get_usage_metrics(12345, history=30, frequency="aggregate")
 
         args = (12345,
@@ -38,6 +42,16 @@ class CDNTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_CdnMarketplace_Metrics',
                                 'getMappingUsageMetrics',
                                 args=args)
+
+    # Does this still work in 2038 ? https://github.com/softlayer/softlayer-python/issues/1764 for context
+    @mock.patch('SoftLayer.utils.days_to_datetime')
+    def test_detail_usage_metric_future(self, mock_now):
+        mock_now.return_value = datetime.datetime(2040, 1, 1)
+        self.assertRaises(
+            OverflowError,
+            self.cdn_client.get_usage_metrics, 12345, history=30, frequency="aggregate"
+        )
+        
 
     def test_get_origins(self):
         self.cdn_client.get_origins("12345")
@@ -105,7 +119,7 @@ class CDNTests(testing.TestCase):
                                 args=args)
 
     def test_cdn_edit(self):
-        identifier = '9934111111111'
+        identifier = '11223344'
         header = 'www.test.com'
         result = self.cdn_client.edit(identifier, header=header)
 
@@ -116,7 +130,7 @@ class CDNTests(testing.TestCase):
             'SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
             'updateDomainMapping',
             args=({
-                'uniqueId': '9934111111111',
+                'uniqueId': '11223344',
                 'originType': 'HOST_SERVER',
                 'protocol': 'HTTP',
                 'path': '/',
