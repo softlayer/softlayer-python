@@ -4,12 +4,12 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import datetime
+from unittest import mock as mock
 
 from SoftLayer import fixtures
 from SoftLayer.managers import cdn
 from SoftLayer import testing
-from unittest import mock as mock
-import datetime
 
 
 class CDNTests(testing.TestCase):
@@ -51,7 +51,6 @@ class CDNTests(testing.TestCase):
             OverflowError,
             self.cdn_client.get_usage_metrics, 12345, history=30, frequency="aggregate"
         )
-        
 
     def test_get_origins(self):
         self.cdn_client.get_origins("12345")
