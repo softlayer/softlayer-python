@@ -467,6 +467,6 @@ def clean_null_table_rows(data):
     """Delete Null fields by '-', in a table"""
     for index_i, row in enumerate(data.rows):
         for index_j, value in enumerate(row):
-            if str(value) + '' == 'NULL':
+            if str(value) == 'NULL':
                 data.rows[index_i][index_j] = '-'
     return data
