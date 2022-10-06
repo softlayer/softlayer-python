@@ -19,7 +19,10 @@ def cli(env, identifier):
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
     instance = vsi.get_instance(vs_id)
 
-    table = formatting.Table(['username', 'password'])
+    table = formatting.Table(['username', 'password', 'Software', 'Version'])
+
     for item in instance['operatingSystem']['passwords']:
-        table.add_row([item['username'], item['password']])
+        table.add_row([item['username'], item['password'],
+                       instance['operatingSystem']['softwareLicense']['softwareDescription']['referenceCode'],
+                       instance['operatingSystem']['softwareLicense']['softwareDescription']['version']])
     env.fout(table)
