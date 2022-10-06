@@ -6,8 +6,10 @@
 """
 # pylint: disable=E0202, consider-merging-isinstance, arguments-differ, keyword-arg-before-vararg
 import collections
+import csv
 import json
 import os
+import tempfile
 
 import click
 from rich import box
@@ -29,6 +31,8 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
         return json.dumps(data, indent=4, cls=CLIJSONEncoder)
     elif fmt == 'jsonraw':
         return json.dumps(data, cls=CLIJSONEncoder)
+    if fmt == 'csv':
+        return csv_output_format(data)
 
     if isinstance(data, str) or isinstance(data, rTable):
         return data
@@ -440,3 +444,29 @@ def _format_list_objects(result):
         table.add_row(values)
 
     return table
+
+
+def csv_output_format(data, delimiter=','):
+    """Formating a table to csv format and show it."""
+    data = clean_null_table_rows(data)
+    with tempfile.TemporaryDirectory() as temp_file:
+        f_name = os.path.join(temp_file, 'temp_csv_file')
+        with open(f_name, 'w', encoding='UTF8') as file:
+            writer = csv.writer(file, delimiter=delimiter)
+            writer.writerow(data.columns)
+            writer.writerows(data.rows)
+        with open(f_name, 'r', encoding='UTF8') as file:
+            csv_file = csv.reader(file, delimiter='\t')
+            for row in csv_file:
+                if len(row) != 0:
+                    print(row[0])
+    return ''
+
+
+def clean_null_table_rows(data):
+    """Delete Null fields by '-', in a table"""
+    for index_i, row in enumerate(data.rows):
+        for index_j, value in enumerate(row):
+            if str(value) + '' == 'NULL':
+                data.rows[index_i][index_j] = '-'
+    return data
