@@ -22,10 +22,13 @@ def cli(env, identifier):
                                      'hardware')
     instance = manager.get_hardware(hardware_id)
 
-    table = formatting.Table(['username', 'password'])
+    table = formatting.Table(['username', 'password', 'Software', 'Version'])
     for item in instance['softwareComponents']:
         if 'passwords' not in item:
             raise exceptions.SoftLayerError("No passwords found in softwareComponents")
         for credentials in item['passwords']:
-            table.add_row([credentials.get('username', 'None'), credentials.get('password', 'None')])
+            table.add_row([credentials.get('username', 'None'),
+                           credentials.get('password', 'None'),
+                           item['softwareLicense']['softwareDescription']['referenceCode'],
+                           item['softwareLicense']['softwareDescription']['version']])
     env.fout(table)
