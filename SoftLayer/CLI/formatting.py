@@ -7,9 +7,10 @@
 # pylint: disable=E0202, consider-merging-isinstance, arguments-differ, keyword-arg-before-vararg
 import collections
 import csv
+import io
 import json
 import os
-import tempfile
+import sys
 
 import click
 from rich import box
@@ -448,25 +449,45 @@ def _format_list_objects(result):
 
 def csv_output_format(data, delimiter=','):
     """Formating a table to csv format and show it."""
-    data = clean_null_table_rows(data)
-    with tempfile.TemporaryDirectory() as temp_file:
-        f_name = os.path.join(temp_file, 'temp_csv_file')
-        with open(f_name, 'w', encoding='UTF8') as file:
-            writer = csv.writer(file, delimiter=delimiter)
-            writer.writerow(data.columns)
-            writer.writerows(data.rows)
-        with open(f_name, 'r', encoding='UTF8') as file:
-            csv_file = csv.reader(file, delimiter='\t')
-            for row in csv_file:
-                if len(row) != 0:
-                    print(row[0])
+    data = clean_table(data, delimiter)
+    write_csv_format(sys.stdout, data, delimiter)
     return ''
 
 
-def clean_null_table_rows(data):
-    """Delete Null fields by '-', in a table"""
-    for index_i, row in enumerate(data.rows):
-        for index_j, value in enumerate(row):
+def clean_table(data, delimiter):
+    """Delete Null fields by '-' and fix nested table in table"""
+    new_data_row = []
+    for row in data.rows:
+        new_value = []
+        for value in row:
             if str(value) == 'NULL':
-                data.rows[index_i][index_j] = '-'
+                value = '-'
+
+            if str(type(value)) == "<class 'SoftLayer.CLI.formatting.Table'>":
+                string_io = io.StringIO()
+                write_csv_format(string_io, value, delimiter)
+
+                nested_table_converted = string_io.getvalue()
+                nested_table_converted = nested_table_converted.replace('\r', '').split('\n')
+                nested_table_converted.pop()
+
+                title_nested_table = new_value.pop()
+                for item in nested_table_converted:
+                    new_value.append(title_nested_table)
+                    new_value.append(item)
+                    new_data_row.append(new_value)
+                    new_value = []
+            else:
+                new_value.append(value)
+
+        if len(new_value) != 0:
+            new_data_row.append(new_value)
+    data.rows = new_data_row
     return data
+
+
+def write_csv_format(support_output, data, delimiter):
+    """Write csv format to supported output"""
+    writer = csv.writer(support_output, delimiter=delimiter)
+    writer.writerow(data.columns)
+    writer.writerows(data.rows)
