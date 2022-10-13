@@ -52,12 +52,10 @@ class ServerCLITests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), [
-            {
-                'username': 'root',
-                'password': 'abc123',
-                'Software': 'CENTOS_7_64',
-                'Version': '7.8 - 64'
-            }
+            {'Password': 'abc123',
+             'Software': 'CENTOS_7_64',
+             'Username': 'root',
+             'Version': '7.8 - 64'}
         ])
 
     def test_server_credentials_exception_passwords_not_found(self):
