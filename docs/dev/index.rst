@@ -180,5 +180,4 @@ Developer Resources
    Issues <https://github.com/softlayer/softlayer-python/issues>
    Pull Requests <https://github.com/softlayer/softlayer-python/pulls>
    PyPI <https://pypi.python.org/pypi/softlayer/>
-   Twitter <https://twitter.com/SoftLayerDevs>
    #softlayer on freenode <irc://irc.freenode.net/#softlayer>
