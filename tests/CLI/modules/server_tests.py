@@ -41,17 +41,22 @@ class ServerCLITests(testing.TestCase):
                 {
                     "password": "abc123",
                     "username": "root"
-                }
-            ]}]
+                }],
+                'softwareLicense': {
+                    'softwareDescription':
+                        {
+                            'referenceCode': 'CENTOS_7_64',
+                            'version': '7.8 - 64'}}}]
         }
         result = self.run_command(['hardware', 'credentials', '12345'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         [{
-                             'username': 'root',
-                             'password': 'abc123'
-                         }])
+        self.assertEqual(json.loads(result.output), [
+            {'Password': 'abc123',
+             'Software': 'CENTOS_7_64',
+             'Username': 'root',
+             'Version': '7.8 - 64'}
+        ])
 
     def test_server_credentials_exception_passwords_not_found(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
@@ -85,7 +90,13 @@ class ServerCLITests(testing.TestCase):
                 {
                     "hardwareId": 22222,
                     "id": 333333,
-                    "passwords": [{}]
+                    "passwords": [{}],
+                    "softwareLicense": {
+                        "softwareDescription": {
+                            "referenceCode": None,
+                            "version": None
+                        }
+                    }
                 }
             ]
         }
