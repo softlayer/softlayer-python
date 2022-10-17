@@ -6,8 +6,11 @@
 """
 # pylint: disable=E0202, consider-merging-isinstance, arguments-differ, keyword-arg-before-vararg
 import collections
+import csv
+import io
 import json
 import os
+import sys
 
 import click
 from rich import box
@@ -29,6 +32,8 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
         return json.dumps(data, indent=4, cls=CLIJSONEncoder)
     elif fmt == 'jsonraw':
         return json.dumps(data, cls=CLIJSONEncoder)
+    if fmt == 'csv':
+        return csv_output_format(data)
 
     if isinstance(data, str) or isinstance(data, rTable):
         return data
@@ -440,3 +445,49 @@ def _format_list_objects(result):
         table.add_row(values)
 
     return table
+
+
+def csv_output_format(data, delimiter=','):
+    """Formating a table to csv format and show it."""
+    data = clean_table(data, delimiter)
+    write_csv_format(sys.stdout, data, delimiter)
+    return ''
+
+
+def clean_table(data, delimiter):
+    """Delete Null fields by '-' and fix nested table in table"""
+    new_data_row = []
+    for row in data.rows:
+        new_value = []
+        for value in row:
+            if str(value) == 'NULL':
+                value = '-'
+
+            if str(type(value)) == "<class 'SoftLayer.CLI.formatting.Table'>":
+                string_io = io.StringIO()
+                write_csv_format(string_io, value, delimiter)
+
+                nested_table_converted = string_io.getvalue()
+                nested_table_converted = nested_table_converted.replace('\r', '').split('\n')
+                nested_table_converted.pop()
+
+                title_nested_table = new_value.pop()
+                for item in nested_table_converted:
+                    new_value.append(title_nested_table)
+                    new_value.append(item)
+                    new_data_row.append(new_value)
+                    new_value = []
+            else:
+                new_value.append(value)
+
+        if len(new_value) != 0:
+            new_data_row.append(new_value)
+    data.rows = new_data_row
+    return data
+
+
+def write_csv_format(support_output, data, delimiter):
+    """Write csv format to supported output"""
+    writer = csv.writer(support_output, delimiter=delimiter)
+    writer.writerow(data.columns)
+    writer.writerows(data.rows)
