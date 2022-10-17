@@ -4,7 +4,9 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import datetime
 import json
+from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import testing
@@ -21,27 +23,22 @@ class CdnTests(testing.TestCase):
                            'domain': 'test.example.com',
                            'origin': '1.1.1.1',
                            'status': 'CNAME_CONFIGURATION',
-                           'unique_id': '9934111111111',
+                           'unique_id': '11223344',
                            'vendor': 'akamai'}]
                          )
 
-    def test_detail_account(self):
+    @mock.patch('SoftLayer.utils.days_to_datetime')
+    def test_detail_account(self, mock_now):
+        mock_now.return_value = datetime.datetime(2020, 1, 1)
         result = self.run_command(['cdn', 'detail', '--history=30', '1245'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'hit_radio': '0.0 %',
-                          'hostname': 'test.example.com',
-                          'origin': '1.1.1.1',
-                          'origin_type': 'HOST_SERVER',
-                          'path': '/',
-                          'protocol': 'HTTP',
-                          'provider': 'akamai',
-                          'status': 'CNAME_CONFIGURATION',
-                          'total_bandwidth': '0.0 GB',
-                          'total_hits': '0',
-                          'unique_id': '9934111111111'}
-                         )
+        api_results = json.loads(result.output)
+        self.assertEqual(api_results['hit_ratio'], '2.0 %')
+        self.assertEqual(api_results['total_bandwidth'], '1.0 GB')
+        self.assertEqual(api_results['total_hits'], 3)
+        self.assertEqual(api_results['hostname'], 'test.example.com')
+        self.assertEqual(api_results['protocol'], 'HTTP')
 
     def test_purge_content(self):
         result = self.run_command(['cdn', 'purge', '1234',
@@ -122,7 +119,7 @@ class CdnTests(testing.TestCase):
         self.assertEqual('include: test', header_result['Cache key optimization'])
 
     def test_edit_cache_by_uniqueId(self):
-        result = self.run_command(['cdn', 'edit', '9934111111111', '--cache', 'include-specified', '--cache', 'test'])
+        result = self.run_command(['cdn', 'edit', '11223344', '--cache', 'include-specified', '--cache', 'test'])
         self.assert_no_fail(result)
         header_result = json.loads(result.output)
         self.assertEqual('include: test', header_result['Cache key optimization'])

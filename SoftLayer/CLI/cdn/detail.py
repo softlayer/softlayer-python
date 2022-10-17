@@ -41,6 +41,6 @@ def cli(env, unique_id, history):
     table.add_row(['status', cdn_mapping['status']])
     table.add_row(['total_bandwidth', total_bandwidth])
     table.add_row(['total_hits', total_hits])
-    table.add_row(['hit_radio', hit_ratio])
+    table.add_row(['hit_ratio', hit_ratio])
 
     env.fout(table)
