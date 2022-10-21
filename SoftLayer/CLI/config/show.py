@@ -13,5 +13,5 @@ from SoftLayer.CLI import environment
 def cli(env):
     """Show current configuration."""
 
-    settings = config.get_settings_from_client(env.client)
+    settings = config.get_settings_from_client(client=env.client, theme=env.theme)
     env.fout(config.config_table(settings))

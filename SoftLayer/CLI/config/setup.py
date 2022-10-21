@@ -68,7 +68,7 @@ def cli(env, auth):
     api_key = None
 
     timeout = 0
-    defaults = config.get_settings_from_client(env.client)
+    defaults = config.get_settings_from_client(env.client, env.theme)
     endpoint_url = get_endpoint_url(env, defaults.get('endpoint_url', 'public'))
     # Get ths username and API key
     if auth == 'ibmid':
@@ -92,6 +92,9 @@ def cli(env, auth):
     # Ask for timeout, convert to float, then to int
     timeout = int(float(env.input('Timeout', default=defaults['timeout'] or 0)))
 
+    # Ask theme for console
+    theme = env.input('Theme [dark/light]', default=defaults['theme'])
+
     path = '~/.softlayer'
     if env.config_file:
         path = env.config_file
@@ -100,7 +103,8 @@ def cli(env, auth):
     env.out(env.fmt(config.config_table({'username': username,
                                          'api_key': api_key,
                                          'endpoint_url': endpoint_url,
-                                         'timeout': timeout})))
+                                         'timeout': timeout,
+                                         'theme': theme})))
 
     if not formatting.confirm('Are you sure you want to write settings to "%s"?' % config_path, default=True):
         raise exceptions.CLIAbort('Aborted.')
@@ -118,6 +122,7 @@ def cli(env, auth):
     parsed_config.set('softlayer', 'api_key', api_key)
     parsed_config.set('softlayer', 'endpoint_url', endpoint_url)
     parsed_config.set('softlayer', 'timeout', timeout)
+    parsed_config.set('softlayer', 'theme', theme)
 
     config_fd = os.fdopen(os.open(config_path, (os.O_WRONLY | os.O_CREAT | os.O_TRUNC), 0o600), 'w')
     try:

@@ -22,7 +22,7 @@ from SoftLayer import utils
 FALSE_VALUES = ['0', 'false', 'FALSE', 'no', 'False']
 
 
-def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
+def format_output(data, fmt='table', theme=None):  # pylint: disable=R0911,R0912
     """Given some data, will format it for console output.
 
     :param data: One of: String, Table, FormattedItem, List, Tuple, SequentialOutput
@@ -40,7 +40,7 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
 
     # responds to .prettytable()
     if hasattr(data, 'prettytable') and fmt in ('table', 'raw'):
-        return format_prettytable(data, fmt)
+        return format_prettytable(data, fmt, theme)
 
     # responds to .to_python()
     if hasattr(data, 'to_python'):
@@ -73,7 +73,7 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
     return str(data)
 
 
-def format_prettytable(table, fmt='table'):
+def format_prettytable(table, fmt='table', theme=None):
     """Converts SoftLayer.CLI.formatting.Table instance to a prettytable."""
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
@@ -83,7 +83,7 @@ def format_prettytable(table, fmt='table'):
                 table.rows[i][j] = format_output(item)
             else:
                 table.rows[i][j] = str(item)
-    ptable = table.prettytable(fmt)
+    ptable = table.prettytable(fmt, theme)
     return ptable
 
 
@@ -267,12 +267,13 @@ class Table(object):
             items.append(dict(zip(self.columns, formatted_row)))
         return items
 
-    def prettytable(self, fmt='table'):
+    def prettytable(self, fmt='table', theme=None):
         """Returns a RICH table instance."""
         box_style = box.SQUARE
         if fmt == 'raw':
             box_style = None
-        table = rTable(title=self.title, box=box_style, header_style="bright_cyan")
+        color_table = utils.table_color_theme(theme)
+        table = rTable(title=self.title, box=box_style, header_style=color_table['header'])
         if self.sortby:
             try:
                 # https://docs.python.org/3/howto/sorting.html#key-functions
@@ -300,7 +301,7 @@ class Table(object):
                 justify = 'left'
             # Special coloring for some columns
             if col in ('id', 'Id', 'ID'):
-                style = "pale_violet_red1"
+                style = color_table['id_columns']
             table.add_column(col, justify=justify, style=style)
 
         for row in self.rows:

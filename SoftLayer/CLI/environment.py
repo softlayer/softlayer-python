@@ -5,6 +5,9 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import configparser
+import os
+
 import importlib
 from json.decoder import JSONDecodeError
 
@@ -40,6 +43,7 @@ class Environment(object):
         self.format = 'table'
         self.skip_confirmations = False
         self.config_file = None
+        self.theme = None
 
         self._modules_loaded = False
 
@@ -76,7 +80,7 @@ class Environment(object):
         """Format output based on current the environment format."""
         if fmt is None:
             fmt = self.format
-        return formatting.format_output(output, fmt)
+        return formatting.format_output(output, fmt, self.theme)
 
     def format_output_is_json(self):
         """Return True if format output is json or jsonraw"""
@@ -207,6 +211,19 @@ class Environment(object):
                 config_file=config_file,
             )
         self.client = client
+
+    def set_env_theme(self, config_file=None):
+        """Get theme to color console and set in env"""
+        theme = os.environ.get('SL_THEME')
+        if theme:
+            self.theme = theme
+        else:
+            config = configparser.RawConfigParser({
+                'theme': '',
+            })
+            config.read(config_file)
+            if config.has_section('softlayer'):
+                self.theme = config.get('softlayer', 'theme')
 
 
 class ModuleLoader(object):

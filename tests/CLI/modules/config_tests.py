@@ -30,13 +30,13 @@ class TestHelpShow(testing.TestCase):
 
     def test_show(self):
         result = self.run_command(['config', 'show'])
-
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output),
                          {'Username': 'username',
                           'API Key': 'api-key',
                           'Endpoint URL': 'http://endpoint-url',
-                          'Timeout': 'not set'})
+                          'Timeout': 'not set',
+                          'Theme': 'not set'})
 
 
 class TestHelpSetup(testing.TestCase):
@@ -63,7 +63,7 @@ class TestHelpSetup(testing.TestCase):
     @mock.patch('SoftLayer.CLI.environment.Environment.input')
     def test_setup(self, mocked_input, getpass, confirm_mock, client):
         client.return_value = self.env.client
-        if(sys.platform.startswith("win")):
+        if (sys.platform.startswith("win")):
             self.skipTest("Test doesn't work in Windows")
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = True
@@ -89,7 +89,7 @@ class TestHelpSetup(testing.TestCase):
         client.return_value = self.env.client
         confirm_mock.return_value = True
         getpass.return_value = 'A' * 64
-        mocked_input.side_effect = ['public', 'user', 10.0]
+        mocked_input.side_effect = ['public', 'user', 10.0, 'None']
 
         result = self.run_command(['--config=%s' % self.config_file, 'config', 'setup'])
 
@@ -114,8 +114,7 @@ class TestHelpSetup(testing.TestCase):
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = False
             getpass.return_value = 'A' * 64
-            mocked_input.side_effect = ['public', 'user', 0]
-
+            mocked_input.side_effect = ['public', 'user', 0, 'None']
             result = self.run_command(['--config=%s' % config_file.name, 'config', 'setup'])
             self.assertEqual(result.exit_code, 2)
             self.assertIsInstance(result.exception, exceptions.CLIAbort)

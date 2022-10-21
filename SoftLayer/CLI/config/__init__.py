@@ -13,7 +13,7 @@ def _resolve_transport(transport):
     return _resolve_transport(nested_transport)
 
 
-def get_settings_from_client(client):
+def get_settings_from_client(client, theme):
     """Pull out settings from a SoftLayer.BaseClient instance.
 
     :param client: SoftLayer.BaseClient instance
@@ -23,6 +23,7 @@ def get_settings_from_client(client):
         'api_key': '',
         'timeout': '',
         'endpoint_url': '',
+        'theme': theme
     }
     try:
         settings['username'] = client.auth.username
@@ -49,4 +50,5 @@ def config_table(settings):
     table.add_row(['API Key', settings['api_key'] or 'not set'])
     table.add_row(['Endpoint URL', settings['endpoint_url'] or 'not set'])
     table.add_row(['Timeout', settings['timeout'] or 'not set'])
+    table.add_row(['Theme', settings['theme'] or 'not set'])
     return table
