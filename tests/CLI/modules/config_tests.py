@@ -68,18 +68,21 @@ class TestHelpSetup(testing.TestCase):
         with tempfile.NamedTemporaryFile() as config_file:
             confirm_mock.return_value = True
             getpass.return_value = 'A' * 64
-            mocked_input.side_effect = ['public', 'user', 0]
+            mocked_input.side_effect = ['public', 'user', 0, 'dark']
 
             result = self.run_command(['--config=%s' % config_file.name, 'config', 'setup'])
 
             self.assert_no_fail(result)
             self.assertIn('Configuration Updated Successfully', result.output)
             contents = config_file.read().decode("utf-8")
-
+            print('***************************')
+            print(contents)
+            print('***************************')
             self.assertIn('[softlayer]', contents)
             self.assertIn('username = user', contents)
             self.assertIn('api_key = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', contents)
             self.assertIn('endpoint_url = %s' % consts.API_PUBLIC_ENDPOINT, contents)
+            self.assertIn('theme = failed', contents)
 
     @mock.patch('SoftLayer.Client')
     @mock.patch('SoftLayer.CLI.formatting.confirm')
