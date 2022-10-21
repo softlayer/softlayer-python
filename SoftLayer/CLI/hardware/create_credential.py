@@ -22,14 +22,13 @@ def cli(env, identifier, username, password, notes, system):
 
     software = mgr.get_software_components(identifier)
     sw_id = None
-    for sw in software:
-        if (sw['softwareLicense']['softwareDescription']['name']).lower() == system:
-            sw_id = sw['id']
+    for sw_instance in software:
+        if (sw_instance['softwareLicense']['softwareDescription']['name']).lower() == system:
+            sw_id = sw_instance['id']
             break
         elif system:
-            if (sw['softwareLicense']['softwareDescription']['name']) == 'Passmark Suite':
-                sw_id = sw['id']
-                break
+            if (sw_instance['softwareLicense']['softwareDescription']['name']) == 'Passmark Suite':
+                sw_id = sw_instance['id']
 
     template = {
         "notes": notes,
