@@ -296,6 +296,7 @@ ALL_ROUTES = [
     ('hardware:monitoring', 'SoftLayer.CLI.hardware.monitoring:cli'),
     ('hardware:notifications', 'SoftLayer.CLI.hardware.notifications:cli'),
     ('hardware:add-notification', 'SoftLayer.CLI.hardware.add_notification:cli'),
+    ('hardware:create-credential', 'SoftLayer.CLI.hardware.create_credential:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),

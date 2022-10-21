@@ -1045,3 +1045,9 @@ class ServerCLITests(testing.TestCase):
     def test_add_notification(self):
         result = self.run_command(['hardware', 'add-notification', '100', '--users', '123456'])
         self.assert_no_fail(result)
+
+    def test_create_credential(self):
+        result = self.run_command(['hw', 'create-credential', '123456',
+                                   '--username', 'testslcli', '--password', 'test-123456',
+                                   '--notes', 'test slcli'])
+        self.assert_no_fail(result)

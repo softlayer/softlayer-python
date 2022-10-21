@@ -104,3 +104,35 @@ getSensorData = [
         "upperNonCritical": "12.915",
         "upperNonRecoverable": "13.403"
     }]
+
+getSoftwareComponents = [{
+    "hardwareId": 123456,
+    "id": 67064532,
+    "passwords": [
+        {
+            "id": 77995567,
+            "notes": "testslcli1",
+            "password": "123456",
+            "softwareId": 67064532,
+            "username": "testslcli1",
+        },
+        {
+            "id": 77944803,
+            "notes": "testslcli2",
+            "password": "test123",
+            "softwareId": 67064532,
+            "username": "testslcli2",
+        }
+    ],
+    "softwareLicense": {
+        "id": 21854,
+        "softwareDescriptionId": 2914,
+        "softwareDescription": {
+            "id": 2914,
+            "longDescription": "Ubuntu 20.04.1-64",
+            "name": "Ubuntu",
+            "referenceCode": "UBUNTU_20_64",
+            "version": "20.04.1-64"
+        }
+    }
+}]
