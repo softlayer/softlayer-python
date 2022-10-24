@@ -36,7 +36,7 @@ class TestHelpShow(testing.TestCase):
                           'API Key': 'api-key',
                           'Endpoint URL': 'http://endpoint-url',
                           'Timeout': 'not set',
-                          'Theme': 'not set'})
+                          'Theme': 'dark'})
 
 
 class TestHelpSetup(testing.TestCase):

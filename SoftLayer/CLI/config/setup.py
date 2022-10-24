@@ -93,7 +93,7 @@ def cli(env, auth):
     timeout = int(float(env.input('Timeout', default=defaults['timeout'] or 0)))
 
     # Ask theme for console
-    theme = env.input('Theme [dark/light]', default=defaults['theme'])
+    theme = env.input('Theme (dark/light)', default=defaults['theme'] or 'dark')
 
     path = '~/.softlayer'
     if env.config_file:

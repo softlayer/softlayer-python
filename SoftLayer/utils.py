@@ -465,41 +465,7 @@ def decode_stacked(document, pos=0, decoder=JSONDecoder()):
 
 def console_color_themes(theme):
     """Colors in https://rich.readthedocs.io/en/stable/appendix/colors.html?highlight=light_pink1#standard-colors"""
-    # Default theme
-    if not theme:
-        return Console(theme=Theme(
-            {
-                "options": "bold cyan",  # OPTIONS
-                "command": "orange3",  # COMMAND
-                "args": "bold cyan",  # ARGS
-                "path": "bold red",  # command path
-                "name_sub_command": "orange3",  # sub command name
-                "sub_command": "orange3",  # sub command list
-                # Help table colors options
-                "option": "bold cyan",
-                "switch": "bold green",
-                "default_option": "light_coral",
-                "option_keyword": "bold cyan",
-                "args_keyword": "bold green",
-            })
-        )
-    if theme == 'dark':
-        return Console(theme=Theme(
-            {
-                "options": "bold cyan",  # OPTIONS
-                "command": "orange3",  # COMMAND
-                "args": "bold cyan",  # ARGS
-                "path": "bold red",  # command path
-                "name_sub_command": "orange3",  # sub command name
-                "sub_command": "orange3",  # sub command list
-                # Help table colors options
-                "option": "bold cyan",
-                "switch": "bold green",
-                "default_option": "light_pink1",
-                "option_keyword": "bold cyan",
-                "args_keyword": "bold green",
-            })
-        )
+
     if theme == 'light':
         return Console(theme=Theme(
             {
@@ -517,18 +483,28 @@ def console_color_themes(theme):
                 "args_keyword": "bold green4",
             })
         )
-    return None
+    return Console(theme=Theme(
+        {
+            "options": "bold cyan",  # OPTIONS
+            "command": "orange3",  # COMMAND
+            "args": "bold cyan",  # ARGS
+            "path": "bold red",  # command path
+            "name_sub_command": "orange3",  # sub command name
+            "sub_command": "orange3",  # sub command list
+            # Help table colors options
+            "option": "bold cyan",
+            "switch": "bold green",
+            "default_option": "light_pink1",
+            "option_keyword": "bold cyan",
+            "args_keyword": "bold green",
+        })
+    )
 
 
 def table_color_theme(theme):
     """Define result table colors"""
-    if not theme:
-        return {'header': 'bright_cyan',
-                'id_columns': 'pale_violet_red1'}
-    if theme == 'dark':
-        return {'header': 'bright_cyan',
-                'id_columns': 'pale_violet_red1'}
     if theme == 'light':
         return {'header': 'dark_cyan',
                 'id_columns': 'light_coral'}
-    return None
+    return {'header': 'bright_cyan',
+            'id_columns': 'pale_violet_red1'}

@@ -19,6 +19,7 @@ from rich.syntax import Syntax
 import SoftLayer
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import routes
+from SoftLayer import utils
 
 # pylint: disable=too-many-instance-attributes, invalid-name
 
@@ -38,12 +39,12 @@ class Environment(object):
         self.vars = {}
 
         self.client = None
-        self.console = Console()
+        self.theme = self.set_env_theme()
+        self.console = utils.console_color_themes(self.theme)
         self.err_console = Console(stderr=True)
         self.format = 'table'
         self.skip_confirmations = False
         self.config_file = None
-        self.theme = None
 
         self._modules_loaded = False
 
@@ -216,14 +217,20 @@ class Environment(object):
         """Get theme to color console and set in env"""
         theme = os.environ.get('SL_THEME')
         if theme:
-            self.theme = theme
+            return theme
         else:
-            config = configparser.RawConfigParser({
-                'theme': '',
-            })
-            config.read(config_file)
+            config_files = ['/etc/softlayer.conf', '~/.softlayer']
+            path_os = os.getenv('HOME')
+            if path_os:
+                config_files.append(path_os + '\\AppData\\Roaming\\softlayer')
+            if config_file:
+                config_files.append(config_file)
+            config = configparser.RawConfigParser({'theme': 'dark'})
+            config.read(config_files)
             if config.has_section('softlayer'):
                 self.theme = config.get('softlayer', 'theme')
+                return config.get('softlayer', 'theme')
+        return 'dark'
 
 
 class ModuleLoader(object):
