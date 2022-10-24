@@ -1103,7 +1103,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self.client.call('SoftLayer_User_Customer_Notification_Hardware', 'createObject', template)
 
     def get_software_components(self, hardware_id):
-        """Returns Hardware sensor data"""
+        """Returns  a piece of hardware’s installed software."""
         return self.client.call('Hardware', 'getSoftwareComponents', id=hardware_id)
 
     def create_credential(self, template):

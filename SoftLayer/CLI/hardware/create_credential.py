@@ -5,15 +5,16 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
-@click.option('--username', '-U', help="The username part of the username/password pair")
-@click.option('--password', '-P', help="The password part of the username/password pair.")
+@click.option('--username', '-U', required=True, help="The username part of the username/password pair")
+@click.option('--password', '-P', required=True, help="The password part of the username/password pair.")
 @click.option('--notes', '-n', help="A note string stored for this username/password pair.")
-@click.option('--system', help="The name of this specific piece of software.")
+@click.option('--system', required=True, help="The name of this specific piece of software.")
 @environment.pass_env
 def cli(env, identifier, username, password, notes, system):
     """Create a password for a software component."""
@@ -21,14 +22,13 @@ def cli(env, identifier, username, password, notes, system):
     mgr = SoftLayer.HardwareManager(env.client)
 
     software = mgr.get_software_components(identifier)
-    sw_id = None
-    for sw_instance in software:
-        if (sw_instance['softwareLicense']['softwareDescription']['name']).lower() == system:
-            sw_id = sw_instance['id']
-            break
-        elif system:
-            if (sw_instance['softwareLicense']['softwareDescription']['name']) == 'Passmark Suite':
+    sw_id = ''
+    try:
+        for sw_instance in software:
+            if (sw_instance['softwareLicense']['softwareDescription']['name']).lower() == system:
                 sw_id = sw_instance['id']
+    except KeyError as ex:
+        raise exceptions.CLIAbort('System id not found') from ex
 
     template = {
         "notes": notes,
