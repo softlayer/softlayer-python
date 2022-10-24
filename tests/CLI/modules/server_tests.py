@@ -1049,5 +1049,5 @@ class ServerCLITests(testing.TestCase):
     def test_create_credential(self):
         result = self.run_command(['hw', 'create-credential', '123456',
                                    '--username', 'testslcli', '--password', 'test-123456',
-                                   '--notes', 'test slcli','--system','system'])
+                                   '--notes', 'test slcli', '--system', 'system'])
         self.assert_no_fail(result)
