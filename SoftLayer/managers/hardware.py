@@ -1102,6 +1102,14 @@ class HardwareManager(utils.IdentifierMixin, object):
         template = {"hardwareId": hardware_id, "userId": user_id}
         return self.client.call('SoftLayer_User_Customer_Notification_Hardware', 'createObject', template)
 
+    def get_software_components(self, hardware_id):
+        """Returns  a piece of hardware’s installed software."""
+        return self.client.call('Hardware', 'getSoftwareComponents', id=hardware_id)
+
+    def create_credential(self, template):
+        """Create a password for a software component"""
+        return self.client.call('SoftLayer_Software_Component_Password', 'createObject', template)
+
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
     """Picks a valid Bandwidth Item, returns the KeyName"""

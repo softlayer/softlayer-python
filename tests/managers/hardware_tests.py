@@ -557,10 +557,10 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'editObject',
                                 args=({
-                                    'hostname': 'new-host',
-                                    'domain': 'new.sftlyr.ws',
-                                    'notes': 'random notes',
-                                },),
+                                          'hostname': 'new-host',
+                                          'domain': 'new.sftlyr.ws',
+                                          'notes': 'random notes',
+                                      },),
                                 identifier=100)
 
     def test_rescue(self):
@@ -927,6 +927,27 @@ class HardwareTests(testing.TestCase):
     def test_add_notification(self):
         self.hardware.add_notification(100, 123456)
         self.assert_called_with('SoftLayer_User_Customer_Notification_Hardware', 'createObject')
+
+    def test_get_software_component(self):
+        self.hardware.get_software_components(123456)
+        self.assert_called_with('SoftLayer_Hardware', 'getSoftwareComponents')
+
+    def test_create_credential(self):
+        template = {
+            "notes": 'notes',
+            "password": 'password',
+            "softwareId": 'sw_id',
+            "username": 'username',
+            "software": {
+                "hardwareId": 123456,
+                "softwareLicense": {
+                    "softwareDescription": {
+                        "name": 'system'
+                    }
+                }
+            }}
+        self.hardware.create_credential(template)
+        self.assert_called_with('SoftLayer_Software_Component_Password', 'createObject')
 
 
 class HardwareHelperTests(testing.TestCase):
