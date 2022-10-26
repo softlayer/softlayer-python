@@ -46,14 +46,16 @@ class ServerCLITests(testing.TestCase):
                     'softwareDescription':
                         {
                             'referenceCode': 'CENTOS_7_64',
-                            'version': '7.8 - 64'}}}]
+                            'version': '7.8 - 64',
+                            'name': 'Centos'
+                        }}}]
         }
         result = self.run_command(['hardware', 'credentials', '12345'])
 
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), [
             {'Password': 'abc123',
-             'Software': 'CENTOS_7_64',
+             'Software': 'Centos',
              'Username': 'root',
              'Version': '7.8 - 64'}
         ])
@@ -93,7 +95,7 @@ class ServerCLITests(testing.TestCase):
                     "passwords": [{}],
                     "softwareLicense": {
                         "softwareDescription": {
-                            "referenceCode": None,
+                            "name": None,
                             "version": None
                         }
                     }

@@ -29,6 +29,6 @@ def cli(env, identifier):
         for credentials in item['passwords']:
             table.add_row([credentials.get('username', 'None'),
                            credentials.get('password', 'None'),
-                           item['softwareLicense']['softwareDescription']['referenceCode'],
+                           item['softwareLicense']['softwareDescription']['name'],
                            item['softwareLicense']['softwareDescription']['version']])
     env.fout(table)
