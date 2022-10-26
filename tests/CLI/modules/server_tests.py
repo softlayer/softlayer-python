@@ -47,7 +47,7 @@ class ServerCLITests(testing.TestCase):
                         {
                             'referenceCode': 'CENTOS_7_64',
                             'version': '7.8 - 64',
-                            'name':'Centos'
+                            'name': 'Centos'
                         }}}]
         }
         result = self.run_command(['hardware', 'credentials', '12345'])
