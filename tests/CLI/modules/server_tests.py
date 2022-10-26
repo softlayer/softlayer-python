@@ -95,7 +95,7 @@ class ServerCLITests(testing.TestCase):
                     "passwords": [{}],
                     "softwareLicense": {
                         "softwareDescription": {
-                            "referenceCode": None,
+                            "name": None,
                             "version": None
                         }
                     }
