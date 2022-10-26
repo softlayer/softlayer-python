@@ -190,7 +190,7 @@ class SLCommand(click.Command):
         if text:
             text = inspect.cleandoc(text)
 
-        self.console.print(f"\n\t{text}\n")
+        self.console.print(f"\n\t{text}\n", highlight=False)
 
     def format_epilog(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
         """Writes the epilog if it exists, then prints out any sub-commands if they exist."""

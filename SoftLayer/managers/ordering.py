@@ -16,7 +16,7 @@ ITEM_MASK = '''id, keyName, description, itemCategory, categories, prices'''
 
 PACKAGE_MASK = '''id, name, keyName, isActive, type'''
 
-PRESET_MASK = '''id, name, keyName, description, categories, prices, locations'''
+PRESET_MASK = '''id, name, keyName, description, prices[id, hourlyRecurringFee, recurringFee], locations'''
 
 
 class OrderingManager(object):
