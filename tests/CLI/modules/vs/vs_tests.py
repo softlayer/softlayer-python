@@ -167,7 +167,7 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
         output = json.loads(result.output)
         self.assertEqual(output['notes'], 'notes')
-        self.assertEqual(output['price_rate'], 6.54)
+        self.assertEqual(output['Price rate'], 61.06)
         self.assertEqual(output['users'][0]['username'], 'user')
         self.assertEqual(output['vlans'][0]['number'], 23)
         self.assertEqual(output['owner'], 'chechu')
