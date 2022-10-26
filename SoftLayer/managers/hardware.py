@@ -260,7 +260,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                                                         name,
                                                         version,
                                                         referenceCode]],
-                    passwords[username,password]],'''
+                    passwords[id,username,password]],'''
                 'billingItem['
                 'id,nextInvoiceTotalRecurringAmount,'
                 'nextInvoiceChildren[nextInvoiceTotalRecurringAmount],'
