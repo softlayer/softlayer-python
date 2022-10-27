@@ -8,7 +8,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
 
-COLUMNS = ['name', 'keyName', 'description']
+COLUMNS = ['Name', 'Key Name', 'Description']
 
 
 @click.command(cls=SLCommand)
