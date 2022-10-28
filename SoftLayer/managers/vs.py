@@ -246,6 +246,10 @@ class VSManager(utils.IdentifierMixin, object):
                 '''billingItem[id,nextInvoiceTotalRecurringAmount,
                                package[id,keyName],
                                children[description,categoryCode,nextInvoiceTotalRecurringAmount],
+                               nextInvoiceChildren[description,
+                                                   categoryCode,
+                                                   recurringFee,
+                                                   nextInvoiceTotalRecurringAmount],
                                orderItem[id,
                                          order.userRecord[username],
                                          preset.keyName]],'''
