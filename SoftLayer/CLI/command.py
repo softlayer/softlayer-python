@@ -11,11 +11,9 @@ import types
 import click
 
 from rich import box
-from rich.console import Console
 from rich.highlighter import RegexHighlighter
 from rich.table import Table
 from rich.text import Text
-from rich.theme import Theme
 
 from SoftLayer.CLI import environment
 
@@ -26,20 +24,7 @@ class OptionHighlighter(RegexHighlighter):
         r"(?P<switch>^\-\w)",  # single options like -v
         r"(?P<option>\-\-[\w\-]+)",  # long options like --verbose
         r"(?P<default_option>\[[^\]]+\])",  # anything between [], usually default options
-
     ]
-
-
-#  Colors defined in https://rich.readthedocs.io/en/latest/_modules/rich/color.html#ColorType
-SLCLI_THEME = Theme(
-    {
-        "option": "bold cyan",
-        "switch": "bold green",
-        "default_option": "light_pink1",
-        "option_keyword": "bold cyan",
-        "args_keyword": "bold green"
-    }
-)
 
 
 class CommandLoader(click.MultiCommand):
@@ -48,31 +33,33 @@ class CommandLoader(click.MultiCommand):
     def __init__(self, *path, **attrs):
         click.MultiCommand.__init__(self, **attrs)
         self.path = path
-
         self.highlighter = OptionHighlighter()
-        self.console = Console(
-            theme=SLCLI_THEME
-        )
+        self.env = None
+        self.console = None
+
+    def ensure_env(self, ctx):
+        """ensures self.env is set"""
+        if self.env is None:
+            self.env = ctx.ensure_object(environment.Environment)
+            self.env.load()
+        if self.console is None:
+            self.console = self.env.console
 
     def list_commands(self, ctx):
         """List all sub-commands."""
-        env = ctx.ensure_object(environment.Environment)
-        env.load()
-
-        return sorted(env.list_commands(*self.path))
+        self.ensure_env(ctx)
+        return sorted(self.env.list_commands(*self.path))
 
     def get_command(self, ctx, cmd_name):
         """Get command for click."""
-        env = ctx.ensure_object(environment.Environment)
-        env.load()
-
+        self.ensure_env(ctx)
         # Do alias lookup (only available for root commands)
         if len(self.path) == 0:
-            cmd_name = env.resolve_alias(cmd_name)
+            cmd_name = self.env.resolve_alias(cmd_name)
 
         new_path = list(self.path)
         new_path.append(cmd_name)
-        module = env.get_command(*new_path)
+        module = self.env.get_command(*new_path)
         if isinstance(module, types.ModuleType):
             return CommandLoader(*new_path, help=module.__doc__ or '')
         else:
@@ -80,14 +67,15 @@ class CommandLoader(click.MultiCommand):
 
     def format_usage(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
         """Formats and colorizes the usage information."""
+        self.ensure_env(ctx)
         pieces = self.collect_usage_pieces(ctx)
         for index, piece in enumerate(pieces):
             if piece == "[OPTIONS]":
-                pieces[index] = "[bold cyan][OPTIONS][/bold cyan]"
+                pieces[index] = "[options][OPTIONS][/]"
             elif piece == "COMMAND [ARGS]...":
-                pieces[index] = "[orange1]COMMAND[/orange1] [bold cyan][ARGS][/bold cyan] ..."
+                pieces[index] = "[command]COMMAND[/] [args][ARGS][/] ..."
 
-        self.console.print(f"Usage: [bold red]{ctx.command_path}[/bold red] {' '.join(pieces)}")
+        self.console.print(f"Usage: [path]{ctx.command_path}[/] {' '.join(pieces)}")
 
     def format_help_text(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
         """Writes the help text"""
@@ -153,9 +141,9 @@ class CommandLoader(click.MultiCommand):
         if len(commands):
             for subcommand, cmd in commands:
                 help_text = cmd.get_short_help_str(120)
-                command_style = Text(f" {subcommand}", style="orange1")
+                command_style = Text(f" {subcommand}", style="sub_command")
                 command_table.add_row(command_style, help_text)
-        self.console.print("\n[bold orange1]Commands:[/]")
+        self.console.print("\n[name_sub_command]Commands:[/]")
         self.console.print(command_table)
 
 
@@ -165,20 +153,28 @@ class SLCommand(click.Command):
     def __init__(self, **attrs):
         click.Command.__init__(self, **attrs)
         self.highlighter = OptionHighlighter()
-        self.console = Console(
-            theme=SLCLI_THEME
-        )
+        self.env = None
+        self.console = None
+
+    def ensure_env(self, ctx):
+        """ensures self.env is set"""
+        if self.env is None:
+            self.env = ctx.ensure_object(environment.Environment)
+            self.env.load()
+        if self.console is None:
+            self.console = self.env.console
 
     def format_usage(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
         """Formats and colorizes the usage information."""
+        self.ensure_env(ctx)
         pieces = self.collect_usage_pieces(ctx)
         for index, piece in enumerate(pieces):
             if piece == "[OPTIONS]":
-                pieces[index] = "[bold cyan][OPTIONS][/bold cyan]"
+                pieces[index] = "[options][OPTIONS][/]"
             elif piece == "COMMAND [ARGS]...":
-                pieces[index] = "[orange1]COMMAND[/orange1] [bold cyan][ARGS][/bold cyan] ..."
+                pieces[index] = "[command]COMMAND[/] [args][ARGS][/] ..."
 
-        self.console.print(f"Usage: [bold red]{ctx.command_path}[/bold red] {' '.join(pieces)}")
+        self.console.print(f"Usage: [path]{ctx.command_path}[/] {' '.join(pieces)}")
 
     def format_help_text(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
         """Writes the help text"""

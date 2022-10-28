@@ -118,6 +118,7 @@ def cli(env,
     env.skip_confirmations = really
     env.config_file = config
     env.format = format
+    env.set_env_theme(config_file=config)
     env.ensure_client(config_file=config, is_demo=demo, proxy=proxy)
     env.vars['_start'] = time.time()
     logger = logging.getLogger()
