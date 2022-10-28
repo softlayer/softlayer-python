@@ -265,15 +265,11 @@ class OrderTests(testing.TestCase):
                          json.loads(result.output))
 
     def test_preset_list(self):
-        active_preset1 = {'name': 'active1', 'keyName': 'PRESET1',
-                          'description': 'description1'}
-        active_preset2 = {'name': 'active2', 'keyName': 'PRESET2',
-                          'description': 'description2'}
-        acc_preset = {'name': 'account1', 'keyName': 'PRESET3',
-                      'description': 'description3'}
+        active_preset1 = {'name': 'active1', 'keyName': 'PRESET1', 'description': 'description1'}
+        active_preset2 = {'name': 'active2', 'keyName': 'PRESET2', 'description': 'description2'}
+        acc_preset = {'name': 'account1', 'keyName': 'PRESET3', 'description': 'description3'}
         active_mock = self.set_mock('SoftLayer_Product_Package', 'getActivePresets')
-        account_mock = self.set_mock('SoftLayer_Product_Package',
-                                     'getAccountRestrictedActivePresets')
+        account_mock = self.set_mock('SoftLayer_Product_Package', 'getAccountRestrictedActivePresets')
         active_mock.return_value = [active_preset1, active_preset2]
         account_mock.return_value = [acc_preset]
 
@@ -282,16 +278,9 @@ class OrderTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getActivePresets')
         self.assert_called_with('SoftLayer_Product_Package', 'getAccountRestrictedActivePresets')
-        self.assertEqual([{'name': 'active1',
-                           'keyName': 'PRESET1',
-                           'description': 'description1'},
-                          {'name': 'active2',
-                           'keyName': 'PRESET2',
-                           'description': 'description2'},
-                          {'name': 'account1',
-                           'keyName': 'PRESET3',
-                           'description': 'description3'}],
-                         json.loads(result.output))
+        self.assertIn('"Key Name": "PRESET1",', result.output)
+        self.assertIn('"Description": "description2"', result.output)
+        self.assertIn('"Name": "account1",', result.output)
 
     def test_preset_list_keywork(self):
         result = self.run_command(['order', 'preset-list', 'package', '--keyword', 'testKeyWord'])
@@ -300,9 +289,20 @@ class OrderTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Product_Package', 'getActivePresets', filter=_filter)
 
     def test_preset_list_prices(self):
+        active_preset1 = {
+            'name': 'active1', 'keyName': 'PRESET1', 'description': 'description1', 'locations': [], 'id': 118822,
+            'prices': [
+                {'hourlyRecurringFee': 100, 'recurringFee': 55},
+                {'hourlyRecurringFee': 110, 'recurringFee': 44},
+            ]
+        }
+        active_mock = self.set_mock('SoftLayer_Product_Package', 'getActivePresets')
+        active_mock.return_value = [active_preset1]
         result = self.run_command(['order', 'preset-list', 'package', '--prices'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Package', 'getActivePresets')
+        self.assertIn("210", result.output)
+        self.assertIn("99", result.output)
 
     def test_location_list(self):
         result = self.run_command(['order', 'package-locations', 'package'])
