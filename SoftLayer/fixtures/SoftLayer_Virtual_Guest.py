@@ -79,7 +79,7 @@ getObject = {
                 "oneTimeFeeTaxRate": "0",
                 "orderItemId": None,
                 "parentId": None,
-                "recurringFee": "59.52",
+                "recurringFee": "1.54",
                 "recurringFeeTaxRate": "0",
                 "recurringMonths": 1,
                 "serviceProviderId": 1,

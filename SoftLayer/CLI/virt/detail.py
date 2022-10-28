@@ -98,9 +98,8 @@ def cli(env, identifier, passwords=False, price=False):
                                    'billingItem',
                                    'nextInvoiceTotalRecurringAmount') or 0
         if total_price != 0:
-            price_data = _get_price_data(utils.lookup(result, 'billingItem'), total_price)
-            table.add_row(['Prices', price_data['priceTable']])
-            table.add_row(['Price rate', price_data['totalPrice']])
+            table.add_row(['Prices', _price_table(utils.lookup(result, 'billingItem'), total_price)])
+            table.add_row(['Price rate', total_price])
 
     if passwords:
         pass_table = formatting.Table(['software', 'username', 'password'])
@@ -154,20 +153,15 @@ def _bw_table(bw_data):
     return table
 
 
-def _get_price_data(billing_item, total_price):
-    """Returns an item table and price rate value in an object"""
+def _price_table(billing_item, total_price):
+    """Returns an item table"""
     price_table = formatting.Table(['Item', 'CategoryCode', 'Recurring Price'])
     price_table.add_row(['Total', '-', total_price])
     items = billing_item['nextInvoiceChildren']
     for item in items:
         if item.get('recurringFee') is not None:
-            total_price += float(item['recurringFee'])
             price_table.add_row([item['description'], item['categoryCode'], item['recurringFee']])
-    response = {
-        "priceTable": price_table,
-        "totalPrice": total_price,
-    }
-    return response
+    return price_table
 
 
 def _cli_helper_dedicated_host(env, result, table):
