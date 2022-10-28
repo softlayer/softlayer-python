@@ -1110,6 +1110,12 @@ class HardwareManager(utils.IdentifierMixin, object):
         """Create a password for a software component"""
         return self.client.call('SoftLayer_Software_Component_Password', 'createObject', template)
 
+    def remove_notification(self, identifier):
+        """Create a password for a software component"""
+
+        template = [{'id': identifier}]
+        return self.client.call('SoftLayer_User_Customer_Notification_Hardware', 'deleteObjects', template)
+
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):
     """Picks a valid Bandwidth Item, returns the KeyName"""

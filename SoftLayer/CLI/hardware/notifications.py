@@ -18,12 +18,13 @@ def cli(env, identifier):
 
     notifications = hardware.get_notifications(identifier)
 
-    table = formatting.KeyValueTable(['Domain', 'Hostmane', 'Username', 'Email', 'FirstName', 'Lastname'])
+    table = formatting.KeyValueTable(['Id', 'Domain', 'Hostmane', 'Username', 'Email', 'FirstName', 'Lastname'])
     table.align['Domain'] = 'r'
     table.align['Username'] = 'l'
 
     for notification in notifications:
-        table.add_row([notification['hardware']['fullyQualifiedDomainName'], notification['hardware']['hostname'],
+        table.add_row([notification['id'],
+                       notification['hardware']['fullyQualifiedDomainName'], notification['hardware']['hostname'],
                        notification['user']['username'], notification['user']['email'],
                        notification['user']['firstName'], notification['user']['lastName']])
 
