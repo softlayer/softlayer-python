@@ -33,7 +33,7 @@ def cli(env, label, in_file, key, note):
     if key:
         key_text = key
     else:
-        with open(path.expanduser(in_file), 'rU', encoding="utf-8") as key_file:
+        with open(path.expanduser(in_file), encoding="utf-8") as key_file:
             key_text = key_file.read().strip()
             key_file.close()
 
