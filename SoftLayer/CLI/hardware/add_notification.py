@@ -24,13 +24,11 @@ def cli(env, identifier, users):
     table.align['Username'] = 'l'
 
     for user in users:
-        try:
-            notification = hardware.add_notification(identifier, user)
-            print(notification)
+        notification = hardware.add_notification(identifier, user)
+        if notification:
             table.add_row([notification['id'], notification['hardware']['fullyQualifiedDomainName'],
                            notification['user']['username'], notification['user']['email'],
                            notification['user']['firstName'], notification['user']['lastName']])
-
-        except Exception:
+        else:
             raise exceptions.CLIAbort("User not found: {}.".format(user))
     env.fout(table)
