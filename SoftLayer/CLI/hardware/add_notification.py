@@ -5,6 +5,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 
 
@@ -23,9 +24,13 @@ def cli(env, identifier, users):
     table.align['Username'] = 'l'
 
     for user in users:
-        notification = hardware.add_notification(identifier, user)
-        table.add_row([notification['id'], notification['hardware']['fullyQualifiedDomainName'],
-                       notification['user']['username'], notification['user']['email'],
-                       notification['user']['firstName'], notification['user']['lastName']])
+        try:
+            notification = hardware.add_notification(identifier, user)
+            print(notification)
+            table.add_row([notification['id'], notification['hardware']['fullyQualifiedDomainName'],
+                           notification['user']['username'], notification['user']['email'],
+                           notification['user']['firstName'], notification['user']['lastName']])
 
+        except Exception:
+            raise exceptions.CLIAbort("User not found: {}.".format(user))
     env.fout(table)
