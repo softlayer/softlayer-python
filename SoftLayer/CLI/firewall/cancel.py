@@ -14,7 +14,13 @@ from SoftLayer.CLI import formatting
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Cancels a firewall."""
+    """Cancels a firewall.
+
+        E.g.
+
+           slcli firewall cancel multiVlan:123456
+
+    """
 
     mgr = SoftLayer.FirewallManager(env.client)
     firewall_type, firewall_id = firewall.parse_id(identifier)
