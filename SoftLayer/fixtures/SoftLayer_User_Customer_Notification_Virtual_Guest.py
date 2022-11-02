@@ -53,3 +53,5 @@ createObject = {
         'username': 'test',
     }
 }
+
+deleteObjects = True

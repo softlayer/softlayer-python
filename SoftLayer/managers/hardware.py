@@ -1111,7 +1111,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         return self.client.call('SoftLayer_Software_Component_Password', 'createObject', template)
 
     def remove_notification(self, identifier):
-        """Create a password for a software component"""
+        """Remove a user hardware notification entry"""
 
         template = [{'id': identifier}]
         return self.client.call('SoftLayer_User_Customer_Notification_Hardware', 'deleteObjects', template)

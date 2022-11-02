@@ -1338,3 +1338,7 @@ class VSTests(testing.TestCase):
     def test_add_notification(self):
         self.vs.add_notification(100, 123456)
         self.assert_called_with('SoftLayer_User_Customer_Notification_Virtual_Guest', 'createObject')
+
+    def test_notification_del(self):
+        self.vs.remove_notification(100)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Virtual_Guest', 'deleteObjects')
