@@ -402,7 +402,6 @@ def _format_dict(result):
     for key, value in result.items():
 
         table_list = Table(['value'])
-        print(str(value))
         if str(value) == "[[], [], []]":
             for item in value:
                 if str(item) == '[]':
