@@ -400,9 +400,19 @@ def _format_dict(result):
     table.align['value'] = 'l'
 
     for key, value in result.items():
-        value = iter_to_table(value)
-        table.add_row([key, value])
 
+        table_list = Table(['value'])
+        print(str(value))
+        if str(value) == "[[], [], []]":
+            for item in value:
+                if str(item) == '[]':
+                    table_list.add_row(['empty'])
+                else:
+                    table_list.add_row(item)
+            table.add_row([key, table_list])
+        else:
+            value = iter_to_table(value)
+            table.add_row([key, value])
     return table
 
 
