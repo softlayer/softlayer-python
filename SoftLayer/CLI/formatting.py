@@ -412,13 +412,14 @@ def _format_list(result):
 
     if not result:
         return result
-
+    table = Table(['value'])
     new_result = [item for item in result if item]
-
+    if len(new_result) == 0:
+        table.add_row(["-"])
+        return table
     if isinstance(new_result[0], dict):
         return _format_list_objects(new_result)
 
-    table = Table(['value'])
     for item in new_result:
         table.add_row([iter_to_table(item)])
     return table
