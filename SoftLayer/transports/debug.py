@@ -6,6 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
+import json
 import logging
 import time
 
@@ -49,7 +50,7 @@ class DebugTransport(object):
 
     def post_transport_log(self, call):
         """Prints the result "Returned Data: \n%s" % (call.result)of an API call"""
-        output = "Returned Data: \n{}".format(call.result)
+        output = "Returned Data: \n{}".format(json.dumps(call.result))
         self.logger.debug(output)
 
     def get_last_calls(self):
