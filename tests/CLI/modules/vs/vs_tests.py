@@ -984,5 +984,9 @@ class VirtTests(testing.TestCase):
         self.assert_no_fail(result)
 
     def test_add_notification(self):
-        result = self.run_command(['vs', 'add-notification', '100', '--users', '123456'])
+        result = self.run_command(['vs', 'notification-add', '100', '--users', '123456'])
+        self.assert_no_fail(result)
+
+    def test_notification_delete(self):
+        result = self.run_command(['vs', 'notification-delete', '100'])
         self.assert_no_fail(result)

@@ -928,6 +928,10 @@ class HardwareTests(testing.TestCase):
         self.hardware.add_notification(100, 123456)
         self.assert_called_with('SoftLayer_User_Customer_Notification_Hardware', 'createObject')
 
+    def test_notification_del(self):
+        self.hardware.remove_notification(100)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Hardware', 'deleteObjects')
+
     def test_get_software_component(self):
         self.hardware.get_software_components(123456)
         self.assert_called_with('SoftLayer_Hardware', 'getSoftwareComponents')

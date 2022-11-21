@@ -1474,3 +1474,9 @@ class VSManager(utils.IdentifierMixin, object):
         mask = 'user'
         return self.client.call('SoftLayer_User_Customer_Notification_Virtual_Guest',
                                 'createObject', template, mask=mask)
+
+    def remove_notification(self, identifier):
+        """Remove a user vs notification entry"""
+
+        template = [{'id': identifier}]
+        return self.client.call('SoftLayer_User_Customer_Notification_Virtual_Guest', 'deleteObjects', template)

@@ -1045,7 +1045,11 @@ class ServerCLITests(testing.TestCase):
         self.assert_no_fail(result)
 
     def test_add_notification(self):
-        result = self.run_command(['hardware', 'add-notification', '100', '--users', '123456'])
+        result = self.run_command(['hardware', 'notification-add', '100', '--users', '123456'])
+        self.assert_no_fail(result)
+
+    def test_notification_delete(self):
+        result = self.run_command(['hardware', 'notification-delete', '100'])
         self.assert_no_fail(result)
 
     def test_create_credential(self):

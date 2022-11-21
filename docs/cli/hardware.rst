@@ -136,8 +136,12 @@ This function updates the firmware of a server. If already at the latest version
    :prog: hardware notifications
    :show-nested:
 
-.. click:: SoftLayer.CLI.hardware.add_notification:cli
-   :prog: hardware add-notification
+.. click:: SoftLayer.CLI.hardware.notification_add:cli
+   :prog: hardware notification-add
+   :show-nested:
+
+.. click:: SoftLayer.CLI.hardware.notification_delete:cli
+   :prog: hardware notification-delete
    :show-nested:
 
 .. click:: SoftLayer.CLI.hardware.create_credential:cli
