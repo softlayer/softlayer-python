@@ -18,4 +18,4 @@ def cli(env, identifier):
     result = virtual.remove_notification(identifier)
 
     if result:
-        env.fout("The hardware notification instance: {} was deleted.".format(identifier))
+        env.fout("The virtual server notification instance: {} was deleted.".format(identifier))
