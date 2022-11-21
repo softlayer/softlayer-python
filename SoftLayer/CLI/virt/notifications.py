@@ -18,12 +18,13 @@ def cli(env, identifier):
 
     notifications = virtual.get_notifications(identifier)
 
-    table = formatting.KeyValueTable(['Domain', 'Hostmane', 'Username', 'Email', 'FirstName', 'Lastname'])
+    table = formatting.KeyValueTable(['Id', 'Domain', 'Hostmane', 'Username', 'Email', 'FirstName', 'Lastname'])
     table.align['Domain'] = 'r'
     table.align['Username'] = 'l'
 
     for notification in notifications:
-        table.add_row([notification['guest']['fullyQualifiedDomainName'], notification['guest']['hostname'],
+        table.add_row([notification['id'],
+                       notification['guest']['fullyQualifiedDomainName'], notification['guest']['hostname'],
                        notification['user']['username'], notification['user']['email'],
                        notification['user']['lastName'], notification['user']['firstName']])
 

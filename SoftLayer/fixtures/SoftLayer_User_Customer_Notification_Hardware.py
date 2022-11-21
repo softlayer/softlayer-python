@@ -68,3 +68,5 @@ createObject = {
 
     }
 }
+
+deleteObjects = True
