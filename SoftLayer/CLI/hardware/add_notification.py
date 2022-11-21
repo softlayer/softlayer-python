@@ -11,7 +11,7 @@ from SoftLayer.CLI import formatting
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
-@click.option('--users', multiple=True,
+@click.option('--users', multiple=True, required=True,
               help='UserId to be notified on monitoring failure.')
 @environment.pass_env
 def cli(env, identifier, users):
