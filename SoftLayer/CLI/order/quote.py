@@ -4,6 +4,7 @@ import click
 
 from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer.managers import ImageManager as ImageManager
@@ -32,6 +33,11 @@ def _parse_create_args(client, args):
             servers.append({'hostname': fqdn[0], 'domain': fqdn[1]})
         data['hardware'] = servers
 
+    if args.get('extras'):
+        try:
+            data['extras'] = args.get('extras')
+        except ValueError as err:
+            raise exceptions.CLIAbort("There was an error when parsing the --extras value: {}".format(err))
     if args.get('image'):
         if args.get('image').isdigit():
             image_mgr = ImageManager(client)
@@ -78,6 +84,8 @@ def _parse_create_args(client, args):
 @helpers.multi_option('--fqdn', required=True,
                       help="<hostname>.<domain.name.tld> formatted name to use. Specify one fqdn per server")
 @click.option('--image', help="Image ID. See: 'slcli image list' for reference")
+@click.option('--extras',
+              help="JSON string denoting extra data that needs to be sent with the order")
 @environment.pass_env
 def cli(env, quote, **args):
     """View and Order a quote
