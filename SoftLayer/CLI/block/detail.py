@@ -80,10 +80,10 @@ def cli(env, volume_id):
             table.add_row(['Replication Status', "%s"
                            % block_volume['replicationStatus']])
 
-        replicant_list = []
         for replicant in block_volume['replicationPartners']:
-            replicant_table = formatting.Table(['Replicant ID',
-                                                replicant['id']])
+            replicant_table = formatting.Table(['Name',
+                                                'Value'])
+            replicant_table.add_row(['Replicant Id', replicant['id']])
             replicant_table.add_row([
                 'Volume Name',
                 utils.lookup(replicant, 'username')])
@@ -98,8 +98,7 @@ def cli(env, volume_id):
                 'Schedule',
                 utils.lookup(replicant,
                              'replicationSchedule', 'type', 'keyname')])
-            replicant_list.append(replicant_table)
-        table.add_row(['Replicant Volumes', replicant_list])
+            table.add_row(['Replicant Volumes', replicant_table])
 
     if block_volume.get('originalVolumeSize'):
         original_volume_info = formatting.Table(['Property', 'Value'])
