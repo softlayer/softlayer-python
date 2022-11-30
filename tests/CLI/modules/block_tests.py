@@ -67,7 +67,7 @@ class BlockTests(testing.TestCase):
             'LUN Id': '2',
             'Notes': "{'status': 'available'}",
             'Endurance Tier': 'READHEAVY_TIER',
-            'IOPs': 1000,
+            'IOPs': 1000.0,
             'Snapshot Capacity (GB)': '10',
             'Snapshot Used (Bytes)': 1024,
             'Capacity (GB)': '20GB',
@@ -80,17 +80,12 @@ class BlockTests(testing.TestCase):
             'Replicant Count': '1',
             'Replication Status': 'Replicant Volume Provisioning '
                                   'has completed.',
-            'Replicant Volumes': [[
-                {'Replicant ID': 'Volume Name', '1784': 'TEST_REP_1'},
-                {'Replicant ID': 'Target IP', '1784': '10.3.174.79'},
-                {'Replicant ID': 'Data Center', '1784': 'wdc01'},
-                {'Replicant ID': 'Schedule', '1784': 'REPLICATION_HOURLY'},
-            ], [
-                {'Replicant ID': 'Volume Name', '1785': 'TEST_REP_2'},
-                {'Replicant ID': 'Target IP', '1785': '10.3.177.84'},
-                {'Replicant ID': 'Data Center', '1785': 'dal01'},
-                {'Replicant ID': 'Schedule', '1785': 'REPLICATION_DAILY'},
-            ]],
+            'Replicant Volumes': [
+                {'Name': 'Replicant Id', 'Value': 1785},
+                {'Name': 'Volume Name', 'Value': 'TEST_REP_2'},
+                {'Name': 'Target IP', 'Value': '10.3.177.84'},
+                {'Name': 'Data Center', 'Value': 'dal01'},
+                {'Name': 'Schedule', 'Value': 'REPLICATION_DAILY'}],
             'Original Volume Properties': [
                 {'Property': 'Original Volume Size',
                  'Value': '20'},
