@@ -313,10 +313,8 @@ class NetworkTests(testing.TestCase):
         result = self.network.list_subnets()
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
-        _filter = {'subnets': {'subnetType': {'operation': '!= GLOBAL_IP'}}}
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
-                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
-                                filter=_filter)
+                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK)
 
     def test_list_subnets_with_filters(self):
         result = self.network.list_subnets(
@@ -328,21 +326,10 @@ class NetworkTests(testing.TestCase):
         )
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
-        _filter = {
-            'subnets': {
-                'networkIdentifier': {'operation': '_= 10.0.0.1'},
-                'datacenter': {
-                    'name': {'operation': '_= dal00'}
-                },
-                'version': {'operation': 4},
-                'subnetType': {'operation': '_= PRIMARY'},
-                'networkVlan': {'networkSpace': {'operation': '_= PUBLIC'}},
-            }
-        }
+
 
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
-                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
-                                filter=_filter)
+                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK)
 
     def test_list_vlans_default(self):
         result = self.network.list_vlans()
