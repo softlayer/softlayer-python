@@ -491,26 +491,6 @@ class NetworkManager(object):
         if 'mask' not in kwargs:
             kwargs['mask'] = DEFAULT_SUBNET_MASK
 
-        _filter = utils.NestedDict(kwargs.get('filter') or {})
-
-        if identifier:
-            _filter['subnets']['networkIdentifier'] = (
-                utils.query_filter(identifier))
-        if datacenter:
-            _filter['subnets']['datacenter']['name'] = (
-                utils.query_filter(datacenter))
-        if version:
-            _filter['subnets']['version'] = utils.query_filter(version)
-        if subnet_type:
-            _filter['subnets']['subnetType'] = utils.query_filter(subnet_type)
-        else:
-            # This filters out global IPs from the subnet listing.
-            _filter['subnets']['subnetType'] = {'operation': '!= GLOBAL_IP'}
-        if network_space:
-            _filter['subnets']['networkVlan']['networkSpace'] = (
-                utils.query_filter(network_space))
-
-        kwargs['filter'] = _filter.to_dict()
         kwargs['iter'] = True
         return self.client.call('Account', 'getSubnets', **kwargs)
 
