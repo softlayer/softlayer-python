@@ -73,7 +73,7 @@ class AccountCLITests(testing.TestCase):
         self.assertEqual(result_output[0], 'Item Id,Category,Description,Single,Monthly,Create Date,Location')
         self.assertEqual(result_output[1], '724951323,Private (only) Secondary VLAN IP Addresses,'
                                            '64 Portable Private IP Addresses (bleg.beh.com),'
-                                           '$0.00,$0.00,2018-04-04T23:15:20-06:00,fra02')
+                                           '$0.00,$0.00,2018-04-04,fra02')
 
     # slcli account invoices
     def test_invoices(self):
