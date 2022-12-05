@@ -135,7 +135,7 @@ def order_options(env, datacenter):
 
             # Vlan/Subnet Lookups
             mask = "mask[networkVlan,podName,addressSpace]"
-            subnets = net_mgr.list_subnets(datacenter=dc_name, network_space='PRIVATE', mask=mask)
+            subnets = net_mgr.list_subnets(mask=mask)
             subnet_table = formatting.Table(['Id', 'Subnet', 'Vlan'], title='Private subnet')
 
             for subnet in subnets:

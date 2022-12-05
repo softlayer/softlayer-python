@@ -470,23 +470,11 @@ class NetworkManager(object):
         kwargs['filter'] = _filter.to_dict()
         return self.account.getGlobalIpRecords(**kwargs)
 
-    def list_subnets(self, identifier=None, datacenter=None, version=0,
-                     subnet_type=None, network_space=None, **kwargs):
+    def list_subnets(self, **kwargs):
         """Display a list of all subnets on the account.
 
         This provides a quick overview of all subnets including information
         about data center residence and the number of devices attached.
-
-        :param string identifier: If specified, the list will only contain the
-                                    subnet matching this network identifier.
-        :param string datacenter: If specified, the list will only contain
-                                    subnets in the specified data center.
-        :param int version: Only returns subnets of this version (4 or 6).
-        :param string subnet_type: If specified, it will only returns subnets
-                                     of this type.
-        :param string network_space: If specified, it will only returns subnets
-                                       with the given address space label.
-        :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
         """
         if 'mask' not in kwargs:
             kwargs['mask'] = DEFAULT_SUBNET_MASK
@@ -678,7 +666,7 @@ class NetworkManager(object):
         """
         identifier = identifier.split('/', 1)[0]
 
-        results = self.list_subnets(identifier=identifier, mask='id')
+        results = self.list_subnets()
         return [result['id'] for result in results]
 
     def _list_vlans_by_name(self, name):

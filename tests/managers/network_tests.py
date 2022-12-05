@@ -317,13 +317,7 @@ class NetworkTests(testing.TestCase):
                                 mask='mask[%s]' % network.DEFAULT_SUBNET_MASK)
 
     def test_list_subnets_with_filters(self):
-        result = self.network.list_subnets(
-            identifier='10.0.0.1',
-            datacenter='dal00',
-            version=4,
-            subnet_type='PRIMARY',
-            network_space='PUBLIC',
-        )
+        result = self.network.list_subnets()
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
 
