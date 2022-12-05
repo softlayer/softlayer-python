@@ -327,7 +327,6 @@ class NetworkTests(testing.TestCase):
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
 
-
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
                                 mask='mask[%s]' % network.DEFAULT_SUBNET_MASK)
 
