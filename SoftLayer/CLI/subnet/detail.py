@@ -26,7 +26,8 @@ def cli(env, identifier, no_vs, no_hardware):
     subnet_id = helpers.resolve_id(mgr.resolve_subnet_ids, identifier,
                                    name='subnet')
 
-    mask = 'mask[ipAddresses[id, ipAddress,note], datacenter, virtualGuests, hardware, networkVlan[networkSpace]]'
+    mask = 'mask[ipAddresses[id, ipAddress,note], datacenter, virtualGuests, hardware,' \
+           ' networkVlan[networkSpace,primaryRouter]]'
 
     subnet = mgr.get_subnet(subnet_id, mask=mask)
 
@@ -56,7 +57,9 @@ def cli(env, identifier, no_vs, no_hardware):
 
     ip_table = formatting.KeyValueTable(['id', 'ip', 'note'])
     for address in ip_address:
-        ip_table.add_row([address.get('id'), address.get('ipAddress'), address.get('note')])
+        ip_table.add_row([address.get('id'),
+                          address.get('ipAddress') + '/' +
+                          subnet['networkVlan']['primaryRouter']['fullyQualifiedDomainName'], address.get('note')])
 
     table.add_row(['ipAddresses', ip_table])
 

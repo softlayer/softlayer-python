@@ -34,7 +34,7 @@ DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'usableIpAddressCount',
                                 'note',
                                 'tagReferences[tag]',
-                                'networkVlan[id,networkSpace]'])
+                                'networkVlan[id,primaryRouter,networkSpace]'])
 DEFAULT_VLAN_MASK = ','.join([
     'firewallInterfaces',
     'hardwareCount',
