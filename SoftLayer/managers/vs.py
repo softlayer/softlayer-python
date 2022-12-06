@@ -1068,8 +1068,11 @@ class VSManager(utils.IdentifierMixin, object):
                                                        'Unable to find %s option with value %s' % (
                                                            ('disk', disk_guest.get('capacity'))))
 
+                category_id = self.get_disk_category_id_by_disk_number(disk_guest.get('capacity'), disk_number)
+                if category_id is None:
+                    raise exceptions.SoftLayerError('Invalid disk number to this disk capacity')
                 category = {'categories': [{
-                    'categoryCode': 'guest_disk' + str(disk_number),
+                    'id': category_id,
                     'complexType': "SoftLayer_Product_Item_Category"}],
                     'complexType': 'SoftLayer_Product_Item_Price',
                     'id': price_id}
@@ -1100,6 +1103,40 @@ class VSManager(utils.IdentifierMixin, object):
             self.client['Product_Order'].placeOrder(order)
             return True
         return False
+
+    def get_disk_category_id_by_disk_number(self, capacity, disk_number):
+        """Uses Product_Package::getItemPrices to get all disk items with its categories."""
+        disk_key_names = {
+            1: "First Disk",
+            2: "Second Disk",
+            3: "Third Disk",
+            4: "Fourth Disk",
+            5: "Fifth Disk",
+        }
+        category_to_request = disk_key_names.get(disk_number)
+        if category_to_request is None:
+            return None
+
+        key_name = "*= GUEST_DISK_"+str(capacity)+"_GB_SAN"
+        object_filter = {
+            "itemPrices": {
+                "locationGroupId": {"operation": "is null"},
+                "item": {
+                    "keyName": {"operation": key_name}
+                }
+            }
+        }
+        mask = "mask[id,locationGroupId,item[capacity,description,keyName],categories]"
+        disk_items = self.client.call(
+            'SoftLayer_Product_Package', 'getItemPrices', id=46, mask=mask, filter=object_filter
+        )
+        category_id = None
+        for disk_item in disk_items:
+            for category in disk_item.get('categories'):
+                if category.get('name') == category_to_request:
+                    category_id = category.get('id')
+                    break
+        return category_id
 
     def order_guest(self, guest_object, test=False):
         """Uses Product_Order::placeOrder to create a virtual guest.

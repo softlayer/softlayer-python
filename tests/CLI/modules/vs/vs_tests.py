@@ -10,6 +10,7 @@ import sys
 from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
+from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer.fixtures import SoftLayer_Virtual_Guest as SoftLayer_Virtual_Guest
 from SoftLayer import SoftLayerAPIError
 from SoftLayer import SoftLayerError
@@ -565,6 +566,8 @@ class VirtTests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_upgrade_disk(self, confirm_mock):
         confirm_mock.return_value = True
+        mock = self.set_mock('SoftLayer_Product_Package', 'getItemPrices')
+        mock.return_value = SoftLayer_Product_Package.getVSDiskItemPrices
         result = self.run_command(['vs', 'upgrade', '100', '--flavor=M1_64X512X100',
                                    '--resize-disk=10', '1', '--resize-disk=10', '2'])
         self.assert_no_fail(result)
@@ -598,6 +601,8 @@ class VirtTests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_upgrade_with_add_disk(self, confirm_mock):
         confirm_mock.return_value = True
+        mock = self.set_mock('SoftLayer_Product_Package', 'getItemPrices')
+        mock.return_value = SoftLayer_Product_Package.getVSDiskItemPrices
         result = self.run_command(['vs', 'upgrade', '100', '--add-disk=10', '--add-disk=10'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
