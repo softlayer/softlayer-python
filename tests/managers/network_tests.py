@@ -313,10 +313,8 @@ class NetworkTests(testing.TestCase):
         result = self.network.list_subnets()
 
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
-        _filter = {'subnets': {'subnetType': {'operation': '!= GLOBAL_IP'}}}
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
-                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
-                                filter=_filter)
+                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK)
 
     def test_list_subnets_with_filters(self):
         result = self.network.list_subnets(

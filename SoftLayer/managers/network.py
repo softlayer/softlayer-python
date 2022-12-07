@@ -34,7 +34,10 @@ DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'usableIpAddressCount',
                                 'note',
                                 'tagReferences[tag]',
-                                'networkVlan[id,networkSpace]'])
+                                'networkVlan[id,networkSpace,fullyQualifiedName]',
+                                'addressSpace',
+                                'endPointIpAddress'
+                                ])
 DEFAULT_VLAN_MASK = ','.join([
     'firewallInterfaces',
     'hardwareCount',
@@ -503,9 +506,6 @@ class NetworkManager(object):
             _filter['subnets']['version'] = utils.query_filter(version)
         if subnet_type:
             _filter['subnets']['subnetType'] = utils.query_filter(subnet_type)
-        else:
-            # This filters out global IPs from the subnet listing.
-            _filter['subnets']['subnetType'] = {'operation': '!= GLOBAL_IP'}
         if network_space:
             _filter['subnets']['networkVlan']['networkSpace'] = (
                 utils.query_filter(network_space))
