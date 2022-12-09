@@ -1105,7 +1105,10 @@ class VSManager(utils.IdentifierMixin, object):
         return False
 
     def get_disk_category_id_by_disk_number(self, capacity, disk_number):
-        """Uses Product_Package::getItemPrices to get all disk items with its categories."""
+        """Uses Product_Package::getItemPrices to get all disk items with its categories and
+
+        disk_key_names dictionary to convert disk numbers (int) to ordinal numbers (string)
+        """
         disk_key_names = {
             1: "First Disk",
             2: "Second Disk",
