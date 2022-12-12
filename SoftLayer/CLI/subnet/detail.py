@@ -38,7 +38,7 @@ def cli(env, identifier, no_vs, no_hardware):
     table.add_row(['identifier',
                    '%s/%s' % (subnet['networkIdentifier'],
                               str(subnet['cidr']))])
-    table.add_row(['subnet type', subnet['subnetType']])
+    table.add_row(['subnet type', subnet.get('subnetType', formatting.blank())])
     table.add_row(['network space',
                    utils.lookup(subnet, 'networkVlan', 'networkSpace')])
     table.add_row(['gateway', subnet.get('gateway', formatting.blank())])

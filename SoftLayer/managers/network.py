@@ -503,9 +503,7 @@ class NetworkManager(object):
             _filter['subnets']['version'] = utils.query_filter(version)
         if subnet_type:
             _filter['subnets']['subnetType'] = utils.query_filter(subnet_type)
-        else:
-            # This filters out global IPs from the subnet listing.
-            _filter['subnets']['subnetType'] = {'operation': '!= GLOBAL_IP'}
+
         if network_space:
             _filter['subnets']['networkVlan']['networkSpace'] = (
                 utils.query_filter(network_space))
@@ -698,7 +696,7 @@ class NetworkManager(object):
         """
         identifier = identifier.split('/', 1)[0]
 
-        results = self.list_subnets(identifier=identifier, mask='id')
+        results = self.list_subnets()
         return [result['id'] for result in results]
 
     def _list_vlans_by_name(self, name):
