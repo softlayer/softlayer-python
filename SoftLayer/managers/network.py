@@ -698,7 +698,7 @@ class NetworkManager(object):
         """
         identifier = identifier.split('/', 1)[0]
 
-        results = self.list_subnets(identifier=identifier, mask='id')
+        results = self.list_subnets()
         return [result['id'] for result in results]
 
     def _list_vlans_by_name(self, name):

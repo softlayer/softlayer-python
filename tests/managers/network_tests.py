@@ -310,13 +310,6 @@ class NetworkTests(testing.TestCase):
                                 filter=_filter)
 
     def test_list_subnets_default(self):
-        result = self.network.list_subnets()
-
-        self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
-        self.assert_called_with('SoftLayer_Account', 'getSubnets',
-                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK)
-
-    def test_list_subnets_with_filters(self):
         result = self.network.list_subnets(
             identifier='10.0.0.1',
             datacenter='dal00',
@@ -324,7 +317,6 @@ class NetworkTests(testing.TestCase):
             subnet_type='PRIMARY',
             network_space='PUBLIC',
         )
-
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
         _filter = {
             'subnets': {
@@ -341,6 +333,14 @@ class NetworkTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
                                 mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
                                 filter=_filter)
+
+    def test_list_subnets_with_filters(self):
+        result = self.network.list_subnets()
+
+        self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
+
+        self.assert_called_with('SoftLayer_Account', 'getSubnets',
+                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK)
 
     def test_list_vlans_default(self):
         result = self.network.list_vlans()
