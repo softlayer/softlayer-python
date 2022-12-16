@@ -2,6 +2,7 @@
 # :license: MIT, see LICENSE for more details.
 
 import click
+from SoftLayer import utils
 
 import SoftLayer
 from SoftLayer.CLI import environment
@@ -30,7 +31,7 @@ def cli(env, is_open):
             ticket['serviceProviderResourceId'],
             user,
             click.wrap_text(ticket['title']),
-            ticket['lastEditDate'],
+            utils.clean_time(ticket.get('lastEditDate'), out_format="%Y-%m-%d"),
             ticket['status']['name'],
             ticket.get('updateCount', 0),
             ticket.get('priority', 0)

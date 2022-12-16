@@ -16,7 +16,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='6.1.2',
+    version='6.1.3',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/x-rst',
@@ -32,7 +32,7 @@ setup(
             'sl = SoftLayer.CLI.deprecated:main',
         ],
     },
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     install_requires=[
         'prettytable >= 2.5.0',
         'click >= 8.0.4',
@@ -52,10 +52,11 @@ setup(
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],

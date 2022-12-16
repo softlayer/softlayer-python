@@ -1,5 +1,34 @@
 # Change Log
 
+## [6.1.3] - 2022-11-30
+
+#### What's Changed
+* New Command: Hardware notifications by @caberos in https://github.com/softlayer/softlayer-python/pull/1756
+* New Command: virtual notifications by @caberos in https://github.com/softlayer/softlayer-python/pull/1758
+* Change regex in rich text in simple option in help text by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1759
+* pip prod(deps): bump rich from 12.5.1 to 12.6.0 by @dependabot in https://github.com/softlayer/softlayer-python/pull/1760
+* add more information to vs credentials by @caberos in https://github.com/softlayer/softlayer-python/pull/1762
+* Fixed maxint issue by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1765
+* Added csv output format by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1766
+* add more information on hw credentials by @caberos in https://github.com/softlayer/softlayer-python/pull/1767
+* Delete twitter link in documentation by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1769
+* new command hw create-credential by @caberos in https://github.com/softlayer/softlayer-python/pull/1774
+* fix the hw credential error by @caberos in https://github.com/softlayer/softlayer-python/pull/1781
+* Added test suite for py311 by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1784
+* New feature to change theme in slcli like dark, light o maintain in default by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1775
+* Match `virtual detail --prices` option with `hardware detail --prices` option by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1780
+* Fixing preset-list pricing table by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1782
+* fix the call api cannot handle empty results by @caberos in https://github.com/softlayer/softlayer-python/pull/1789
+* Debug output changed to a valid JSON by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1791
+* slcli hw add-notifications crashes with a bad user by @caberos in https://github.com/softlayer/softlayer-python/pull/1786
+* del-notification commands, rename the commands to notifications-add by @caberos in https://github.com/softlayer/softlayer-python/pull/1785
+* Add --extras to slcli order quote by @caberos in https://github.com/softlayer/softlayer-python/pull/1792
+* An error is displaying for volume with replica in slcli for Active pr… by @caberos in https://github.com/softlayer/softlayer-python/pull/1794
+
+
+**Full Changelog**: https://github.com/softlayer/softlayer-python/compare/v6.1.2...v6.1.3
+
+
 ## [6.1.2] - 2022-09-23
 
 #### What's Changed

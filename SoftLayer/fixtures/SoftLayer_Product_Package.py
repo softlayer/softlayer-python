@@ -2216,3 +2216,63 @@ getItems_IPSEC = [{
         }
     ]
 }]
+
+getVSDiskItemPrices = [
+    {
+        "id": 2255,
+        "locationGroupId": None,
+        "categories": [
+            {
+                "categoryCode": "guest_disk1",
+                "id": 82,
+                "name": "Second Disk",
+                "quantityLimit": 0,
+                "sortOrder": None
+            },
+            {
+                "categoryCode": "guest_disk2",
+                "id": 92,
+                "name": "Third Disk",
+                "quantityLimit": 0,
+                "sortOrder": None
+            },
+            {
+                "categoryCode": "guest_disk3",
+                "id": 93,
+                "name": "Fourth Disk",
+                "quantityLimit": 0,
+                "sortOrder": None
+            },
+            {
+                "categoryCode": "guest_disk4",
+                "id": 116,
+                "name": "Fifth Disk",
+                "quantityLimit": 0,
+                "sortOrder": None
+            }
+        ],
+        "item": {
+            "capacity": "10",
+            "description": "10 GB (SAN)",
+            "keyName": "GUEST_DISK_10_GB_SAN"
+        }
+    },
+    {
+        "id": 1639,
+        "locationGroupId": None,
+        "categories": [
+            {
+                "categoryCode": "guest_disk0",
+                "id": 81,
+                "name": "First Disk",
+                "quantityLimit": 0,
+                "sortOrder": None
+            }
+        ],
+        "item": {
+            "capacity": "10",
+            "description": "10 GB (SAN)",
+            "keyName": "GUEST_DISK_10_GB_SAN"
+        }
+    }
+]
