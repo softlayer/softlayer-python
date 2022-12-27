@@ -5,6 +5,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 
 target_types = {'vlan': 'SoftLayer_Network_Vlan',
                 'ip': 'SoftLayer_Network_Subnet_IpAddress',
@@ -24,4 +25,9 @@ def cli(env, identifier, target, target_resource):
     """Assigns the subnet to a target."""
 
     mgr = SoftLayer.NetworkManager(env.client)
-    mgr.route(identifier, target_types.get(target), target_resource)
+    route = mgr.route(identifier, target_types.get(target), target_resource)
+
+    if route:
+        click.secho("Route updated successfully.")
+    else:
+        raise exceptions.CLIAbort('Failed to route the subnet.')
