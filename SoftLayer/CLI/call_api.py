@@ -150,6 +150,9 @@ def cli(env, service, method, parameters, _id, _filters, mask, limit, offset, or
             '[{"keyName": "NETWORK_MESSAGE_DELIVERY_MANAGE"}]'
         slcli call-api Account getVirtualGuests \\
             --orderBy virttualguests.id=ASC
+        slcli call-api SoftLayer_Notification_Occurrence_Event getAllObjects \\
+            --json-filter='{"endDate": {"operation": "greaterThanDate", \\
+            "options": [{"name":"date", "value": ["10/14/2022"]}]}}' --limit=50
     """
 
     if _filters and json_filter:
