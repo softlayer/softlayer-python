@@ -89,6 +89,9 @@ updateVpnUser = True
 removeDedicatedHostAccess = True
 removeHardwareAccess = True
 removeVirtualGuestAccess = True
+addDedicatedHostAccess = True
+addHardwareAccess = True
+addVirtualGuestAccess = True
 
 getHardware = [{
         "domain": "testedit.com",

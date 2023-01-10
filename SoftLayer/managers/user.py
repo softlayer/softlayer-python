@@ -392,6 +392,36 @@ class UserManager(utils.IdentifierMixin, object):
 
         return overrides_list
 
+    def grant_hardware_access(self, user_id, hardware_id):
+        """Grants the user access to a single hardware device.
+
+        :param int user_id:
+        :param int hardware_id
+
+        :returns: true
+        """
+        return self.user_service.addHardwareAccess(hardware_id, id=user_id)
+
+    def grant_virtual_access(self, user_id, virtual_id):
+        """Grants the user access to a single VS device.
+
+        :param int user_id:
+        :param int virtual_id
+
+        :returns: true
+        """
+        return self.user_service.addVirtualGuestAccess(virtual_id, id=user_id)
+
+    def grant_dedicated_access(self, user_id, dedicated_id):
+        """Grants the user access to a single dedicated host device.
+
+        :param int user_id:
+        :param int dedicated_id
+
+        :returns: true
+        """
+        return self.user_service.addDedicatedHostAccess(dedicated_id, id=user_id)
+
     def remove_hardware_access(self, user_id, hardware_id):
         """Remove hardware from a portal user’s hardware access list.
 
