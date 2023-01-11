@@ -12,7 +12,7 @@ from SoftLayer.CLI import formatting
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Get all hardware notifications."""
+    """Get all VS notifications."""
 
     virtual = SoftLayer.VSManager(env.client)
 
