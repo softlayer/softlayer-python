@@ -1,0 +1,3256 @@
+SLCLI Command Directory
+==============================================================
+slcli account bandwidth-pools
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Displays bandwidth pool information
+	--------------------------------
+	Usage: Usage: cli account bandwidth-pools [OPTIONS]
+==============================================================
+slcli account bandwidth-pools-detail
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get bandwidth pool details.
+	--------------------------------
+	Usage: Usage: cli account bandwidth-pools-detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli account billing-items
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Lists billing items with some other useful information.
+	--------------------------------
+	Usage: Usage: cli account billing-items [OPTIONS]
+==============================================================
+slcli account cancel-item
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancels a billing item.
+	--------------------------------
+	Usage: Usage: cli account cancel-item [OPTIONS] IDENTIFIER
+==============================================================
+slcli account event-detail
+	Flag: identifier: 
+	Flag: --ack: Acknowledge Event. Doing so will turn off the popup in the control portal
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Details of a specific event, and ability to acknowledge event.
+	--------------------------------
+	Usage: Usage: cli account event-detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli account events
+	Flag: --ack-all: Acknowledge every upcoming event. Doing so will turn off the popup in the control portal
+	Flag: --planned: Show only planned events
+	Flag: --unplanned: Show only unplanned events
+	Flag: --announcement: Show only announcement events
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Summary and acknowledgement of upcoming and ongoing maintenance events
+	--------------------------------
+	Usage: Usage: cli account events [OPTIONS]
+==============================================================
+slcli account invoice-detail
+	Flag: identifier: 
+	Flag: --details: Shows a very detailed list of charges  [default: False]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Invoice details
+	--------------------------------
+	Usage: Usage: cli account invoice-detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli account invoices
+	Flag: --limit: How many invoices to get back.  [default: 50]
+	Flag: --closed: Include invoices with a CLOSED status.  [default: False]
+	Flag: --all: Return ALL invoices. There may be a lot of these.  [default: False]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List invoices
+	--------------------------------
+	Usage: Usage: cli account invoices [OPTIONS]
+==============================================================
+slcli account item-detail
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Gets detailed information about a billing item.
+	--------------------------------
+	Usage: Usage: cli account item-detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli account licenses
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Show all licenses.
+	--------------------------------
+	Usage: Usage: cli account licenses [OPTIONS]
+==============================================================
+slcli account orders
+	Flag: -l,--limit: How many results to get in one api call  [default: 100]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Lists account orders. Use `slcli order lookup <ID>` to find more details about a specific order.
+	--------------------------------
+	Usage: Usage: cli account orders [OPTIONS]
+==============================================================
+slcli account summary
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Prints some various bits of information about an account
+	--------------------------------
+	Usage: Usage: cli account summary [OPTIONS]
+==============================================================
+slcli autoscale delete
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Delete this group and destroy all members of it.
+	--------------------------------
+	Usage: Usage: cli autoscale delete [OPTIONS] IDENTIFIER
+==============================================================
+slcli autoscale detail
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get details of an Autoscale groups.
+	--------------------------------
+	Usage: Usage: cli autoscale detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli autoscale list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List AutoScale Groups.
+	--------------------------------
+	Usage: Usage: cli autoscale list [OPTIONS]
+==============================================================
+slcli block access-authorize
+	Flag: volume_id: 
+	Flag: -h,--hardware-id: The id of one SoftLayer_Hardware to authorize (Multiple allowed)
+	Flag: -v,--virtual-id: The id of one SoftLayer_Virtual_Guest to authorize (Multiple allowed)
+	Flag: -i,--ip-address-id: The id of one SoftLayer_Network_Subnet_IpAddress to authorize (Multiple allowed)
+	Flag: --ip-address: An IP address to authorize (Multiple allowed)
+	Flag: --help: Show this message and exit.
+	--------------------------------
+	Description: Authorizes hosts to access a given volume
+	--------------------------------
+	Usage: Usage: cli block access-authorize [OPTIONS] VOLUME_ID
+==============================================================
+slcli block access-list
+	Flag: volume_id: 
+	Flag: --sortby: Column to sort by
+	Flag: --columns: Columns to display. Options: id, name, type, private_ip_address, source_subnet, host_iqn, username, password, allowed_host_id
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List ACLs.
+	--------------------------------
+	Usage: Usage: cli block access-list [OPTIONS] VOLUME_ID
+==============================================================
+slcli block access-password
+	Flag: access_id: 
+	Flag: -p,--password: Password you want to set, this command will fail if the password is not strong
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Changes a password for a volume's access.
+	--------------------------------
+	Usage: Usage: cli block access-password [OPTIONS] ACCESS_ID
+==============================================================
+slcli block access-revoke
+	Flag: volume_id: 
+	Flag: -h,--hardware-id: The id of one SoftLayer_Hardware to revoke authorization
+	Flag: -v,--virtual-id: The id of one SoftLayer_Virtual_Guest to revoke authorization
+	Flag: -i,--ip-address-id: The id of one SoftLayer_Network_Subnet_IpAddress to revoke authorization
+	Flag: --ip-address: An IP address to revoke authorization
+	Flag: --help: Show this message and exit.
+	--------------------------------
+	Description: Revokes authorization for hosts accessing a given volume
+	--------------------------------
+	Usage: Usage: cli block access-revoke [OPTIONS] VOLUME_ID
+==============================================================
+slcli block disaster-recovery-failover
+	Flag: volume-id: 
+	Flag: --replicant-id: ID of the replicant volume
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Failover an inaccessible block volume to its available replicant volume.
+	--------------------------------
+	Usage: Usage: cli block disaster-recovery-failover [OPTIONS] VOLUME_ID
+==============================================================
+slcli block duplicate-convert-status
+	Flag: volume-id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get status for split or move completed percentage of a given block duplicate volume.
+	--------------------------------
+	Usage: Usage: cli block duplicate-convert-status [OPTIONS] VOLUME_ID
+==============================================================
+slcli block object-list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List cloud block storage.
+	--------------------------------
+	Usage: Usage: cli block object-list [OPTIONS]
+==============================================================
+slcli block object-storage-detail
+	Flag: object_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Display details for a cloud object storage.
+	--------------------------------
+	Usage: Usage: cli block object-storage-detail [OPTIONS] OBJECT_ID
+==============================================================
+slcli block object-storage-permission
+	Flag: object_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Display permission details for a cloud object storage.
+	--------------------------------
+	Usage: Usage: cli block object-storage-permission [OPTIONS] OBJECT_ID
+==============================================================
+slcli block replica-failback
+	Flag: volume-id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Failback a block volume from the given replicant volume.
+	--------------------------------
+	Usage: Usage: cli block replica-failback [OPTIONS] VOLUME_ID
+==============================================================
+slcli block replica-failover
+	Flag: volume-id: 
+	Flag: --replicant-id: ID of the replicant volume
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Failover a block volume to the given replicant volume.
+	--------------------------------
+	Usage: Usage: cli block replica-failover [OPTIONS] VOLUME_ID
+==============================================================
+slcli block replica-locations
+	Flag: volume-id: 
+	Flag: --sortby: Column to sort by
+	Flag: --columns: Columns to display. Options: ID, Long Name, Short Name
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List suitable replication datacenters for the given volume.
+	--------------------------------
+	Usage: Usage: cli block replica-locations [OPTIONS] VOLUME_ID
+==============================================================
+slcli block replica-order
+	Flag: volume_id: 
+	Flag: -s,--snapshot-schedule: Snapshot schedule to use for replication, (HOURLY | DAILY | WEEKLY)  [required]
+	Flag: -l,--location: Short name of the data center for the replicant (e.g.: dal09)  [required]
+	Flag: --tier: Endurance Storage Tier (IOPS per GB) of the primary volume for which a replicant is ordered [optional]
+	Flag: --os-type: Operating System Type (e.g.: LINUX) of the primary volume for which a replica is ordered [optional]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order a block storage replica volume.
+	--------------------------------
+	Usage: Usage: cli block replica-order [OPTIONS] VOLUME_ID
+==============================================================
+slcli block replica-partners
+	Flag: volume-id: 
+	Flag: --sortby: Column to sort by
+	Flag: --columns: Columns to display. Options: ID, Username, Account ID, Capacity (GB), Hardware ID, Guest ID, Host ID
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List existing replicant volumes for a block volume.
+	--------------------------------
+	Usage: Usage: cli block replica-partners [OPTIONS] VOLUME_ID
+==============================================================
+slcli block snapshot-cancel
+	Flag: volume-id: 
+	Flag: --reason: An optional reason for cancellation
+	Flag: --immediate: Cancels the snapshot space immediately instead of on the billing anniversary
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel existing snapshot space for a given volume.
+	--------------------------------
+	Usage: Usage: cli block snapshot-cancel [OPTIONS] VOLUME_ID
+==============================================================
+slcli block snapshot-create
+	Flag: volume_id: 
+	Flag: -n,--notes: Notes to set on the new snapshot
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Creates a snapshot on a given volume
+	--------------------------------
+	Usage: Usage: cli block snapshot-create [OPTIONS] VOLUME_ID
+==============================================================
+slcli block snapshot-delete
+	Flag: snapshot_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Deletes a snapshot on a given volume
+	--------------------------------
+	Usage: Usage: cli block snapshot-delete [OPTIONS] SNAPSHOT_ID
+==============================================================
+slcli block snapshot-disable
+	Flag: volume_id: 
+	Flag: --schedule-type: Snapshot schedule [INTERVAL|HOURLY|DAILY|WEEKLY]  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Disables snapshots on the specified schedule for a given volume
+	--------------------------------
+	Usage: Usage: cli block snapshot-disable [OPTIONS] VOLUME_ID
+==============================================================
+slcli block snapshot-enable
+	Flag: volume_id: 
+	Flag: --schedule-type: Snapshot schedule [INTERVAL|HOURLY|DAILY|WEEKLY]  [required]
+	Flag: --retention-count: Number of snapshots to retain  [required]
+	Flag: --minute: Minute of the day when snapshots should be taken
+	Flag: --hour: Hour of the day when snapshots should be taken
+	Flag: --day-of-week: Day of the week when snapshots should be taken
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Enables snapshots for a given volume on the specified schedule
+	--------------------------------
+	Usage: Usage: cli block snapshot-enable [OPTIONS] VOLUME_ID
+==============================================================
+slcli block snapshot-get-notification-status
+	Flag: volume_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get snapshots space usage threshold warning flag setting for a given volume
+	--------------------------------
+	Usage: Usage: cli block snapshot-get-notification-status [OPTIONS] VOLUME_ID
+==============================================================
+slcli block snapshot-list
+	Flag: volume_id: 
+	Flag: --sortby: Column to sort by
+	Flag: --columns: Columns to display. Options: id, name, created, size_bytes
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List block storage snapshots.
+	--------------------------------
+	Usage: Usage: cli block snapshot-list [OPTIONS] VOLUME_ID
+==============================================================
+slcli block snapshot-order
+	Flag: volume_id: 
+	Flag: --capacity: Size of snapshot space to create in GB  [required]
+	Flag: --tier: Endurance Storage Tier (IOPS per GB) of the block volume for which space is ordered [optional, and only valid for endurance storage volumes]
+	Flag: --upgrade: Flag to indicate that the order is an upgrade
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order snapshot space for a block storage volume.
+	--------------------------------
+	Usage: Usage: cli block snapshot-order [OPTIONS] VOLUME_ID
+==============================================================
+slcli block snapshot-restore
+	Flag: volume_id: 
+	Flag: -s,--snapshot-id: The id of the snapshot which will be used to restore the block volume
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Restore block volume using a given snapshot
+	--------------------------------
+	Usage: Usage: cli block snapshot-restore [OPTIONS] VOLUME_ID
+==============================================================
+slcli block snapshot-schedule-list
+	Flag: volume_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Lists snapshot schedules for a given volume
+	--------------------------------
+	Usage: Usage: cli block snapshot-schedule-list [OPTIONS] VOLUME_ID
+==============================================================
+slcli block snapshot-set-notification
+	Flag: volume_id: 
+	Flag: --enable: Enable/Disable snapshot notification. Use `slcli block snapshot-set-notification volumeId --enable` to enable  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Enables/Disables snapshot space usage threshold warning for a given volume
+	--------------------------------
+	Usage: Usage: cli block snapshot-set-notification [OPTIONS] VOLUME_ID
+==============================================================
+slcli block subnets-assign
+	Flag: access_id: 
+	Flag: --subnet-id: ID of the subnets to assign; e.g.: --subnet-id 1234
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Assign block storage subnets to the given host id.
+	--------------------------------
+	Usage: Usage: cli block subnets-assign [OPTIONS] ACCESS_ID
+==============================================================
+slcli block subnets-list
+	Flag: access_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List block storage assigned subnets for the given host id.
+	--------------------------------
+	Usage: Usage: cli block subnets-list [OPTIONS] ACCESS_ID
+==============================================================
+slcli block subnets-remove
+	Flag: access_id: 
+	Flag: --subnet-id: ID of the subnets to remove; e.g.: --subnet-id 1234
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Remove block storage subnets for the given host id.
+	--------------------------------
+	Usage: Usage: cli block subnets-remove [OPTIONS] ACCESS_ID
+==============================================================
+slcli block volume-cancel
+	Flag: volume-id: 
+	Flag: --reason: An optional reason for cancellation
+	Flag: --immediate: Cancels the block storage volume immediately instead of on the billing anniversary
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel an existing block storage volume.
+	--------------------------------
+	Usage: Usage: cli block volume-cancel [OPTIONS] VOLUME_ID
+==============================================================
+slcli block volume-convert
+	Flag: volume_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Convert a dependent duplicate volume to an independent volume.
+	--------------------------------
+	Usage: Usage: cli block volume-convert [OPTIONS] VOLUME_ID
+==============================================================
+slcli block volume-count
+	Flag: -d,--datacenter: Datacenter shortname
+	Flag: --sortby: Column to sort by
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List number of block storage volumes per datacenter.
+	--------------------------------
+	Usage: Usage: cli block volume-count [OPTIONS]
+==============================================================
+slcli block volume-detail
+	Flag: volume_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Display details for a specified volume.
+	--------------------------------
+	Usage: Usage: cli block volume-detail [OPTIONS] VOLUME_ID
+==============================================================
+slcli block volume-duplicate
+	Flag: origin-volume-id: 
+	Flag: -o,--origin-snapshot-id: ID of an origin volume snapshot to use for duplcation.
+	Flag: -c,--duplicate-size: Size of duplicate block volume in GB. ***If no size is specified, the size of the origin volume will be used.***
+	Flag: : Potential Sizes: [20, 40, 80, 100, 250, 500, 1000, 2000, 4000, 8000, 12000] Minimum: [the size of the origin volume]
+	Flag: -i,--duplicate-iops: Performance Storage IOPS, between 100 and 6000 in multiples of 100 [only used for performance volumes] ***If no IOPS value is specified, the IOPS value of the origin volume will be used.***
+	Flag: : Requirements: [If IOPS/GB for the origin volume is less than 0.3, IOPS/GB for the duplicate must also be less than 0.3. If IOPS/GB for the origin volume is greater than or equal to 0.3, IOPS/GB for
+	Flag: : the duplicate must also be greater than or equal to 0.3.]
+	Flag: -t,--duplicate-tier: Endurance Storage Tier (IOPS per GB) [only used for endurance volumes] ***If no tier is specified, the tier of the origin volume will be used.***
+	Flag: : Requirements: [If IOPS/GB for the origin volume is 0.25, IOPS/GB for the duplicate must also be 0.25. If IOPS/GB for the origin volume is greater than 0.25, IOPS/GB for the duplicate must also be
+	Flag: : greater than 0.25.]
+	Flag: -s,--duplicate-snapshot-size: The size of snapshot space to order for the duplicate. ***If no snapshot space size is specified, the snapshot space size of the origin block volume will be used.***
+	Flag: : Input "0" for this parameter to order a duplicate volume with no snapshot space.
+	Flag: --billing: Optional parameter for Billing rate (default to monthly)
+	Flag: --dependent-duplicate: Whether or not this duplicate will be a dependent duplicate of the origin volume.  [default: False]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order a duplicate block storage volume.
+	--------------------------------
+	Usage: Usage: cli block volume-duplicate [OPTIONS] ORIGIN_VOLUME_ID
+==============================================================
+slcli block volume-limits
+	Flag: --sortby: Column to sort by
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List number of block storage volumes limit per datacenter.
+	--------------------------------
+	Usage: Usage: cli block volume-limits [OPTIONS]
+==============================================================
+slcli block volume-list
+	Flag: -u,--username: Volume username
+	Flag: -d,--datacenter: Datacenter shortname
+	Flag: -o,--order: Filter by ID of the order that purchased the block storage
+	Flag: --storage-type: Type of storage volume
+	Flag: --sortby: Column to sort by
+	Flag: --columns: Columns to display. Options: id, username, datacenter, storage_type, capacity_gb, bytes_used, IOPs, ip_addr, lunId, active_transactions, rep_partner_count, created_by, notes
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List block storage.
+	--------------------------------
+	Usage: Usage: cli block volume-list [OPTIONS]
+==============================================================
+slcli block volume-modify
+	Flag: volume-id: 
+	Flag: -c,--new-size: New Size of block volume in GB. ***If no size is given, the original size of volume is used.***
+	Flag: : Potential Sizes: [20, 40, 80, 100, 250, 500, 1000, 2000, 4000, 8000, 12000]
+	Flag: : Minimum: [the original size of the volume]
+	Flag: -i,--new-iops: Performance Storage IOPS, between 100 and 6000 in multiples of 100 [only for performance volumes] ***If no IOPS value is specified, the original IOPS value of the volume will be used.***
+	Flag: : Requirements: [If original IOPS/GB for the volume is less than 0.3, new IOPS/GB must also be less than 0.3. If original IOPS/GB for the volume is greater than or equal to 0.3, new IOPS/GB for the volume must also
+	Flag: : be greater than or equal to 0.3.]
+	Flag: -t,--new-tier: Endurance Storage Tier (IOPS per GB) [only for endurance volumes] ***If no tier is specified, the original tier of the volume will be used.***
+	Flag: : Requirements: [If original IOPS/GB for the volume is 0.25, new IOPS/GB for the volume must also be 0.25. If original IOPS/GB for the volume is greater than 0.25, new IOPS/GB for the volume must also be greater than
+	Flag: : 0.25.]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Modify an existing block storage volume.
+	--------------------------------
+	Usage: Usage: cli block volume-modify [OPTIONS] VOLUME_ID
+==============================================================
+slcli block volume-options
+	Flag: location: 
+	Flag: -p,--prices: Use --prices to list the server item prices, and to list the Item Prices by location,add it to the --prices option using location short name, e.g. --prices dal13
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List all options for ordering a block storage
+	--------------------------------
+	Usage: Usage: cli block volume-options [OPTIONS] [LOCATION]
+==============================================================
+slcli block volume-order
+	Flag: --storage-type: Type of block storage volume  [required]
+	Flag: --size: Size of block storage volume in GB.  [required]
+	Flag: --iops: Performance Storage IOPs. Options vary based on storage size.
+	Flag: : [required for storage-type performance]
+	Flag: --tier: Endurance Storage Tier (IOP per GB) [required for storage-type endurance]
+	Flag: --os-type: Operating System  [required]
+	Flag: --location: Datacenter short name (e.g.: dal09)  [required]
+	Flag: --snapshot-size: Optional parameter for ordering snapshot space along with endurance block storage; specifies the size (in GB) of snapshot space to order
+	Flag: --service-offering: The service offering package to use for placing the order.
+	Flag: : [optional, default is 'storage_as_a_service']. enterprise and performance are depreciated
+	Flag: --billing: Optional parameter for Billing rate (default to monthly)
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order a block storage volume.
+	--------------------------------
+	Usage: Usage: cli block volume-order [OPTIONS]
+==============================================================
+slcli block volume-refresh
+	Flag: volume_id: 
+	Flag: snapshot_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Refresh a duplicate volume with a snapshot from its parent.
+	--------------------------------
+	Usage: Usage: cli block volume-refresh [OPTIONS] VOLUME_ID SNAPSHOT_ID
+==============================================================
+slcli block volume-set-lun-id
+	Flag: volume-id: 
+	Flag: lun-id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Set the LUN ID on an existing block storage volume.
+	--------------------------------
+	Usage: Usage: cli block volume-set-lun-id [OPTIONS] VOLUME_ID LUN_ID
+==============================================================
+slcli block volume-set-note
+	Flag: volume-id: 
+	Flag: -n,--note: Public notes related to a Storage volume  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Set note for an existing block storage volume.
+	--------------------------------
+	Usage: Usage: cli block volume-set-note [OPTIONS] VOLUME_ID
+==============================================================
+slcli cdn detail
+	Flag: unique_id: 
+	Flag: --history: Bandwidth, Hits, Ratio counted over history number of days ago. 89 is the maximum.   [1<=x<=89]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Detail a CDN Account.
+	--------------------------------
+	Usage: Usage: cli cdn detail [OPTIONS] UNIQUE_ID
+==============================================================
+slcli cdn edit
+	Flag: identifier: 
+	Flag: -H,--header: Host header.
+	Flag: -t,--http-port: HTTP port.
+	Flag: -s,--https-port: HTTPS port.
+	Flag: -o,--origin: Origin server address.
+	Flag: -r,--respect-headers: Respect headers. The value 1 is On and 0 is Off.
+	Flag: -c,--cache: Cache key optimization. These are the valid options to choose: 'include-all', 'ignore-all', 'include-specified', 'ignore-specified'. If you select 'include-specified' or 'ignore-specified' please
+	Flag: : add a description too using again --cache, e.g --cache=include-specified --cache=description.
+	Flag: -p,--performance-configuration: Optimize for, General web delivery', 'Large file optimization', 'Video on demand optimization', the Dynamic content acceleration option is not added because this has a special configuration.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit a CDN Account.
+	--------------------------------
+	Usage: Usage: cli cdn edit [OPTIONS] IDENTIFIER
+==============================================================
+slcli cdn list
+	Flag: --sortby: Column to sort by
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List all CDN accounts.
+	--------------------------------
+	Usage: Usage: cli cdn list [OPTIONS]
+==============================================================
+slcli cdn origin-add
+	Flag: unique_id: 
+	Flag: origin: 
+	Flag: path: 
+	Flag: -t,--origin-type: The origin type.  [default: server]
+	Flag: -H,--header: The host header to communicate with the origin.
+	Flag: -b,--bucket-name: The name of the available resource [required if --origin-type=storage]
+	Flag: -p,--port: The http port number.  [default: 80]
+	Flag: -P,--protocol: The protocol used by the origin.  [default: http]
+	Flag: -o,--optimize-for: Performance configuration  [default: web]
+	Flag: -e,--extensions: File extensions that can be stored in the CDN, example: 'jpg, png, pdf'
+	Flag: -c,--cache-query: Cache query rules with the following formats:
+	Flag: : 'ignore-all', 'include: <query-names>', 'ignore: <query-names>'  [default: include-all]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Create an origin path for an existing CDN mapping.
+	--------------------------------
+	Usage: Usage: cli cdn origin-add [OPTIONS] UNIQUE_ID ORIGIN PATH
+==============================================================
+slcli cdn origin-list
+	Flag: unique_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List origin path for an existing CDN mapping.
+	--------------------------------
+	Usage: Usage: cli cdn origin-list [OPTIONS] UNIQUE_ID
+==============================================================
+slcli cdn origin-remove
+	Flag: unique_id: 
+	Flag: origin_path: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Removes an origin path for an existing CDN mapping.
+	--------------------------------
+	Usage: Usage: cli cdn origin-remove [OPTIONS] UNIQUE_ID ORIGIN_PATH
+==============================================================
+slcli cdn purge
+	Flag: unique_id: 
+	Flag: path: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Creates a purge record and also initiates the purge call.
+	--------------------------------
+	Usage: Usage: cli cdn purge [OPTIONS] UNIQUE_ID PATH
+==============================================================
+slcli config setup
+	Flag: -a,--auth: Select a method of authentication.  [default: classic_key]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Setup the ~/.softlayer file with username and apikey.
+	--------------------------------
+	Usage: Usage: cli config setup [OPTIONS]
+==============================================================
+slcli config show
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Show current configuration.
+	--------------------------------
+	Usage: Usage: cli config show [OPTIONS]
+==============================================================
+slcli dedicatedhost cancel
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel a dedicated host server immediately
+	--------------------------------
+	Usage: Usage: cli dedicatedhost cancel [OPTIONS] IDENTIFIER
+==============================================================
+slcli dedicatedhost cancel-guests
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel all virtual guests of the dedicated host immediately.
+	--------------------------------
+	Usage: Usage: cli dedicatedhost cancel-guests [OPTIONS] IDENTIFIER
+==============================================================
+slcli dedicatedhost create
+	Flag: -H,--hostname: Host portion of the FQDN  [required]
+	Flag: -r,--router: Router hostname ex. fcr02a.dal13
+	Flag: -D,--domain: Domain portion of the FQDN  [required]
+	Flag: -d,--datacenter: Datacenter shortname  [required]
+	Flag: -f,--flavor: Dedicated Virtual Host flavor  [required]
+	Flag: --billing: Billing rate  [default: hourly]
+	Flag: --verify: Verify dedicatedhost without creating it.
+	Flag: -t,--template: A template file that defaults the command-line options
+	Flag: --export: Exports options to a template file
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order/create a dedicated host.
+	--------------------------------
+	Usage: Usage: cli dedicatedhost create [OPTIONS]
+==============================================================
+slcli dedicatedhost create-options
+	Flag: -d,--datacenter: Router hostname (requires --flavor) ex. ams01
+	Flag: -f,--flavor: Dedicated Virtual Host flavor (requires --datacenter) ex. 56_CORES_X_242_RAM_X_1_4_TB
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: host order options for a given dedicated host.
+	--------------------------------
+	Usage: Usage: cli dedicatedhost create-options [OPTIONS]
+==============================================================
+slcli dedicatedhost detail
+	Flag: identifier: 
+	Flag: --price: Show associated prices
+	Flag: --guests: Show guests on dedicated host
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get details for a dedicated host.
+	--------------------------------
+	Usage: Usage: cli dedicatedhost detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli dedicatedhost list
+	Flag: -c,--cpu: Number of CPU cores
+	Flag: --tag: Filter by tags (multiple occurrence permitted)
+	Flag: --sortby: Column to sort by  [default: name]
+	Flag: --columns: Columns to display. [options: datacenter, created_by, tags]  [default: id,name,cpuCount,diskCapacity,memoryCapacity,datacenter,guestCount]
+	Flag: -d,--datacenter: Datacenter shortname
+	Flag: -H,--name: Host portion of the FQDN
+	Flag: -m,--memory: Memory capacity in mebibytes
+	Flag: -D,--disk: Disk capacity
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List dedicated host.
+	--------------------------------
+	Usage: Usage: cli dedicatedhost list [OPTIONS]
+==============================================================
+slcli dedicatedhost list-guests
+	Flag: identifier: 
+	Flag: -c,--cpu: Number of CPU cores
+	Flag: -D,--domain: Domain portion of the FQDN
+	Flag: -H,--hostname: Host portion of the FQDN
+	Flag: -m,--memory: Memory in mebibytes
+	Flag: --tag: Filter by tags (multiple occurrence permitted)
+	Flag: --sortby: Column to sort by  [default: hostname]
+	Flag: --columns: Columns to display. [options: guid, cpu, memory, datacenter, primary_ip, backend_ip, created_by, power_state, tags]  [default: id,hostname,domain,primary_ip,backend_ip,power_state]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List guests which are in a dedicated host server.
+	--------------------------------
+	Usage: Usage: cli dedicatedhost list-guests [OPTIONS] IDENTIFIER
+==============================================================
+slcli dns import
+	Flag: zonefile: 
+	Flag: --dry-run: Don't actually create records
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Import zone based off a BIND zone file.
+	--------------------------------
+	Usage: Usage: cli dns import [OPTIONS] ZONEFILE
+==============================================================
+slcli dns record-add
+	Flag: record: 
+	Flag: record_type: 
+	Flag: data: 
+	Flag: --zone: Zone name or identifier that the resource record will be associated with.
+	Flag: : Required for all record types except PTR
+	Flag: --ttl: TTL value in seconds, such as 86400  [default: 900]
+	Flag: --priority: The priority of the target host. (MX or SRV type only)  [default: 10]
+	Flag: --protocol: The protocol of the service, usually either TCP or UDP. (SRV type only)  [default: tcp]
+	Flag: --port: The TCP/UDP/TLS port on which the service is to be found. (SRV type only)
+	Flag: --service: The symbolic name of the desired service. (SRV type only)
+	Flag: --weight: Relative weight for records with same priority. (SRV type only)  [default: 5]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Add resource record.
+	--------------------------------
+	Usage: Usage: cli dns record-add [OPTIONS] RECORD RECORD_TYPE DATA
+==============================================================
+slcli dns record-edit
+	Flag: zone-id: 
+	Flag: --by-record: Edit by host record, such as www
+	Flag: --by-id: Edit a single record by its ID
+	Flag: --data: Record data, such as an IP address
+	Flag: --ttl: TTL value in seconds, such as 86400
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Update DNS record.
+	--------------------------------
+	Usage: Usage: cli dns record-edit [OPTIONS] ZONE_ID
+==============================================================
+slcli dns record-list
+	Flag: zone: 
+	Flag: --data: Record data, such as an IP address
+	Flag: --record: Host record, such as www
+	Flag: --ttl: TTL value in seconds, such as 86400
+	Flag: --type: Record type, such as A or CNAME
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List all records in a zone.
+	--------------------------------
+	Usage: Usage: cli dns record-list [OPTIONS] ZONE
+==============================================================
+slcli dns record-remove
+	Flag: record_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Remove resource record.
+	--------------------------------
+	Usage: Usage: cli dns record-remove [OPTIONS] RECORD_ID
+==============================================================
+slcli dns zone-create
+	Flag: zone: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Create a zone.
+	--------------------------------
+	Usage: Usage: cli dns zone-create [OPTIONS] ZONE
+==============================================================
+slcli dns zone-delete
+	Flag: zone: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Delete zone.
+	--------------------------------
+	Usage: Usage: cli dns zone-delete [OPTIONS] ZONE
+==============================================================
+slcli dns zone-list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List all zones.
+	--------------------------------
+	Usage: Usage: cli dns zone-list [OPTIONS]
+==============================================================
+slcli dns zone-print
+	Flag: zone: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Print zone in BIND format.
+	--------------------------------
+	Usage: Usage: cli dns zone-print [OPTIONS] ZONE
+==============================================================
+slcli email detail
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Display details for a specified email.
+	--------------------------------
+	Usage: Usage: cli email detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli email edit
+	Flag: identifier: 
+	Flag: --username: Sets username for this account
+	Flag: --email: Sets the contact email for this account
+	Flag: --password: Password must be between 8 and 20 characters and must contain one letter and one number.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit details of an email delivery account.
+	--------------------------------
+	Usage: Usage: cli email edit [OPTIONS] IDENTIFIER
+==============================================================
+slcli email list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Lists Email Delivery Service
+	--------------------------------
+	Usage: Usage: cli email list [OPTIONS]
+==============================================================
+slcli event-log get
+	Flag: -d,--date-min: The earliest date we want to search for event logs in mm/dd/yyyy format.
+	Flag: -D,--date-max: The latest date we want to search for event logs in mm/dd/yyyy format.
+	Flag: -e,--obj-event: The event we want to get event logs for
+	Flag: -i,--obj-id: The id of the object we want to get event logs for
+	Flag: -t,--obj-type: The type of the object we want to get event logs for
+	Flag: -z,--utc-offset: UTC Offset for searching with dates. +/-HHMM format  [default: -0000]
+	Flag: --metadata: Display metadata if present  [default: no-metadata]
+	Flag: -l,--limit: Total number of result to return. -1 to return ALL, there may be a LOT of these.  [default: 50]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get Event Logs
+	--------------------------------
+	Usage: Usage: cli event-log get [OPTIONS]
+==============================================================
+slcli event-log types
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get Event Log Types
+	--------------------------------
+	Usage: Usage: cli event-log types [OPTIONS]
+==============================================================
+slcli file access-authorize
+	Flag: volume_id: 
+	Flag: -h,--hardware-id: The id of one SoftLayer_Hardware to authorize (Multiple allowed)
+	Flag: -v,--virtual-id: The id of one SoftLayer_Virtual_Guest to authorize (Multiple allowed)
+	Flag: -i,--ip-address-id: The id of one SoftLayer_Network_Subnet_IpAddress to authorize (Multiple allowed)
+	Flag: --ip-address: An IP address to authorize (Multiple allowed)
+	Flag: -s,--subnet-id: The id of one SoftLayer_Network_Subnet to authorize (Multiple allowed)
+	Flag: --help: Show this message and exit.
+	--------------------------------
+	Description: Authorizes hosts to access a given volume
+	--------------------------------
+	Usage: Usage: cli file access-authorize [OPTIONS] VOLUME_ID
+==============================================================
+slcli file access-list
+	Flag: volume_id: 
+	Flag: --sortby: Column to sort by
+	Flag: --columns: Columns to display. Options: id, name, type, private_ip_address, source_subnet, host_iqn, username, password, allowed_host_id
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List ACLs.
+	--------------------------------
+	Usage: Usage: cli file access-list [OPTIONS] VOLUME_ID
+==============================================================
+slcli file access-revoke
+	Flag: volume_id: 
+	Flag: -h,--hardware-id: The id of one SoftLayer_Hardware to revoke authorization
+	Flag: -v,--virtual-id: The id of one SoftLayer_Virtual_Guest to revoke authorization
+	Flag: -i,--ip-address-id: The id of one SoftLayer_Network_Subnet_IpAddress to revoke authorization
+	Flag: --ip-address: An IP address to revoke authorization
+	Flag: -s,--subnet-id: The id of one SoftLayer_Network_Subnet to revoke authorization
+	Flag: --help: Show this message and exit.
+	--------------------------------
+	Description: Revokes authorization for hosts accessing a given volume
+	--------------------------------
+	Usage: Usage: cli file access-revoke [OPTIONS] VOLUME_ID
+==============================================================
+slcli file disaster-recovery-failover
+	Flag: volume-id: 
+	Flag: --replicant-id: ID of the replicant volume
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Failover an inaccessible file volume to its available replicant volume.
+	--------------------------------
+	Usage: Usage: cli file disaster-recovery-failover [OPTIONS] VOLUME_ID
+==============================================================
+slcli file duplicate-convert-status
+	Flag: volume-id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get status for split or move completed percentage of a given file duplicate volume.
+	--------------------------------
+	Usage: Usage: cli file duplicate-convert-status [OPTIONS] VOLUME_ID
+==============================================================
+slcli file replica-failback
+	Flag: volume-id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Failback a file volume from the given replicant volume.
+	--------------------------------
+	Usage: Usage: cli file replica-failback [OPTIONS] VOLUME_ID
+==============================================================
+slcli file replica-failover
+	Flag: volume-id: 
+	Flag: --replicant-id: ID of the replicant volume
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Failover a file volume to the given replicant volume.
+	--------------------------------
+	Usage: Usage: cli file replica-failover [OPTIONS] VOLUME_ID
+==============================================================
+slcli file replica-locations
+	Flag: volume-id: 
+	Flag: --sortby: Column to sort by
+	Flag: --columns: Columns to display. Options: ID, Long Name, Short Name
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List suitable replication datacenters for the given volume.
+	--------------------------------
+	Usage: Usage: cli file replica-locations [OPTIONS] VOLUME_ID
+==============================================================
+slcli file replica-order
+	Flag: volume_id: 
+	Flag: -s,--snapshot-schedule: Snapshot schedule to use for replication, (HOURLY | DAILY | WEEKLY)  [required]
+	Flag: -l,--location: Short name of the data center for the replicant (e.g.: dal09)  [required]
+	Flag: --tier: Endurance Storage Tier (IOPS per GB) of the primary volume for which a replicant is ordered [optional]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order a file storage replica volume.
+	--------------------------------
+	Usage: Usage: cli file replica-order [OPTIONS] VOLUME_ID
+==============================================================
+slcli file replica-partners
+	Flag: volume-id: 
+	Flag: --sortby: Column to sort by
+	Flag: --columns: Columns to display. Options: ID, Username, Account ID, Capacity (GB), Hardware ID, Guest ID, Host ID
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List existing replicant volumes for a file volume.
+	--------------------------------
+	Usage: Usage: cli file replica-partners [OPTIONS] VOLUME_ID
+==============================================================
+slcli file snapshot-cancel
+	Flag: volume-id: 
+	Flag: --reason: An optional reason for cancellation
+	Flag: --immediate: Cancels the snapshot space immediately instead of on the billing anniversary
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel existing snapshot space for a given volume.
+	--------------------------------
+	Usage: Usage: cli file snapshot-cancel [OPTIONS] VOLUME_ID
+==============================================================
+slcli file snapshot-create
+	Flag: volume_id: 
+	Flag: -n,--notes: Notes to set on the new snapshot
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Creates a snapshot on a given volume
+	--------------------------------
+	Usage: Usage: cli file snapshot-create [OPTIONS] VOLUME_ID
+==============================================================
+slcli file snapshot-delete
+	Flag: snapshot_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Deletes a snapshot on a given volume
+	--------------------------------
+	Usage: Usage: cli file snapshot-delete [OPTIONS] SNAPSHOT_ID
+==============================================================
+slcli file snapshot-disable
+	Flag: volume_id: 
+	Flag: --schedule-type: Snapshot schedule [INTERVAL|HOURLY|DAILY|WEEKLY]  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Disables snapshots on the specified schedule for a given volume
+	--------------------------------
+	Usage: Usage: cli file snapshot-disable [OPTIONS] VOLUME_ID
+==============================================================
+slcli file snapshot-enable
+	Flag: volume_id: 
+	Flag: --schedule-type: Snapshot schedule [INTERVAL|HOURLY|DAILY|WEEKLY]  [required]
+	Flag: --retention-count: Number of snapshots to retain  [required]
+	Flag: --minute: Minute of the day when snapshots should be taken
+	Flag: --hour: Hour of the day when snapshots should be taken
+	Flag: --day-of-week: Day of the week when snapshots should be taken
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Enables snapshots for a given volume on the specified schedule
+	--------------------------------
+	Usage: Usage: cli file snapshot-enable [OPTIONS] VOLUME_ID
+==============================================================
+slcli file snapshot-get-notification-status
+	Flag: volume_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get snapshots space usage threshold warning flag setting for a given volume
+	--------------------------------
+	Usage: Usage: cli file snapshot-get-notification-status [OPTIONS] VOLUME_ID
+==============================================================
+slcli file snapshot-list
+	Flag: volume_id: 
+	Flag: --sortby: Column to sort by
+	Flag: --columns: Columns to display. Options: id, name, created, size_bytes
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List file storage snapshots.
+	--------------------------------
+	Usage: Usage: cli file snapshot-list [OPTIONS] VOLUME_ID
+==============================================================
+slcli file snapshot-order
+	Flag: volume_id: 
+	Flag: --capacity: Size of snapshot space to create in GB  [required]
+	Flag: --tier: Endurance Storage Tier (IOPS per GB) of the file volume for which space is ordered [optional, and only valid for endurance storage volumes]
+	Flag: --upgrade: Flag to indicate that the order is an upgrade
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order snapshot space for a file storage volume.
+	--------------------------------
+	Usage: Usage: cli file snapshot-order [OPTIONS] VOLUME_ID
+==============================================================
+slcli file snapshot-restore
+	Flag: volume_id: 
+	Flag: -s,--snapshot-id: The id of the snapshot which will be used to restore the block volume
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Restore file volume using a given snapshot
+	--------------------------------
+	Usage: Usage: cli file snapshot-restore [OPTIONS] VOLUME_ID
+==============================================================
+slcli file snapshot-schedule-list
+	Flag: volume_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Lists snapshot schedules for a given volume
+	--------------------------------
+	Usage: Usage: cli file snapshot-schedule-list [OPTIONS] VOLUME_ID
+==============================================================
+slcli file snapshot-set-notification
+	Flag: volume_id: 
+	Flag: --enable: Enable/Disable snapshot notification. Use `slcli file snapshot-set-notification volumeId --enable` to enable  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Enables/Disables snapshot space usage threshold warning for a given volume
+	--------------------------------
+	Usage: Usage: cli file snapshot-set-notification [OPTIONS] VOLUME_ID
+==============================================================
+slcli file volume-cancel
+	Flag: volume-id: 
+	Flag: --reason: An optional reason for cancellation
+	Flag: --immediate: Cancels the file storage volume immediately instead of on the billing anniversary
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel an existing file storage volume.
+	--------------------------------
+	Usage: Usage: cli file volume-cancel [OPTIONS] VOLUME_ID
+==============================================================
+slcli file volume-convert
+	Flag: volume_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Convert a dependent duplicate volume to an independent volume.
+	--------------------------------
+	Usage: Usage: cli file volume-convert [OPTIONS] VOLUME_ID
+==============================================================
+slcli file volume-count
+	Flag: -d,--datacenter: Datacenter shortname
+	Flag: --sortby: Column to sort by
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List number of file storage volumes per datacenter.
+	--------------------------------
+	Usage: Usage: cli file volume-count [OPTIONS]
+==============================================================
+slcli file volume-detail
+	Flag: volume_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Display details for a specified volume.
+	--------------------------------
+	Usage: Usage: cli file volume-detail [OPTIONS] VOLUME_ID
+==============================================================
+slcli file volume-duplicate
+	Flag: origin-volume-id: 
+	Flag: -o,--origin-snapshot-id: ID of an origin volume snapshot to use for duplcation.
+	Flag: -c,--duplicate-size: Size of duplicate file volume in GB. ***If no size is specified, the size of the origin volume will be used.***
+	Flag: : Minimum: [the size of the origin volume]
+	Flag: -i,--duplicate-iops: Performance Storage IOPS, between 100 and 6000 in multiples of 100 [only used for performance volumes] ***If no IOPS value is specified, the IOPS value of the origin volume will be used.***
+	Flag: : Requirements: [If IOPS/GB for the origin volume is less than 0.3, IOPS/GB for the duplicate must also be less than 0.3. If IOPS/GB for the origin volume is greater than or equal to 0.3, IOPS/GB for
+	Flag: : the duplicate must also be greater than or equal to 0.3.]
+	Flag: -t,--duplicate-tier: Endurance Storage Tier (IOPS per GB) [only used for endurance volumes] ***If no tier is specified, the tier of the origin volume will be used.***
+	Flag: : Requirements: [If IOPS/GB for the origin volume is 0.25, IOPS/GB for the duplicate must also be 0.25. If IOPS/GB for the origin volume is greater than 0.25, IOPS/GB for the duplicate must also be
+	Flag: : greater than 0.25.]
+	Flag: -s,--duplicate-snapshot-size: The size of snapshot space to order for the duplicate. ***If no snapshot space size is specified, the snapshot space size of the origin file volume will be used.***
+	Flag: : Input "0" for this parameter to order a duplicate volume with no snapshot space.
+	Flag: --billing: Optional parameter for Billing rate (default to monthly)
+	Flag: --dependent-duplicate: Whether or not this duplicate will be a dependent duplicateof the origin volume.  [default: False]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order a duplicate file storage volume.
+	--------------------------------
+	Usage: Usage: cli file volume-duplicate [OPTIONS] ORIGIN_VOLUME_ID
+==============================================================
+slcli file volume-limits
+	Flag: --sortby: Column to sort by
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List number of block storage volumes limit per datacenter.
+	--------------------------------
+	Usage: Usage: cli file volume-limits [OPTIONS]
+==============================================================
+slcli file volume-list
+	Flag: -u,--username: Volume username
+	Flag: -d,--datacenter: Datacenter shortname
+	Flag: -o,--order: Filter by ID of the order that purchased the block storage
+	Flag: --storage-type: Type of storage volume
+	Flag: --sortby: Column to sort by
+	Flag: --columns: Columns to display. Options: id, username, datacenter, storage_type, capacity_gb, bytes_used, ip_addr, active_transactions, mount_addr, rep_partner_count, created_by, notes
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List file storage.
+	--------------------------------
+	Usage: Usage: cli file volume-list [OPTIONS]
+==============================================================
+slcli file volume-modify
+	Flag: volume-id: 
+	Flag: -c,--new-size: New Size of file volume in GB. ***If no size is given, the original size of volume is used.***
+	Flag: : Potential Sizes: [20, 40, 80, 100, 250, 500, 1000, 2000, 4000, 8000, 12000]
+	Flag: : Minimum: [the original size of the volume]
+	Flag: -i,--new-iops: Performance Storage IOPS, between 100 and 6000 in multiples of 100 [only for performance volumes] ***If no IOPS value is specified, the original IOPS value of the volume will be used.***
+	Flag: : Requirements: [If original IOPS/GB for the volume is less than 0.3, new IOPS/GB must also be less than 0.3. If original IOPS/GB for the volume is greater than or equal to 0.3, new IOPS/GB for the volume must also
+	Flag: : be greater than or equal to 0.3.]
+	Flag: -t,--new-tier: Endurance Storage Tier (IOPS per GB) [only for endurance volumes] ***If no tier is specified, the original tier of the volume will be used.***
+	Flag: : Requirements: [If original IOPS/GB for the volume is 0.25, new IOPS/GB for the volume must also be 0.25. If original IOPS/GB for the volume is greater than 0.25, new IOPS/GB for the volume must also be greater than
+	Flag: : 0.25.]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Modify an existing file storage volume.
+	--------------------------------
+	Usage: Usage: cli file volume-modify [OPTIONS] VOLUME_ID
+==============================================================
+slcli file volume-options
+	Flag: location: 
+	Flag: -p,--prices: Use --prices to list the server item prices, and to list the Item Prices by location,add it to the --prices option using location short name, e.g. --prices dal13
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List all options for ordering a block storage
+	--------------------------------
+	Usage: Usage: cli file volume-options [OPTIONS] [LOCATION]
+==============================================================
+slcli file volume-order
+	Flag: --storage-type: Type of file storage volume  [required]
+	Flag: --size: Size of file storage volume in GB  [required]
+	Flag: --iops: Performance Storage IOPs. Options vary based on storage size.
+	Flag: : [required for storage-type performance]
+	Flag: --tier: Endurance Storage Tier (IOP per GB) [required for storage-type endurance]
+	Flag: --location: Datacenter short name (e.g.: dal09)  [required]
+	Flag: --snapshot-size: Optional parameter for ordering snapshot space along with endurance file storage; specifies the size (in GB) of snapshot space to order
+	Flag: --service-offering: The service offering package to use for placing the order.
+	Flag: : [optional, default is 'storage_as_a_service']. enterprise and performance are depreciated
+	Flag: --billing: Optional parameter for Billing rate (default to monthly)
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order a file storage volume.
+	--------------------------------
+	Usage: Usage: cli file volume-order [OPTIONS]
+==============================================================
+slcli file volume-refresh
+	Flag: volume_id: 
+	Flag: snapshot_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Refresh a duplicate volume with a snapshot from its parent.
+	--------------------------------
+	Usage: Usage: cli file volume-refresh [OPTIONS] VOLUME_ID SNAPSHOT_ID
+==============================================================
+slcli file volume-set-note
+	Flag: volume-id: 
+	Flag: -n,--note: Public notes related to a Storage volume  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Set note for an existing file storage volume.
+	--------------------------------
+	Usage: Usage: cli file volume-set-note [OPTIONS] VOLUME_ID
+==============================================================
+slcli firewall add
+	Flag: target: 
+	Flag: --firewall-type: Firewall type  [required]
+	Flag: --high-availability,-ha: High available firewall option
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Create new firewall.
+	--------------------------------
+	Usage: Usage: cli firewall add [OPTIONS] TARGET
+==============================================================
+slcli firewall cancel
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancels a firewall.
+	--------------------------------
+	Usage: Usage: cli firewall cancel [OPTIONS] IDENTIFIER
+==============================================================
+slcli firewall detail
+	Flag: identifier: 
+	Flag: --credentials: Display FortiGate username and FortiGate password to multi vlans.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Detail firewall.
+	--------------------------------
+	Usage: Usage: cli firewall detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli firewall edit
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit firewall rules.
+	--------------------------------
+	Usage: Usage: cli firewall edit [OPTIONS] IDENTIFIER
+==============================================================
+slcli firewall list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List firewalls.
+	--------------------------------
+	Usage: Usage: cli firewall list [OPTIONS]
+==============================================================
+slcli firewall monitoring
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Gets bandwidth details for a firewall from the past 30 days.
+	--------------------------------
+	Usage: Usage: cli firewall monitoring [OPTIONS] IDENTIFIER
+==============================================================
+slcli globalip assign
+	Flag: identifier: 
+	Flag: --target: choose the type. vlan, ip, hardware, vsi
+	Flag: --target-id: The identifier for the destination resource to route this subnet to.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Assigns the subnet to a target.
+	--------------------------------
+	Usage: Usage: cli globalip assign [OPTIONS] IDENTIFIER
+==============================================================
+slcli globalip cancel
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel global IP.
+	--------------------------------
+	Usage: Usage: cli globalip cancel [OPTIONS] IDENTIFIER
+==============================================================
+slcli globalip create
+	Flag: --ipv6,-v6: Order a IPv6 IP
+	Flag: --test: test order
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Creates a global IP.
+	--------------------------------
+	Usage: Usage: cli globalip create [OPTIONS]
+==============================================================
+slcli globalip list
+	Flag: --ip-version: Display only IPv4
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List all global IPs.
+	--------------------------------
+	Usage: Usage: cli globalip list [OPTIONS]
+==============================================================
+slcli globalip unassign
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Unassigns a global IP from a target.
+	--------------------------------
+	Usage: Usage: cli globalip unassign [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware authorize-storage
+	Flag: identifier: 
+	Flag: -u,--username-storage: The storage username to be added to the hardware server
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Authorize File or Block Storage to a Hardware Server.
+	--------------------------------
+	Usage: Usage: cli hardware authorize-storage [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware bandwidth
+	Flag: identifier: 
+	Flag: -s,--start_date: Start Date YYYY-MM-DD, YYYY-MM-DDTHH:mm:ss,  [required]
+	Flag: -e,--end_date: End Date YYYY-MM-DD, YYYY-MM-DDTHH:mm:ss  [required]
+	Flag: -p,--summary_period: 300, 600, 1800, 3600, 43200 or 86400 seconds  [default: 3600]
+	Flag: -q,--quite_summary: Only show the summary table  [default: False]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Bandwidth data over date range. Bandwidth is listed in GB
+	--------------------------------
+	Usage: Usage: cli hardware bandwidth [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware billing
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get billing for a hardware device.
+	--------------------------------
+	Usage: Usage: cli hardware billing [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware cancel
+	Flag: identifier: 
+	Flag: --immediate: Cancels the server immediately (instead of on the billing anniversary)
+	Flag: --comment: An optional comment to add to the cancellation ticket
+	Flag: --reason: An optional cancellation reason. See cancel-reasons for a list of available options
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel a dedicated server.
+	--------------------------------
+	Usage: Usage: cli hardware cancel [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware cancel-reasons
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Display a list of cancellation reasons.
+	--------------------------------
+	Usage: Usage: cli hardware cancel-reasons [OPTIONS]
+==============================================================
+slcli hardware create
+	Flag: -H,--hostname: Host portion of the FQDN  [required]
+	Flag: -D,--domain: Domain portion of the FQDN  [required]
+	Flag: -s,--size: Hardware size  [required]
+	Flag: -o,--os: OS Key value  [required]
+	Flag: -d,--datacenter: Datacenter shortname  [required]
+	Flag: --port-speed: Port speeds. DEPRECATED, use --network
+	Flag: --no-public: Private network only. DEPRECATED, use --network.
+	Flag: --network: Network Option Key. Use instead of port-speed option
+	Flag: --billing: Billing rate  [default: hourly]
+	Flag: -i,--postinstall: Post-install script. Should be a HTTPS URL.
+	Flag: --test: Do not actually create the server
+	Flag: -t,--template: A template file that defaults the command-line options
+	Flag: --export: Exports options to a template file
+	Flag: --wait: Wait until the server is finished provisioning for up to X seconds before returning
+	Flag: --router-public: The ID of the public ROUTER on which you want the virtual server placed
+	Flag: --router-private: The ID of the private ROUTER on which you want the virtual server placed
+	Flag: -k,--key: SSH keys to add to the root user (multiple occurrence permitted)
+	Flag: -e,--extra: Extra option Key Names (multiple occurrence permitted)
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order/create a dedicated server.
+	--------------------------------
+	Usage: Usage: cli hardware create [OPTIONS]
+==============================================================
+slcli hardware create-credential
+	Flag: identifier: 
+	Flag: -U,--username: The username part of the username/password pair  [required]
+	Flag: -P,--password: The password part of the username/password pair.  [required]
+	Flag: -n,--notes: A note string stored for this username/password pair.
+	Flag: --system: The name of this specific piece of software.  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Create a password for a software component.
+	--------------------------------
+	Usage: Usage: cli hardware create-credential [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware create-options
+	Flag: location: 
+	Flag: -p,--prices: Use --prices to list the server item prices, and to list the Item Prices by location,add it to the --prices option using location short name, e.g. --prices dal13
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Server order options for a given chassis.
+	--------------------------------
+	Usage: Usage: cli hardware create-options [OPTIONS] [LOCATION]
+==============================================================
+slcli hardware credentials
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List server credentials.
+	--------------------------------
+	Usage: Usage: cli hardware credentials [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware detail
+	Flag: identifier: 
+	Flag: --passwords: Show passwords (check over your shoulder!)
+	Flag: --price: Show associated prices
+	Flag: --components: Show associated hardware components
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get details for a hardware device.
+	--------------------------------
+	Usage: Usage: cli hardware detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware dns-sync
+	Flag: identifier: 
+	Flag: -a,--a-record: Sync the A record for the host
+	Flag: --aaaa-record: Sync the AAAA record for the host
+	Flag: --ptr: Sync the PTR record for the host
+	Flag: --ttl: Sets the TTL for the A and/or PTR records  [default: 7200]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Sync DNS records.
+	--------------------------------
+	Usage: Usage: cli hardware dns-sync [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware edit
+	Flag: identifier: 
+	Flag: -D,--domain: Domain portion of the FQDN
+	Flag: -F,--userfile: Read userdata from file
+	Flag: -g,--tag: Tags to set or empty string to remove all
+	Flag: -H,--hostname: Host portion of the FQDN
+	Flag: -u,--userdata: User defined metadata string
+	Flag: --public-speed: Public port speed. -1 is best speed available
+	Flag: --private-speed: Private port speed. -1 is best speed available
+	Flag: --redundant: The desired state of redundancy for the interface(s)
+	Flag: --degraded: The desired state of degraded for the interface(s)
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit hardware details.
+	--------------------------------
+	Usage: Usage: cli hardware edit [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware list
+	Flag: -c,--cpu: Filter by number of CPU cores
+	Flag: -D,--domain: Filter by domain
+	Flag: -d,--datacenter: Filter by datacenter
+	Flag: -H,--hostname: Filter by hostname
+	Flag: -m,--memory: Filter by memory in gigabytes
+	Flag: -n,--network: Filter by network port speed in Mbps
+	Flag: --tag: Filter by tags (multiple occurrence permitted)
+	Flag: --sortby: Column to sort by  [default: hostname]
+	Flag: --columns: Columns to display. [options: guid, primary_ip, backend_ip, datacenter, action, created_by, tags]  [default: id,hostname,primary_ip,backend_ip,datacenter,action]
+	Flag: -l,--limit: How many results to get in one api call, default is 100  [default: 100]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List hardware servers.
+	--------------------------------
+	Usage: Usage: cli hardware list [OPTIONS]
+==============================================================
+slcli hardware monitoring
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get details for a hardware monitors device.
+	--------------------------------
+	Usage: Usage: cli hardware monitoring [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware notification-add
+	Flag: identifier: 
+	Flag: --users: UserId to be notified on monitoring failure.  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Create a user hardware notification entry.
+	--------------------------------
+	Usage: Usage: cli hardware notification-add [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware notification-delete
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Remove a user hardware notification entry.
+	--------------------------------
+	Usage: Usage: cli hardware notification-delete [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware notifications
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get all hardware notifications.
+	--------------------------------
+	Usage: Usage: cli hardware notifications [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware power-cycle
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Power cycle a server.
+	--------------------------------
+	Usage: Usage: cli hardware power-cycle [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware power-off
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Power off an active server.
+	--------------------------------
+	Usage: Usage: cli hardware power-off [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware power-on
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Power on a server.
+	--------------------------------
+	Usage: Usage: cli hardware power-on [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware ready
+	Flag: identifier: 
+	Flag: --wait: Seconds to wait  [default: 0]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Check if a server is ready.
+	--------------------------------
+	Usage: Usage: cli hardware ready [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware reboot
+	Flag: identifier: 
+	Flag: --hard: Perform a hard or soft reboot
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Reboot an active server.
+	--------------------------------
+	Usage: Usage: cli hardware reboot [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware reflash-firmware
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Reflash server firmware.
+	--------------------------------
+	Usage: Usage: cli hardware reflash-firmware [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware reload
+	Flag: identifier: 
+	Flag: -i,--postinstall: Post-install script to download (Only HTTPS executes, HTTP leaves file in /root
+	Flag: -k,--key: SSH keys to add to the root user (multiple occurrence permitted)
+	Flag: -l,--lvm: A flag indicating that the provision should use LVM for all logical drives.  [default: False]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Reload operating system on a server.
+	--------------------------------
+	Usage: Usage: cli hardware reload [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware rescue
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Reboot server into a rescue image.
+	--------------------------------
+	Usage: Usage: cli hardware rescue [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware sensor
+	Flag: identifier: 
+	Flag: --discrete: Show discrete units associated hardware sensor
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Retrieve a server’s hardware state via its internal sensors.
+	--------------------------------
+	Usage: Usage: cli hardware sensor [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware storage
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get storage details for a hardware server.
+	--------------------------------
+	Usage: Usage: cli hardware storage [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware toggle-ipmi
+	Flag: identifier: 
+	Flag: --enable: Whether enable (DEFAULT) or disable the interface.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Toggle the IPMI interface on and off
+	--------------------------------
+	Usage: Usage: cli hardware toggle-ipmi [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware update-firmware
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Update server firmware.
+	--------------------------------
+	Usage: Usage: cli hardware update-firmware [OPTIONS] IDENTIFIER
+==============================================================
+slcli hardware upgrade
+	Flag: identifier: 
+	Flag: --memory: Memory Size in GB
+	Flag: --network: Network port speed in Mbps
+	Flag: --drive-controller: Drive Controller
+	Flag: --public-bandwidth: Public Bandwidth in GB
+	Flag: --add-disk: Add a Hard disk in GB to a specific channel, e.g 1000 GB in disk2, it will be --add-disk 1000 2
+	Flag: --resize-disk: Upgrade a specific disk size in GB, e.g --resize-disk 2000 2
+	Flag: --test: Do not actually upgrade the hardware server
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Upgrade a Hardware Server.
+	--------------------------------
+	Usage: Usage: cli hardware upgrade [OPTIONS] IDENTIFIER
+==============================================================
+slcli image datacenter
+	Flag: identifier: 
+	Flag: --add: To add or remove Datacenter
+	Flag: locations: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Add/Remove datacenter of an image.
+	--------------------------------
+	Usage: Usage: cli image datacenter [OPTIONS] IDENTIFIER LOCATIONS...
+==============================================================
+slcli image delete
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Delete an image.
+	--------------------------------
+	Usage: Usage: cli image delete [OPTIONS] IDENTIFIER
+==============================================================
+slcli image detail
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get details for an image.
+	--------------------------------
+	Usage: Usage: cli image detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli image edit
+	Flag: identifier: 
+	Flag: --name: Name of the image
+	Flag: --note: Additional note for the image
+	Flag: --tag: Tags for the image
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit details of an image.
+	--------------------------------
+	Usage: Usage: cli image edit [OPTIONS] IDENTIFIER
+==============================================================
+slcli image export
+	Flag: identifier: 
+	Flag: uri: 
+	Flag: --ibm-api-key: The IBM Cloud API Key with access to IBM Cloud Object Storage instance. For help creating this key see
+	Flag: : https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-iam-overview#iam-overview-service-id-api-key
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Export an image to object storage.
+	--------------------------------
+	Usage: Usage: cli image export [OPTIONS] IDENTIFIER URI
+==============================================================
+slcli image import
+	Flag: name: 
+	Flag: uri: 
+	Flag: --note: The note to be applied to the imported template
+	Flag: --os-code: The referenceCode of the operating system software description for the imported VHD, ISO, or RAW image
+	Flag: --ibm-api-key: The IBM Cloud API Key with access to IBM Cloud Object Storage instance and IBM KeyProtect instance. For help creating this key see
+	Flag: : https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-iam-overview#iam-overview-service-id-api-key
+	Flag: --root-key-crn: CRN of the root key in your KMS instance
+	Flag: --wrapped-dek: Wrapped Data Encryption Key provided by IBM KeyProtect. For more info see https://cloud.ibm.com/docs/key-protect?topic=key-protect-wrap-keys
+	Flag: --cloud-init: Specifies if image is cloud-init
+	Flag: --byol: Specifies if image is bring your own license
+	Flag: --is-encrypted: Specifies if image is encrypted
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Import an image.
+	--------------------------------
+	Usage: Usage: cli image import [OPTIONS] NAME URI
+==============================================================
+slcli image list
+	Flag: --name: Filter on image name
+	Flag: --public: Display only public or private images
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List images.
+	--------------------------------
+	Usage: Usage: cli image list [OPTIONS]
+==============================================================
+slcli ipsec cancel
+	Flag: identifier: 
+	Flag: --immediate: Cancels the service  immediately (instead of on the billing anniversary)
+	Flag: --reason: An optional cancellation reason. See cancel-reasons for a list of available options
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel a IPSEC VPN tunnel context.
+	--------------------------------
+	Usage: Usage: cli ipsec cancel [OPTIONS] IDENTIFIER
+==============================================================
+slcli ipsec configure
+	Flag: context_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Request configuration of a tunnel context.
+	--------------------------------
+	Usage: Usage: cli ipsec configure [OPTIONS] CONTEXT_ID
+==============================================================
+slcli ipsec detail
+	Flag: context_id: 
+	Flag: -i,--include: Include additional resources
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List IPSEC VPN tunnel context details.
+	--------------------------------
+	Usage: Usage: cli ipsec detail [OPTIONS] CONTEXT_ID
+==============================================================
+slcli ipsec list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List IPSec VPN tunnel contexts
+	--------------------------------
+	Usage: Usage: cli ipsec list [OPTIONS]
+==============================================================
+slcli ipsec order
+	Flag: -d,--datacenter: Datacenter shortname  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order/create a IPSec VPN tunnel instance.
+	--------------------------------
+	Usage: Usage: cli ipsec order [OPTIONS]
+==============================================================
+slcli ipsec subnet-add
+	Flag: context_id: 
+	Flag: -s,--subnet-id: Subnet identifier to add
+	Flag: -t,: Subnet type to add  [required]
+	Flag: -n,: Subnet network identifier to create
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Add a subnet to an IPSEC tunnel context.
+	--------------------------------
+	Usage: Usage: cli ipsec subnet-add [OPTIONS] CONTEXT_ID
+==============================================================
+slcli ipsec subnet-remove
+	Flag: context_id: 
+	Flag: -s,--subnet-id: Subnet identifier to remove  [required]
+	Flag: -t,: Subnet type to add  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Remove a subnet from an IPSEC tunnel context.
+	--------------------------------
+	Usage: Usage: cli ipsec subnet-remove [OPTIONS] CONTEXT_ID
+==============================================================
+slcli ipsec translation-add
+	Flag: context_id: 
+	Flag: -s,--static-ip: Static IP address value  [required]
+	Flag: -r,--remote-ip: Remote IP address value  [required]
+	Flag: -n,--note: Note value
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Add an address translation to an IPSEC tunnel context.
+	--------------------------------
+	Usage: Usage: cli ipsec translation-add [OPTIONS] CONTEXT_ID
+==============================================================
+slcli ipsec translation-remove
+	Flag: context_id: 
+	Flag: -t,--translation-id: Translation identifier to remove  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Remove a translation entry from an IPSEC tunnel context.
+	--------------------------------
+	Usage: Usage: cli ipsec translation-remove [OPTIONS] CONTEXT_ID
+==============================================================
+slcli ipsec translation-update
+	Flag: context_id: 
+	Flag: -t,--translation-id: Translation identifier to update  [required]
+	Flag: -s,--static-ip: Static IP address value
+	Flag: -r,--remote-ip: Remote IP address value
+	Flag: -n,--note: Note value
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Update an address translation for an IPSEC tunnel context.
+	--------------------------------
+	Usage: Usage: cli ipsec translation-update [OPTIONS] CONTEXT_ID
+==============================================================
+slcli ipsec update
+	Flag: context_id: 
+	Flag: --friendly-name: Friendly name value
+	Flag: --remote-peer: Remote peer IP address value
+	Flag: --preshared-key: Preshared key value
+	Flag: --p1-auth,--phase1-auth: Phase 1 authentication value
+	Flag: --p1-crypto,--phase1-crypto: Phase 1 encryption value
+	Flag: --p1-dh,--phase1-dh: Phase 1 diffie hellman group value
+	Flag: --p1-key-ttl,--phase1-key-ttl: Phase 1 key life value  [120<=x<=172800]
+	Flag: --p2-auth,--phase2-auth: Phase 2 authentication value
+	Flag: --p2-crypto,--phase2-crypto: Phase 2 encryption value
+	Flag: --p2-dh,--phase2-dh: Phase 2 diffie hellman group value
+	Flag: --p2-forward-secrecy,--phase2-forward-secrecy: Phase 2 perfect forward secrecy value  [0<=x<=1]
+	Flag: --p2-key-ttl,--phase2-key-ttl: Phase 2 key life value  [120<=x<=172800]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Update tunnel context properties.
+	--------------------------------
+	Usage: Usage: cli ipsec update [OPTIONS] CONTEXT_ID
+==============================================================
+slcli licenses cancel
+	Flag: key: 
+	Flag: --immediate: Immediate cancellation
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel a license.
+	--------------------------------
+	Usage: Usage: cli licenses cancel [OPTIONS] KEY
+==============================================================
+slcli licenses create
+	Flag: -k,--key: The VMware License Key. To get could use the product_package::getItems id=301 with name Software License PackageE.g VMWARE_VSAN_ENTERPRISE_TIER_III_65_124_TB_6_X_2  [required]
+	Flag: -d,--datacenter: Datacenter shortname  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order/Create License.
+	--------------------------------
+	Usage: Usage: cli licenses create [OPTIONS]
+==============================================================
+slcli licenses create-options
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Server order options for a given chassis.
+	--------------------------------
+	Usage: Usage: cli licenses create-options [OPTIONS]
+==============================================================
+slcli loadbal cancel
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancels a LBaaS instance
+	--------------------------------
+	Usage: Usage: cli loadbal cancel [OPTIONS] IDENTIFIER
+==============================================================
+slcli loadbal detail
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get Load Balancer as a Service details.
+	--------------------------------
+	Usage: Usage: cli loadbal detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli loadbal health
+	Flag: identifier: 
+	Flag: --uuid: Health check UUID to modify.  [required]
+	Flag: -i,--interval: Seconds between checks. [2-60]  [2<=x<=60]
+	Flag: -r,--retry: Number of times before marking as DOWN. [1-10]  [1<=x<=10]
+	Flag: -t,--timeout: Seconds to wait for a connection. [1-59]  [1<=x<=59]
+	Flag: -u,--url: Url path for HTTP/HTTPS checks.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Manage LBaaS health checks.
+	--------------------------------
+	Usage: Usage: cli loadbal health [OPTIONS] IDENTIFIER
+==============================================================
+slcli loadbal l7policies
+	Flag: -p,--protocol-id: Front-end Protocol identifier
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List policies of the front-end protocol (listener).
+	--------------------------------
+	Usage: Usage: cli loadbal l7policies [OPTIONS]
+==============================================================
+slcli loadbal l7pool-add
+	Flag: identifier: 
+	Flag: -n,--name: Name for this L7 pool.  [required]
+	Flag: -m,--method: Balancing Method.  [default: ROUNDROBIN]
+	Flag: -P,--protocol: Protocol type to use for incoming connections  [default: HTTP]
+	Flag: -S,--server: Backend servers that are part of this pool. Format is colon deliminated. BACKEND_IP:PORT:WEIGHT. eg. 10.0.0.1:80:50 (multiple occurrence permitted)  [required]
+	Flag: --healthPath: Health check path.  [default: /]
+	Flag: --healthInterval: Health check interval between checks.  [default: 5]
+	Flag: --healthRetry: Health check number of times before marking as DOWN.  [default: 2]
+	Flag: --healthTimeout: Health check timeout.  [default: 2]
+	Flag: -s,--sticky: Make sessions sticky based on source_ip.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Adds a new l7 pool
+	--------------------------------
+	Usage: Usage: cli loadbal l7pool-add [OPTIONS] IDENTIFIER
+==============================================================
+slcli loadbal l7pool-del
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Deletes the identified pool
+	--------------------------------
+	Usage: Usage: cli loadbal l7pool-del [OPTIONS] IDENTIFIER
+==============================================================
+slcli loadbal list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List active Load Balancer as a Service devices.
+	--------------------------------
+	Usage: Usage: cli loadbal list [OPTIONS]
+==============================================================
+slcli loadbal member-add
+	Flag: identifier: 
+	Flag: --private: Private or public IP of the new member.  [required]
+	Flag: -m,--member: Member IP address.  [required]
+	Flag: -w,--weight: Weight of this member.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Add a new LBaaS members.
+	--------------------------------
+	Usage: Usage: cli loadbal member-add [OPTIONS] IDENTIFIER
+==============================================================
+slcli loadbal member-del
+	Flag: identifier: 
+	Flag: -m,--member: Member UUID  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Remove a LBaaS member.
+	--------------------------------
+	Usage: Usage: cli loadbal member-del [OPTIONS] IDENTIFIER
+==============================================================
+slcli loadbal ns-detail
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get Netscaler details.
+	--------------------------------
+	Usage: Usage: cli loadbal ns-detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli loadbal ns-list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List active Netscaler devices.
+	--------------------------------
+	Usage: Usage: cli loadbal ns-list [OPTIONS]
+==============================================================
+slcli loadbal order
+	Flag: -n,--name: Label for this loadbalancer.  [required]
+	Flag: -d,--datacenter: Datacenter shortname (dal13).  [required]
+	Flag: -l,--label: A descriptive label for this loadbalancer.
+	Flag: -f,--frontend: PROTOCOL:PORT string for incoming internet connections.  [default: HTTP:80; required]
+	Flag: -b,--backend: PROTOCOL:PORT string for connecting to backend servers.  [default: HTTP:80; required]
+	Flag: -m,--method: Balancing Method.  [default: ROUNDROBIN]
+	Flag: -s,--subnet: Private subnet Id to order the LB on. See `slcli lb order-options`  [required]
+	Flag: --public: Use a Public to Public loadbalancer.  [default: False]
+	Flag: --verify: Only verify an order, dont actually create one.  [default: False]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Creates a LB. Protocols supported are TCP, HTTP, and HTTPS.
+	--------------------------------
+	Usage: Usage: cli loadbal order [OPTIONS]
+==============================================================
+slcli loadbal order-options
+	Flag: -d,--datacenter: Show only selected datacenter, use shortname (dal13) format.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Prints options for order a LBaaS
+	--------------------------------
+	Usage: Usage: cli loadbal order-options [OPTIONS]
+==============================================================
+slcli loadbal pool-add
+	Flag: identifier: 
+	Flag: -P,--frontProtocol: Protocol type to use for incoming connections  [default: HTTP]
+	Flag: -p,--backProtocol: Protocol type to use when connecting to backend servers. Defaults to whatever --frontProtocol is.
+	Flag: -f,--frontPort: Internet side port  [required]
+	Flag: -b,--backPort: Private side port  [required]
+	Flag: -m,--method: Balancing Method  [default: ROUNDROBIN]
+	Flag: -c,--connections: Maximum number of connections to allow.
+	Flag: -s,--sticky: Make sessions sticky based on source_ip.
+	Flag: -x,--sslCert: SSL certificate ID. See `slcli ssl list`
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Adds a listener to the identifier LB
+	--------------------------------
+	Usage: Usage: cli loadbal pool-add [OPTIONS] IDENTIFIER
+==============================================================
+slcli loadbal pool-del
+	Flag: identifier: 
+	Flag: listener: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Removes the listener from identified LBaaS instance
+	--------------------------------
+	Usage: Usage: cli loadbal pool-del [OPTIONS] IDENTIFIER LISTENER
+==============================================================
+slcli loadbal pool-edit
+	Flag: identifier: 
+	Flag: listener: 
+	Flag: -P,--frontProtocol: Protocol type to use for incoming connections
+	Flag: -p,--backProtocol: Protocol type to use when connecting to backend servers. Defaults to whatever --frontProtocol is.
+	Flag: -f,--frontPort: Internet side port
+	Flag: -b,--backPort: Private side port
+	Flag: -m,--method: Balancing Method
+	Flag: -c,--connections: Maximum number of connections to allow.
+	Flag: -t,--clientTimeout: maximum idle time in seconds(Range: 1 to 7200).
+	Flag: -s,--sticky: Make sessions sticky based on source_ip.
+	Flag: -x,--sslCert: SSL certificate ID. See `slcli ssl list`
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Updates a listener's configuration.
+	--------------------------------
+	Usage: Usage: cli loadbal pool-edit [OPTIONS] IDENTIFIER LISTENER
+==============================================================
+slcli nas credentials
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List NAS account credentials.
+	--------------------------------
+	Usage: Usage: cli nas credentials [OPTIONS] IDENTIFIER
+==============================================================
+slcli nas list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List NAS accounts.
+	--------------------------------
+	Usage: Usage: cli nas list [OPTIONS]
+==============================================================
+slcli object-storage accounts
+	Flag: --limit: Result limit
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List object storage accounts.
+	--------------------------------
+	Usage: Usage: cli object-storage accounts [OPTIONS]
+==============================================================
+slcli object-storage credential create
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Create credentials for an IBM Cloud Object Storage Account
+	--------------------------------
+	Usage: Usage: cli object-storage credential create [OPTIONS] IDENTIFIER
+==============================================================
+slcli object-storage credential delete
+	Flag: identifier: 
+	Flag: -c,--credential_id: This is the credential id associated with the volume
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Delete the credential of an Object Storage Account.
+	--------------------------------
+	Usage: Usage: cli object-storage credential delete [OPTIONS] IDENTIFIER
+==============================================================
+slcli object-storage credential limit
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Credential limits for this IBM Cloud Object Storage account.
+	--------------------------------
+	Usage: Usage: cli object-storage credential limit [OPTIONS] IDENTIFIER
+==============================================================
+slcli object-storage credential list
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Retrieve credentials used for generating an AWS signature. Max of 2.
+	--------------------------------
+	Usage: Usage: cli object-storage credential list [OPTIONS] IDENTIFIER
+==============================================================
+slcli object-storage endpoints
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List object storage endpoints.
+	--------------------------------
+	Usage: Usage: cli object-storage endpoints [OPTIONS] IDENTIFIER
+==============================================================
+slcli order category-list
+	Flag: package_keyname: 
+	Flag: --required: List only the required categories for the package
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List the categories of a package.
+	--------------------------------
+	Usage: Usage: cli order category-list [OPTIONS] PACKAGE_KEYNAME
+==============================================================
+slcli order item-list
+	Flag: package_keyname: 
+	Flag: -k,--keyword: A word (or string) used to filter item names.
+	Flag: -c,--category: Category code to filter items by
+	Flag: -p,--prices: Use --prices to list the server item prices, and to list the Item Prices by location, add it to the --prices option using location KeyName, e.g. --prices AMSTERDAM02
+	Flag: location: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List package items used for ordering.
+	--------------------------------
+	Usage: Usage: cli order item-list [OPTIONS] PACKAGE_KEYNAME [LOCATION]
+==============================================================
+slcli order lookup
+	Flag: identifier: 
+	Flag: --details: Shows a very detailed list of charges  [default: False]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Provides some details related to order owner, date order, cost information, initial invoice.
+	--------------------------------
+	Usage: Usage: cli order lookup [OPTIONS] IDENTIFIER
+==============================================================
+slcli order package-list
+	Flag: --keyword: A word (or string) used to filter package names.
+	Flag: --package_type: The keyname for the type of package. BARE_METAL_CPU for example
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List packages that can be ordered via the placeOrder API.
+	--------------------------------
+	Usage: Usage: cli order package-list [OPTIONS]
+==============================================================
+slcli order package-locations
+	Flag: package_keyname: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List Datacenters a package can be ordered in.
+	--------------------------------
+	Usage: Usage: cli order package-locations [OPTIONS] PACKAGE_KEYNAME
+==============================================================
+slcli order place
+	Flag: package_keyname: 
+	Flag: location: 
+	Flag: --preset: The order preset (if required by the package)
+	Flag: --verify: Flag denoting whether or not to only verify the order, not place it
+	Flag: --quantity: The quantity of the item being ordered
+	Flag: --billing: Billing rate  [default: hourly]
+	Flag: --complex-type: The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'.
+	Flag: --extras: JSON string denoting extra data that needs to be sent with the order
+	Flag: order_items: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Place or verify an order.
+	--------------------------------
+	Usage: Usage: cli order place [OPTIONS] PACKAGE_KEYNAME LOCATION [ORDER_ITEMS]...
+==============================================================
+slcli order place-quote
+	Flag: package_keyname: 
+	Flag: location: 
+	Flag: --preset: The order preset (if required by the package)
+	Flag: --name: A custom name to be assigned to the quote (optional)
+	Flag: --send-email: The quote will be sent to the email address associated with your user.
+	Flag: --complex-type: The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'.
+	Flag: --extras: JSON string denoting extra data that needs to be sent with the order
+	Flag: order_items: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Place a quote.
+	--------------------------------
+	Usage: Usage: cli order place-quote [OPTIONS] PACKAGE_KEYNAME LOCATION [ORDER_ITEMS]...
+==============================================================
+slcli order preset-list
+	Flag: package_keyname: 
+	Flag: --keyword: A word (or string) used to filter preset names.
+	Flag: -p,--prices: Use --prices to list the server item prices.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List package presets.
+	--------------------------------
+	Usage: Usage: cli order preset-list [OPTIONS] PACKAGE_KEYNAME
+==============================================================
+slcli order quote
+	Flag: quote: 
+	Flag: --verify: If specified, will only show what the quote will order, will NOT place an order  [default: False]
+	Flag: --quantity: The quantity of the item being ordered if different from quoted value
+	Flag: --complex-type: The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'.  [default: SoftLayer_Container_Product_Order_Hardware_Server]
+	Flag: -u,--userdata: User defined metadata string
+	Flag: -F,--userfile: Read userdata from file
+	Flag: -i,--postinstall: Post-install script to download
+	Flag: -k,--key: SSH keys to add to the root user (multiple occurrence permitted)
+	Flag: --fqdn: <hostname>.<domain.name.tld> formatted name to use. Specify one fqdn per server (multiple occurrence permitted)  [required]
+	Flag: --image: Image ID. See: 'slcli image list' for reference
+	Flag: --extras: JSON string denoting extra data that needs to be sent with the order
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: View and Order a quote
+	--------------------------------
+	Usage: Usage: cli order quote [OPTIONS] QUOTE
+==============================================================
+slcli order quote-detail
+	Flag: quote: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: View a quote
+	--------------------------------
+	Usage: Usage: cli order quote-detail [OPTIONS] QUOTE
+==============================================================
+slcli order quote-list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List all active quotes on an account
+	--------------------------------
+	Usage: Usage: cli order quote-list [OPTIONS]
+==============================================================
+slcli order quote-save
+	Flag: quote: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Save a quote
+	--------------------------------
+	Usage: Usage: cli order quote-save [OPTIONS] QUOTE
+==============================================================
+slcli report bandwidth
+	Flag: --start: datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'
+	Flag: --end: datetime in the format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'
+	Flag: --sortby: Column to sort by  [default: hostname]
+	Flag: --virtual: Show only the bandwidth summary for each virtual server
+	Flag: --server: Show only the bandwidth summary for each hardware server
+	Flag: --pool: Show only the bandwidth pool summary.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Bandwidth report for every pool/server.
+	--------------------------------
+	Usage: Usage: cli report bandwidth [OPTIONS]
+==============================================================
+slcli report datacenter-closures
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Report on Resources in closing datacenters
+	--------------------------------
+	Usage: Usage: cli report datacenter-closures [OPTIONS]
+==============================================================
+slcli securitygroup create
+	Flag: -n,--name: The name of the security group
+	Flag: -d,--description: The description of the security group
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Create a security group.
+	--------------------------------
+	Usage: Usage: cli securitygroup create [OPTIONS]
+==============================================================
+slcli securitygroup delete
+	Flag: securitygroup_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Deletes the given security group
+	--------------------------------
+	Usage: Usage: cli securitygroup delete [OPTIONS] SECURITYGROUP_ID
+==============================================================
+slcli securitygroup detail
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get details about a security group.
+	--------------------------------
+	Usage: Usage: cli securitygroup detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli securitygroup edit
+	Flag: group_id: 
+	Flag: -n,--name: The name of the security group
+	Flag: -d,--description: The description of the security group
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit details of a security group.
+	--------------------------------
+	Usage: Usage: cli securitygroup edit [OPTIONS] GROUP_ID
+==============================================================
+slcli securitygroup event-log
+	Flag: request_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Search for event logs by request id
+	--------------------------------
+	Usage: Usage: cli securitygroup event-log [OPTIONS] REQUEST_ID
+==============================================================
+slcli securitygroup interface-add
+	Flag: securitygroup_id: 
+	Flag: -n,--network-component: The network component to associate with the security group
+	Flag: -s,--server: The server ID to associate with the security group
+	Flag: -i,--interface: The interface of the server to associate (public/private)
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Attach an interface to a security group.
+	--------------------------------
+	Usage: Usage: cli securitygroup interface-add [OPTIONS] SECURITYGROUP_ID
+==============================================================
+slcli securitygroup interface-list
+	Flag: securitygroup_id: 
+	Flag: --sortby: Column to sort by
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List interfaces associated with security groups.
+	--------------------------------
+	Usage: Usage: cli securitygroup interface-list [OPTIONS] SECURITYGROUP_ID
+==============================================================
+slcli securitygroup interface-remove
+	Flag: securitygroup_id: 
+	Flag: -n,--network-component: The network component to remove from with the security group
+	Flag: -s,--server: The server ID to remove from the security group
+	Flag: -i,--interface: The interface of the server to remove (public/private)
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Detach an interface from a security group.
+	--------------------------------
+	Usage: Usage: cli securitygroup interface-remove [OPTIONS] SECURITYGROUP_ID
+==============================================================
+slcli securitygroup list
+	Flag: --sortby: Column to sort by
+	Flag: -l,--limit: How many results to get in one api call, default is 100  [default: 100]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List security groups.
+	--------------------------------
+	Usage: Usage: cli securitygroup list [OPTIONS]
+==============================================================
+slcli securitygroup rule-add
+	Flag: securitygroup_id: 
+	Flag: -r,--remote-ip: The remote IP/CIDR to enforce
+	Flag: -s,--remote-group: The ID of the remote security group to enforce
+	Flag: -d,--direction: The direction of traffic to enforce (ingress, egress)
+	Flag: -e,--ethertype: The ethertype (IPv4 or IPv6) to enforce
+	Flag: -M,--port-max: The upper port bound to enforce. When the protocol is ICMP, this specifies the ICMP code to permit
+	Flag: -m,--port-min: The lower port bound to enforce. When the protocol is ICMP, this specifies the ICMP type to permit
+	Flag: -p,--protocol: The protocol (icmp, tcp, udp) to enforce
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Add a security group rule to a security group.
+	--------------------------------
+	Usage: Usage: cli securitygroup rule-add [OPTIONS] SECURITYGROUP_ID
+==============================================================
+slcli securitygroup rule-edit
+	Flag: securitygroup_id: 
+	Flag: rule_id: 
+	Flag: -r,--remote-ip: The remote IP/CIDR to enforce
+	Flag: -s,--remote-group: The ID of the remote security group to enforce
+	Flag: -d,--direction: The direction of traffic to enforce
+	Flag: -e,--ethertype: The ethertype (IPv4 or IPv6) to enforce
+	Flag: -M,--port-max: The upper port bound to enforce
+	Flag: -m,--port-min: The lower port bound to enforce
+	Flag: -p,--protocol: The protocol (icmp, tcp, udp) to enforce
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit a security group rule in a security group.
+	--------------------------------
+	Usage: Usage: cli securitygroup rule-edit [OPTIONS] SECURITYGROUP_ID RULE_ID
+==============================================================
+slcli securitygroup rule-list
+	Flag: securitygroup_id: 
+	Flag: --sortby: Column to sort by
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List security group rules.
+	--------------------------------
+	Usage: Usage: cli securitygroup rule-list [OPTIONS] SECURITYGROUP_ID
+==============================================================
+slcli securitygroup rule-remove
+	Flag: securitygroup_id: 
+	Flag: rule_id: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Remove a rule from a security group.
+	--------------------------------
+	Usage: Usage: cli securitygroup rule-remove [OPTIONS] SECURITYGROUP_ID RULE_ID
+==============================================================
+slcli sshkey add
+	Flag: label: 
+	Flag: -f,--in-file: The id_rsa.pub file to import for this key
+	Flag: -k,--key: The actual SSH key
+	Flag: --note: Extra note that will be associated with key
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Add a new SSH key.
+	--------------------------------
+	Usage: Usage: cli sshkey add [OPTIONS] LABEL
+==============================================================
+slcli sshkey edit
+	Flag: identifier: 
+	Flag: -k,--label: The new label for the key
+	Flag: --note: New notes for the key
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edits an SSH key.
+	--------------------------------
+	Usage: Usage: cli sshkey edit [OPTIONS] IDENTIFIER
+==============================================================
+slcli sshkey list
+	Flag: --sortby: Column to sort by
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List SSH keys.
+	--------------------------------
+	Usage: Usage: cli sshkey list [OPTIONS]
+==============================================================
+slcli sshkey print
+	Flag: identifier: 
+	Flag: -f,--out-file: The public SSH key will be written to this file
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Prints out an SSH key to the screen.
+	--------------------------------
+	Usage: Usage: cli sshkey print [OPTIONS] IDENTIFIER
+==============================================================
+slcli sshkey remove
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Permanently removes an SSH key.
+	--------------------------------
+	Usage: Usage: cli sshkey remove [OPTIONS] IDENTIFIER
+==============================================================
+slcli ssl add
+	Flag: --crt: Certificate file
+	Flag: --csr: Certificate Signing Request file
+	Flag: --icc: Intermediate Certificate file
+	Flag: --key: Private Key file
+	Flag: --notes: Additional notes
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Add and upload SSL certificate details.
+	--------------------------------
+	Usage: Usage: cli ssl add [OPTIONS]
+==============================================================
+slcli ssl download
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Download SSL certificate and key file.
+	--------------------------------
+	Usage: Usage: cli ssl download [OPTIONS] IDENTIFIER
+==============================================================
+slcli ssl edit
+	Flag: identifier: 
+	Flag: --crt: Certificate file
+	Flag: --csr: Certificate Signing Request file
+	Flag: --icc: Intermediate Certificate file
+	Flag: --key: Private Key file
+	Flag: --notes: Additional notes
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit SSL certificate.
+	--------------------------------
+	Usage: Usage: cli ssl edit [OPTIONS] IDENTIFIER
+==============================================================
+slcli ssl list
+	Flag: --status: Show certificates with this status  [default: all]
+	Flag: --sortby: Column to sort by
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List SSL certificates.
+	--------------------------------
+	Usage: Usage: cli ssl list [OPTIONS]
+==============================================================
+slcli ssl remove
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Remove SSL certificate.
+	--------------------------------
+	Usage: Usage: cli ssl remove [OPTIONS] IDENTIFIER
+==============================================================
+slcli subnet cancel
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel a subnet.
+	--------------------------------
+	Usage: Usage: cli subnet cancel [OPTIONS] IDENTIFIER
+==============================================================
+slcli subnet clear-route
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Remove the route of your Account Owned subnets.
+	--------------------------------
+	Usage: Usage: cli subnet clear-route [OPTIONS] IDENTIFIER
+==============================================================
+slcli subnet create
+	Flag: network: 
+	Flag: quantity: 
+	Flag: endpoint-id: 
+	Flag: --v6,--ipv6: Order IPv6 Addresses
+	Flag: --test: Do not order the subnet; just get a quote
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Add a new subnet to your account. Valid quantities vary by type.
+	--------------------------------
+	Usage: Usage: cli subnet create [OPTIONS] {static|public|private} QUANTITY ENDPOINT_ID
+==============================================================
+slcli subnet detail
+	Flag: identifier: 
+	Flag: --no-vs: Hide virtual server listing
+	Flag: --no-hardware: Hide hardware listing
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get subnet details.
+	--------------------------------
+	Usage: Usage: cli subnet detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli subnet edit
+	Flag: identifier: 
+	Flag: -t,--tags: Comma separated list of tags, enclosed in quotes. "tag1, tag2"
+	Flag: -n,--note: The note
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit note and tags of a subnet.
+	--------------------------------
+	Usage: Usage: cli subnet edit [OPTIONS] IDENTIFIER
+==============================================================
+slcli subnet edit-ip
+	Flag: identifier: 
+	Flag: --note: set ip address note of subnet
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Set the note of the ipAddress
+	--------------------------------
+	Usage: Usage: cli subnet edit-ip [OPTIONS] IDENTIFIER
+==============================================================
+slcli subnet list
+	Flag: --sortby: Column to sort by
+	Flag: -d,--datacenter: Filter by datacenter shortname (sng01, dal05, ...)
+	Flag: --identifier: Filter by network identifier
+	Flag: -t,--subnet-type: Filter by subnet type
+	Flag: --network-space: Filter by network space
+	Flag: --v4,--ipv4: Display only IPv4 subnets
+	Flag: --v6,--ipv6: Display only IPv6 subnets
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List subnets.
+	--------------------------------
+	Usage: Usage: cli subnet list [OPTIONS]
+==============================================================
+slcli subnet lookup
+	Flag: ip_address: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Find an IP address and display its subnet and device info.
+	--------------------------------
+	Usage: Usage: cli subnet lookup [OPTIONS] IP_ADDRESS
+==============================================================
+slcli subnet route
+	Flag: identifier: 
+	Flag: --target: choose the type. vlan, ip, hardware, vsi
+	Flag: --target-id: The identifier for the destination resource to route this subnet to.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Assigns the subnet to a target.
+	--------------------------------
+	Usage: Usage: cli subnet route [OPTIONS] IDENTIFIER
+==============================================================
+slcli tags cleanup
+	Flag: -d,--dry-run: Don't delete, just show what will be deleted.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Removes all empty tags.
+	--------------------------------
+	Usage: Usage: cli tags cleanup [OPTIONS]
+==============================================================
+slcli tags delete
+	Flag: identifier: 
+	Flag: --name: Assume identifier is a tag name. Useful if your tag name is a number.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Delete a Tag. Tag names that contain spaces need to be encased in quotes
+	--------------------------------
+	Usage: Usage: cli tags delete [OPTIONS] IDENTIFIER
+==============================================================
+slcli tags details
+	Flag: identifier: 
+	Flag: --name: Assume identifier is a tag name. Useful if your tag name is a number.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get details for a Tag. Identifier can be either a name or tag-id
+	--------------------------------
+	Usage: Usage: cli tags details [OPTIONS] IDENTIFIER
+==============================================================
+slcli tags list
+	Flag: -d,--detail: Show information about the resources using this tag.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List Tags.
+	--------------------------------
+	Usage: Usage: cli tags list [OPTIONS]
+==============================================================
+slcli tags set
+	Flag: -t,--tags: Comma seperated list of tags, enclosed in quotes. "tag1, tag2"  [required]
+	Flag: -k,--key-name: Key name of a tag type e.g. GUEST, HARDWARE. See slcli tags taggable output.  [required]
+	Flag: -r,--resource-id: ID of the object being tagged  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Set Tags.
+	--------------------------------
+	Usage: Usage: cli tags set [OPTIONS]
+==============================================================
+slcli tags taggable
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List everything that could be tagged.
+	--------------------------------
+	Usage: Usage: cli tags taggable [OPTIONS]
+==============================================================
+slcli ticket attach
+	Flag: identifier: 
+	Flag: --hardware: The identifier for hardware to attach
+	Flag: --virtual: The identifier for a virtual server to attach
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Attach devices to a ticket.
+	--------------------------------
+	Usage: Usage: cli ticket attach [OPTIONS] IDENTIFIER
+==============================================================
+slcli ticket create
+	Flag: --title: The title of the ticket  [required]
+	Flag: --subject-id: The subject id to use for the ticket, run 'slcli ticket subjects' to get the list  [required]
+	Flag: --body: The ticket body
+	Flag: --hardware: The identifier for hardware to attach
+	Flag: --virtual: The identifier for a virtual server to attach
+	Flag: --priority: Ticket priority, from 1 (Critical) to 4 (Minimal Impact).
+	Flag: : Only settable with Advanced and Premium support. See https://www.ibm.com/cloud/support
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Create a Infrastructure support ticket.
+	--------------------------------
+	Usage: Usage: cli ticket create [OPTIONS]
+==============================================================
+slcli ticket detach
+	Flag: identifier: 
+	Flag: --hardware: The identifier for hardware to detach
+	Flag: --virtual: The identifier for a virtual server to detach
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Detach devices from a ticket.
+	--------------------------------
+	Usage: Usage: cli ticket detach [OPTIONS] IDENTIFIER
+==============================================================
+slcli ticket detail
+	Flag: identifier: 
+	Flag: --count: Number of updates  [default: 10]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get details for a ticket.
+	--------------------------------
+	Usage: Usage: cli ticket detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli ticket list
+	Flag: --open: Display only open or closed tickets
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List tickets.
+	--------------------------------
+	Usage: Usage: cli ticket list [OPTIONS]
+==============================================================
+slcli ticket subjects
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List Subject IDs for ticket creation.
+	--------------------------------
+	Usage: Usage: cli ticket subjects [OPTIONS]
+==============================================================
+slcli ticket summary
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Summary info about tickets.
+	--------------------------------
+	Usage: Usage: cli ticket summary [OPTIONS]
+==============================================================
+slcli ticket update
+	Flag: identifier: 
+	Flag: --body: Text to add to the ticket. STDIN or the default text editor will be used otherwise.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Adds an update to an existing ticket.
+	--------------------------------
+	Usage: Usage: cli ticket update [OPTIONS] IDENTIFIER
+==============================================================
+slcli ticket upload
+	Flag: identifier: 
+	Flag: --path: The path of the attachment to be uploaded
+	Flag: --name: The name of the attachment shown in the ticket
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Adds an attachment to an existing ticket.
+	--------------------------------
+	Usage: Usage: cli ticket upload [OPTIONS] IDENTIFIER
+==============================================================
+slcli user create
+	Flag: username: 
+	Flag: -e,--email: Email address for this user. Required for creation.  [required]
+	Flag: -p,--password: Password to set for this user. If no password is provided, user will be sent an email to generate one, which expires in 24 hours.  '-p generate' will create a password for you (Requires Python 3.6+). Passwords
+	Flag: : require 8+ characters, upper and lowercase, a number and a symbol.
+	Flag: -u,--from-user: Base user to use as a template for creating this user. Will default to the user running this command. Information provided in --template supersedes this template.
+	Flag: -t,--template: A json string describing https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Creates a user Users.
+	--------------------------------
+	Usage: Usage: cli user create [OPTIONS] USERNAME
+==============================================================
+slcli user delete
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Sets a user's status to CANCEL_PENDING, which will immediately disable the account,
+	--------------------------------
+	Usage: Usage: cli user delete [OPTIONS] IDENTIFIER
+==============================================================
+slcli user detail
+	Flag: identifier: 
+	Flag: -k,--keys: Show the users API key.
+	Flag: -p,--permissions: Display permissions assigned to this user. Master users will show no permissions
+	Flag: -h,--hardware: Display hardware this user has access to.
+	Flag: -v,--virtual: Display virtual guests this user has access to.
+	Flag: -l,--logins: Show login history of this user for the last 30 days
+	Flag: -e,--events: Show event log for this user.
+	Flag: --help: Show this message and exit.
+	--------------------------------
+	Description: User details.
+	--------------------------------
+	Usage: Usage: cli user detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli user device-access
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: User Device access.
+	--------------------------------
+	Usage: Usage: cli user device-access [OPTIONS] IDENTIFIER
+==============================================================
+slcli user edit-details
+	Flag: user: 
+	Flag: -t,--template: A json string describing https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer/  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit a Users details
+	--------------------------------
+	Usage: Usage: cli user edit-details [OPTIONS] USER
+==============================================================
+slcli user edit-notifications
+	Flag: --enable: Enable (DEFAULT) or Disable selected notification
+	Flag: notification: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Enable or Disable specific notifications for the active user.
+	--------------------------------
+	Usage: Usage: cli user edit-notifications [OPTIONS] NOTIFICATION...
+==============================================================
+slcli user edit-permissions
+	Flag: identifier: 
+	Flag: --enable: Enable (DEFAULT) or Disable selected permissions
+	Flag: -p,--permission: Permission keyName to set, multiple instances allowed. Use keyword ALL to select ALL permisssions
+	Flag: -u,--from-user: Set permissions to match this user's permissions. Will add then remove the appropriate permissions
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Enable or Disable specific permissions.
+	--------------------------------
+	Usage: Usage: cli user edit-permissions [OPTIONS] IDENTIFIER
+==============================================================
+slcli user list
+	Flag: --columns: Columns to display. [options: id, username, email, displayName, status, hardwareCount, virtualGuestCount, 2FA, classicAPIKey]  [default: id,username,email,displayName,2FA,classicAPIKey]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List Users.
+	--------------------------------
+	Usage: Usage: cli user list [OPTIONS]
+==============================================================
+slcli user notifications
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: My Notifications.
+	--------------------------------
+	Usage: Usage: cli user notifications [OPTIONS]
+==============================================================
+slcli user permissions
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: User Permissions.
+	--------------------------------
+	Usage: Usage: cli user permissions [OPTIONS] IDENTIFIER
+==============================================================
+slcli user remove-access
+	Flag: identifier: 
+	Flag: -h,--hardware: Display hardware this user has access to.
+	Flag: -v,--virtual: Display virtual guests this user has access to.
+	Flag: -l,--dedicated: dedicated host ID
+	Flag: --help: Show this message and exit.
+	--------------------------------
+	Description: Remove access from a user to an specific device.
+	--------------------------------
+	Usage: Usage: cli user remove-access [OPTIONS] IDENTIFIER
+==============================================================
+slcli user vpn-manual
+	Flag: user: 
+	Flag: --enable: Enable or disable vpn subnets manual config.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Enable or disable user vpn subnets manual config
+	--------------------------------
+	Usage: Usage: cli user vpn-manual [OPTIONS] USER
+==============================================================
+slcli user vpn-subnet
+	Flag: --add: Add or remove access to subnets.
+	Flag: user: 
+	Flag: subnet: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Add or remove subnets access for a user.
+	--------------------------------
+	Usage: Usage: cli user vpn-subnet [OPTIONS] USER SUBNET...
+==============================================================
+slcli virtual access
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get user access details a virtual server.
+	--------------------------------
+	Usage: Usage: cli virtual access [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual authorize-storage
+	Flag: identifier: 
+	Flag: -u,--username-storage: The storage username to be added to the virtual server
+	Flag: --portable-id: The portable storage id to be added to the virtual server
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Authorize File, Block and Portable Storage to a Virtual Server.
+	--------------------------------
+	Usage: Usage: cli virtual authorize-storage [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual bandwidth
+	Flag: identifier: 
+	Flag: -s,--start_date: Start Date YYYY-MM-DD, YYYY-MM-DDTHH:mm:ss,  [required]
+	Flag: -e,--end_date: End Date YYYY-MM-DD, YYYY-MM-DDTHH:mm:ss  [required]
+	Flag: -p,--summary_period: 300, 600, 1800, 3600, 43200 or 86400 seconds  [default: 3600]
+	Flag: -q,--quite_summary: Only show the summary table  [default: False]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Bandwidth data over date range. Bandwidth is listed in GB
+	--------------------------------
+	Usage: Usage: cli virtual bandwidth [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual billing
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get billing for a virtual device.
+	--------------------------------
+	Usage: Usage: cli virtual billing [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual cancel
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel virtual servers.
+	--------------------------------
+	Usage: Usage: cli virtual cancel [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual capacity create
+	Flag: -n,--name: Name for your new reserved capacity  [required]
+	Flag: -b,--backend_router_id: backendRouterId, create-options has a list of valid ids to use.  [required]
+	Flag: -f,--flavor: Capacity keyname (C1_2X2_1_YEAR_TERM for example).  [required]
+	Flag: -i,--instances: Number of VSI instances this capacity reservation can support.  [required]
+	Flag: --test: Do not actually create the virtual server
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Create a Reserved Capacity instance.
+	--------------------------------
+	Usage: Usage: cli virtual capacity create [OPTIONS]
+==============================================================
+slcli virtual capacity create-guest
+	Flag: --capacity-id: Reserve capacity Id to provision this guest into.
+	Flag: --primary-disk: Size of the main drive.
+	Flag: -H,--hostname: Host portion of the FQDN.  [required]
+	Flag: -D,--domain: Domain portion of the FQDN.  [required]
+	Flag: -o,--os: OS install code. Tip: you can specify <OS>_LATEST.
+	Flag: --image: Image ID. See: 'slcli image list' for reference.
+	Flag: --boot-mode: Specify the mode to boot the OS in. Supported modes are HVM and PV.
+	Flag: -i,--postinstall: Post-install script to download.
+	Flag: -k,--key: SSH keys to add to the root user. (multiple occurrence permitted)
+	Flag: --disk: Additional disk sizes. (multiple occurrence permitted)
+	Flag: --private: Forces the VS to only have access the private network.
+	Flag: --like: Use the configuration from an existing VS.
+	Flag: -n,--network: Network port speed in Mbps.
+	Flag: -g,--tag: Tags to add to the instance. (multiple occurrence permitted)
+	Flag: -u,--userdata: User defined metadata string.
+	Flag: --ipv6: Adds an IPv6 address to this guest
+	Flag: --test: Test order, will return the order container, but not actually order a server.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Allows for creating a virtual guest in a reserved capacity. Only MONTHLY guests are supported at this time.
+	--------------------------------
+	Usage: Usage: cli virtual capacity create-guest [OPTIONS]
+==============================================================
+slcli virtual capacity create-options
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List options for creating Reserved Capacity
+	--------------------------------
+	Usage: Usage: cli virtual capacity create-options [OPTIONS]
+==============================================================
+slcli virtual capacity detail
+	Flag: identifier: 
+	Flag: --columns: Columns to display. [options: Id, hostname, domain, primary_ip, backend_ip]  [default: id,hostname,domain,primary_ip,backend_ip]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Reserved Capacity Group details. Will show which guests are assigned to a reservation.
+	--------------------------------
+	Usage: Usage: cli virtual capacity detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual capacity list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List Reserved Capacity groups.
+	--------------------------------
+	Usage: Usage: cli virtual capacity list [OPTIONS]
+==============================================================
+slcli virtual capture
+	Flag: identifier: 
+	Flag: -n,--name: Name of the image  [required]
+	Flag: --all: Capture all disks belonging to the VS
+	Flag: --note: Add a note to be associated with the image
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Capture one or all disks from a virtual server to a SoftLayer image.
+	--------------------------------
+	Usage: Usage: cli virtual capture [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual create
+	Flag: -H,--hostname: Host portion of the FQDN  [required]
+	Flag: -D,--domain: Domain portion of the FQDN  [required]
+	Flag: -c,--cpu: Number of CPU cores (not available with flavors)
+	Flag: -m,--memory: Memory in mebibytes (not available with flavors)
+	Flag: -f,--flavor: Public Virtual Server flavor key name
+	Flag: -d,--datacenter: Datacenter shortname  [required]
+	Flag: -o,--os: OS install code. Tip: you can specify <OS>_LATEST
+	Flag: --image: Image ID. See: 'slcli image list' for reference
+	Flag: --boot-mode: Specify the mode to boot the OS in. Supported modes are HVM and PV.
+	Flag: --billing: Billing rate  [default: hourly]
+	Flag: --dedicated: Create a Dedicated Virtual Server
+	Flag: --host-id: Host Id to provision a Dedicated Host Virtual Server onto
+	Flag: --san: Use SAN storage instead of local disk.
+	Flag: --test: Do not actually create the virtual server
+	Flag: --export: Exports options to a template file
+	Flag: -i,--postinstall: Post-install script to download
+	Flag: -k,--key: SSH keys to add to the root user (multiple occurrence permitted)
+	Flag: --disk: Disk sizes (multiple occurrence permitted)
+	Flag: --private: Forces the VS to only have access the private network
+	Flag: --like: Use the configuration from an existing VS
+	Flag: -n,--network: Network port speed in Mbps
+	Flag: -g,--tag: Tags to add to the instance (multiple occurrence permitted)
+	Flag: -t,--template: A template file that defaults the command-line options
+	Flag: -u,--userdata: User defined metadata string
+	Flag: -F,--userfile: Read userdata from file
+	Flag: --vlan-public: The ID of the public VLAN on which you want the virtual server placed
+	Flag: --vlan-private: The ID of the private VLAN on which you want the virtual server placed
+	Flag: --subnet-public: The ID of the public SUBNET on which you want the virtual server placed
+	Flag: --subnet-private: The ID of the private SUBNET on which you want the virtual server placed
+	Flag: --router-public: The ID of the public ROUTER on which you want the virtual server placed
+	Flag: --router-private: The ID of the private ROUTER on which you want the virtual server placed
+	Flag: -S,--public-security-group: Security group ID to associate with the public interface (multiple occurrence permitted)
+	Flag: -s,--private-security-group: Security group ID to associate with the private interface (multiple occurrence permitted)
+	Flag: --wait: Wait until VS is finished provisioning for up to X seconds before returning
+	Flag: --placementgroup: Placement Group name or Id to order this guest on. See: slcli vs placementgroup list
+	Flag: --ipv6: Adds an IPv6 address to this guest
+	Flag: --transient: Create a transient virtual server
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order/create virtual servers.
+	--------------------------------
+	Usage: Usage: cli virtual create [OPTIONS]
+==============================================================
+slcli virtual create-options
+	Flag: location: 
+	Flag: --vsi-type: VS keyName type.  [default: PUBLIC_CLOUD_SERVER]
+	Flag: -p,--prices: Use --prices to list the server item prices, and to list the Item Prices by location,add it to the --prices option using location short name, e.g. --prices dal13
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Virtual server order options.
+	--------------------------------
+	Usage: Usage: cli virtual create-options [OPTIONS] [LOCATION]
+==============================================================
+slcli virtual credentials
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List virtual server credentials.
+	--------------------------------
+	Usage: Usage: cli virtual credentials [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual detail
+	Flag: identifier: 
+	Flag: --passwords: Show passwords (check over your shoulder!)
+	Flag: --price: Show associated prices
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get details for a virtual server.
+	--------------------------------
+	Usage: Usage: cli virtual detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual dns-sync
+	Flag: identifier: 
+	Flag: -a,--a-record: Sync the A record for the host
+	Flag: --aaaa-record: Sync the AAAA record for the host
+	Flag: --ptr: Sync the PTR record for the host
+	Flag: --ttl: Sets the TTL for the A and/or PTR records  [default: 7200]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Sync DNS records.
+	--------------------------------
+	Usage: Usage: cli virtual dns-sync [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual edit
+	Flag: identifier: 
+	Flag: -D,--domain: Domain portion of the FQDN
+	Flag: -H,--hostname: Host portion of the FQDN. example: server
+	Flag: -g,--tag: Tags to set or empty string to remove all
+	Flag: -u,--userdata: User defined metadata string
+	Flag: -F,--userfile: Read userdata from file
+	Flag: --public-speed: Public port speed.
+	Flag: --private-speed: Private port speed.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit a virtual server's details.
+	--------------------------------
+	Usage: Usage: cli virtual edit [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual list
+	Flag: -c,--cpu: Number of CPU cores
+	Flag: -D,--domain: Domain portion of the FQDN
+	Flag: -d,--datacenter: Datacenter shortname
+	Flag: -H,--hostname: Host portion of the FQDN
+	Flag: -m,--memory: Memory in mebibytes
+	Flag: -n,--network: Network port speed in Mbps
+	Flag: --hourly: Show only hourly instances
+	Flag: --monthly: Show only monthly instances
+	Flag: --transient: Filter by transient instances
+	Flag: --hardware: Show the all VSI related to hardware
+	Flag: --all-guests: Show the all VSI and hardware VSIs
+	Flag: --tag: Filter by tags (multiple occurrence permitted)
+	Flag: --sortby: Column to sort by  [default: hostname]
+	Flag: --columns: Columns to display. [options: guid, primary_ip, backend_ip, datacenter, action, power_state, created_by, tags]  [default: id,hostname,domain,deviceStatus.name,datacenter,primary_ip,backend_ip,createDate,action]
+	Flag: -l,--limit: How many results to get in one api call, default is 100  [default: 100]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List virtual servers.
+	--------------------------------
+	Usage: Usage: cli virtual list [OPTIONS]
+==============================================================
+slcli virtual migrate
+	Flag: -g,--guest: Guest ID to immediately migrate.
+	Flag: -a,--all: Migrate ALL guests that require migration immediately.
+	Flag: -h,--host: Dedicated Host ID to migrate to. Only works on guests that are already on a dedicated host.
+	Flag: --help: Show this message and exit.
+	--------------------------------
+	Description: Manage VSIs that require migration. Can migrate Dedicated Host VSIs as well.
+	--------------------------------
+	Usage: Usage: cli virtual migrate [OPTIONS]
+==============================================================
+slcli virtual monitoring
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get details for a vsi monitors device.
+	--------------------------------
+	Usage: Usage: cli virtual monitoring [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual notification-add
+	Flag: identifier: 
+	Flag: --users: UserId to be notified on monitoring failure.
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Create a user virtual notification entry.
+	--------------------------------
+	Usage: Usage: cli virtual notification-add [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual notification-delete
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Remove a user VS notification entry.
+	--------------------------------
+	Usage: Usage: cli virtual notification-delete [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual notifications
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get all hardware notifications.
+	--------------------------------
+	Usage: Usage: cli virtual notifications [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual pause
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Pauses an active virtual server.
+	--------------------------------
+	Usage: Usage: cli virtual pause [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual placementgroup create
+	Flag: --name: Name for this new placement group.  [required]
+	Flag: -b,--backend_router: backendRouter, can be either the hostname or id.  [required]
+	Flag: -r,--rule: The keyName or Id of the rule to govern this placement group.  [required]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Create a placement group.
+	--------------------------------
+	Usage: Usage: cli virtual placementgroup create [OPTIONS]
+==============================================================
+slcli virtual placementgroup create-options
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List options for creating a placement group.
+	--------------------------------
+	Usage: Usage: cli virtual placementgroup create-options [OPTIONS]
+==============================================================
+slcli virtual placementgroup delete
+	Flag: identifier: 
+	Flag: --purge: Delete all guests in this placement group. The group itself can be deleted once all VMs are fully reclaimed
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Delete a placement group.
+	--------------------------------
+	Usage: Usage: cli virtual placementgroup delete [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual placementgroup detail
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: View details of a placement group.
+	--------------------------------
+	Usage: Usage: cli virtual placementgroup detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual placementgroup list
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List placement groups.
+	--------------------------------
+	Usage: Usage: cli virtual placementgroup list [OPTIONS]
+==============================================================
+slcli virtual power-off
+	Flag: identifier: 
+	Flag: --hard: Perform a hard shutdown
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Power off an active virtual server.
+	--------------------------------
+	Usage: Usage: cli virtual power-off [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual power-on
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Power on a virtual server.
+	--------------------------------
+	Usage: Usage: cli virtual power-on [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual ready
+	Flag: identifier: 
+	Flag: --wait: Seconds to wait  [default: 0]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Check if a virtual server is ready.
+	--------------------------------
+	Usage: Usage: cli virtual ready [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual reboot
+	Flag: identifier: 
+	Flag: --hard: Perform a hard or soft reboot
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Reboot an active virtual server.
+	--------------------------------
+	Usage: Usage: cli virtual reboot [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual reload
+	Flag: identifier: 
+	Flag: -i,--postinstall: Post-install script to download
+	Flag: --image: Image ID. The default is to use the current operating system.
+	Flag: : See: 'slcli image list' for reference
+	Flag: -k,--key: SSH keys to add to the root user (multiple occurrence permitted)
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Reload operating system on a virtual server.
+	--------------------------------
+	Usage: Usage: cli virtual reload [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual rescue
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Reboot into a rescue image.
+	--------------------------------
+	Usage: Usage: cli virtual rescue [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual resume
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Resumes a paused virtual server.
+	--------------------------------
+	Usage: Usage: cli virtual resume [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual storage
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get storage details for a virtual server.
+	--------------------------------
+	Usage: Usage: cli virtual storage [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual upgrade
+	Flag: identifier: 
+	Flag: --cpu: Number of CPU cores
+	Flag: --private: CPU core will be on a dedicated host server.
+	Flag: --memory: Memory in megabytes
+	Flag: --network: Network port speed in Mbps
+	Flag: --add-disk: add Hard disk in GB
+	Flag: --resize-disk: Update disk number to size in GB. --resize-disk 250 2
+	Flag: --flavor: Flavor keyName
+	Flag: : Do not use --memory, --cpu or --private, if you are using flavors
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Upgrade a virtual server.
+	--------------------------------
+	Usage: Usage: cli virtual upgrade [OPTIONS] IDENTIFIER
+==============================================================
+slcli virtual usage
+	Flag: identifier: 
+	Flag: -s,--start_date: Start Date e.g. 2019-3-4 (yyyy-MM-dd)  [required]
+	Flag: -e,--end_date: End Date e.g. 2019-4-2 (yyyy-MM-dd)  [required]
+	Flag: -t,--valid_type: Metric_Data_Type keyName e.g. CPU0, CPU1, MEMORY_USAGE, etc.  [required]
+	Flag: -p,--summary_period: 300, 600, 1800, 3600, 43200 or 86400 seconds
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Usage information of a virtual server.
+	--------------------------------
+	Usage: Usage: cli virtual usage [OPTIONS] IDENTIFIER
+==============================================================
+slcli vlan cancel
+	Flag: identifier: 
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Cancel network VLAN.
+	--------------------------------
+	Usage: Usage: cli vlan cancel [OPTIONS] IDENTIFIER
+==============================================================
+slcli vlan create
+	Flag: --name: Vlan name
+	Flag: -d,--datacenter: Datacenter shortname
+	Flag: -p,--pod: Pod name. E.g dal05.pod01
+	Flag: --network: Network vlan type  [default: public]
+	Flag: --billing: Billing rate  [default: hourly]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Order/create a VLAN instance.
+	--------------------------------
+	Usage: Usage: cli vlan create [OPTIONS]
+==============================================================
+slcli vlan create-options
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List all the options for creating VLAN
+	--------------------------------
+	Usage: Usage: cli vlan create-options [OPTIONS]
+==============================================================
+slcli vlan detail
+	Flag: identifier: 
+	Flag: --no-vs: Hide virtual server listing
+	Flag: --no-hardware: Hide hardware listing
+	Flag: --no-trunks: Hide devices with trunks
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Get details about a VLAN.
+	--------------------------------
+	Usage: Usage: cli vlan detail [OPTIONS] IDENTIFIER
+==============================================================
+slcli vlan edit
+	Flag: identifier: 
+	Flag: -n,--name: The optional name for this VLAN
+	Flag: -e,--note: The note for this vlan.
+	Flag: -g,--tags: Tags to set e.g. "tag1,tag2", or empty string to remove all
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: Edit a vlan's details.
+	--------------------------------
+	Usage: Usage: cli vlan edit [OPTIONS] IDENTIFIER
+==============================================================
+slcli vlan list
+	Flag: --sortby: Column to sort by
+	Flag: -d,--datacenter: Filter by datacenter shortname (sng01, dal05, ...)
+	Flag: -n,--number: Filter by VLAN number
+	Flag: --name: Filter by VLAN name
+	Flag: -l,--limit: How many results to get in one api call, default is 100  [default: 100]
+	Flag: -h,--help: Show this message and exit.
+	--------------------------------
+	Description: List VLANs.
+	--------------------------------
+	Usage: Usage: cli vlan list [OPTIONS]
+==============================================================
