@@ -5,6 +5,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -24,20 +25,20 @@ def cli(env, identifier, hardware, virtual, dedicated):
     if hardware:
         result = mgr.remove_hardware_access(identifier, hardware)
         if result:
-            click.secho("Remove to access to hardware: %s" % hardware, fg='green')
+            click.secho(f"Removed access to hardware: {hardware}.", fg='green')
 
     if virtual:
         result = mgr.remove_virtual_access(identifier, virtual)
         if result:
-            click.secho("Remove to access to virtual guest: %s" % virtual, fg='green')
+            click.secho(f"Removed access to virtual guest: {virtual}", fg='green')
 
     if dedicated:
         result = mgr.remove_dedicated_access(identifier, dedicated)
         if result:
-            click.secho("Remove to access to dedicated host: %s" % dedicated, fg='green')
+            click.secho(f"Removed access to dedicated host: {dedicated}", fg='green')
 
     if not result:
-        raise SoftLayer.exceptions.SoftLayerError('You need argument a hardware, virtual or dedicated identifier.\n'
-                                                  'E.g slcli user remove-access 123456 --hardware 91803794\n'
-                                                  '    slcli user remove-access 123456 --dedicated 91803793\n'
-                                                  '    slcli user remove-access 123456 --virtual 91803792')
+        raise exceptions.CLIAbort('A device option is required.\n'
+                                  'E.g slcli user remove-access 123456 --hardware 91803794\n'
+                                  '    slcli user remove-access 123456 --dedicated 91803793\n'
+                                  '    slcli user remove-access 123456 --virtual 91803792')
