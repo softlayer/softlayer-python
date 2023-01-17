@@ -1,4 +1,4 @@
-"""User grant access to devices."""
+"""Grants a user access to a given device"""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -6,6 +6,7 @@ import SoftLayer
 
 from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 
 
 @click.command(cls=SLCommand, )
@@ -15,7 +16,7 @@ from SoftLayer.CLI import environment
 @click.option('--dedicated', help="dedicated host ID")
 @environment.pass_env
 def cli(env, identifier, hardware, virtual, dedicated):
-    """Grant access from a user to an specific device.
+    """Grants a user access to a given device.
 
     Example: slcli user grant-access 123456 --hardware 123456789
     """
@@ -25,20 +26,20 @@ def cli(env, identifier, hardware, virtual, dedicated):
     if hardware:
         result = mgr.grant_hardware_access(identifier, hardware)
         if result:
-            click.secho("Grant to access to hardware: %s" % hardware, fg='green')
+            click.secho(f"User {identifier} has been given access to hardware {hardware}", fg='green')
 
     if virtual:
         result = mgr.grant_virtual_access(identifier, virtual)
         if result:
-            click.secho("Grant to access to virtual guest: %s" % virtual, fg='green')
+            click.secho(f"User {identifier} has been given access to hardware {virtual}", fg='green')
 
     if dedicated:
         result = mgr.grant_dedicated_access(identifier, dedicated)
         if result:
-            click.secho("Grant to access to dedicated host: %s" % dedicated, fg='green')
+            click.secho(f"User {identifier} has been given access to hardware {dedicated}", fg='green')
 
     if not result:
-        raise SoftLayer.exceptions.SoftLayerError('You need argument a hardware, virtual or dedicated identifier.\n'
-                                                  'E.g slcli user grant-access 123456 --hardware 91803794\n'
-                                                  '    slcli user grant-access 123456 --dedicated 91803793\n'
-                                                  '    slcli user grant-access 123456 --virtual 91803792')
+        raise exceptions.CLIAbort('A device option is required.\n'
+                                  'E.g slcli user grant-access 123456 --hardware 91803794\n'
+                                  '    slcli user grant-access 123456 --dedicated 91803793\n'
+                                  '    slcli user grant-access 123456 --virtual 91803792')
