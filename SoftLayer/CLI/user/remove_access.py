@@ -1,4 +1,4 @@
-"""User remove access to devices."""
+"""Removes a user access to a given device."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -15,7 +15,7 @@ from SoftLayer.CLI import exceptions
 @click.option('--dedicated', help="Dedicated host ID ")
 @environment.pass_env
 def cli(env, identifier, hardware, virtual, dedicated):
-    """Remove access from a user to an specific device.
+    """Removes a user access to a given device.
 
     Example: slcli user remove-access 123456 --hardware 123456789
     """
