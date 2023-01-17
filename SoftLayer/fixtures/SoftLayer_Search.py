@@ -21,3 +21,31 @@ advancedSearch = [
         }
     }
 ]
+
+search = advancedSearch
+
+getObjectTypes = [{"name": "SoftLayer_Event_Log",
+                   "properties": [
+                       {
+                           "name": "accountId",
+                           "sortableFlag": True,
+                           "type": "integer"
+                       }]},
+                  {"name": "SoftLayer_Hardware",
+                   "properties": [
+                       {
+                           "name": "accountId",
+                           "sortableFlag": True,
+                           "type": "integer"
+                       },
+                       {
+                           "name": "datacenter.longName",
+                           "sortableFlag": True,
+                           "type": "string"
+                       },
+                       {
+                           "name": "deviceStatus.name",
+                           "sortableFlag": True,
+                           "type": "string"
+                       }]
+                   }]
