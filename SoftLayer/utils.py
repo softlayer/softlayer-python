@@ -13,7 +13,7 @@ import time
 
 from rich.console import Console
 from rich.theme import Theme
-
+from SoftLayer.CLI import exceptions
 # pylint: disable=no-member, invalid-name
 
 UUID_RE = re.compile(r'^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$', re.I)
@@ -369,6 +369,18 @@ def clean_time(sltime, in_format='%Y-%m-%dT%H:%M:%S%z', out_format='%Y-%m-%d %H:
             clean = datetime.datetime.strptime(sltime[:-ulr], in_format)
             return clean.strftime(out_format)
         return sltime
+
+
+def verify_date(date):
+    """Verify if the date format is correct
+
+    :param string date: A date in format string
+    :return a exception if the date is not the correct format
+    """
+    try:
+        date = datetime.datetime.strptime(date, '%m/%d/%Y')
+    except Exception as exc:
+        raise exceptions.CLIAbort('Date invalid, example date: mm/dd/yyyy, 01/15/2023.') from exc
 
 
 def timestamp(date):

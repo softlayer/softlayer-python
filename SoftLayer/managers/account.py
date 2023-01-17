@@ -53,10 +53,11 @@ class AccountManager(utils.IdentifierMixin, object):
         """
         return self.client.call('Account', 'getObject', mask=mask)
 
-    def get_upcoming_events(self, event_type):
+    def get_upcoming_events(self, event_type, date_min):
         """Retrieves a list of Notification_Occurrence_Events that have not ended yet
 
         :param: String event_type: notification event type.
+        :param: String date_min: greater Than Date to data recovery, default is 2 days ago.
         :return: SoftLayer_Notification_Occurrence_Event
         """
         mask = "mask[id, subject, startDate, endDate, modifyDate, statusCode, acknowledgedFlag, " \
@@ -70,21 +71,32 @@ class AccountManager(utils.IdentifierMixin, object):
             }
         }
 
-        self.add_event_filter(_filter, event_type)
+        self.add_event_filter(_filter, event_type, date_min)
 
         return self.client.call('Notification_Occurrence_Event', 'getAllObjects', filter=_filter, mask=mask, iter=True)
 
     @staticmethod
-    def add_event_filter(_filter, event_type):
+    def add_event_filter(_filter, event_type, date_min):
         """Add data to the object filter.
 
         :param: _filter: event filter.
         :param: string event_type: event type.
+        :param: string date_min: greater Than Date to data recovery, default is 2 days ago.
         """
+
         if event_type == 'PLANNED':
-            _filter['endDate'] = {
-                'operation': '> sysdate - 2'
-            }
+            if date_min:
+                _filter['endDate'] = {
+                    'operation': 'greaterThanDate',
+                    'options': [{
+                        'name': 'date',
+                        'value': [date_min]
+                    }]
+                }
+            else:
+                _filter['endDate'] = {
+                    'operation': '> sysdate - 2'
+                }
             _filter['startDate'] = {
                 'operation': 'orderBy',
                 'options': [{
@@ -94,9 +106,18 @@ class AccountManager(utils.IdentifierMixin, object):
             }
 
         if event_type == 'UNPLANNED_INCIDENT':
-            _filter['modifyDate'] = {
-                'operation': '> sysdate - 2'
-            }
+            if date_min:
+                _filter['modifyDate'] = {
+                    'operation': 'greaterThanDate',
+                    'options': [{
+                        'name': 'date',
+                        'value': [date_min]
+                    }]
+                }
+            else:
+                _filter['modifyDate'] = {
+                    'operation': '> sysdate - 2'
+                }
 
         if event_type == 'ANNOUNCEMENT':
             _filter['statusCode'] = {
