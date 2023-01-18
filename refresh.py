@@ -1,4 +1,4 @@
-"""Refresh a dependent duplicate volume with a snapshot from its parent."""
+"""Refresh a duplicate volume with a snapshot from its parent."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -16,7 +16,7 @@ from SoftLayer.CLI import environment
 @environment.pass_env
 def cli(env, volume_id, snapshot_id, force_refresh):
     """Refresh a duplicate volume with a snapshot from its parent."""
-    file_manager = SoftLayer.FileStorageManager(env.client)
-    resp = file_manager.refresh_dupe(volume_id, snapshot_id, force_refresh)
+    block_manager = SoftLayer.BlockStorageManager(env.client)
+    resp = block_manager.refresh_dupe(volume_id, snapshot_id, force_refresh)
 
     click.echo(resp)
