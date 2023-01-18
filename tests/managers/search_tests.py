@@ -5,14 +5,14 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from SoftLayer.managers.search import SearchingManager
+from SoftLayer.managers.search import SearchManager
 from SoftLayer import testing
 
 
 class SearchTests(testing.TestCase):
 
     def set_up(self):
-        self.search = SearchingManager(self.client)
+        self.search = SearchManager(self.client)
 
     def test_search_type(self):
         self.search.get_object_types()
