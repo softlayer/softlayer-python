@@ -32,7 +32,7 @@ def cli(env, query, types, advanced):
     Examples:
         slcli search test.com
         slcli search _objectType:SoftLayer_Virtual_Guest test.com
-        slcli -vvv search _objectType:SoftLayer_Hardware hostname:testibm --advanced 
+        slcli -vvv search _objectType:SoftLayer_Hardware hostname:testibm --advanced
     """
     search = SearchManager(env.client)
     # query is in array, so we need to convert it to a normal string for the API
