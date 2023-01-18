@@ -11,9 +11,9 @@ from SoftLayer import testing
 class FindTests(testing.TestCase):
 
     def test_find(self):
-        result = self.run_command(['find', 'hardware', '--types'])
+        result = self.run_command(['search', '--types'])
         self.assert_no_fail(result)
 
     def test_find_advanced(self):
-        result = self.run_command(['find', 'hardware', '--advanced'])
+        result = self.run_command(['search', 'hardware', '--advanced'])
         self.assert_no_fail(result)
