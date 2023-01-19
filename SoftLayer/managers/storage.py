@@ -559,15 +559,17 @@ class StorageManager(utils.IdentifierMixin, object):
                                 reason,
                                 id=billing_item_id)
 
-    def refresh_dupe(self, volume_id, snapshot_id):
+    def refresh_dupe(self, volume_id, snapshot_id, force_refresh=False):
         """"Refresh a duplicate volume with a snapshot from its parent.
 
         :param integer volume_id: The id of the volume
         :param integer snapshot_id: The id of the snapshot
+        :param boolean force_refresh: Force refreshing the volume if True
         """
         return self.client.call('Network_Storage',
                                 'refreshDuplicate',
                                 snapshot_id,
+                                force_refresh,
                                 id=volume_id)
 
     def convert_dep_dupe(self, volume_id):
