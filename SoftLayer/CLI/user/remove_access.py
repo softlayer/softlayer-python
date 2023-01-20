@@ -1,46 +1,44 @@
-"""User remove access to devices."""
+"""Removes a user access to a given device."""
 # :license: MIT, see LICENSE for more details.
 
 import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
-@click.option('--hardware', '-h',
-              help="Display hardware this user has access to.")
-@click.option('--virtual', '-v',
-              help="Display virtual guests this user has access to.")
-@click.option('--dedicated', '-l',
-              help="dedicated host ID ")
+@click.option('--hardware', help="Hardware ID")
+@click.option('--virtual', help="Virtual Guest ID")
+@click.option('--dedicated', help="Dedicated host ID ")
 @environment.pass_env
 def cli(env, identifier, hardware, virtual, dedicated):
-    """Remove access from a user to an specific device.
+    """Removes a user access to a given device.
 
     Example: slcli user remove-access 123456 --hardware 123456789
     """
 
     mgr = SoftLayer.UserManager(env.client)
-    device = ''
     result = False
     if hardware:
-        device = hardware
         result = mgr.remove_hardware_access(identifier, hardware)
+        if result:
+            click.secho(f"Removed access to hardware: {hardware}.", fg='green')
 
     if virtual:
-        device = virtual
         result = mgr.remove_virtual_access(identifier, virtual)
+        if result:
+            click.secho(f"Removed access to virtual guest: {virtual}", fg='green')
 
     if dedicated:
-        device = dedicated
         result = mgr.remove_dedicated_access(identifier, dedicated)
+        if result:
+            click.secho(f"Removed access to dedicated host: {dedicated}", fg='green')
 
-    if result:
-        click.secho("Remove to access to device: %s" % device, fg='green')
-    else:
-        raise SoftLayer.exceptions.SoftLayerError('You need argument a hardware, virtual or dedicated identifier.\n'
-                                                  'E.g slcli user 123456 --hardware 91803794\n'
-                                                  '    slcli user 123456 --dedicated 91803793\n'
-                                                  '    slcli user 123456 --virtual 91803792')
+    if not result:
+        raise exceptions.CLIAbort('A device option is required.\n'
+                                  'E.g slcli user remove-access 123456 --hardware 91803794\n'
+                                  '    slcli user remove-access 123456 --dedicated 91803793\n'
+                                  '    slcli user remove-access 123456 --virtual 91803792')

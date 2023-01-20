@@ -373,3 +373,8 @@ class UserCLITests(testing.TestCase):
     def test_remove_access_dedicated(self):
         result = self.run_command(['user', 'remove-access', '123456', '--dedicated', '369852'])
         self.assert_no_fail(result)
+
+    def test_remove_without_device(self):
+        result = self.run_command(['user', 'remove-access', '123456'])
+        self.assertEqual(2, result.exit_code)
+        self.assertIn('A device option is required.', result.exception.message)
