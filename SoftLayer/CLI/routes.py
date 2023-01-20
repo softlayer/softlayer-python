@@ -387,6 +387,7 @@ ALL_ROUTES = [
     ('vlan:cancel', 'SoftLayer.CLI.vlan.cancel:cli'),
 
     ('summary', 'SoftLayer.CLI.summary:cli'),
+    ('search', 'SoftLayer.CLI.search:cli'),
 
     ('report', 'SoftLayer.CLI.report'),
     ('report:bandwidth', 'SoftLayer.CLI.report.bandwidth:cli'),
