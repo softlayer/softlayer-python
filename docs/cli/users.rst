@@ -56,4 +56,8 @@ Version 5.6.0 introduces the ability to interact with user accounts from the cli
     :prog: user remove-access
     :show-nested:
 
+.. click:: SoftLayer.CLI.user.grant_access:cli
+    :prog: user grant-access
+    :show-nested:
+
 
