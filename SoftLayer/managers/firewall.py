@@ -157,11 +157,9 @@ class FirewallManager(utils.IdentifierMixin, object):
             firewall_service = self.client['Network_Component_Firewall']
         firewall = firewall_service.getObject(id=firewall_id, mask=mask)
         if firewall is None:
-            raise exceptions.SoftLayerError(
-                "Unable to find firewall %d" % firewall_id)
+            raise exceptions.SoftLayerError(f"Unable to find firewall {firewall_id}")
         if firewall.get('billingItem') is None:
-            raise exceptions.SoftLayerError(
-                "Unable to find billing item for firewall %d" % firewall_id)
+            raise exceptions.SoftLayerError(f"Unable to find billing item for firewall {firewall_id}")
 
         return firewall['billingItem']
 

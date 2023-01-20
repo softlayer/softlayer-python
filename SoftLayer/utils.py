@@ -481,6 +481,7 @@ def console_color_themes(theme):
                 "default_option": "light_coral",
                 "option_keyword": "bold dark_cyan",
                 "args_keyword": "bold green4",
+                "option_choices": "gold3",
             })
         )
     return Console(theme=Theme(
@@ -497,6 +498,7 @@ def console_color_themes(theme):
             "default_option": "light_pink1",
             "option_keyword": "bold cyan",
             "args_keyword": "bold green",
+            "option_choices": "gold3",
         })
     )
 

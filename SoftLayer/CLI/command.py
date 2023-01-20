@@ -19,11 +19,15 @@ from SoftLayer.CLI import environment
 
 
 class OptionHighlighter(RegexHighlighter):
-    """Provides highlighter regex for the Command help"""
+    """Provides highlighter regex for the Command help.
+
+    Defined in SoftLayer\\utils.py console_color_themes()
+    """
     highlights = [
         r"(?P<switch>^\-\w)",  # single options like -v
         r"(?P<option>\-\-[\w\-]+)",  # long options like --verbose
         r"(?P<default_option>\[[^\]]+\])",  # anything between [], usually default options
+        r"(?P<option_choices>Choices: )",
     ]
 
 
@@ -222,6 +226,11 @@ class SLCommand(click.Command):
             help_message = ""
             if help_record:
                 help_message = param.get_help_record(ctx)[-1]
+
+            # Add Click choices to help message
+            if isinstance(param.type, click.Choice):
+                choices = ", ".join(param.type.choices)
+                help_message += f" Choices: {choices}"
 
             if param.metavar:
                 options += f" {param.metavar}"
