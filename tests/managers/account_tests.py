@@ -176,3 +176,7 @@ class AccountManagerTests(testing.TestCase):
         total = self.manager.get_bandwidth_pool_counts(1234)
         self.assert_called_with('SoftLayer_Network_Bandwidth_Version1_Allotment', 'getObject', identifier=1234)
         self.assertEqual(total, 2)
+
+    def test_get_dedicated_hosts(self):
+        self.manager.get_dedicated_hosts("", "")
+        self.assert_called_with('SoftLayer_Account', 'getDedicatedHosts')
