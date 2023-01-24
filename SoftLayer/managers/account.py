@@ -53,7 +53,7 @@ class AccountManager(utils.IdentifierMixin, object):
         """
         return self.client.call('Account', 'getObject', mask=mask)
 
-    def get_upcoming_events(self, event_type, date_min):
+    def get_upcoming_events(self, event_type, date_min=None):
         """Retrieves a list of Notification_Occurrence_Events that have not ended yet
 
         :param: String event_type: notification event type.
@@ -76,7 +76,7 @@ class AccountManager(utils.IdentifierMixin, object):
         return self.client.call('Notification_Occurrence_Event', 'getAllObjects', filter=_filter, mask=mask, iter=True)
 
     @staticmethod
-    def add_event_filter(_filter, event_type, date_min):
+    def add_event_filter(_filter, event_type, date_min=None):
         """Add data to the object filter.
 
         :param: _filter: event filter.
