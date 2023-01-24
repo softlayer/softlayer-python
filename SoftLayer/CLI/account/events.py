@@ -10,15 +10,15 @@ from SoftLayer import utils
 
 
 @click.command(cls=SLCommand)
+@click.option('--announcement', is_flag=True, default=False,
+              help="Show only announcement events.")
 @click.option('--ack-all', is_flag=True, default=False,
               help="Acknowledge every upcoming event. Doing so will turn off the popup in the control portal.")
+@click.option('--date-min', help="Earliest date to retrieve events for [MM/DD/YYYY]. Default: 2 days ago.")
 @click.option('--planned', is_flag=True, default=False,
               help="Show only planned events.")
 @click.option('--unplanned', is_flag=True, default=False,
               help="Show only unplanned events.")
-@click.option('--announcement', is_flag=True, default=False,
-              help="Show only announcement events.")
-@click.option('--date-min', help="Earliest date to retrieve events for [MM/DD/YYYY]. Default: 2 days ago.")
 @environment.pass_env
 def cli(env, ack_all, planned, unplanned, announcement, date_min):
     """Summary and acknowledgement of upcoming and ongoing maintenance events"""
