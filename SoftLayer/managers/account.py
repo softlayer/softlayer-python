@@ -367,7 +367,7 @@ class AccountManager(utils.IdentifierMixin, object):
         bareMetalInstances[outboundBandwidthUsage,bandwidthAllotmentDetail[allocation]]"""
         return self.client['SoftLayer_Network_Bandwidth_Version1_Allotment'].getObject(id=identifier, mask=_mask)
 
-    def get_dedicated_hosts(self, object_mask, object_filter):
+    def get_dedicated_hosts(self, object_mask="", object_filter=""):
         """Returns all associated virtual dedicated host objects.
 
         :return SoftLayer_Virtual_DedicatedHost[].

@@ -11,10 +11,10 @@ from SoftLayer import utils
 
 
 @click.command(cls=SLCommand, short_help="List virtual servers.")
-@click.option('--name', '-n', help='Filter by name of the dedicated host')
 @click.option('--datacenter', '-d', help='Filter by datacenter of the dedicated host')
-@click.option('--owner', help='Filter by owner of the dedicated host')
+@click.option('--name', '-n', help='Filter by name of the dedicated host')
 @click.option('--order', help='Filter by ID of the order which purchased this dedicated host', type=click.INT)
+@click.option('--owner', help='Filter by owner of the dedicated host')
 @environment.pass_env
 def cli(env, name, datacenter, owner, order,):
     """List dedicated hosts."""

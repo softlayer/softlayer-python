@@ -178,5 +178,5 @@ class AccountManagerTests(testing.TestCase):
         self.assertEqual(total, 2)
 
     def test_get_dedicated_hosts(self):
-        self.manager.get_dedicated_hosts("", "")
+        self.manager.get_dedicated_hosts()
         self.assert_called_with('SoftLayer_Account', 'getDedicatedHosts')
