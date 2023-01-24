@@ -1120,7 +1120,7 @@ class VSManager(utils.IdentifierMixin, object):
         if category_to_request is None:
             return None
 
-        key_name = "*= GUEST_DISK_"+str(capacity)+"_GB_SAN"
+        key_name = "*= GUEST_DISK_" + str(capacity) + "_GB_SAN"
         object_filter = {
             "itemPrices": {
                 "locationGroupId": {"operation": "is null"},
@@ -1520,3 +1520,9 @@ class VSManager(utils.IdentifierMixin, object):
 
         template = [{'id': identifier}]
         return self.client.call('SoftLayer_User_Customer_Notification_Virtual_Guest', 'deleteObjects', template)
+
+    def get_os(self):
+        """returns all Operations system available to client can use"""
+
+        _filter = {"items": {"prices": {"categories": {"categoryCode": {"operation": "os"}}}}}
+        return self.package_svc.getItems(id=46, filter=_filter)
