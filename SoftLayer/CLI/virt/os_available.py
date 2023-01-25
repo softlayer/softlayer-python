@@ -18,9 +18,9 @@ def cli(env):
     table.align['value'] = 'l'
     vsi = SoftLayer.VSManager(env.client)
     operations = vsi.get_os()
-    for os in operations:
-        table.add_row([os.get('id'), os.get('keyName'), os.get('description'),
-                       os['prices'][0]['laborFee'],
-                       os['prices'][0]['setupFee']])
+    for operation_system in operations:
+        table.add_row([operation_system.get('id'), operation_system.get('keyName'), operation_system.get('description'),
+                       operation_system['prices'][0]['laborFee'],
+                       operation_system['prices'][0]['setupFee']])
 
     env.fout(table)
