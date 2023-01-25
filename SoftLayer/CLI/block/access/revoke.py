@@ -8,20 +8,17 @@ from SoftLayer.CLI import environment
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
-@click.option('--hardware-id', '-h', multiple=True,
-              help='The id of one SoftLayer_Hardware'
-              ' to revoke authorization')
-@click.option('--virtual-id', '-v', multiple=True,
-              help='The id of one SoftLayer_Virtual_Guest'
-              ' to revoke authorization')
+@click.option('--hardware-id', '-d', multiple=True,
+              help='The ID of one IP address to revoke authorization')
 @click.option('--ip-address-id', '-i', multiple=True,
-              help='The id of one SoftLayer_Network_Subnet_IpAddress'
-              ' to revoke authorization')
+              help='The ID of one IP address to revoke authorization')
 @click.option('--ip-address', multiple=True,
               help='An IP address to revoke authorization')
+@click.option('--virtual-id', '-v', multiple=True,
+              help='The ID of one virtual server to revoke authorization')
 @environment.pass_env
 def cli(env, volume_id, hardware_id, virtual_id, ip_address_id, ip_address):
-    """Revokes authorization for hosts accessing a given volume"""
+    """Revoke authorization for hosts that are accessing a specific volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
     ip_address_id_list = list(ip_address_id)
 
