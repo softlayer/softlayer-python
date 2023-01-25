@@ -1521,7 +1521,7 @@ class VSManager(utils.IdentifierMixin, object):
         template = [{'id': identifier}]
         return self.client.call('SoftLayer_User_Customer_Notification_Virtual_Guest', 'deleteObjects', template)
 
-    # pylint: disable=inconsistent-return-statements
+    # pylint: disable=R0904
     def get_os(self):
         """returns all Operations system available to client can use"""
 
