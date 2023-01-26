@@ -16,8 +16,10 @@ def cli(env):
     table = formatting.KeyValueTable(['id', 'keyName', 'Description', 'price', 'setup fee'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'
-    vsi = SoftLayer.VSManager(env.client)
-    operations = vsi.get_os()
+    manager = SoftLayer.OrderingManager(env.client)
+    _filter = {"items": {"prices": {"categories": {"categoryCode": {"operation": "os"}}}}}
+    operations = manager.get_items(storage_filter=_filter, package_id=46)
+
     for operation_system in operations:
         table.add_row([operation_system.get('id'), operation_system.get('keyName'), operation_system.get('description'),
                        operation_system['prices'][0]['laborFee'],
