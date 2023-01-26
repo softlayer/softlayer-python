@@ -15,7 +15,7 @@ from SoftLayer import utils
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Get details of an Autoscale groups."""
+    """Get details of an Autoscale group."""
 
     autoscale = AutoScaleManager(env.client)
     group = autoscale.details(identifier)
