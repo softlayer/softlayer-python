@@ -25,11 +25,10 @@ class DedicatedHostTests(testing.TestCase):
     def test_list_instances_with_filters(self):
         results = self.dedicated_host.list_instances(
             tags=['tag1', 'tag2'],
-            cpus=2,
-            memory=1,
-            hostname='hostname',
-            datacenter='dal05',
-            disk=1
+            hostname='dedicatedhost01',
+            datacenter='dal13',
+            order=85857762,
+            owner='sl307608-dcabero'
         )
         self.assertEqual(results, fixtures.SoftLayer_Account.getDedicatedHosts)
 

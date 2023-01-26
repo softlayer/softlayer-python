@@ -292,6 +292,7 @@ If no timezone is specified, IMS local time (CST) will be assumed, which might n
    :show-nested:
 
 .. click:: SoftLayer.CLI.virt.host_list:cli
+    This command is an alias for `slcli dedicatedhost list`
     :prog: virtual host-list
     :show-nested:
 

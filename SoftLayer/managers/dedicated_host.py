@@ -171,8 +171,8 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         kwargs['iter'] = True
         return self.host.getGuests(id=host_id, **kwargs)
 
-    def list_instances(self, tags=None, cpus=None, memory=None, hostname=None,
-                       disk=None, datacenter=None, **kwargs):
+    def list_instances(self, tags=None, hostname=None,
+                       datacenter=None, order=None, owner=None):
         """Retrieve a list of all dedicated hosts on the account
 
         :param list tags: filter based on list of tags
@@ -185,19 +185,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
         :returns: Returns a list of dictionaries representing the matching dedicated host.
 
         """
-        if 'mask' not in kwargs:
-            items = [
-                'id',
-                'name',
-                'cpuCount',
-                'diskCapacity',
-                'memoryCapacity',
-                'datacenter',
-                'guestCount',
-            ]
-            kwargs['mask'] = "mask[%s]" % ','.join(items)
-
-        _filter = utils.NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict({})
         if tags:
             _filter['dedicatedHosts']['tagReferences']['tag']['name'] = {
                 'operation': 'in',
@@ -209,23 +197,22 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                 utils.query_filter(hostname)
             )
 
-        if cpus:
-            _filter['dedicatedHosts']['cpuCount'] = utils.query_filter(cpus)
-
-        if disk:
-            _filter['dedicatedHosts']['diskCapacity'] = (
-                utils.query_filter(disk))
-
-        if memory:
-            _filter['dedicatedHosts']['memoryCapacity'] = (
-                utils.query_filter(memory))
-
         if datacenter:
             _filter['dedicatedHosts']['datacenter']['name'] = (
                 utils.query_filter(datacenter))
 
-        kwargs['filter'] = _filter.to_dict()
-        return self.account.getDedicatedHosts(**kwargs)
+        if order:
+            _filter['dedicatedHosts']['billingItem']['orderItem']['order']['id'] = (
+                utils.query_filter(order))
+
+        if owner:
+            _filter['dedicatedHosts']['billingItem']['orderItem']['order']['userRecord']['username'] = (
+                utils.query_filter(owner))
+
+        object_filter = _filter.to_dict()
+        object_mask = "mask[id,name,createDate,cpuCount,diskCapacity,memoryCapacity,guestCount," \
+                      "datacenter,backendRouter,allocationStatus,billingItem[orderItem[order[userRecord]]]]"
+        return self.account.getDedicatedHosts(mask=object_mask, filter=object_filter)
 
     def get_host(self, host_id, **kwargs):
         """Get details about a dedicated host.

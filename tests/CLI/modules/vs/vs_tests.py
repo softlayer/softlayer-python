@@ -10,7 +10,6 @@ import sys
 from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
-from SoftLayer.fixtures import SoftLayer_Account
 from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer.fixtures import SoftLayer_Virtual_Guest as SoftLayer_Virtual_Guest
 from SoftLayer import SoftLayerAPIError
@@ -996,29 +995,3 @@ class VirtTests(testing.TestCase):
     def test_notification_delete(self):
         result = self.run_command(['vs', 'notification-delete', '100'])
         self.assert_no_fail(result)
-
-    def test_host_list(self):
-        mock = self.set_mock('SoftLayer_Account', 'getDedicatedHosts')
-        mock.return_value = SoftLayer_Account.getFilteredDedicatedHosts
-        result = self.run_command(['vs', 'host-list', '-n', 'dedicatedhost01', '-d', 'dal13',
-                                   '--owner', 'sl307608-dcabero', '--order', '85857762'])
-        self.assert_no_fail(result)
-        expected = [{
-            "Id": 656700,
-            "Name": "dedicatedhost01",
-            "Datacenter": "dal13",
-            "Router": "bcr01a.dal13",
-            "CPU (allocated/total)": "0/56",
-            "Memory (allocated/total)": "0/242",
-            "Disk (allocated/total)": "0/1200",
-            "Guests": 0
-        }]
-        self.assertEqual(json.loads(result.output), expected)
-
-    def test_empty_host_list(self):
-        mock = self.set_mock('SoftLayer_Account', 'getDedicatedHosts')
-        mock.return_value = {}
-        result = self.run_command(['vs', 'host-list', '-n', 'dedicatedhost01', '-d', 'dal13',
-                                   '--owner', 'sl307608-dcabero', '--order', '85857762'])
-        self.assert_no_fail(result)
-        self.assertIn("No dedicated hosts are found.", result.output)

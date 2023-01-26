@@ -366,16 +366,3 @@ class AccountManager(utils.IdentifierMixin, object):
         virtualGuests[outboundPublicBandwidthUsage,bandwidthAllotmentDetail[allocation]],
         bareMetalInstances[outboundBandwidthUsage,bandwidthAllotmentDetail[allocation]]"""
         return self.client['SoftLayer_Network_Bandwidth_Version1_Allotment'].getObject(id=identifier, mask=_mask)
-
-    def get_dedicated_hosts(self, object_mask="", object_filter=""):
-        """Returns all associated virtual dedicated host objects.
-
-        :return SoftLayer_Virtual_DedicatedHost[].
-        """
-
-        if object_mask == "":
-            object_mask = "mask[id,name,createDate,cpuCount,diskCapacity,memoryCapacity,guestCount,datacenter]"
-
-        if object_filter == "":
-            object_filter = {}
-        return self.client.call('SoftLayer_Account', 'getDedicatedHosts', mask=object_mask, filter=object_filter)
