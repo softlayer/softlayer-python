@@ -716,14 +716,15 @@ generateOrderTemplate = {
 setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
 setTags = True
-createArchiveTransaction = {
+createArchiveTemplate = {
     'createDate': '2018-12-10T17:29:18-06:00',
     'elapsedSeconds': 0,
     'guestId': 12345678,
     'hardwareId': None,
     'id': 12345,
     'modifyDate': '2018-12-10T17:29:18-06:00',
-    'statusChangeDate': '2018-12-10T17:29:18-06:00'
+    'statusChangeDate': '2018-12-10T17:29:18-06:00',
+    'globalIdentifier': '495c47c2-80af-4fef-87a9-97faf132345678'
 }
 
 executeRescueLayer = True
