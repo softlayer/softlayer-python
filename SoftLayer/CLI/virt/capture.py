@@ -24,8 +24,7 @@ def cli(env, identifier, name, all, note):
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
 
     capture = vsi.capture(vs_id, name, all, note)
-
-    print(capture)
+    
 
     table = formatting.KeyValueTable(['name', 'value'])
     table.align['name'] = 'r'
