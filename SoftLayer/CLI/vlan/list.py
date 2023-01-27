@@ -65,7 +65,7 @@ def cli(env, sortby, datacenter, number, name, limit):
             vlan.get('vlanNumber'),
             vlan.get('fullyQualifiedName'),
             vlan.get('name') or formatting.blank(),
-            vlan.get('networkSpace').capitalize(),
+            vlan.get('networkSpace').capitalize() or formatting.blank(),
             utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name'),
             get_pod_with_closed_announcement(vlan, pods),
             get_gateway_firewall(vlan),
