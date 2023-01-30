@@ -9,7 +9,7 @@ from SoftLayer.CLI import environment
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
 @click.argument('snapshot_id')
-@click.option('--force-refresh', '-f', is_flag = True, default = False, show_default = True,
+@click.option('--force-refresh', '-f', is_flag=True, default=False, show_default=True,
               help="Cancel current refresh process and initiates the new refresh.")
 @environment.pass_env
 def cli(env, volume_id, snapshot_id, force_refresh):
