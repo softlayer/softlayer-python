@@ -13,7 +13,7 @@ from SoftLayer.CLI import formatting
 def cli(env):
     """Get the all Os available"""
 
-    table = formatting.KeyValueTable(['id', 'keyName', 'Description', 'price', 'setup fee'])
+    table = formatting.KeyValueTable(['Id', 'KeyName', 'Description', 'Price', 'Setup Fee'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'
     manager = SoftLayer.OrderingManager(env.client)
