@@ -968,11 +968,11 @@ class VSTests(testing.TestCase):
         # capture only the OS disk
         result = self.vs.capture(1, 'a')
 
-        expected = fixtures.SoftLayer_Virtual_Guest.createArchiveTransaction
+        expected = fixtures.SoftLayer_Virtual_Guest.createArchiveTemplate
         self.assertEqual(result, expected)
         args = ('a', [{'device': 0, 'uuid': 1, 'mountType': 'Disk'}], None)
         self.assert_called_with('SoftLayer_Virtual_Guest',
-                                'createArchiveTransaction',
+                                'createArchiveTemplate',
                                 args=args,
                                 identifier=1)
 
@@ -981,12 +981,12 @@ class VSTests(testing.TestCase):
         # make sure the data is carried along with it
         result = self.vs.capture(1, 'a', additional_disks=True)
 
-        expected = fixtures.SoftLayer_Virtual_Guest.createArchiveTransaction
+        expected = fixtures.SoftLayer_Virtual_Guest.createArchiveTemplate
         self.assertEqual(result, expected)
         args = ('a', [{'device': 0, 'mountType': 'Disk', 'uuid': 1},
                       {'device': 3, 'mountType': 'Disk', 'uuid': 3}], None)
         self.assert_called_with('SoftLayer_Virtual_Guest',
-                                'createArchiveTransaction',
+                                'createArchiveTemplate',
                                 args=args,
                                 identifier=1)
 
