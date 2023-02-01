@@ -345,6 +345,23 @@ class UserCLITests(testing.TestCase):
         self.assert_called_with('SoftLayer_User_Customer', 'getDedicatedHosts')
         self.assert_called_with('SoftLayer_User_Customer', 'getVirtualGuests')
 
+    def test_grant_access_hardware(self):
+        result = self.run_command(['user', 'grant-access', '123456', '--hardware', '147258'])
+        self.assert_no_fail(result)
+
+    def test_grant_access_virtual(self):
+        result = self.run_command(['user', 'grant-access', '123456', '--virtual', '987456'])
+        self.assert_no_fail(result)
+
+    def test_grant_access_dedicated(self):
+        result = self.run_command(['user', 'grant-access', '123456', '--dedicated', '369852'])
+        self.assert_no_fail(result)
+
+    def test_grant_without_device(self):
+        result = self.run_command(['user', 'grant-access', '123456'])
+        self.assertEqual(2, result.exit_code)
+        self.assertIn('A device option is required.', result.exception.message)
+
     def test_remove_access_hardware(self):
         result = self.run_command(['user', 'remove-access', '123456', '--hardware', '147258'])
         self.assert_no_fail(result)
@@ -356,3 +373,8 @@ class UserCLITests(testing.TestCase):
     def test_remove_access_dedicated(self):
         result = self.run_command(['user', 'remove-access', '123456', '--dedicated', '369852'])
         self.assert_no_fail(result)
+
+    def test_remove_without_device(self):
+        result = self.run_command(['user', 'remove-access', '123456'])
+        self.assertEqual(2, result.exit_code)
+        self.assertIn('A device option is required.', result.exception.message)

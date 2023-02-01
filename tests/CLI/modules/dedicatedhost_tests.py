@@ -22,17 +22,24 @@ class DedicatedHostsTests(testing.TestCase):
         result = self.run_command(['dedicatedhost', 'list'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         [{
-                             'cpuCount': 56,
-                             'datacenter': 'dal05',
-                             'diskCapacity': 1200,
-                             'guestCount': 1,
-                             'id': 12345,
-                             'memoryCapacity': 242,
-                             'name': 'test-dedicated'
-                         }]
-                         )
+        expected = [{
+            "Id": 656700,
+            "Name": "dedicatedhost01",
+            "Datacenter": "dal13",
+            "Router": "bcr01a.dal13",
+            "CPU (allocated/total)": "0/56",
+            "Memory (allocated/total)": "0/242",
+            "Disk (allocated/total)": "0/1200",
+            "Guests": 0
+        }]
+        self.assertEqual(json.loads(result.output), expected)
+
+    def test_empty_host_list(self):
+        mock = self.set_mock('SoftLayer_Account', 'getDedicatedHosts')
+        mock.return_value = {}
+        result = self.run_command(['vs', 'host-list'])
+        self.assert_no_fail(result)
+        self.assertIn("No dedicated hosts are found.", result.output)
 
     def test_details(self):
         mock = self.set_mock('SoftLayer_Virtual_DedicatedHost', 'getObject')

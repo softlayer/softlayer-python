@@ -52,8 +52,7 @@ class BlockStorageManager(StorageManager):
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
 
-        _filter['iscsiNetworkStorage']['serviceResource']['type']['type'] = \
-            (utils.query_filter('!~ ISCSI'))
+        _filter['iscsiNetworkStorage']['serviceResource']['type']['type'] = utils.query_filter('!~ ISCSI')
 
         _filter['iscsiNetworkStorage']['storageType']['keyName'] = (
             utils.query_filter('*BLOCK_STORAGE*'))
@@ -63,15 +62,14 @@ class BlockStorageManager(StorageManager):
 
         if datacenter:
             _filter['iscsiNetworkStorage']['serviceResource']['datacenter'][
-                'name'] = (utils.query_filter(datacenter))
+                'name'] = utils.query_filter(datacenter)
 
         if username:
-            _filter['iscsiNetworkStorage']['username'] = \
-                (utils.query_filter(username))
+            _filter['iscsiNetworkStorage']['username'] = utils.query_filter(username)
 
         if order:
             _filter['iscsiNetworkStorage']['billingItem']['orderItem'][
-                'order']['id'] = (utils.query_filter(order))
+                'order']['id'] = utils.query_filter(order)
 
         kwargs['filter'] = _filter.to_dict()
         return self.client.call('Account', 'getIscsiNetworkStorage', iter=True, **kwargs)

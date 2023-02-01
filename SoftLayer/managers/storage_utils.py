@@ -73,7 +73,7 @@ def get_package(manager, category_code):
     _filter = utils.NestedDict({})
     _filter['categories']['categoryCode'] = (
         utils.query_filter(category_code))
-    _filter['statusCode'] = (utils.query_filter('ACTIVE'))
+    _filter['statusCode'] = utils.query_filter('ACTIVE')
 
     packages = manager.client.call(
         'Product_Package', 'getAllObjects',
@@ -645,7 +645,7 @@ def _get_order_type_and_category(service_offering, storage_type, volume_type):
 
 
 def prepare_replicant_order_object(manager, snapshot_schedule, location,
-                                   tier, volume, volume_type):
+                                   tier, volume, volume_type, iops):
     """Prepare the order object which is submitted to the placeOrder() method
 
     :param manager: The File or Block manager calling this function
@@ -730,7 +730,7 @@ def prepare_replicant_order_object(manager, snapshot_schedule, location,
                     "A replica volume cannot be ordered for this performance "
                     "volume since it does not support Encryption at Rest.")
             volume_is_performance = True
-            iops = int(volume['provisionedIops'])
+
             prices = [
                 find_price_by_category(package, billing_item_category_code),
                 find_price_by_category(package, 'storage_' + volume_type),

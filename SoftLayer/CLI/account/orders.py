@@ -13,7 +13,7 @@ from SoftLayer import utils
 @click.command(cls=SLCommand)
 @click.option('--limit', '-l',
               help='How many results to get in one api call',
-              default=100,
+              default=50,
               show_default=True)
 @environment.pass_env
 def cli(env, limit):

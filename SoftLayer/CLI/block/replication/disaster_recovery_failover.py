@@ -15,7 +15,7 @@ failover to an available replica in another location. This method does not allow
 After using this method, to failback to the original volume, please open a support ticket.
 If you wish to test failover, please use replica-failover.""")
 @click.argument('volume-id')
-@click.option('--replicant-id', help="ID of the replicant volume")
+@click.option('--replicant-id', help="ID of the replicant volume.")
 @environment.pass_env
 def cli(env, volume_id, replicant_id):
     """Failover an inaccessible block volume to its available replicant volume."""

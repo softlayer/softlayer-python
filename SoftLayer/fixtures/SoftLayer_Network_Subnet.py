@@ -8,7 +8,10 @@ getObject = {
     'cidr': '26',
     'subnetType': 'ADDITIONAL_PRIMARY',
     'networkVlan': {
-        'networkSpace': 'PUBLIC'
+        'networkSpace': 'PUBLIC',
+        'primaryRouter': {
+            'fullyQualifiedDomainName': 'fcr03a.dal13.softlayer.com'
+        }
     },
     'gateway': '1.2.3.254',
     'broadcastAddress': '1.2.3.255',

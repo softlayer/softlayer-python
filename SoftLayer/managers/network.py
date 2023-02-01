@@ -34,7 +34,7 @@ DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'usableIpAddressCount',
                                 'note',
                                 'tagReferences[tag]',
-                                'networkVlan[id,networkSpace,fullyQualifiedName]',
+                                'networkVlan[id, primaryRouter, networkSpace,fullyQualifiedName]',
                                 'addressSpace',
                                 'endPointIpAddress'
                                 ])
@@ -698,7 +698,7 @@ class NetworkManager(object):
         """
         identifier = identifier.split('/', 1)[0]
 
-        results = self.list_subnets()
+        results = self.list_subnets(identifier=identifier, mask='id')
         return [result['id'] for result in results]
 
     def _list_vlans_by_name(self, name):

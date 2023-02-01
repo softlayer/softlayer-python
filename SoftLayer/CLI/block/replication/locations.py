@@ -22,12 +22,12 @@ DEFAULT_COLUMNS = [
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume-id')
-@click.option('--sortby', help='Column to sort by', default='Long Name')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
               help='Columns to display. Options: {0}'.format(
                   ', '.join(column.name for column in COLUMNS)),
               default=','.join(DEFAULT_COLUMNS))
+@click.option('--sortby', help='Column to sort by', default='Long Name')
 @environment.pass_env
 def cli(env, columns, sortby, volume_id):
     """List suitable replication datacenters for the given volume."""

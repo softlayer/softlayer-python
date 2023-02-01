@@ -57,6 +57,7 @@ ALL_ROUTES = [
     ('virtual:notifications', 'SoftLayer.CLI.virt.notifications:cli'),
     ('virtual:notification-add', 'SoftLayer.CLI.virt.notification_add:cli'),
     ('virtual:notification-delete', 'SoftLayer.CLI.virt.notification_delete:cli'),
+    ('virtual:host-list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
     ('virtual:os-available', 'SoftLayer.CLI.virt.os_available:cli'),
 
     ('dedicatedhost', 'SoftLayer.CLI.dedicatedhost'),
@@ -377,6 +378,7 @@ ALL_ROUTES = [
     ('user:vpn-manual', 'SoftLayer.CLI.user.vpn_manual:cli'),
     ('user:vpn-subnet', 'SoftLayer.CLI.user.vpn_subnet:cli'),
     ('user:remove-access', 'SoftLayer.CLI.user.remove_access:cli'),
+    ('user:grant-access', 'SoftLayer.CLI.user.grant_access:cli'),
 
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:create', 'SoftLayer.CLI.vlan.create:cli'),
@@ -387,6 +389,7 @@ ALL_ROUTES = [
     ('vlan:cancel', 'SoftLayer.CLI.vlan.cancel:cli'),
 
     ('summary', 'SoftLayer.CLI.summary:cli'),
+    ('search', 'SoftLayer.CLI.search:cli'),
 
     ('report', 'SoftLayer.CLI.report'),
     ('report:bandwidth', 'SoftLayer.CLI.report.bandwidth:cli'),

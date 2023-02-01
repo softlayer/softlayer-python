@@ -307,6 +307,18 @@ class UserManagerTests(testing.TestCase):
         self.manager.get_user_virtuals(1234)
         self.assert_called_with('SoftLayer_User_Customer', 'getVirtualGuests')
 
+    def test_grant_hardware(self):
+        self.manager.grant_hardware_access(123456, 369852)
+        self.assert_called_with('SoftLayer_User_Customer', 'addHardwareAccess')
+
+    def test_grant_virtual(self):
+        self.manager.grant_virtual_access(123456, 369852)
+        self.assert_called_with('SoftLayer_User_Customer', 'addVirtualGuestAccess')
+
+    def test_grant_dedicated(self):
+        self.manager.grant_dedicated_access(123456, 369852)
+        self.assert_called_with('SoftLayer_User_Customer', 'addDedicatedHostAccess')
+
     def test_remove_hardware(self):
         self.manager.remove_hardware_access(123456, 369852)
         self.assert_called_with('SoftLayer_User_Customer', 'removeHardwareAccess')

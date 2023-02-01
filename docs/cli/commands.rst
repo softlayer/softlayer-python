@@ -35,3 +35,13 @@ Can be called with an un-authenticated API call.
 .. click:: SoftLayer.CLI.metadata:cli
     :prog: metadata
     :show-nested:
+
+search
+========
+
+Is an API service that lets you make complex queries about data indexed by the service.
+Can be called with an un-authenticated API call.
+
+.. click:: SoftLayer.CLI.search:cli
+    :prog: search
+    :show-nested:

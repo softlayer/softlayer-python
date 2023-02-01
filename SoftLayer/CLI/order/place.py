@@ -28,7 +28,7 @@ COLUMNS = ['keyName', 'description', 'cost']
 @click.option('--billing', type=click.Choice(['hourly', 'monthly']), default='hourly', show_default=True,
               help="Billing rate")
 @click.option('--complex-type',
-              help=("The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'."))
+              help="The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'.")
 @click.option('--extras',
               help="JSON string denoting extra data that needs to be sent with the order")
 @click.argument('order_items', nargs=-1)

@@ -143,6 +143,12 @@ class VlanTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getNetworkVlans')
 
+    def test_vlan_list_space_empty(self):
+        result = self.run_command(['vlan', 'list'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getNetworkVlans')
+        self.assertEqual(json.loads(result.output)[0]['Network'], '')
+
     def test_create_vlan(self):
         _mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
         _mock.return_value = SoftLayer_Product_Package.getItemsVLAN

@@ -996,7 +996,7 @@ class VSManager(utils.IdentifierMixin, object):
 
             disks_to_capture.append(block_device)
 
-        return self.guest.createArchiveTransaction(
+        return self.guest.createArchiveTemplate(
             name, disks_to_capture, notes, id=instance_id)
 
     def upgrade(self, instance_id, cpus=None, memory=None, nic_speed=None, public=True, preset=None, disk=None):
@@ -1362,7 +1362,7 @@ class VSManager(utils.IdentifierMixin, object):
         }
         category_code = option_category[option]
         for item in package_items:
-            is_private = (item.get('units') == 'PRIVATE_CORE')
+            is_private = item.get('units') == 'PRIVATE_CORE'
             for price in item['prices']:
                 if 'locationGroupId' in price and price['locationGroupId']:
                     # Skip location based prices

@@ -75,7 +75,7 @@ def _parse_create_args(client, args):
 @click.option('--quantity', type=int, default=None,
               help="The quantity of the item being ordered if different from quoted value")
 @click.option('--complex-type', default='SoftLayer_Container_Product_Order_Hardware_Server', show_default=True,
-              help=("The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'."))
+              help="The complex type of the order. Starts with 'SoftLayer_Container_Product_Order'.")
 @click.option('--userdata', '-u', help="User defined metadata string")
 @click.option('--userfile', '-F', type=click.Path(exists=True, readable=True, resolve_path=True),
               help="Read userdata from file")
