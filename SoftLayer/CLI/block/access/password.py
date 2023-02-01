@@ -9,7 +9,7 @@ from SoftLayer.CLI import environment
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('access_id')
 @click.option('--password', '-p', multiple=False,
-              help='Password you want to set, this command will fail if the password is not strong')
+              help='Password you want to set, this command will fail if the password is not strong.')
 @environment.pass_env
 def cli(env, access_id, password):
     """Changes a password for a volume's access.
