@@ -233,7 +233,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
 
         """
         if 'mask' not in kwargs:
-            kwargs['mask'] = ('''
+            kwargs['mask'] = '''
                 id,
                 name,
                 cpuCount,
@@ -272,7 +272,7 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
                     uuid
                 ],
                 guestCount
-            ''')
+            '''
 
         return self.host.getObject(id=host_id, **kwargs)
 

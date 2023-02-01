@@ -1362,7 +1362,7 @@ class VSManager(utils.IdentifierMixin, object):
         }
         category_code = option_category[option]
         for item in package_items:
-            is_private = (item.get('units') == 'PRIVATE_CORE')
+            is_private = item.get('units') == 'PRIVATE_CORE'
             for price in item['prices']:
                 if 'locationGroupId' in price and price['locationGroupId']:
                     # Skip location based prices
