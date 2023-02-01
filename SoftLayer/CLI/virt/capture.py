@@ -29,7 +29,7 @@ def cli(env, identifier, name, all, note):
     table.align['name'] = 'r'
     table.align['value'] = 'l'
 
-    table.add_row(['vs_id', capture['guestId']])
+    table.add_row(['globalIdentifier', capture['globalIdentifier']])
     table.add_row(['date', capture['createDate'][:10]])
     table.add_row(['time', capture['createDate'][11:19]])
     table.add_row(['transaction', formatting.transaction_status(capture)])

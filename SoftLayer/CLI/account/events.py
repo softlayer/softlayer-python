@@ -10,22 +10,26 @@ from SoftLayer import utils
 
 
 @click.command(cls=SLCommand)
-@click.option('--ack-all', is_flag=True, default=False,
-              help="Acknowledge every upcoming event. Doing so will turn off the popup in the control portal")
-@click.option('--planned', is_flag=True, default=False,
-              help="Show only planned events")
-@click.option('--unplanned', is_flag=True, default=False,
-              help="Show only unplanned events")
 @click.option('--announcement', is_flag=True, default=False,
-              help="Show only announcement events")
+              help="Show only announcement events.")
+@click.option('--ack-all', is_flag=True, default=False,
+              help="Acknowledge every upcoming event. Doing so will turn off the popup in the control portal.")
+@click.option('--date-min', help="Earliest date to retrieve events for [MM/DD/YYYY]. Default: 2 days ago.")
+@click.option('--planned', is_flag=True, default=False,
+              help="Show only planned events.")
+@click.option('--unplanned', is_flag=True, default=False,
+              help="Show only unplanned events.")
 @environment.pass_env
-def cli(env, ack_all, planned, unplanned, announcement):
+def cli(env, ack_all, planned, unplanned, announcement, date_min):
     """Summary and acknowledgement of upcoming and ongoing maintenance events"""
 
+    if date_min:
+        utils.verify_date(date_min)
+
     manager = AccountManager(env.client)
-    planned_events = manager.get_upcoming_events("PLANNED")
-    unplanned_events = manager.get_upcoming_events("UNPLANNED_INCIDENT")
-    announcement_events = manager.get_upcoming_events("ANNOUNCEMENT")
+    planned_events = manager.get_upcoming_events("PLANNED", date_min)
+    unplanned_events = manager.get_upcoming_events("UNPLANNED_INCIDENT", date_min)
+    announcement_events = manager.get_upcoming_events("ANNOUNCEMENT", date_min)
 
     add_ack_flag(planned_events, manager, ack_all)
     add_ack_flag(unplanned_events, manager, ack_all)
