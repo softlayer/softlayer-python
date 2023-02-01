@@ -33,9 +33,7 @@ def cli(env, sortby, datacenter, name, tag, order, owner):
     table.align['Name'] = 'l'
     table.sortby = sortby
 
-    if len(dedicated_hosts) == 0:
-        click.secho("No dedicated hosts are found.")
-    else:
+    if len(dedicated_hosts) != 0:
         for host in dedicated_hosts:
             cpu_allocated = host.get('allocationStatus').get('cpuAllocated')
             cpu_total = host.get('allocationStatus').get('cpuCount')
@@ -55,3 +53,5 @@ def cli(env, sortby, datacenter, name, tag, order, owner):
             ])
 
         env.fout(table)
+    else:
+        click.secho("No dedicated hosts are found.")
