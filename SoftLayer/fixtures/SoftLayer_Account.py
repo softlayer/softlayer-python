@@ -485,7 +485,7 @@ getCdnAccounts = [
 
 getNetworkVlans = [{
     'id': 1,
-    'networkSpace': 'PRIVATE',
+    'networkSpace': '',
     'hardwareCount': 0,
     'hardware': [],
     'vlanNumber': 12,
