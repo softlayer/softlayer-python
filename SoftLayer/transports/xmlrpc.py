@@ -164,7 +164,7 @@ ElementTree.dump(xml)
         safe_payload = re.sub(r'<string>[a-z0-9]{64}</string>', r'<string>API_KEY_GOES_HERE</string>', request.payload)
         safe_payload = re.sub(r'(\s+)', r' ', safe_payload)
         safe_payload = safe_payload.encode()
-        substitutions = dict(url=request.url, payload=safe_payload, transport_headers=request.transport_headers,
-                             timeout=self.timeout, verify=request.verify, cert=request.cert,
-                             proxy=_proxies_dict(self.proxy))
+        substitutions = {"url": request.url, "payload": safe_payload, "transport_headers": request.transport_headers,
+                         "timeout": self.timeout, "verify": request.verify, "cert": request.cert,
+                         "proxy": _proxies_dict(self.proxy)}
         return output.substitute(substitutions)

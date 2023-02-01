@@ -173,12 +173,12 @@ class FirewallManager(utils.IdentifierMixin, object):
 
         fwl_port_speed = 0
         if is_virt:
-            mask = ('primaryNetworkComponent[maxSpeed]')
+            mask = 'primaryNetworkComponent[maxSpeed]'
             svc = self.client['Virtual_Guest']
             primary = svc.getObject(mask=mask, id=server_id)
             fwl_port_speed = primary['primaryNetworkComponent']['maxSpeed']
         else:
-            mask = ('id,maxSpeed,networkComponentGroup.networkComponents')
+            mask = 'id,maxSpeed,networkComponentGroup.networkComponents'
             svc = self.client['Hardware_Server']
             network_components = svc.getFrontendNetworkComponents(
                 mask=mask, id=server_id)
