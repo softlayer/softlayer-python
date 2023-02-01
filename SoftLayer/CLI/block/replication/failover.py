@@ -8,10 +8,10 @@ from SoftLayer.CLI import environment
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume-id')
-@click.option('--replicant-id', help="ID of the replicant volume")
+@click.option('--replicant-id', help="ID of the replicant volume.")
 @environment.pass_env
 def cli(env, volume_id, replicant_id):
-    """Failover a block volume to the given replicant volume."""
+    """Failover a block volume to the given replica volume."""
     block_storage_manager = SoftLayer.BlockStorageManager(env.client)
 
     success = block_storage_manager.failover_to_replicant(

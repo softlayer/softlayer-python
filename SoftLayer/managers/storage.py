@@ -217,7 +217,8 @@ class StorageManager(utils.IdentifierMixin, object):
                                snapshot_schedule,
                                location,
                                tier=None,
-                               os_type=None):
+                               os_type=None,
+                               iops=None):
         """Places an order for a replicant volume.
 
         :param volume_id: The ID of the primary volume to be replicated
@@ -239,9 +240,12 @@ class StorageManager(utils.IdentifierMixin, object):
         storage_class = storage_utils.block_or_file(
             block_volume['storageType']['keyName'])
 
+        if iops is None:
+            iops = int(block_volume['provisionedIops'])
+
         order = storage_utils.prepare_replicant_order_object(
             self, snapshot_schedule, location, tier, block_volume,
-            storage_class)
+            storage_class, iops)
 
         if storage_class == 'block':
             if os_type is None:

@@ -625,7 +625,8 @@ class BlockTests(testing.TestCase):
 
         result = self.run_command(['block', 'replica-order', '100',
                                    '--snapshot-schedule=DAILY',
-                                   '--location=dal05'])
+                                   '--datacenter=dal05',
+                                   '--iops=100'])
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,
@@ -650,7 +651,8 @@ class BlockTests(testing.TestCase):
 
         result = self.run_command(['block', 'replica-order', '100',
                                    '--snapshot-schedule=DAILY',
-                                   '--location=dal05', '--tier=2'])
+                                   '--datacenter=dal05', '--tier=2',
+                                   '--iops=100'])
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,
