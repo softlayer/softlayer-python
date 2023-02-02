@@ -73,7 +73,7 @@ def get_package(manager, category_code):
     _filter = utils.NestedDict({})
     _filter['categories']['categoryCode'] = (
         utils.query_filter(category_code))
-    _filter['statusCode'] = (utils.query_filter('ACTIVE'))
+    _filter['statusCode'] = utils.query_filter('ACTIVE')
 
     packages = manager.client.call(
         'Product_Package', 'getAllObjects',

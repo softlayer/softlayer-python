@@ -13,7 +13,7 @@ from SoftLayer.CLI import helpers
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--postinstall', '-i',
-              help=("Post-install script to download (Only HTTPS executes, HTTP leaves file in /root"))
+              help="Post-install script to download (Only HTTPS executes, HTTP leaves file in /root")
 @helpers.multi_option('--key', '-k', help="SSH keys to add to the root user")
 @click.option('--lvm', '-l', is_flag=True, default=False, show_default=True,
               help="A flag indicating that the provision should use LVM for all logical drives.")

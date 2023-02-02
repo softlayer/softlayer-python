@@ -199,9 +199,9 @@ def _parse_create_args(client, args):
 @click.option('--router-private', type=click.INT,
               help="The ID of the private ROUTER on which you want the virtual server placed")
 @helpers.multi_option('--public-security-group', '-S',
-                      help=('Security group ID to associate with the public interface'))
+                      help='Security group ID to associate with the public interface')
 @helpers.multi_option('--private-security-group', '-s',
-                      help=('Security group ID to associate with the private interface'))
+                      help='Security group ID to associate with the private interface')
 @click.option('--wait', type=click.INT,
               help="Wait until VS is finished provisioning for up to X seconds before returning")
 @click.option('--placementgroup',

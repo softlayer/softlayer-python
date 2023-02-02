@@ -52,11 +52,11 @@ def get_latest_version():
     return latest
 
 
-CONTEXT_SETTINGS = dict(
-    help_option_names=['--help', '-h'],
-    auto_envvar_prefix='SLCLI',
-    max_content_width=999
-)
+CONTEXT_SETTINGS = {
+    "help_option_names": ['--help', '-h'],
+    "auto_envvar_prefix": 'SLCLI',
+    "max_content_width": 999
+}
 
 
 def get_version_message(ctx, param, value):

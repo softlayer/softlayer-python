@@ -4,67 +4,54 @@
 import click
 
 import SoftLayer
-from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
-COLUMNS = [
-    column_helper.Column('datacenter', ('datacenter', 'name')),
-    column_helper.Column(
-        'created_by',
-        ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
-    column_helper.Column(
-        'tags',
-        lambda server: formatting.tags(server.get('tagReferences')),
-        mask="tagReferences.tag.name"),
-]
-
-DEFAULT_COLUMNS = [
-    'id',
-    'name',
-    'cpuCount',
-    'diskCapacity',
-    'memoryCapacity',
-    'datacenter',
-    'guestCount',
-]
-
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
-@click.option('--cpu', '-c', help='Number of CPU cores', type=click.INT)
 @helpers.multi_option('--tag', help='Filter by tags')
 @click.option('--sortby', help='Column to sort by',
-              default='name',
+              default='Name',
               show_default=True)
-@click.option('--columns',
-              callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. [options: %s]'
-              % ', '.join(column.name for column in COLUMNS),
-              default=','.join(DEFAULT_COLUMNS),
-              show_default=True)
-@click.option('--datacenter', '-d', help='Datacenter shortname')
-@click.option('--name', '-H', help='Host portion of the FQDN')
-@click.option('--memory', '-m', help='Memory capacity in mebibytes',
-              type=click.INT)
-@click.option('--disk', '-D', help='Disk capacity')
+@click.option('--datacenter', '-d', help='Filter by datacenter shortname')
+@click.option('--name', '-H', help='Filter by host portion of the FQDN')
+@click.option('--order', help='Filter by ID of the order which purchased this dedicated host', type=click.INT)
+@click.option('--owner', help='Filter by owner of the dedicated host')
 @environment.pass_env
-def cli(env, sortby, cpu, columns, datacenter, name, memory, disk, tag):
+def cli(env, sortby, datacenter, name, tag, order, owner):
     """List dedicated host."""
     mgr = SoftLayer.DedicatedHostManager(env.client)
-    hosts = mgr.list_instances(cpus=cpu,
-                               datacenter=datacenter,
-                               hostname=name,
-                               memory=memory,
-                               disk=disk,
-                               tags=tag,
-                               mask=columns.mask())
+    dedicated_hosts = mgr.list_instances(datacenter=datacenter,
+                                         hostname=name,
+                                         tags=tag,
+                                         order=order,
+                                         owner=owner)
 
-    table = formatting.Table(columns.columns)
+    table = formatting.Table(["Id", "Name", "Datacenter", "Router", "CPU (allocated/total)",
+                              "Memory (allocated/total)", "Disk (allocated/total)", "Guests"])
+    table.align['Name'] = 'l'
     table.sortby = sortby
 
-    for host in hosts:
-        table.add_row([value or formatting.blank()
-                       for value in columns.row(host)])
+    if len(dedicated_hosts) != 0:
+        for host in dedicated_hosts:
+            cpu_allocated = host.get('allocationStatus').get('cpuAllocated')
+            cpu_total = host.get('allocationStatus').get('cpuCount')
+            memory_allocated = host.get('allocationStatus').get('memoryAllocated')
+            memory_total = host.get('allocationStatus').get('memoryCapacity')
+            disk_allocated = host.get('allocationStatus').get('diskAllocated')
+            disk_total = host.get('allocationStatus').get('diskCapacity')
+            table.add_row([
+                host.get('id'),
+                host.get('name'),
+                host.get('datacenter').get('name'),
+                host.get('backendRouter').get('hostname'),
+                f"{cpu_allocated}/{cpu_total}",
+                f"{memory_allocated}/{memory_total}",
+                f"{disk_allocated}/{disk_total}",
+                host.get('guestCount')
+            ])
 
-    env.fout(table)
+        env.fout(table)
+    else:
+        click.secho("No dedicated hosts are found.")
