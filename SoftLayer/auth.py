@@ -151,10 +151,14 @@ class EmployeeAuthentication(AuthenticationBase):
 
     def get_request(self, request):
         """Sets token-based auth headers."""
-        request.headers['employeesession'] = {
-            'userId': self.user_id,
-            'authToken': self.hash,
-        }
+        if 'xml' in request.url:
+            request.headers['employeesession'] = {
+                'userId': self.user_id,
+                'authToken': self.hash,
+            }
+        else:
+            request.transport_user = self.user_id
+            request.transport_password = self.hash
         return request
 
     def __repr__(self):

@@ -154,7 +154,7 @@ def employee_client(username=None,
                     proxy=None,
                     user_agent=None,
                     transport=None,
-                    verify=True):
+                    verify=False):
     """Creates an INTERNAL SoftLayer API client using your environment.
 
     Settings are loaded via keyword arguments, environemtal variables and
@@ -187,6 +187,7 @@ def employee_client(username=None,
         'Your Company'
 
     """
+    # SSL verification is OFF because internal api uses a self signed cert
     settings = config.get_client_settings(username=username,
                                           api_key=None,
                                           endpoint_url=endpoint_url,
@@ -381,6 +382,7 @@ class BaseClient(object):
         request.filter = kwargs.get('filter')
         request.limit = kwargs.get('limit')
         request.offset = kwargs.get('offset')
+        request.url = self.settings['softlayer'].get('endpoint_url')
         if kwargs.get('verify') is not None:
             request.verify = kwargs.get('verify')
 

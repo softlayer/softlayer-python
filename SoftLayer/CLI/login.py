@@ -8,6 +8,7 @@ import os
 from SoftLayer.API import EmployeeClient
 from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer import config
+from SoftLayer import consts
 from SoftLayer.CLI import environment
 
 
