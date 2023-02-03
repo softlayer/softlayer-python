@@ -16,4 +16,7 @@ def cli(env, key, immediate):
 
     licenses = SoftLayer.LicensesManager(env.client)
 
-    env.fout(licenses.cancel_item(key, immediate))
+    item = licenses.cancel_item(key, immediate)
+
+    if item:
+        env.fout("License key: {} was cancelled.".format(key))

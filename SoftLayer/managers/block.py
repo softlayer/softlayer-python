@@ -9,6 +9,7 @@ from SoftLayer.managers.storage import StorageManager
 from SoftLayer.managers import storage_utils
 from SoftLayer import utils
 
+
 # pylint: disable=too-many-public-methods
 
 
@@ -51,8 +52,7 @@ class BlockStorageManager(StorageManager):
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
 
-        _filter['iscsiNetworkStorage']['serviceResource']['type']['type'] = \
-            (utils.query_filter('!~ ISCSI'))
+        _filter['iscsiNetworkStorage']['serviceResource']['type']['type'] = utils.query_filter('!~ ISCSI')
 
         _filter['iscsiNetworkStorage']['storageType']['keyName'] = (
             utils.query_filter('*BLOCK_STORAGE*'))
@@ -62,15 +62,14 @@ class BlockStorageManager(StorageManager):
 
         if datacenter:
             _filter['iscsiNetworkStorage']['serviceResource']['datacenter'][
-                'name'] = (utils.query_filter(datacenter))
+                'name'] = utils.query_filter(datacenter)
 
         if username:
-            _filter['iscsiNetworkStorage']['username'] = \
-                (utils.query_filter(username))
+            _filter['iscsiNetworkStorage']['username'] = utils.query_filter(username)
 
         if order:
             _filter['iscsiNetworkStorage']['billingItem']['orderItem'][
-                'order']['id'] = (utils.query_filter(order))
+                'order']['id'] = utils.query_filter(order)
 
         kwargs['filter'] = _filter.to_dict()
         return self.client.call('Account', 'getIscsiNetworkStorage', iter=True, **kwargs)
@@ -196,3 +195,23 @@ class BlockStorageManager(StorageManager):
         if results:
             return [result['id'] for result in results]
         return []
+
+    def get_cloud_list(self):
+        """Returns a list cloud object storage.
+
+        return: Returns a list cloud object storage.
+        """
+
+        mask = 'mask[id,username,billingItem,storageType, notes]'
+
+        return self.client.call('Account', 'getHubNetworkStorage', mask=mask)
+
+    def get_buckets(self, object_id):
+        """Return  buckets data of the cloud storage.
+
+        :param object_id cloud object storage identifier
+
+        Returns: Get buckets
+
+        """
+        return self.client.call('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getBuckets', id=object_id)

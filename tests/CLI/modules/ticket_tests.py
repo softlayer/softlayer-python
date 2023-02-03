@@ -39,7 +39,7 @@ class TicketTests(testing.TestCase):
             'assigned_user': 'John Smith',
             'Case_Number': 'CS123456',
             'id': 102,
-            'last_edited': '2013-08-01T14:16:47-07:00',
+            'last_edited': '2013-08-01',
             'priority': 0,
             'status': 'Open',
             'title': 'Cloud Instance Cancellation - 08/01/13',

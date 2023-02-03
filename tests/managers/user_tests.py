@@ -294,3 +294,39 @@ class UserManagerTests(testing.TestCase):
                                self.manager.gather_notifications,
                                ['Test not exit'])
         self.assertEqual("Test not exit is not a valid notification name", str(ex))
+
+    def test_get_hardware(self):
+        self.manager.get_user_hardware(1234)
+        self.assert_called_with('SoftLayer_User_Customer', 'getHardware')
+
+    def test_get_dedicated_host(self):
+        self.manager.get_user_dedicated_host(1234)
+        self.assert_called_with('SoftLayer_User_Customer', 'getDedicatedHosts')
+
+    def test_get_virtual(self):
+        self.manager.get_user_virtuals(1234)
+        self.assert_called_with('SoftLayer_User_Customer', 'getVirtualGuests')
+
+    def test_grant_hardware(self):
+        self.manager.grant_hardware_access(123456, 369852)
+        self.assert_called_with('SoftLayer_User_Customer', 'addHardwareAccess')
+
+    def test_grant_virtual(self):
+        self.manager.grant_virtual_access(123456, 369852)
+        self.assert_called_with('SoftLayer_User_Customer', 'addVirtualGuestAccess')
+
+    def test_grant_dedicated(self):
+        self.manager.grant_dedicated_access(123456, 369852)
+        self.assert_called_with('SoftLayer_User_Customer', 'addDedicatedHostAccess')
+
+    def test_remove_hardware(self):
+        self.manager.remove_hardware_access(123456, 369852)
+        self.assert_called_with('SoftLayer_User_Customer', 'removeHardwareAccess')
+
+    def test_remove_virtual(self):
+        self.manager.remove_virtual_access(123456, 369852)
+        self.assert_called_with('SoftLayer_User_Customer', 'removeVirtualGuestAccess')
+
+    def test_remove_dedicated(self):
+        self.manager.remove_dedicated_access(123456, 369852)
+        self.assert_called_with('SoftLayer_User_Customer', 'removeDedicatedHostAccess')

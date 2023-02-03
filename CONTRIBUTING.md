@@ -40,7 +40,7 @@ Manager methods should have a decent docblock describing any parameters and what
 
 Docs are generated with [Sphinx](https://docs.readthedocs.io/en/latest/intro/getting-started-with-sphinx.html) and once Sphinx is setup, you can simply do
 
-`make html` in the softlayer-python/docs directory, which should generate the HTML in softlayer-python/docs/_build/html for testing. 
+`make html` in the softlayer-python/docs directory, which should generate the HTML in `softlayer-python/docs/_build/html` for testing.
 
 
 ## Unit Tests

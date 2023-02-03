@@ -23,4 +23,5 @@ def cli(env, identifier):
                                'reflash device firmware. Continue?' % hw_id)):
         raise exceptions.CLIAbort('Aborted.')
 
-    mgr.reflash_firmware(hw_id)
+    if mgr.reflash_firmware(hw_id):
+        click.echo('Successfully device firmware reflashed')

@@ -40,12 +40,24 @@ Version 5.6.0 introduces the ability to interact with user accounts from the cli
     :prog: user delete
     :show-nested:
 
+.. click:: SoftLayer.CLI.user.device_access:cli
+    :prog: user device-access
+    :show-nested:
+
 .. click:: SoftLayer.CLI.user.vpn_manual:cli
     :prog: user vpn-manual
     :show-nested:
 
 .. click:: SoftLayer.CLI.user.vpn_subnet:cli
     :prog: user vpn-subnet
+    :show-nested:
+
+.. click:: SoftLayer.CLI.user.remove_access:cli
+    :prog: user remove-access
+    :show-nested:
+
+.. click:: SoftLayer.CLI.user.grant_access:cli
+    :prog: user grant-access
     :show-nested:
 
 

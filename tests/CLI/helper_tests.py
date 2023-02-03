@@ -396,6 +396,12 @@ class TestFormatOutput(testing.TestCase):
             formatting.format_output, t, 'table',
         )
 
+    def test_format_raw_table(self):
+        test_table = formatting.Table(['col1', 'col2'])
+        test_table.add_row(['row1', 'row2'])
+        pretty_table = formatting.format_output(test_table, 'raw')
+        self.assertIsNone(pretty_table.box)
+
 
 class TestTemplateArgs(testing.TestCase):
 
@@ -478,3 +484,13 @@ class IterToTableTests(testing.TestCase):
 
         self.assertIsInstance(result, formatting.Table)
         self.assertEqual(result.columns, ['key'])
+
+    def test_format_api_list_with_empty_array(self):
+        result = formatting.iter_to_table([{'id': 130224450, 'activeTickets': []}])
+        self.assertIsInstance(result, formatting.Table)
+        self.assertIn('id', result.columns)
+        self.assertIn('activeTickets', result.columns)
+        formatted = formatting.format_output(result, "table")
+        # No good ways to test whats actually in a Rich.Table without going through the hassel of
+        # printing it out. As long as this didn't throw and exception it should be fine.
+        self.assertEqual(formatted.row_count, 1)

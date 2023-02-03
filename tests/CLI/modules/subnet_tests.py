@@ -190,3 +190,7 @@ class SubnetTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(result.exit_code, 0)
+
+    def test_clear_route(self):
+        result = self.run_command(['subnet', 'clear-route', '123456'])
+        self.assert_no_fail(result)

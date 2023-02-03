@@ -392,6 +392,90 @@ class UserManager(utils.IdentifierMixin, object):
 
         return overrides_list
 
+    def grant_hardware_access(self, user_id, hardware_id):
+        """Grants the user access to a single hardware device.
+
+        :param int user_id:
+        :param int hardware_id
+
+        :returns: true
+        """
+        return self.user_service.addHardwareAccess(hardware_id, id=user_id)
+
+    def grant_virtual_access(self, user_id, virtual_id):
+        """Grants the user access to a single VS device.
+
+        :param int user_id:
+        :param int virtual_id
+
+        :returns: true
+        """
+        return self.user_service.addVirtualGuestAccess(virtual_id, id=user_id)
+
+    def grant_dedicated_access(self, user_id, dedicated_id):
+        """Grants the user access to a single dedicated host device.
+
+        :param int user_id:
+        :param int dedicated_id
+
+        :returns: true
+        """
+        return self.user_service.addDedicatedHostAccess(dedicated_id, id=user_id)
+
+    def remove_hardware_access(self, user_id, hardware_id):
+        """Remove hardware from a portal user’s hardware access list.
+
+        :param int user_id:
+        :param int hardware_id
+
+        :returns: true
+        """
+        return self.user_service.removeHardwareAccess(hardware_id, id=user_id)
+
+    def remove_virtual_access(self, user_id, virtual_id):
+        """Remove hardware from a portal user’s virtual guests access list.
+
+        :param int user_id:
+        :param int hardware_id
+
+        :returns: true
+        """
+        return self.user_service.removeVirtualGuestAccess(virtual_id, id=user_id)
+
+    def remove_dedicated_access(self, user_id, dedicated_id):
+        """Remove hardware from a portal user’s dedicated host access list.
+
+        :param int user_id:
+        :param int dedicated_id
+
+        :returns: true
+        """
+        return self.user_service.removeDedicatedHostAccess(dedicated_id, id=user_id)
+
+    def get_user_hardware(self, user_id):
+        """User Hardware list.
+
+        :param int user_id:
+        :return: List hardware relate to user
+        """
+        return self.user_service.getHardware(id=user_id)
+
+    def get_user_dedicated_host(self, user_id):
+        """User dedicate host list.
+
+        :param int user_id:
+        :return: List dedicated host relate to user
+        """
+        return self.user_service.getDedicatedHosts(id=user_id)
+
+    def get_user_virtuals(self, user_id):
+        """User virtual guest list.
+
+        :param int user_id:
+        :return: List virtual guest relate to user
+        """
+        return self.user_service.getVirtualGuests(id=user_id)
+
 
 def _keyname_search(haystack, needle):
     for item in haystack:

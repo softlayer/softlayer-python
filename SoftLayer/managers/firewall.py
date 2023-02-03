@@ -157,11 +157,9 @@ class FirewallManager(utils.IdentifierMixin, object):
             firewall_service = self.client['Network_Component_Firewall']
         firewall = firewall_service.getObject(id=firewall_id, mask=mask)
         if firewall is None:
-            raise exceptions.SoftLayerError(
-                "Unable to find firewall %d" % firewall_id)
+            raise exceptions.SoftLayerError(f"Unable to find firewall {firewall_id}")
         if firewall.get('billingItem') is None:
-            raise exceptions.SoftLayerError(
-                "Unable to find billing item for firewall %d" % firewall_id)
+            raise exceptions.SoftLayerError(f"Unable to find billing item for firewall {firewall_id}")
 
         return firewall['billingItem']
 
@@ -175,12 +173,12 @@ class FirewallManager(utils.IdentifierMixin, object):
 
         fwl_port_speed = 0
         if is_virt:
-            mask = ('primaryNetworkComponent[maxSpeed]')
+            mask = 'primaryNetworkComponent[maxSpeed]'
             svc = self.client['Virtual_Guest']
             primary = svc.getObject(mask=mask, id=server_id)
             fwl_port_speed = primary['primaryNetworkComponent']['maxSpeed']
         else:
-            mask = ('id,maxSpeed,networkComponentGroup.networkComponents')
+            mask = 'id,maxSpeed,networkComponentGroup.networkComponents'
             svc = self.client['Hardware_Server']
             network_components = svc.getFrontendNetworkComponents(
                 mask=mask, id=server_id)
@@ -297,8 +295,43 @@ class FirewallManager(utils.IdentifierMixin, object):
         :param integer firewall_id: the instance ID of the standard firewall
         """
         if not mask:
-            mask = 'mask[datacenter,networkVlan]'
+            mask = 'mask[firewallType,datacenter,managementCredentials,networkVlan,' \
+                   'metricTrackingObject[data,type],networkGateway[insideVlans,members,privateIpAddress,' \
+                   'publicIpAddress,publicIpv6Address,privateVlan,publicVlan,status]]'
 
         svc = self.client['Network_Vlan_Firewall']
 
         return svc.getObject(id=firewall_id, mask=mask)
+
+    def get_firewalls_gatewalls(self):
+        """Returns a list of all gateway firewalls (gatewalls) on the account.
+
+        returns: A list of gateway firewalls (gatewalls) on the current account.
+        """
+        mask = 'mask[id,networkSpace,name,' \
+               'networkFirewall[id,firewallType,datacenter[name]],' \
+               'status[keyName],' \
+               'insideVlans[id],' \
+               'privateIpAddress[ipAddress],' \
+               'publicVlan[id,primaryRouter[hostname]],' \
+               'publicIpAddress[ipAddress],members[id,hardware[hostname]]]'
+        _filter = {"networkGateways": {"networkFirewall": {"operation": "not null"}}}
+
+        return self.account.getNetworkGateways(mask=mask, filter=_filter)
+
+    def get_summary(self, identifier, start_date, end_date):
+        """Returns the metric data for the date range provided
+
+        :param integer metric_tracking_id
+        """
+        body = [{
+            "keyName": "PUBLICIN",
+            "summaryType": "sum"
+
+        }, {
+            "keyName": "PUBLICOUT",
+            "summaryType": "sum"
+        }]
+
+        return self.client['Metric_Tracking_Object'].getSummaryData(start_date,
+                                                                    end_date, body, 86400, id=identifier)

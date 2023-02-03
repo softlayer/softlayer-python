@@ -11,12 +11,12 @@ from SoftLayer import utils
 
 
 @click.command(cls=SLCommand)
-@click.option('--limit', default=50, show_default=True,
-              help="How many invoices to get back.")
-@click.option('--closed', is_flag=True, default=False, show_default=True,
-              help="Include invoices with a CLOSED status.")
 @click.option('--all', 'get_all', is_flag=True, default=False, show_default=True,
               help="Return ALL invoices. There may be a lot of these.")
+@click.option('--closed', is_flag=True, default=False, show_default=True,
+              help="Include invoices with a CLOSED status.")
+@click.option('--limit', default=50, show_default=True,
+              help="How many invoices to get back.")
 @environment.pass_env
 def cli(env, limit, closed=False, get_all=False):
     """List invoices"""

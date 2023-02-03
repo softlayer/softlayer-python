@@ -34,7 +34,7 @@ DEBUG_LOGGING_MAP = {
 }
 
 PROG_NAME = "slcli (SoftLayer Command-line)"
-VALID_FORMATS = ['table', 'raw', 'json', 'jsonraw']
+VALID_FORMATS = ['table', 'raw', 'json', 'jsonraw', 'csv']
 DEFAULT_FORMAT = 'raw'
 
 if sys.stdout.isatty():
@@ -44,7 +44,7 @@ if sys.stdout.isatty():
 def get_latest_version():
     """Gets the latest version of the Softlayer library."""
     try:
-        result = requests.get('https://pypi.org/pypi/SoftLayer/json')
+        result = requests.get('https://pypi.org/pypi/SoftLayer/json',  timeout=60)
         json_result = result.json()
         latest = 'v{}'.format(json_result['info']['version'])
     except Exception:
@@ -52,11 +52,11 @@ def get_latest_version():
     return latest
 
 
-CONTEXT_SETTINGS = dict(
-    help_option_names=['--help', '-h'],
-    auto_envvar_prefix='SLCLI',
-    max_content_width=999
-)
+CONTEXT_SETTINGS = {
+    "help_option_names": ['--help', '-h'],
+    "auto_envvar_prefix": 'SLCLI',
+    "max_content_width": 999
+}
 
 
 def get_version_message(ctx, param, value):
@@ -119,6 +119,7 @@ def cli(env,
     env.skip_confirmations = really
     env.config_file = config
     env.format = format
+    env.set_env_theme(config_file=config)
     env.ensure_client(config_file=config, is_demo=demo, proxy=proxy)
     env.vars['_start'] = time.time()
     logger = logging.getLogger()

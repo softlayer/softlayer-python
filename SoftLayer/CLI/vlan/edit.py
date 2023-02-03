@@ -5,6 +5,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import helpers
 
 
@@ -21,6 +22,9 @@ from SoftLayer.CLI import helpers
 @environment.pass_env
 def cli(env, identifier, name, note, tags):
     """Edit a vlan's details."""
+
+    if not any([name, note, tags]):
+        raise exceptions.CLIAbort("At least one option is required")
 
     new_tags = None
 

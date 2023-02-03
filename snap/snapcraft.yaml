@@ -6,13 +6,18 @@ description: |
 
 license: MIT
 
-base: core20
+base: core22
 grade: stable 
 confinement: strict
+
+assumes:
+  - command-chain
 
 apps:
   slcli:
     command: bin/slcli
+    command-chain: 
+      - bin/homeishome-launch        
     environment: 
       LC_ALL: C.UTF-8
     plugs:
@@ -34,3 +39,8 @@ parts:
       
     stage-packages:
       - python3
+
+  homeishome-launch:
+    plugin: nil
+    stage-snaps:
+      - homeishome-launch     

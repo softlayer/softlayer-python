@@ -65,7 +65,7 @@ def _format_name(obj):
 
         return name
     else:
-        raise Exception('Unknown type %s' % obj['type'])
+        raise ValueError('Unknown type %s' % obj['type'])
 
 
 COLUMNS = [

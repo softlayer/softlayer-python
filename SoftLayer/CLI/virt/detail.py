@@ -97,12 +97,9 @@ def cli(env, identifier, passwords=False, price=False):
         total_price = utils.lookup(result,
                                    'billingItem',
                                    'nextInvoiceTotalRecurringAmount') or 0
-        total_price += sum(p['nextInvoiceTotalRecurringAmount']
-                           for p
-                           in utils.lookup(result,
-                                           'billingItem',
-                                           'children') or [])
-        table.add_row(['price_rate', total_price])
+        if total_price != 0:
+            table.add_row(['Prices', _price_table(utils.lookup(result, 'billingItem'), total_price)])
+            table.add_row(['Price rate', total_price])
 
     if passwords:
         pass_table = formatting.Table(['software', 'username', 'password'])
@@ -154,6 +151,17 @@ def _bw_table(bw_data):
 
         table.add_row([bw_type, bw_point['amountIn'], bw_point['amountOut'], allotment])
     return table
+
+
+def _price_table(billing_item, total_price):
+    """Returns an item table"""
+    price_table = formatting.Table(['Item', 'CategoryCode', 'Recurring Price'])
+    price_table.add_row(['Total', '-', total_price])
+    items = billing_item['nextInvoiceChildren']
+    for item in items:
+        if item.get('recurringFee') is not None:
+            price_table.add_row([item['description'], item['categoryCode'], item['recurringFee']])
+    return price_table
 
 
 def _cli_helper_dedicated_host(env, result, table):

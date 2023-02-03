@@ -10,7 +10,7 @@ from SoftLayer.CLI import environment
 @click.argument('volume-id')
 @environment.pass_env
 def cli(env, volume_id):
-    """Failback a block volume from the given replicant volume."""
+    """Failback a block volume from the given replica volume."""
     block_storage_manager = SoftLayer.BlockStorageManager(env.client)
 
     success = block_storage_manager.failback_from_replicant(volume_id)

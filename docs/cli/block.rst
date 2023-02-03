@@ -83,6 +83,10 @@ Block Commands
     :prog: block volume-count
     :show-nested:
 
+.. click:: SoftLayer.CLI.block.options:cli
+    :prog: block volume-options
+    :show-nested:
+
 .. click:: SoftLayer.CLI.block.detail:cli
     :prog: block volume-detail
     :show-nested:
@@ -155,3 +159,20 @@ Block Commands
 .. click:: SoftLayer.CLI.block.snapshot.get_notify_status:cli
     :prog: block snapshot-get-notification-status
     :show-nested:
+
+.. click:: SoftLayer.CLI.block.object_list:cli
+    :prog: block object-list
+    :show-nested:
+
+.. click:: SoftLayer.CLI.block.object_storage_detail:cli
+    :prog: block object-storage-detail
+    :show-nested:
+
+.. click:: SoftLayer.CLI.block.duplicate_convert_status:cli
+    :prog: block duplicate-convert-status
+    :show-nested:
+
+.. click:: SoftLayer.CLI.block.object_storage_permission:cli
+    :prog: block object-storage-permission
+    :show-nested:
+

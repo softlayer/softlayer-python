@@ -53,7 +53,12 @@ ALL_ROUTES = [
     ('virtual:capacity', 'SoftLayer.CLI.virt.capacity:cli'),
     ('virtual:placementgroup', 'SoftLayer.CLI.virt.placementgroup:cli'),
     ('virtual:migrate', 'SoftLayer.CLI.virt.migrate:cli'),
+    ('virtual:access', 'SoftLayer.CLI.virt.access:cli'),
     ('virtual:monitoring', 'SoftLayer.CLI.virt.monitoring:cli'),
+    ('virtual:notifications', 'SoftLayer.CLI.virt.notifications:cli'),
+    ('virtual:notification-add', 'SoftLayer.CLI.virt.notification_add:cli'),
+    ('virtual:notification-delete', 'SoftLayer.CLI.virt.notification_delete:cli'),
+    ('virtual:host-list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
 
     ('dedicatedhost', 'SoftLayer.CLI.dedicatedhost'),
     ('dedicatedhost:list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
@@ -94,6 +99,7 @@ ALL_ROUTES = [
     ('block:access-list', 'SoftLayer.CLI.block.access.list:cli'),
     ('block:access-revoke', 'SoftLayer.CLI.block.access.revoke:cli'),
     ('block:access-password', 'SoftLayer.CLI.block.access.password:cli'),
+    ('block:duplicate-convert-status', 'SoftLayer.CLI.block.duplicate_convert_status:cli'),
     ('block:subnets-list', 'SoftLayer.CLI.block.subnets.list:cli'),
     ('block:subnets-assign', 'SoftLayer.CLI.block.subnets.assign:cli'),
     ('block:subnets-remove', 'SoftLayer.CLI.block.subnets.remove:cli'),
@@ -125,7 +131,11 @@ ALL_ROUTES = [
     ('block:volume-limits', 'SoftLayer.CLI.block.limit:cli'),
     ('block:volume-refresh', 'SoftLayer.CLI.block.refresh:cli'),
     ('block:volume-convert', 'SoftLayer.CLI.block.convert:cli'),
+    ('block:volume-options', 'SoftLayer.CLI.block.options:cli'),
     ('block:volume-set-note', 'SoftLayer.CLI.block.set_note:cli'),
+    ('block:object-list', 'SoftLayer.CLI.block.object_list:cli'),
+    ('block:object-storage-detail', 'SoftLayer.CLI.block.object_storage_detail:cli'),
+    ('block:object-storage-permission', 'SoftLayer.CLI.block.object_storage_permission:cli'),
 
     ('email', 'SoftLayer.CLI.email'),
     ('email:list', 'SoftLayer.CLI.email.list:cli'),
@@ -143,6 +153,7 @@ ALL_ROUTES = [
     ('file:access-authorize', 'SoftLayer.CLI.file.access.authorize:cli'),
     ('file:access-list', 'SoftLayer.CLI.file.access.list:cli'),
     ('file:access-revoke', 'SoftLayer.CLI.file.access.revoke:cli'),
+    ('file:duplicate-convert-status', 'SoftLayer.CLI.file.duplicate_convert_status:cli'),
     ('file:replica-failback', 'SoftLayer.CLI.file.replication.failback:cli'),
     ('file:replica-failover', 'SoftLayer.CLI.file.replication.failover:cli'),
     ('file:disaster-recovery-failover', 'SoftLayer.CLI.file.replication.disaster_recovery_failover:cli'),
@@ -170,6 +181,7 @@ ALL_ROUTES = [
     ('file:volume-limits', 'SoftLayer.CLI.file.limit:cli'),
     ('file:volume-refresh', 'SoftLayer.CLI.file.refresh:cli'),
     ('file:volume-convert', 'SoftLayer.CLI.file.convert:cli'),
+    ('file:volume-options', 'SoftLayer.CLI.file.options:cli'),
     ('file:volume-set-note', 'SoftLayer.CLI.file.set_note:cli'),
 
     ('firewall', 'SoftLayer.CLI.firewall'),
@@ -178,6 +190,7 @@ ALL_ROUTES = [
     ('firewall:detail', 'SoftLayer.CLI.firewall.detail:cli'),
     ('firewall:edit', 'SoftLayer.CLI.firewall.edit:cli'),
     ('firewall:list', 'SoftLayer.CLI.firewall.list:cli'),
+    ('firewall:monitoring', 'SoftLayer.CLI.firewall.monitoring:cli'),
 
     ('globalip', 'SoftLayer.CLI.globalip'),
     ('globalip:assign', 'SoftLayer.CLI.globalip.assign:cli'),
@@ -205,6 +218,8 @@ ALL_ROUTES = [
     ('ipsec:translation-remove', 'SoftLayer.CLI.vpn.ipsec.translation.remove:cli'),
     ('ipsec:translation-update', 'SoftLayer.CLI.vpn.ipsec.translation.update:cli'),
     ('ipsec:update', 'SoftLayer.CLI.vpn.ipsec.update:cli'),
+    ('ipsec:order', 'SoftLayer.CLI.vpn.ipsec.order:cli'),
+    ('ipsec:cancel', 'SoftLayer.CLI.vpn.ipsec.cancel:cli'),
 
     ('loadbal', 'SoftLayer.CLI.loadbal'),
     ('loadbal:detail', 'SoftLayer.CLI.loadbal.detail:cli'),
@@ -264,7 +279,6 @@ ALL_ROUTES = [
     ('hardware:detail', 'SoftLayer.CLI.hardware.detail:cli'),
     ('hardware:billing', 'SoftLayer.CLI.hardware.billing:cli'),
     ('hardware:edit', 'SoftLayer.CLI.hardware.edit:cli'),
-    ('hardware:guests', 'SoftLayer.CLI.hardware.guests:cli'),
     ('hardware:list', 'SoftLayer.CLI.hardware.list:cli'),
     ('hardware:power-cycle', 'SoftLayer.CLI.hardware.power:power_cycle'),
     ('hardware:power-off', 'SoftLayer.CLI.hardware.power:power_off'),
@@ -283,6 +297,10 @@ ALL_ROUTES = [
     ('hardware:upgrade', 'SoftLayer.CLI.hardware.upgrade:cli'),
     ('hardware:sensor', 'SoftLayer.CLI.hardware.sensor:cli'),
     ('hardware:monitoring', 'SoftLayer.CLI.hardware.monitoring:cli'),
+    ('hardware:notifications', 'SoftLayer.CLI.hardware.notifications:cli'),
+    ('hardware:notification-add', 'SoftLayer.CLI.hardware.notification_add:cli'),
+    ('hardware:notification-delete', 'SoftLayer.CLI.hardware.notification_delete:cli'),
+    ('hardware:create-credential', 'SoftLayer.CLI.hardware.create_credential:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),
@@ -325,6 +343,7 @@ ALL_ROUTES = [
     ('subnet:lookup', 'SoftLayer.CLI.subnet.lookup:cli'),
     ('subnet:edit-ip', 'SoftLayer.CLI.subnet.edit_ip:cli'),
     ('subnet:route', 'SoftLayer.CLI.subnet.route:cli'),
+    ('subnet:clear-route', 'SoftLayer.CLI.subnet.clear_route:cli'),
 
     ('tags', 'SoftLayer.CLI.tags'),
     ('tags:cleanup', 'SoftLayer.CLI.tags.cleanup:cli'),
@@ -355,8 +374,11 @@ ALL_ROUTES = [
     ('user:edit-details', 'SoftLayer.CLI.user.edit_details:cli'),
     ('user:create', 'SoftLayer.CLI.user.create:cli'),
     ('user:delete', 'SoftLayer.CLI.user.delete:cli'),
+    ('user:device-access', 'SoftLayer.CLI.user.device_access:cli'),
     ('user:vpn-manual', 'SoftLayer.CLI.user.vpn_manual:cli'),
     ('user:vpn-subnet', 'SoftLayer.CLI.user.vpn_subnet:cli'),
+    ('user:remove-access', 'SoftLayer.CLI.user.remove_access:cli'),
+    ('user:grant-access', 'SoftLayer.CLI.user.grant_access:cli'),
 
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:create', 'SoftLayer.CLI.vlan.create:cli'),
@@ -367,6 +389,7 @@ ALL_ROUTES = [
     ('vlan:cancel', 'SoftLayer.CLI.vlan.cancel:cli'),
 
     ('summary', 'SoftLayer.CLI.summary:cli'),
+    ('search', 'SoftLayer.CLI.search:cli'),
 
     ('report', 'SoftLayer.CLI.report'),
     ('report:bandwidth', 'SoftLayer.CLI.report.bandwidth:cli'),
@@ -374,12 +397,7 @@ ALL_ROUTES = [
 
     ('autoscale', 'SoftLayer.CLI.autoscale'),
     ('autoscale:list', 'SoftLayer.CLI.autoscale.list:cli'),
-    ('autoscale:create', 'SoftLayer.CLI.autoscale.create:cli'),
     ('autoscale:detail', 'SoftLayer.CLI.autoscale.detail:cli'),
-    ('autoscale:scale', 'SoftLayer.CLI.autoscale.scale:cli'),
-    ('autoscale:logs', 'SoftLayer.CLI.autoscale.logs:cli'),
-    ('autoscale:tag', 'SoftLayer.CLI.autoscale.tag:cli'),
-    ('autoscale:edit', 'SoftLayer.CLI.autoscale.edit:cli'),
     ('autoscale:delete', 'SoftLayer.CLI.autoscale.delete:cli'),
 ]
 

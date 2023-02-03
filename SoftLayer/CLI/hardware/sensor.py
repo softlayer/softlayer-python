@@ -16,16 +16,16 @@ def cli(env, identifier, discrete):
     mgr = SoftLayer.HardwareManager(env.client)
     sensors = mgr.get_sensors(identifier)
 
-    temperature_table = formatting.Table(["Sensor", "Status", "Reading", "Min", "Max"],
+    temperature_table = formatting.Table(["Sensor", "Status", "Reading", "Critical Min", "Min", "Max", "Critical Max"],
                                          title='Temperature (c)')
 
-    volts_table = formatting.Table(["Sensor", "Status", "Reading", "Min", "Max"],
+    volts_table = formatting.Table(["Sensor", "Status", "Reading", "Critical Min", "Min", "Max", "Critical Max"],
                                    title='Volts')
 
-    watts_table = formatting.Table(["Sensor", "Status", "Reading"],
+    watts_table = formatting.Table(["Sensor", "Status", "Reading", "Critical Min", "Min", "Max", "Critical Max"],
                                    title='Watts')
 
-    rpm_table = formatting.Table(["Sensor", "Status", "Reading", "Min"],
+    rpm_table = formatting.Table(["Sensor", "Status", "Reading", "Critical Min", "Min", "Max", "Critical Max"],
                                  title='RPM')
 
     discrete_table = formatting.Table(["Sensor", "Status", "Reading"],
@@ -36,26 +36,37 @@ def cli(env, identifier, discrete):
             temperature_table.add_row([sensor.get('sensorId'),
                                        sensor.get('status'),
                                        sensor.get('sensorReading'),
+                                       sensor.get('lowerCritical'),
+                                       sensor.get('lowerNonCritical'),
                                        sensor.get('upperNonCritical'),
                                        sensor.get('upperCritical')])
 
-        if sensor.get('sensorUnits') == 'volts':
+        if sensor.get('sensorUnits') == 'Volts':
             volts_table.add_row([sensor.get('sensorId'),
                                  sensor.get('status'),
                                  sensor.get('sensorReading'),
+                                 sensor.get('lowerCritical'),
                                  sensor.get('lowerNonCritical'),
-                                 sensor.get('lowerCritical')])
+                                 sensor.get('upperNonCritical'),
+                                 sensor.get('upperCritical')])
 
         if sensor.get('sensorUnits') == 'Watts':
             watts_table.add_row([sensor.get('sensorId'),
                                  sensor.get('status'),
-                                 sensor.get('sensorReading')])
+                                 sensor.get('sensorReading'),
+                                 sensor.get('lowerCritical'),
+                                 sensor.get('lowerNonCritical'),
+                                 sensor.get('upperNonCritical'),
+                                 sensor.get('upperCritical')])
 
         if sensor.get('sensorUnits') == 'RPM':
             rpm_table.add_row([sensor.get('sensorId'),
                                sensor.get('status'),
                                sensor.get('sensorReading'),
-                               sensor.get('lowerCritical')])
+                               sensor.get('lowerCritical'),
+                               sensor.get('lowerNonCritical'),
+                               sensor.get('upperNonCritical'),
+                               sensor.get('upperCritical')])
 
         if sensor.get('sensorUnits') == 'discrete':
             discrete_table.add_row([sensor.get('sensorId'),

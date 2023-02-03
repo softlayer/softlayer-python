@@ -18,14 +18,23 @@ from SoftLayer import utils
 @click.option('--no-hardware',
               is_flag=True,
               help="Hide hardware listing")
+@click.option('--no-trunks',
+              is_flag=True,
+              help="Hide devices with trunks")
 @environment.pass_env
-def cli(env, identifier, no_vs, no_hardware):
+def cli(env, identifier, no_vs, no_hardware, no_trunks):
     """Get details about a VLAN."""
-
     mgr = SoftLayer.NetworkManager(env.client)
 
     vlan_id = helpers.resolve_id(mgr.resolve_vlan_ids, identifier, 'VLAN')
-    vlan = mgr.get_vlan(vlan_id)
+
+    mask = """mask[firewallInterfaces,primaryRouter[id, fullyQualifiedDomainName, datacenter],
+    totalPrimaryIpAddressCount,networkSpace,billingItem,hardware,subnets,virtualGuests,
+    networkVlanFirewall[id,fullyQualifiedDomainName,primaryIpAddress],attachedNetworkGateway[id,name,networkFirewall],
+    networkComponentTrunks[networkComponent[downlinkComponent[networkComponentGroup[membersDescription],
+    hardware[tagReferences]]]]]"""
+
+    vlan = mgr.get_vlan(vlan_id, mask=mask)
 
     table = formatting.KeyValueTable(['name', 'value'])
     table.align['name'] = 'r'
@@ -38,20 +47,20 @@ def cli(env, identifier, no_vs, no_hardware):
     table.add_row(['primary_router',
                    utils.lookup(vlan, 'primaryRouter', 'fullyQualifiedDomainName')])
     table.add_row(['Gateway/Firewall', get_gateway_firewall(vlan)])
-    subnets = []
-    for subnet in vlan.get('subnets', []):
-        subnet_table = formatting.KeyValueTable(['name', 'value'])
-        subnet_table.align['name'] = 'r'
-        subnet_table.align['value'] = 'l'
-        subnet_table.add_row(['id', subnet.get('id')])
-        subnet_table.add_row(['identifier', subnet.get('networkIdentifier')])
-        subnet_table.add_row(['netmask', subnet.get('netmask')])
-        subnet_table.add_row(['gateway', subnet.get('gateway', formatting.blank())])
-        subnet_table.add_row(['type', subnet.get('subnetType')])
-        subnet_table.add_row(['usable ips', subnet.get('usableIpAddressCount')])
-        subnets.append(subnet_table)
 
-    table.add_row(['subnets', subnets])
+    if vlan.get('subnets'):
+        subnet_table = formatting.Table(['id', 'identifier', 'netmask', 'gateway', 'type', 'usable ips'])
+        for subnet in vlan.get('subnets'):
+            subnet_table.add_row([subnet.get('id'),
+                                  subnet.get('networkIdentifier'),
+                                  subnet.get('netmask'),
+                                  subnet.get('gateway') or formatting.blank(),
+                                  subnet.get('subnetType'),
+                                  subnet.get('usableIpAddressCount')])
+        # subnets.append(subnet_table)
+        table.add_row(['subnets', subnet_table])
+    else:
+        table.add_row(['subnets', '-'])
 
     server_columns = ['hostname', 'domain', 'public_ip', 'private_ip']
 
@@ -65,7 +74,7 @@ def cli(env, identifier, no_vs, no_hardware):
                                   vsi.get('primaryBackendIpAddress')])
             table.add_row(['vs', vs_table])
         else:
-            table.add_row(['vs', 'none'])
+            table.add_row(['vs', '-'])
 
     if not no_hardware:
         if vlan.get('hardware'):
@@ -77,7 +86,22 @@ def cli(env, identifier, no_vs, no_hardware):
                                   hardware.get('primaryBackendIpAddress')])
             table.add_row(['hardware', hw_table])
         else:
-            table.add_row(['hardware', 'none'])
+            table.add_row(['hardware', '-'])
+
+    if not no_trunks:
+        if vlan.get('networkComponentTrunks'):
+            trunks = filter_trunks(vlan.get('networkComponentTrunks'))
+            trunks_table = formatting.Table(['device', 'port', 'tags'])
+            for trunk in trunks:
+                trunks_table.add_row([utils.lookup(trunk, 'networkComponent', 'downlinkComponent',
+                                                   'hardware', 'fullyQualifiedDomainName'),
+                                      utils.lookup(trunk, 'networkComponent', 'downlinkComponent',
+                                                   'networkComponentGroup', 'membersDescription'),
+                                      formatting.tags(utils.lookup(trunk, 'networkComponent', 'downlinkComponent',
+                                                                   'hardware', 'tagReferences'))])
+            table.add_row(['trunks', trunks_table])
+        else:
+            table.add_row(['trunks', '-'])
 
     env.fout(table)
 
@@ -92,3 +116,14 @@ def get_gateway_firewall(vlan):
     if gateway:
         return gateway
     return formatting.blank()
+
+
+def filter_trunks(trunks):
+    """Filter duplicates devices with trunks of the vlan."""
+    trunk_filters = []
+    hardware_id = []
+    for trunk in trunks:
+        if utils.lookup(trunk, 'networkComponent', 'downlinkComponent', 'hardwareId') not in hardware_id:
+            trunk_filters.append(trunk)
+            hardware_id.append(utils.lookup(trunk, 'networkComponent', 'downlinkComponent', 'hardwareId'))
+    return trunk_filters

@@ -1,9 +1,149 @@
 # Change Log
 
+## [6.1.3] - 2022-11-30
 
-## [6.0.2] - 2022-03-30
+#### What's Changed
+* New Command: Hardware notifications by @caberos in https://github.com/softlayer/softlayer-python/pull/1756
+* New Command: virtual notifications by @caberos in https://github.com/softlayer/softlayer-python/pull/1758
+* Change regex in rich text in simple option in help text by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1759
+* pip prod(deps): bump rich from 12.5.1 to 12.6.0 by @dependabot in https://github.com/softlayer/softlayer-python/pull/1760
+* add more information to vs credentials by @caberos in https://github.com/softlayer/softlayer-python/pull/1762
+* Fixed maxint issue by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1765
+* Added csv output format by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1766
+* add more information on hw credentials by @caberos in https://github.com/softlayer/softlayer-python/pull/1767
+* Delete twitter link in documentation by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1769
+* new command hw create-credential by @caberos in https://github.com/softlayer/softlayer-python/pull/1774
+* fix the hw credential error by @caberos in https://github.com/softlayer/softlayer-python/pull/1781
+* Added test suite for py311 by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1784
+* New feature to change theme in slcli like dark, light o maintain in default by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1775
+* Match `virtual detail --prices` option with `hardware detail --prices` option by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1780
+* Fixing preset-list pricing table by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1782
+* fix the call api cannot handle empty results by @caberos in https://github.com/softlayer/softlayer-python/pull/1789
+* Debug output changed to a valid JSON by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1791
+* slcli hw add-notifications crashes with a bad user by @caberos in https://github.com/softlayer/softlayer-python/pull/1786
+* del-notification commands, rename the commands to notifications-add by @caberos in https://github.com/softlayer/softlayer-python/pull/1785
+* Add --extras to slcli order quote by @caberos in https://github.com/softlayer/softlayer-python/pull/1792
+* An error is displaying for volume with replica in slcli for Active pr… by @caberos in https://github.com/softlayer/softlayer-python/pull/1794
 
-## What's Changed
+
+**Full Changelog**: https://github.com/softlayer/softlayer-python/compare/v6.1.2...v6.1.3
+
+
+## [6.1.2] - 2022-09-23
+
+#### What's Changed
+* Snapcraft: Updated to Core22 and  add homeishome-launch by @kz6fittycent in https://github.com/softlayer/softlayer-python/pull/1740
+* Add status, create date and domain columns in `slcli vs list command` by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1728
+* New command: ipsec cancel by @caberos in https://github.com/softlayer/softlayer-python/pull/1729
+* New command: subnet clear-route by @caberos in https://github.com/softlayer/softlayer-python/pull/1738
+* Deprecate slcli hw guests by @caberos in https://github.com/softlayer/softlayer-python/pull/1736
+* Remove real usersnames from test fixtrues by @caberos in https://github.com/softlayer/softlayer-python/pull/1743
+* Fix tox request.get hangout issue by @caberos in https://github.com/softlayer/softlayer-python/pull/1746
+* add vs user-access command by @caberos in https://github.com/softlayer/softlayer-python/pull/1741
+* Update Help message for commands that take in multiple arguments by @caberos in https://github.com/softlayer/softlayer-python/pull/1748
+* Error with slcli order item-list by @caberos in https://github.com/softlayer/softlayer-python/pull/1751
+* deprecate sl `autoscale` by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1753
+* Unhandled error running a subcommand in slcli by @caberos in https://github.com/softlayer/softlayer-python/pull/1754
+
+
+**Full Changelog**: https://github.com/softlayer/softlayer-python/compare/v6.1.1...v6.1.2
+
+
+## [6.1.1] - 2022-08-18
+
+#### What's Changed
+* v6.1.0 Changelog and version bump by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1674
+* item-list fix by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1679
+* updating release job to actually publish to pypi by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1680
+* Update command - slcli object-storage endpoints by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1685
+* add the block volume-options command by @caberos in https://github.com/softlayer/softlayer-python/pull/1681
+* add the file volume-options command by @caberos in https://github.com/softlayer/softlayer-python/pull/1684
+* fixed issues where a message warned users about closing datacenter by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1688
+* Enable --format=raw and fixes table width  by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1689
+* Update `slcli hardware sensor` by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1691
+* Improved successful response to command - slcli vs cancel by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1695
+* Fixed an issue with printing tables that contained empty items by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1697
+* Added a dependabot scanner  by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1699
+* block|file volume-options improvements by @caberos in https://github.com/softlayer/softlayer-python/pull/1700
+* Option create-options in commands hardware and dedicatedhost fixed by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1703
+* pip prod(deps): bump rich from 12.3.0 to 12.5.1 by @dependabot in https://github.com/softlayer/softlayer-python/pull/1704
+* block/file volume-options improvements 2 by @caberos in https://github.com/softlayer/softlayer-python/pull/1702
+* New command ipsec order by @caberos in https://github.com/softlayer/softlayer-python/pull/1698
+* block/file volume-options improvement 3 by @caberos in https://github.com/softlayer/softlayer-python/pull/1705
+* Command slcli vlan create - displaying an error message by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1707
+* New Command: user device-access by @caberos in https://github.com/softlayer/softlayer-python/pull/1712
+* Command slcli vlan edit accept that we do not send any parameters by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1709
+* Updated command - slcli vlan list by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1713
+* `slcli block subnets-list` command display an error message by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1716
+* add user remove-access command by @caberos in https://github.com/softlayer/softlayer-python/pull/1717
+* Add Devices with Trunks to vlan detail by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1721
+* slcli hardware reflash-firmware command does not display success message by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1724
+* Fix bug with command - slcli cdn edit by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1726
+
+#### New Contributors
+* @dependabot made their first contribution in https://github.com/softlayer/softlayer-python/pull/1704
+
+**Full Changelog**: https://github.com/softlayer/softlayer-python/compare/v6.1.0...v6.1.1
+
+
+
+## [6.1.0] - 2022-06-30
+
+#### Major Updates
+* [Rich](https://github.com/Textualize/rich) tables by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1646
+* [Rich](https://github.com/Textualize/rich) Text support by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1635
+
+Rich Text and Rich Tables will modernize the output of the SLCLI to be a little nicer to look at, with colors and other highlighting.
+
+![image](https://user-images.githubusercontent.com/7408017/176753783-f6a4a43a-53ac-4600-a24f-21362f152747.png)
+![image](https://user-images.githubusercontent.com/7408017/176753845-32af33f0-454f-4bab-ac63-1ae3db788ede.png)
+
+
+#### What's Changed
+* slcli licenses is missing the help text by @caberos in https://github.com/softlayer/softlayer-python/pull/1605
+* Add a warning if user orders in a POD that is being closed by @caberos in https://github.com/softlayer/softlayer-python/pull/1600
+* updated number of updates in the command account event-detail by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1609
+* Add an orderBy filter to slcli vlan list by @caberos in https://github.com/softlayer/softlayer-python/pull/1599
+* Add options to print a specific table in command slcli account events by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1611
+* Update global ip assign/unassign to use new API by @caberos in https://github.com/softlayer/softlayer-python/pull/1614
+* Ability to route/unroute subnets by @caberos in https://github.com/softlayer/softlayer-python/pull/1615
+* Improved successful response to command - slcli account cancel-item by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1617
+* Improved successful response to command - slcli virtual edit by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1618
+* Improved successful response to command - slcli vlan cancel by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1619
+* Mishandling of domain and hostname data in `slcli account item-detail` by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1621
+* Unable to get VSI details when last TXN is "Software install is finis… by @caberos in https://github.com/softlayer/softlayer-python/pull/1625
+* new command on autoscale delete by @caberos in https://github.com/softlayer/softlayer-python/pull/1628
+* Incorrect table title is displayed when an Auto Scale Group is scaled to reduce members by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1629
+* slcli autoscale create by @caberos in https://github.com/softlayer/softlayer-python/pull/1623
+* Soap transport by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1626
+* fix issue on loadbal order command by @caberos in https://github.com/softlayer/softlayer-python/pull/1633
+* Policy is not added when an AutoScale Group is created by @caberos in https://github.com/softlayer/softlayer-python/pull/1637
+* When `slcli event-log` not return any event log the command display an error by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1641
+* add new columns on vlan list(premium, tags) by @caberos in https://github.com/softlayer/softlayer-python/pull/1645
+* fixed documentation build issues by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1648
+* Improved successful response to command - slcli licenses cancel by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1653
+* update the firewall list by @caberos in https://github.com/softlayer/softlayer-python/pull/1649
+* Updated readme by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1656
+* Update `slcli firewall detail` to handle multi vlan firewalls by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1651
+* New command for getting duplicate convert status  by @ko101 in https://github.com/softlayer/softlayer-python/pull/1655
+* Fixed TOX errors by @allmightyspiff in https://github.com/softlayer/softlayer-python/pull/1661
+* add a new feature to get all cloud object storage by @caberos in https://github.com/softlayer/softlayer-python/pull/1662
+* Update `slcli report bandwidth` command by @BrianSantivanez in https://github.com/softlayer/softlayer-python/pull/1664
+* add firewall monitoring command by @caberos in https://github.com/softlayer/softlayer-python/pull/1657
+* add a new command on block object-storage details by @caberos in https://github.com/softlayer/softlayer-python/pull/1666
+* slcli account bandwidth-pools-detail command displays an error with b… by @caberos in https://github.com/softlayer/softlayer-python/pull/1670
+* new feature block object-storage permissions command by @caberos in https://github.com/softlayer/softlayer-python/pull/1668
+* fix the vlan table by @caberos in https://github.com/softlayer/softlayer-python/pull/1672
+
+#### New Contributors
+* @BrianSantivanez made their first contribution in https://github.com/softlayer/softlayer-python/pull/1629
+
+**Full Changelog**: https://github.com/softlayer/softlayer-python/compare/v6.0.2...v6.1.0
+
+
+### [6.0.2] - 2022-03-30
+
+#### What's Changed
 * New Command slcli hardware|virtual monitoring by @caberos in https://github.com/softlayer/softlayer-python/pull/1593
 * When listing datacenters/pods, mark those that are closing soon. by @caberos in https://github.com/softlayer/softlayer-python/pull/1597
 
@@ -13,7 +153,7 @@
 ## [6.0.1] - 2022-03-11
 
 
-## What's Changed
+#### What's Changed
 * Replace the use of ptable with prettytable by @dvzrv in https://github.com/softlayer/softlayer-python/pull/1584
 * Bandwidth pool management by @caberos in https://github.com/softlayer/softlayer-python/pull/1582
 * Add id in the result in the command bandwidth-pools by @edsonarios in https://github.com/softlayer/softlayer-python/pull/1586

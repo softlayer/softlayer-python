@@ -9,6 +9,7 @@ from SoftLayer import exceptions
 from SoftLayer.managers import storage_utils
 from SoftLayer import utils
 
+
 # pylint: disable=too-many-public-methods
 
 
@@ -25,7 +26,7 @@ class StorageManager(utils.IdentifierMixin, object):
         self.client = client
         self.resolvers = [self._get_ids_from_username]
 
-    def _get_ids_from_username(self, username):  # pylint: disable=unused-argument,no-self-use
+    def _get_ids_from_username(self, username):  # pylint: disable=unused-argument
         """Should only be actually called from the block/file manager"""
         return []
 
@@ -216,7 +217,8 @@ class StorageManager(utils.IdentifierMixin, object):
                                snapshot_schedule,
                                location,
                                tier=None,
-                               os_type=None):
+                               os_type=None,
+                               iops=None):
         """Places an order for a replicant volume.
 
         :param volume_id: The ID of the primary volume to be replicated
@@ -238,9 +240,12 @@ class StorageManager(utils.IdentifierMixin, object):
         storage_class = storage_utils.block_or_file(
             block_volume['storageType']['keyName'])
 
+        if iops is None:
+            iops = int(block_volume['provisionedIops'])
+
         order = storage_utils.prepare_replicant_order_object(
             self, snapshot_schedule, location, tier, block_volume,
-            storage_class)
+            storage_class, iops)
 
         if storage_class == 'block':
             if os_type is None:
@@ -577,3 +582,31 @@ class StorageManager(utils.IdentifierMixin, object):
         return self.client.call('Network_Storage',
                                 'convertCloneDependentToIndependent',
                                 id=volume_id)
+
+    def convert_dupe_status(self, volume_id):
+        """Get the Clone split/move status completion of a duplicate volume
+
+        :param integer volume_id: The id of the volume.
+        """
+        return self.client.call('Network_Storage',
+                                'getDuplicateConversionStatus',
+                                id=volume_id)
+
+    def get_network_message_delivery_accounts(self, object_id):
+        """Return  object data of the cloud storage.
+
+        :param object_id cloud object storage identifier
+        Returns: Get instances
+        """
+        object_mask = 'mask[uuid,credentials]'
+        return self.client.call('SoftLayer_Network_Storage_Hub_Cleversafe_Account',
+                                'getObject', mask=object_mask, id=object_id)
+
+    def get_end_points(self, object_id):
+        """Returns a collection of endpoint URLs available to this IBM Cloud Object Storage account.
+
+        :param object_id cloud object storage identifier
+        Returns: Returns a collection of endpoint URLs.
+        """
+        return self.client.call('SoftLayer_Network_Storage_Hub_Cleversafe_Account',
+                                'getEndpoints',  id=object_id)

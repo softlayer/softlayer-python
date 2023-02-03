@@ -41,17 +41,24 @@ class ServerCLITests(testing.TestCase):
                 {
                     "password": "abc123",
                     "username": "root"
-                }
-            ]}]
+                }],
+                'softwareLicense': {
+                    'softwareDescription':
+                        {
+                            'referenceCode': 'CENTOS_7_64',
+                            'version': '7.8 - 64',
+                            'name': 'Centos'
+                        }}}]
         }
         result = self.run_command(['hardware', 'credentials', '12345'])
 
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         [{
-                             'username': 'root',
-                             'password': 'abc123'
-                         }])
+        self.assertEqual(json.loads(result.output), [
+            {'Password': 'abc123',
+             'Software': 'Centos',
+             'Username': 'root',
+             'Version': '7.8 - 64'}
+        ])
 
     def test_server_credentials_exception_passwords_not_found(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
@@ -85,7 +92,13 @@ class ServerCLITests(testing.TestCase):
                 {
                     "hardwareId": 22222,
                     "id": 333333,
-                    "passwords": [{}]
+                    "passwords": [{}],
+                    "softwareLicense": {
+                        "softwareDescription": {
+                            "name": None,
+                            "version": None
+                        }
+                    }
                 }
             ]
         }
@@ -401,6 +414,17 @@ class ServerCLITests(testing.TestCase):
         self.assertIn('Warning: Closed soon: TEST00.pod2', result.output)
         self.assertIn('"id": 98765', result.output)
 
+        result = self.run_command(['--really', 'server', 'create',
+                                   '--size=S1270_8GB_2X1TBSATA_NORAID',
+                                   '--hostname=test',
+                                   '--domain=example.com',
+                                   '--datacenter=mex01',
+                                   '--os=OS_UBUNTU_14_04_LTS_TRUSTY_TAHR_64_BIT',
+                                   ])
+
+        self.assert_no_fail(result)
+        self.assertNotIn('Warning: Closed soon: mex01', result.output)
+
     @mock.patch('SoftLayer.CLI.template.export_to_template')
     def test_create_server_with_export(self, export_mock):
 
@@ -512,7 +536,7 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['server', 'reflash-firmware', '1000'])
 
         self.assert_no_fail(result)
-        self.assertEqual(result.output, "")
+        self.assertEqual(result.output, 'Successfully device firmware reflashed\n')
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'createFirmwareReflashTransaction',
                                 args=((1, 1, 1)), identifier=1000)
@@ -693,19 +717,19 @@ class ServerCLITests(testing.TestCase):
                                            'getResourceRecords')
         getResourceRecords.return_value = []
         createAargs = ({
-            'type': 'a',
-            'host': 'hardware-test1',
-            'domainId': 12345,  # from SoftLayer_Account::getDomains
-            'data': '172.16.1.100',
-            'ttl': 7200
-        },)
+                           'type': 'a',
+                           'host': 'hardware-test1',
+                           'domainId': 12345,  # from SoftLayer_Account::getDomains
+                           'data': '172.16.1.100',
+                           'ttl': 7200
+                       },)
         createPTRargs = ({
-            'type': 'ptr',
-            'host': '100',
-            'domainId': 123456,
-            'data': 'hardware-test1.test.sftlyr.ws',
-            'ttl': 7200
-        },)
+                             'type': 'ptr',
+                             'host': '100',
+                             'domainId': 123456,
+                             'data': 'hardware-test1.test.sftlyr.ws',
+                             'ttl': 7200
+                         },)
 
         result = self.run_command(['hw', 'dns-sync', '1000'])
 
@@ -748,12 +772,12 @@ class ServerCLITests(testing.TestCase):
             }
         }
         createV6args = ({
-            'type': 'aaaa',
-            'host': 'hardware-test1',
-            'domainId': 12345,  # from SoftLayer_Account::getDomains
-            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
-            'ttl': 7200
-        },)
+                            'type': 'aaaa',
+                            'host': 'hardware-test1',
+                            'domainId': 12345,  # from SoftLayer_Account::getDomains
+                            'data': '2607:f0d0:1b01:0023:0000:0000:0000:0004',
+                            'ttl': 7200
+                        },)
         server.return_value = test_server
         result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
         self.assert_no_fail(result)
@@ -899,18 +923,6 @@ class ServerCLITests(testing.TestCase):
 
         self.assertEqual(result.exit_code, 2)
 
-    def test_get_hardware_guests(self):
-        result = self.run_command(['hw', 'guests', '123456'])
-        self.assert_no_fail(result)
-
-    def test_hardware_guests_empty(self):
-        mock = self.set_mock('SoftLayer_Virtual_Host', 'getGuests')
-        mock.return_value = None
-
-        result = self.run_command(['hw', 'guests', '123456'])
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
-
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_authorize_hw_no_confirm(self, confirm_mock):
         confirm_mock.return_value = False
@@ -1014,4 +1026,34 @@ class ServerCLITests(testing.TestCase):
 
     def test_monitoring(self):
         result = self.run_command(['hardware', 'monitoring', '100'])
+        self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_check_for_closing(self, confirm_mock):
+        confirm_mock.return_value = True
+        result = self.run_command(['vs', 'create', '--hostname', 'TEST', '--domain', 'TESTING',
+                                   '--flavor', 'B1_2X8X25', '--datacenter', 'ams01', '--os', 'UBUNTU_LATEST'])
+        self.assert_no_fail(result)
+        self.assertIn('Warning: Closed soon: ams01', result.output)
+        result = self.run_command(['vs', 'create', '--hostname', 'TEST', '--domain', 'TESTING',
+                                   '--flavor', 'B1_2X8X25', '--datacenter', 'mex01', '--os', 'UBUNTU_LATEST'])
+        self.assert_no_fail(result)
+        self.assertNotIn('Warning: Closed soon: mex01', result.output)
+
+    def test_notifications(self):
+        result = self.run_command(['hardware', 'notifications', '100'])
+        self.assert_no_fail(result)
+
+    def test_add_notification(self):
+        result = self.run_command(['hardware', 'notification-add', '100', '--users', '123456'])
+        self.assert_no_fail(result)
+
+    def test_notification_delete(self):
+        result = self.run_command(['hardware', 'notification-delete', '100'])
+        self.assert_no_fail(result)
+
+    def test_create_credential(self):
+        result = self.run_command(['hw', 'create-credential', '123456',
+                                   '--username', 'testslcli', '--password', 'test-123456',
+                                   '--notes', 'test slcli', '--system', 'system'])
         self.assert_no_fail(result)

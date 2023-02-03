@@ -5,7 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-# pylint: disable=no-self-use
+
 
 __all__ = [
     'BasicAuthentication',

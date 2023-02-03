@@ -7,6 +7,7 @@
 """
 
 from SoftLayer.exceptions import SoftLayerAPIError
+from SoftLayer.managers import ordering
 from SoftLayer import utils
 
 
@@ -284,3 +285,35 @@ class IPSECManager(utils.IdentifierMixin, object):
         if phase2_key_ttl is not None:
             context['phaseTwoKeylife'] = phase2_key_ttl
         return self.context.editObject(context, id=context_id)
+
+    def order(self, datacenter, item_package):
+        """Create a ipsec.
+
+        :param string datacenter: the datacenter shortname
+        :param string[] item_package: items array
+        """
+        complex_type = 'SoftLayer_Container_Product_Order_Network_Tunnel_Ipsec'
+        ordering_manager = ordering.OrderingManager(self.client)
+        return ordering_manager.place_order(package_keyname='ADDITIONAL_PRODUCTS',
+                                            location=datacenter,
+                                            item_keynames=item_package,
+                                            complex_type=complex_type,
+                                            hourly=False)
+
+    def cancel_item(self, identifier, immediate, reason):
+        """Cancels the specified billing item Ipsec.
+
+        Example::
+
+            # Cancels ipsec id 1234
+            result = mgr.cancel_item(billing_item_id=1234)
+
+        :param int billing_id: The ID of the billing item to be cancelled.
+        :param string reason: The reason code for the cancellation. This should come from
+                              :func:`get_cancellation_reasons`.
+        :param bool immediate: If set to True, will automatically update the cancelation ticket to request
+                               the resource be reclaimed asap. This request still has to be reviewed by a human
+        :returns: True on success or an exception
+        """
+        return self.client.call('SoftLayer_Billing_Item', 'cancelItem',
+                                True, immediate, reason, id=identifier)

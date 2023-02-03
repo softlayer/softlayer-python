@@ -17,7 +17,7 @@ from .transport import SoftLayerListResult as SoftLayerListResult
 from .xmlrpc import XmlRpcTransport
 
 # transports.Request does have a lot of instance attributes. :(
-# pylint: disable=too-many-instance-attributes, no-self-use
+# pylint: disable=too-many-instance-attributes
 
 __all__ = [
     'Request',

@@ -123,6 +123,10 @@ File Commands
     :prog: file volume-set-note
     :show-nested:
 
+.. click:: SoftLayer.CLI.file.options:cli
+    :prog: file volume-options
+    :show-nested:
+
 .. click:: SoftLayer.CLI.file.replication.disaster_recovery_failover:cli
     :prog: file disaster-recovery-failover
     :show-nested:
@@ -133,5 +137,9 @@ File Commands
 
 .. click:: SoftLayer.CLI.file.snapshot.get_notify_status:cli
     :prog: file snapshot-get-notification-status
+    :show-nested:
+
+.. click:: SoftLayer.CLI.file.duplicate_convert_status:cli
+    :prog: file duplicate-convert-status
     :show-nested:
 

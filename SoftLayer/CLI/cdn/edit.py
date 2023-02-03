@@ -19,6 +19,10 @@ from SoftLayer.CLI import helpers
               type=click.INT,
               help="HTTP port."
               )
+@click.option('--https-port', '-s',
+              type=click.INT,
+              help="HTTPS port."
+              )
 @click.option('--origin', '-o',
               type=click.STRING,
               help="Origin server address."
@@ -39,7 +43,7 @@ from SoftLayer.CLI import helpers
                    "the Dynamic content acceleration option is not added because this has a special configuration."
               )
 @environment.pass_env
-def cli(env, identifier, header, http_port, origin, respect_headers, cache, performance_configuration):
+def cli(env, identifier, header, http_port, https_port, origin, respect_headers, cache, performance_configuration):
     """Edit a CDN Account.
 
        Note: You can use the hostname or uniqueId as IDENTIFIER.
@@ -56,7 +60,7 @@ def cli(env, identifier, header, http_port, origin, respect_headers, cache, perf
         else:
             cache_result['cacheKeyQueryRule'] = cache[0]
 
-    cdn_result = manager.edit(cdn_id, header=header, http_port=http_port, origin=origin,
+    cdn_result = manager.edit(cdn_id, header=header, http_port=http_port, https_port=https_port, origin=origin,
                               respect_headers=respect_headers, cache=cache_result,
                               performance_configuration=performance_configuration)
 
@@ -67,7 +71,10 @@ def cli(env, identifier, header, http_port, origin, respect_headers, cache, perf
     for cdn in cdn_result:
         table.add_row(['Create Date', cdn.get('createDate')])
         table.add_row(['Header', cdn.get('header')])
-        table.add_row(['Http Port', cdn.get('httpPort')])
+        if cdn.get('httpPort'):
+            table.add_row(['Http Port', cdn.get('httpPort')])
+        if cdn.get('httpsPort'):
+            table.add_row(['Https Port', cdn.get('httpsPort')])
         table.add_row(['Origin Type', cdn.get('originType')])
         table.add_row(['Performance Configuration', cdn.get('performanceConfiguration')])
         table.add_row(['Protocol', cdn.get('protocol')])

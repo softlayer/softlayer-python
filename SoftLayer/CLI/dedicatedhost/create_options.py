@@ -58,4 +58,4 @@ def cli(env, **kwargs):
             br_table.add_row([router['hostname']])
         tables.append(br_table)
 
-    env.fout(formatting.listing(tables, separator='\n'))
+    env.fout(tables)

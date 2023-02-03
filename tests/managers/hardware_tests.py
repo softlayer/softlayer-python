@@ -557,10 +557,10 @@ class HardwareTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server',
                                 'editObject',
                                 args=({
-                                    'hostname': 'new-host',
-                                    'domain': 'new.sftlyr.ws',
-                                    'notes': 'random notes',
-                                },),
+                                          'hostname': 'new-host',
+                                          'domain': 'new.sftlyr.ws',
+                                          'notes': 'random notes',
+                                      },),
                                 identifier=100)
 
     def test_rescue(self):
@@ -809,38 +809,6 @@ class HardwareTests(testing.TestCase):
 
         self.assertEqual([], result)
 
-    def test_get_hardware_guests_empty_virtualHost(self):
-        mock = self.set_mock('SoftLayer_Hardware_Server', 'getVirtualHost')
-        mock.return_value = None
-
-        result = self.hardware.get_hardware_guests(1234)
-
-        self.assertEqual(None, result)
-
-    def test_get_hardware_guests(self):
-        mock = self.set_mock('SoftLayer_Virtual_Host', 'getGuests')
-        mock.return_value = [
-            {
-                "accountId": 11111,
-                "hostname": "NSX-T Manager",
-                "id": 22222,
-                "maxCpu": 16,
-                "maxCpuUnits": "CORE",
-                "maxMemory": 49152,
-                "powerState": {
-                    "keyName": "RUNNING",
-                    "name": "Running"
-                },
-                "status": {
-                    "keyName": "ACTIVE",
-                    "name": "Active"
-                }
-            }]
-
-        result = self.hardware.get_hardware_guests(1234)
-
-        self.assertEqual("NSX-T Manager", result[0]['hostname'])
-
     def test_authorize_storage(self):
         options = self.hardware.authorize_storage(1234, "SL01SEL301234-11")
 
@@ -951,6 +919,39 @@ class HardwareTests(testing.TestCase):
     def test_sensor(self):
         self.hardware.get_sensors(100)
         self.assert_called_with('SoftLayer_Hardware', 'getSensorData')
+
+    def test_notification(self):
+        self.hardware.get_notifications(100)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Hardware', 'findByHardwareId')
+
+    def test_add_notification(self):
+        self.hardware.add_notification(100, 123456)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Hardware', 'createObject')
+
+    def test_notification_del(self):
+        self.hardware.remove_notification(100)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Hardware', 'deleteObjects')
+
+    def test_get_software_component(self):
+        self.hardware.get_software_components(123456)
+        self.assert_called_with('SoftLayer_Hardware', 'getSoftwareComponents')
+
+    def test_create_credential(self):
+        template = {
+            "notes": 'notes',
+            "password": 'password',
+            "softwareId": 'sw_id',
+            "username": 'username',
+            "software": {
+                "hardwareId": 123456,
+                "softwareLicense": {
+                    "softwareDescription": {
+                        "name": 'system'
+                    }
+                }
+            }}
+        self.hardware.create_credential(template)
+        self.assert_called_with('SoftLayer_Software_Component_Password', 'createObject')
 
 
 class HardwareHelperTests(testing.TestCase):

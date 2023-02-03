@@ -36,9 +36,12 @@ COLUMNS = [
 DEFAULT_COLUMNS = [
     'id',
     'hostname',
+    'domain',
+    'deviceStatus.name',
+    'datacenter',
     'primary_ip',
     'backend_ip',
-    'datacenter',
+    'createDate',
     'action',
 ]
 

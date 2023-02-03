@@ -3259,7 +3259,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_replicant_order_object,
-            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(
@@ -3275,7 +3275,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_replicant_order_object,
-            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(
@@ -3292,7 +3292,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_replicant_order_object,
-            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(
@@ -3310,7 +3310,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_replicant_order_object,
-            self.block, 'WEEKLY', 'hoth02', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'hoth02', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(
@@ -3329,7 +3329,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_replicant_order_object,
-            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(
@@ -3348,7 +3348,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_replicant_order_object,
-            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(
@@ -3385,7 +3385,7 @@ class StorageUtilsTests(testing.TestCase):
         }
 
         result = storage_utils.prepare_replicant_order_object(
-            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(expected_object, result)
@@ -3419,7 +3419,7 @@ class StorageUtilsTests(testing.TestCase):
         }
 
         result = storage_utils.prepare_replicant_order_object(
-            self.block, 'WEEKLY', 'wdc04', 2, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', 2, mock_volume, 'block', 100
         )
 
         self.assertEqual(expected_object, result)
@@ -3437,7 +3437,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_replicant_order_object,
-            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(
@@ -3472,12 +3472,12 @@ class StorageUtilsTests(testing.TestCase):
             'originVolumeId': 102,
             'originVolumeScheduleId': 978,
             'volumeSize': 500,
-            'iops': 1000,
+            'iops': 100,
             'useHourlyPricing': False
         }
 
         result = storage_utils.prepare_replicant_order_object(
-            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(expected_object, result)
@@ -3494,7 +3494,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_replicant_order_object,
-            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(
@@ -3534,7 +3534,7 @@ class StorageUtilsTests(testing.TestCase):
         }
 
         result = storage_utils.prepare_replicant_order_object(
-            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(expected_object, result)
@@ -3569,7 +3569,7 @@ class StorageUtilsTests(testing.TestCase):
         }
 
         result = storage_utils.prepare_replicant_order_object(
-            self.block, 'WEEKLY', 'wdc04', 2, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', 2, mock_volume, 'block', 100
         )
 
         self.assertEqual(expected_object, result)
@@ -3604,7 +3604,7 @@ class StorageUtilsTests(testing.TestCase):
         }
 
         result = storage_utils.prepare_replicant_order_object(
-            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block'
+            self.block, 'WEEKLY', 'wdc04', None, mock_volume, 'block', 100
         )
 
         self.assertEqual(expected_object, result)

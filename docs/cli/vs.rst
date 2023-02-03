@@ -275,6 +275,27 @@ If no timezone is specified, IMS local time (CST) will be assumed, which might n
    :prog: virtual monitoring
    :show-nested:
 
+.. click:: SoftLayer.CLI.virt.access:cli
+   :prog: virtual access
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.notifications:cli
+   :prog: virtual notifications
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.notification_add:cli
+   :prog: virtual notification-add
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.notification_delete:cli
+   :prog: virtual notification-delete
+   :show-nested:
+
+.. click:: SoftLayer.CLI.virt.host_list:cli
+    This command is an alias for `slcli dedicatedhost list`
+    :prog: virtual host-list
+    :show-nested:
+
 Manages the migration of virutal guests. Supports migrating virtual guests on Dedicated Hosts as well.
 
 Reserved Capacity

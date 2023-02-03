@@ -303,3 +303,21 @@ vlan_placeOrder = {"orderDate": "2021-06-02 15:23:47",
                            "id": 1071,
                            "keyName": "PUBLIC_NETWORK_VLAN"}}
                    ]}
+
+ipsec_placeOrder = {
+    "orderDate": "2022-07-14T16:09:08-06:00",
+    "orderId": 123456,
+    "placedOrder": {
+        "items": [
+            {
+                "categoryCode": "network_tunnel",
+                "description": "IPSEC - Standard",
+                "id": 931479898,
+                "itemId": 1092,
+                "itemPriceId": "2048",
+
+            }
+        ]
+
+    }
+}

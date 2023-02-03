@@ -20,7 +20,7 @@ from SoftLayer import utils
 LOGGER = logging.getLogger(__name__)
 
 # Invalid names are ignored due to long method names and short argument names
-# pylint: disable=invalid-name, no-self-use, too-many-lines
+# pylint: disable=invalid-name, too-many-lines
 
 EXTRA_CATEGORIES = ['pri_ipv6_addresses',
                     'static_ipv6_addresses',
@@ -260,7 +260,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                                                         name,
                                                         version,
                                                         referenceCode]],
-                    passwords[username,password]],'''
+                    passwords[id,username,password]],'''
                 'billingItem['
                 'id,nextInvoiceTotalRecurringAmount,'
                 'nextInvoiceChildren[nextInvoiceTotalRecurringAmount],'
@@ -769,18 +769,6 @@ class HardwareManager(utils.IdentifierMixin, object):
         """
         return self.hardware.getHardDrives(id=instance_id)
 
-    def get_hardware_guests(self, instance_id):
-        """Returns the hardware server guests.
-
-        :param int instance_id: Id of the hardware server.
-        """
-        mask = "mask[id]"
-        virtual_host = self.hardware.getVirtualHost(mask=mask, id=instance_id)
-        if virtual_host:
-            return self.client.call('SoftLayer_Virtual_Host', 'getGuests', mask='mask[powerState]',
-                                    id=virtual_host['id'])
-        return virtual_host
-
     def get_hardware_item_prices(self, location):
         """Returns the hardware server item prices by location.
 
@@ -1103,6 +1091,30 @@ class HardwareManager(utils.IdentifierMixin, object):
     def get_sensors(self, hardware_id):
         """Returns Hardware sensor data"""
         return self.client.call('Hardware', 'getSensorData', id=hardware_id)
+
+    def get_notifications(self, hardware_id):
+        """Returns all hardware notifications."""
+        return self.client.call('SoftLayer_User_Customer_Notification_Hardware', 'findByHardwareId', hardware_id)
+
+    def add_notification(self, hardware_id, user_id):
+        """Create a user hardware notification entry"""
+
+        template = {"hardwareId": hardware_id, "userId": user_id}
+        return self.client.call('SoftLayer_User_Customer_Notification_Hardware', 'createObject', template)
+
+    def get_software_components(self, hardware_id):
+        """Returns  a piece of hardware’s installed software."""
+        return self.client.call('Hardware', 'getSoftwareComponents', id=hardware_id)
+
+    def create_credential(self, template):
+        """Create a password for a software component"""
+        return self.client.call('SoftLayer_Software_Component_Password', 'createObject', template)
+
+    def remove_notification(self, identifier):
+        """Remove a user hardware notification entry"""
+
+        template = [{'id': identifier}]
+        return self.client.call('SoftLayer_User_Customer_Notification_Hardware', 'deleteObjects', template)
 
 
 def _get_bandwidth_key(items, hourly=True, no_public=False, location=None):

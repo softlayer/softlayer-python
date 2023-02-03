@@ -46,7 +46,6 @@ class FirewallTests(testing.TestCase):
                                 identifier=1234)
 
     def test_get_dedicated_fwl_rules(self):
-
         rules = self.firewall.get_dedicated_fwl_rules(1234)
 
         self.assertEqual(rules,
@@ -322,3 +321,7 @@ class FirewallTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_Firewall_Update_Request',
                                 'createObject',
                                 args=args)
+
+    def test_get_gateways(self):
+        self.firewall.get_firewalls_gatewalls()
+        self.assert_called_with('SoftLayer_Account', 'getNetworkGateways')

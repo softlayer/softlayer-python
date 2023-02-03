@@ -6,8 +6,11 @@
 """
 # pylint: disable=E0202, consider-merging-isinstance, arguments-differ, keyword-arg-before-vararg
 import collections
+import csv
+import io
 import json
 import os
+import sys
 
 import click
 from rich import box
@@ -19,7 +22,7 @@ from SoftLayer import utils
 FALSE_VALUES = ['0', 'false', 'FALSE', 'no', 'False']
 
 
-def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
+def format_output(data, fmt='table', theme=None):  # pylint: disable=R0911,R0912
     """Given some data, will format it for console output.
 
     :param data: One of: String, Table, FormattedItem, List, Tuple, SequentialOutput
@@ -29,13 +32,15 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
         return json.dumps(data, indent=4, cls=CLIJSONEncoder)
     elif fmt == 'jsonraw':
         return json.dumps(data, cls=CLIJSONEncoder)
+    if fmt == 'csv':
+        return csv_output_format(data)
 
     if isinstance(data, str) or isinstance(data, rTable):
         return data
 
     # responds to .prettytable()
     if hasattr(data, 'prettytable') and fmt in ('table', 'raw'):
-        return format_prettytable(data)
+        return format_prettytable(data, fmt, theme)
 
     # responds to .to_python()
     if hasattr(data, 'to_python'):
@@ -68,12 +73,17 @@ def format_output(data, fmt='table'):  # pylint: disable=R0911,R0912
     return str(data)
 
 
-def format_prettytable(table):
+def format_prettytable(table, fmt='table', theme=None):
     """Converts SoftLayer.CLI.formatting.Table instance to a prettytable."""
     for i, row in enumerate(table.rows):
         for j, item in enumerate(row):
-            table.rows[i][j] = format_output(item)
-    ptable = table.prettytable()
+            # Issue when adding items that evaulate to None (like empty lists) for Rich Tables
+            # so we just cast those to a str
+            if item:
+                table.rows[i][j] = format_output(item)
+            else:
+                table.rows[i][j] = str(item)
+    ptable = table.prettytable(fmt, theme)
     return ptable
 
 
@@ -208,7 +218,6 @@ class SequentialOutput(list):
         return self
 
     def __str__(self):
-        print("CASTSDFSDFSDFSDFSDF")
         return self.separator.join(str(x) for x in self)
 
 
@@ -258,9 +267,13 @@ class Table(object):
             items.append(dict(zip(self.columns, formatted_row)))
         return items
 
-    def prettytable(self):
+    def prettytable(self, fmt='table', theme=None):
         """Returns a RICH table instance."""
-        table = rTable(title=self.title, box=box.SQUARE, header_style="bright_cyan")
+        box_style = box.SQUARE
+        if fmt == 'raw':
+            box_style = None
+        color_table = utils.table_color_theme(theme)
+        table = rTable(title=self.title, box=box_style, header_style=color_table['header'])
         if self.sortby:
             try:
                 # https://docs.python.org/3/howto/sorting.html#key-functions
@@ -288,7 +301,7 @@ class Table(object):
                 justify = 'left'
             # Special coloring for some columns
             if col in ('id', 'Id', 'ID'):
-                style = "pale_violet_red1"
+                style = color_table['id_columns']
             table.add_column(col, justify=justify, style=style)
 
         for row in self.rows:
@@ -399,13 +412,14 @@ def _format_list(result):
 
     if not result:
         return result
-
+    table = Table(['value'])
     new_result = [item for item in result if item]
-
+    if len(new_result) == 0:
+        table.add_row(["-"])
+        return table
     if isinstance(new_result[0], dict):
         return _format_list_objects(new_result)
 
-    table = Table(['value'])
     for item in new_result:
         table.add_row([iter_to_table(item)])
     return table
@@ -433,3 +447,49 @@ def _format_list_objects(result):
         table.add_row(values)
 
     return table
+
+
+def csv_output_format(data, delimiter=','):
+    """Formating a table to csv format and show it."""
+    data = clean_table(data, delimiter)
+    write_csv_format(sys.stdout, data, delimiter)
+    return ''
+
+
+def clean_table(data, delimiter):
+    """Delete Null fields by '-' and fix nested table in table"""
+    new_data_row = []
+    for row in data.rows:
+        new_value = []
+        for value in row:
+            if str(value) == 'NULL':
+                value = '-'
+
+            if str(type(value)) == "<class 'SoftLayer.CLI.formatting.Table'>":
+                string_io = io.StringIO()
+                write_csv_format(string_io, value, delimiter)
+
+                nested_table_converted = string_io.getvalue()
+                nested_table_converted = nested_table_converted.replace('\r', '').split('\n')
+                nested_table_converted.pop()
+
+                title_nested_table = new_value.pop()
+                for item in nested_table_converted:
+                    new_value.append(title_nested_table)
+                    new_value.append(item)
+                    new_data_row.append(new_value)
+                    new_value = []
+            else:
+                new_value.append(value)
+
+        if len(new_value) != 0:
+            new_data_row.append(new_value)
+    data.rows = new_data_row
+    return data
+
+
+def write_csv_format(support_output, data, delimiter):
+    """Write csv format to supported output"""
+    writer = csv.writer(support_output, delimiter=delimiter)
+    writer.writerow(data.columns)
+    writer.writerows(data.rows)

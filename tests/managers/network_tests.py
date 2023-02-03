@@ -310,15 +310,6 @@ class NetworkTests(testing.TestCase):
                                 filter=_filter)
 
     def test_list_subnets_default(self):
-        result = self.network.list_subnets()
-
-        self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
-        _filter = {'subnets': {'subnetType': {'operation': '!= GLOBAL_IP'}}}
-        self.assert_called_with('SoftLayer_Account', 'getSubnets',
-                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
-                                filter=_filter)
-
-    def test_list_subnets_with_filters(self):
         result = self.network.list_subnets(
             identifier='10.0.0.1',
             datacenter='dal00',
@@ -326,7 +317,6 @@ class NetworkTests(testing.TestCase):
             subnet_type='PRIMARY',
             network_space='PUBLIC',
         )
-
         self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
         _filter = {
             'subnets': {
@@ -343,6 +333,14 @@ class NetworkTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Account', 'getSubnets',
                                 mask='mask[%s]' % network.DEFAULT_SUBNET_MASK,
                                 filter=_filter)
+
+    def test_list_subnets_with_filters(self):
+        result = self.network.list_subnets()
+
+        self.assertEqual(result, fixtures.SoftLayer_Account.getSubnets)
+
+        self.assert_called_with('SoftLayer_Account', 'getSubnets',
+                                mask='mask[%s]' % network.DEFAULT_SUBNET_MASK)
 
     def test_list_vlans_default(self):
         result = self.network.list_vlans()
@@ -363,11 +361,11 @@ class NetworkTests(testing.TestCase):
                 'id': {
                     'operation': 'orderBy',
                     'options': [
-                           {'name': 'sort', 'value': ['ASC']}]},
+                        {'name': 'sort', 'value': ['ASC']}]},
                 'vlanNumber': {'operation': 5},
                 'name': {'operation': '_= primary-vlan'},
                 'primaryRouter': {
-                      'datacenter': {'name': {'operation': '_= dal00'}}}}
+                    'datacenter': {'name': {'operation': '_= dal00'}}}}
         }
         self.assert_called_with('SoftLayer_Account', 'getNetworkVlans',
                                 filter=_filter)
@@ -637,3 +635,25 @@ class NetworkTests(testing.TestCase):
     def test_get_all_datacenter(self):
         self.network.get_datacenter()
         self.assert_called_with('SoftLayer_Location', 'getDatacenters')
+        self.network.get_datacenter(datacenter="dal11")
+        expected_filter = {"name": {"operation": "dal11"}}
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters', filter=expected_filter)
+
+    def test_get_datacenter_by_keyname(self):
+        # normal operation
+        result = self.network.get_datacenter_by_keyname("TEST01")
+        expected_filter = {"regions": {"keyname": {"operation": "TEST01"}}}
+        self.assert_called_with('SoftLayer_Location', 'getDatacenters', filter=expected_filter)
+        self.assertEqual(result.get('name'), 'dal13')
+
+        # an "empty" result
+        SoftLayer_Location = self.set_mock('SoftLayer_Location', 'getDatacenters')
+        SoftLayer_Location.return_value = []
+        result = self.network.get_datacenter_by_keyname("TEST01")
+        self.assertEqual(result, {})
+
+    def test_clear_route(self):
+        result = self.network.clear_route(1234)
+
+        self.assertEqual(result, True)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'clearRoute')

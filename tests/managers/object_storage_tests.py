@@ -21,28 +21,48 @@ class ObjectStorageTests(testing.TestCase):
                          fixtures.SoftLayer_Account.getHubNetworkStorage)
 
     def test_list_endpoints(self):
-        accounts = self.set_mock('SoftLayer_Account', 'getHubNetworkStorage')
-        accounts.return_value = {
-            'storageNodes': [{
-                'datacenter': {'name': 'dal05'},
-                'frontendIpAddress': 'https://dal05/auth/v1.0/',
-                'backendIpAddress': 'https://dal05/auth/v1.0/'}
-            ],
-        }
-        endpoints = self.object_storage.list_endpoints()
+        accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getEndpoints')
+        accounts.return_value = [
+            {
+                'legacy': False,
+                'region': 'us-geo',
+                'type': 'public',
+                'url': 's3.us.cloud-object-storage.appdomain.cloud'
+            },
+            {
+                'legacy': False,
+                'region': 'us-geo',
+                'type': 'private',
+                'url': 's3.private.us.cloud-object-storage.appdomain.cloud'
+            }
+        ]
+
+        endpoints = self.object_storage.list_endpoints(123)
         self.assertEqual(endpoints,
-                         [{'datacenter': {'name': 'dal05'},
-                           'private': 'https://dal05/auth/v1.0/',
-                           'public': 'https://dal05/auth/v1.0/'}])
+                         [
+                             {
+                                 'legacy': False,
+                                 'region': 'us-geo',
+                                 'type': 'public',
+                                 'url': 's3.us.cloud-object-storage.appdomain.cloud'
+                             },
+                             {
+                                 'legacy': False,
+                                 'region': 'us-geo',
+                                 'type': 'private',
+                                 'url': 's3.private.us.cloud-object-storage.appdomain.cloud'
+                             }
+                         ])
 
     def test_list_endpoints_no_results(self):
-        accounts = self.set_mock('SoftLayer_Account', 'getHubNetworkStorage')
-        accounts.return_value = {
-            'storageNodes': [],
-        }
-        endpoints = self.object_storage.list_endpoints()
+        accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getEndpoints')
+        accounts.return_value = [
+            {}
+        ]
+
+        endpoints = self.object_storage.list_endpoints(123)
         self.assertEqual(endpoints,
-                         [])
+                         [{}])
 
     def test_create_credential(self):
         accounts = self.set_mock('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'credentialCreate')

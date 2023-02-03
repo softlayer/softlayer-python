@@ -67,7 +67,7 @@ class BlockTests(testing.TestCase):
             'LUN Id': '2',
             'Notes': "{'status': 'available'}",
             'Endurance Tier': 'READHEAVY_TIER',
-            'IOPs': 1000,
+            'IOPs': 1000.0,
             'Snapshot Capacity (GB)': '10',
             'Snapshot Used (Bytes)': 1024,
             'Capacity (GB)': '20GB',
@@ -80,17 +80,12 @@ class BlockTests(testing.TestCase):
             'Replicant Count': '1',
             'Replication Status': 'Replicant Volume Provisioning '
                                   'has completed.',
-            'Replicant Volumes': [[
-                {'Replicant ID': 'Volume Name', '1784': 'TEST_REP_1'},
-                {'Replicant ID': 'Target IP', '1784': '10.3.174.79'},
-                {'Replicant ID': 'Data Center', '1784': 'wdc01'},
-                {'Replicant ID': 'Schedule', '1784': 'REPLICATION_HOURLY'},
-            ], [
-                {'Replicant ID': 'Volume Name', '1785': 'TEST_REP_2'},
-                {'Replicant ID': 'Target IP', '1785': '10.3.177.84'},
-                {'Replicant ID': 'Data Center', '1785': 'dal01'},
-                {'Replicant ID': 'Schedule', '1785': 'REPLICATION_DAILY'},
-            ]],
+            'Replicant Volumes': [
+                {'Name': 'Replicant Id', 'Value': 1785},
+                {'Name': 'Volume Name', 'Value': 'TEST_REP_2'},
+                {'Name': 'Target IP', 'Value': '10.3.177.84'},
+                {'Name': 'Data Center', 'Value': 'dal01'},
+                {'Name': 'Schedule', 'Value': 'REPLICATION_DAILY'}],
             'Original Volume Properties': [
                 {'Property': 'Original Volume Size',
                  'Value': '20'},
@@ -630,7 +625,8 @@ class BlockTests(testing.TestCase):
 
         result = self.run_command(['block', 'replica-order', '100',
                                    '--snapshot-schedule=DAILY',
-                                   '--location=dal05'])
+                                   '--datacenter=dal05',
+                                   '--iops=100'])
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,
@@ -655,7 +651,8 @@ class BlockTests(testing.TestCase):
 
         result = self.run_command(['block', 'replica-order', '100',
                                    '--snapshot-schedule=DAILY',
-                                   '--location=dal05', '--tier=2'])
+                                   '--datacenter=dal05', '--tier=2',
+                                   '--iops=100'])
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,
@@ -792,6 +789,11 @@ class BlockTests(testing.TestCase):
 
         self.assert_no_fail(result)
 
+    def test_volume_options(self):
+        result = self.run_command(['block', 'volume-options'])
+
+        self.assert_no_fail(result)
+
     @mock.patch('SoftLayer.BlockStorageManager.volume_set_note')
     def test_volume_set_note(self, set_note):
         set_note.return_value = True
@@ -819,3 +821,22 @@ class BlockTests(testing.TestCase):
             result = self.run_command(['block', 'snapshot-get-notification-status', '999'])
             self.assert_no_fail(result)
             self.assertIn(expect, result.output)
+
+    def test_object_list(self):
+        result = self.run_command(['block', 'object-list'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getHubNetworkStorage')
+
+    def test_object_details(self):
+        result = self.run_command(['block', 'object-storage-detail', '1234'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getBuckets')
+
+    def test_object_permissions(self):
+        result = self.run_command(['block', 'object-storage-permission', '1234'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getObject')
+        self.assert_called_with('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getEndpoints')

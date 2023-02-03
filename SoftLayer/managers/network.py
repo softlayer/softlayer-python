@@ -34,7 +34,10 @@ DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'usableIpAddressCount',
                                 'note',
                                 'tagReferences[tag]',
-                                'networkVlan[id,networkSpace]'])
+                                'networkVlan[id, primaryRouter, networkSpace,fullyQualifiedName]',
+                                'addressSpace',
+                                'endPointIpAddress'
+                                ])
 DEFAULT_VLAN_MASK = ','.join([
     'firewallInterfaces',
     'hardwareCount',
@@ -429,15 +432,21 @@ class NetworkManager(object):
 
         return self.subnet.getObject(id=subnet_id, **kwargs)
 
-    def get_vlan(self, vlan_id):
+    def get_vlan(self, vlan_id, mask=None):
         """Returns information about a single VLAN.
 
-        :param int id: The unique identifier for the VLAN
+        :param int vlan_id: The unique identifier for the VLAN
+        :param string mask: mask for request
         :returns: A dictionary containing a large amount of information about
                   the specified VLAN.
-
         """
-        return self.vlan.getObject(id=vlan_id, mask=DEFAULT_GET_VLAN_MASK)
+
+        if mask:
+            _mask = mask
+        else:
+            _mask = DEFAULT_GET_VLAN_MASK
+
+        return self.vlan.getObject(id=vlan_id, mask=_mask)
 
     def list_global_ips(self, version=None, identifier=None, **kwargs):
         """Returns a list of all global IP address records on the account.
@@ -497,9 +506,6 @@ class NetworkManager(object):
             _filter['subnets']['version'] = utils.query_filter(version)
         if subnet_type:
             _filter['subnets']['subnetType'] = utils.query_filter(subnet_type)
-        else:
-            # This filters out global IPs from the subnet listing.
-            _filter['subnets']['subnetType'] = {'operation': '!= GLOBAL_IP'}
         if network_space:
             _filter['subnets']['networkVlan']['networkSpace'] = (
                 utils.query_filter(network_space))
@@ -786,17 +792,25 @@ class NetworkManager(object):
                                 customer_note,
                                 id=identifier)
 
-    def get_pods(self, datacenter=None):
+    def get_pods(self, datacenter=None, mask=None):
         """Calls SoftLayer_Network_Pod::getAllObjects()
 
         returns list of all network pods and their routers.
         """
-        _filter = None
-
+        _filter = {
+            'name': {
+                'operation': 'orderBy',
+                'options': [{'name': 'sort', 'value': ['DESC']}]
+            }
+        }
         if datacenter:
             _filter = {"datacenterName": {"operation": datacenter}}
 
-        return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', filter=_filter)
+        _mask = None
+        if mask:
+            _mask = mask
+
+        return self.client.call('SoftLayer_Network_Pod', 'getAllObjects', mask=_mask, filter=_filter)
 
     def get_list_datacenter(self):
         """Calls SoftLayer_Location::getDatacenters()
@@ -851,3 +865,25 @@ class NetworkManager(object):
             _filter = {"name": {"operation": datacenter}}
 
         return self.client.call('SoftLayer_Location', 'getDatacenters', filter=_filter, limit=1)
+
+    def get_datacenter_by_keyname(self, keyname=None):
+        """Calls SoftLayer_Location::getDatacenters()
+
+        returns datacenter list.
+        """
+        mask = "mask[id,longName,name,regions[keyname,description]]"
+        _filter = {}
+        if keyname:
+            _filter = {"regions": {"keyname": {"operation": keyname}}}
+
+        result = self.client.call('SoftLayer_Location', 'getDatacenters', filter=_filter, limit=1, mask=mask)
+        if len(result) >= 1:
+            return result[0]
+        return {}
+
+    def clear_route(self, identifier):
+        """Calls SoftLayer_Network_Subnet::clearRoute()
+
+        returns  true or false.
+        """
+        return self.client.call('SoftLayer_Network_Subnet', 'clearRoute', id=identifier)

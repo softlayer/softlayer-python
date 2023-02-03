@@ -2171,3 +2171,108 @@ getItemsVLAN = [{
     }]
 }
 ]
+
+getAllObjectsIPSEC = [{
+    "firstOrderStepId": 1,
+    "id": 0,
+    "isActive": 1,
+    "keyName": "ADDITIONAL_PRODUCTS",
+    "name": "Additional Products"}]
+
+getItems_IPSEC = [{
+    "description": "IPSEC - Standard",
+    "id": 1092,
+    "keyName": "IPSEC_STANDARD",
+    "categories": [
+        {
+            "categoryCode": "network_tunnel",
+            "id": 117,
+            "name": "Network Tunnel",
+            "quantityLimit": 0,
+        },
+        {
+            "categoryCode": "one_time_charge",
+            "id": 33,
+            "name": "One Time Charge",
+            "quantityLimit": 0,
+        }
+    ],
+    "itemCategory": {
+        "categoryCode": "network_tunnel",
+        "id": 117,
+        "name": "Network Tunnel",
+        "quantityLimit": 0,
+    },
+    "prices": [
+        {
+            "id": 51379,
+            "itemId": 1092,
+            "laborFee": "0",
+            "locationGroupId": 503,
+            "oneTimeFee": "0",
+            "recurringFee": "102",
+            "setupFee": "0",
+            "sort": 0,
+        }
+    ]
+}]
+
+getVSDiskItemPrices = [
+    {
+        "id": 2255,
+        "locationGroupId": None,
+        "categories": [
+            {
+                "categoryCode": "guest_disk1",
+                "id": 82,
+                "name": "Second Disk",
+                "quantityLimit": 0,
+                "sortOrder": None
+            },
+            {
+                "categoryCode": "guest_disk2",
+                "id": 92,
+                "name": "Third Disk",
+                "quantityLimit": 0,
+                "sortOrder": None
+            },
+            {
+                "categoryCode": "guest_disk3",
+                "id": 93,
+                "name": "Fourth Disk",
+                "quantityLimit": 0,
+                "sortOrder": None
+            },
+            {
+                "categoryCode": "guest_disk4",
+                "id": 116,
+                "name": "Fifth Disk",
+                "quantityLimit": 0,
+                "sortOrder": None
+            }
+        ],
+        "item": {
+            "capacity": "10",
+            "description": "10 GB (SAN)",
+            "keyName": "GUEST_DISK_10_GB_SAN"
+        }
+    },
+    {
+        "id": 1639,
+        "locationGroupId": None,
+        "categories": [
+            {
+                "categoryCode": "guest_disk0",
+                "id": 81,
+                "name": "First Disk",
+                "quantityLimit": 0,
+                "sortOrder": None
+            }
+        ],
+        "item": {
+            "capacity": "10",
+            "description": "10 GB (SAN)",
+            "keyName": "GUEST_DISK_10_GB_SAN"
+        }
+    }
+]

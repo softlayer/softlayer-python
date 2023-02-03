@@ -11,7 +11,7 @@ listDomainMappings = [
         "path": "/",
         "protocol": "HTTP",
         "status": "CNAME_CONFIGURATION",
-        "uniqueId": "9934111111111",
+        "uniqueId": "11223344",
         "vendorName": "akamai"
     }
 ]
@@ -28,7 +28,7 @@ listDomainMappingByUniqueId = [
         "path": "/",
         "protocol": "HTTP",
         "status": "CNAME_CONFIGURATION",
-        "uniqueId": "9934111111111",
+        "uniqueId": "11223344",
         "vendorName": "akamai"
     }
 ]
@@ -41,7 +41,7 @@ updateDomainMapping = [
         "performanceConfiguration": "Large file optimization",
         "protocol": "HTTP",
         "respectHeaders": True,
-        "uniqueId": "424406419091111",
+        "uniqueId": "11223344",
         "vendorName": "akamai",
         "header": "www.test.com",
         "httpPort": 83,

@@ -939,10 +939,10 @@ class VSTests(testing.TestCase):
 
         self.assertEqual(result, True)
         args = ({
-            'hostname': 'new-host',
-            'domain': 'new.sftlyr.ws',
-            'notes': 'random notes',
-        },)
+                    'hostname': 'new-host',
+                    'domain': 'new.sftlyr.ws',
+                    'notes': 'random notes',
+                },)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'editObject',
                                 identifier=100,
                                 args=args)
@@ -968,11 +968,11 @@ class VSTests(testing.TestCase):
         # capture only the OS disk
         result = self.vs.capture(1, 'a')
 
-        expected = fixtures.SoftLayer_Virtual_Guest.createArchiveTransaction
+        expected = fixtures.SoftLayer_Virtual_Guest.createArchiveTemplate
         self.assertEqual(result, expected)
         args = ('a', [{'device': 0, 'uuid': 1, 'mountType': 'Disk'}], None)
         self.assert_called_with('SoftLayer_Virtual_Guest',
-                                'createArchiveTransaction',
+                                'createArchiveTemplate',
                                 args=args,
                                 identifier=1)
 
@@ -981,12 +981,12 @@ class VSTests(testing.TestCase):
         # make sure the data is carried along with it
         result = self.vs.capture(1, 'a', additional_disks=True)
 
-        expected = fixtures.SoftLayer_Virtual_Guest.createArchiveTransaction
+        expected = fixtures.SoftLayer_Virtual_Guest.createArchiveTemplate
         self.assertEqual(result, expected)
         args = ('a', [{'device': 0, 'mountType': 'Disk', 'uuid': 1},
                       {'device': 3, 'mountType': 'Disk', 'uuid': 3}], None)
         self.assert_called_with('SoftLayer_Virtual_Guest',
-                                'createArchiveTransaction',
+                                'createArchiveTemplate',
                                 args=args,
                                 identifier=1)
 
@@ -1325,3 +1325,20 @@ class VSTests(testing.TestCase):
     def test_authorize_portable_storage(self):
         options = self.vs.attach_portable_storage(1234, 1234567)
         self.assertEqual(1234567, options['id'])
+
+    def test_browser_access_log(self):
+        result = self.vs.browser_access_log(1234)
+        self.assertTrue(result)
+        self.assert_called_with('SoftLayer_Virtual_Guest', 'getBrowserConsoleAccessLogs', identifier=1234)
+
+    def test_notification(self):
+        self.vs.get_notifications(100)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Virtual_Guest', 'findByGuestId')
+
+    def test_add_notification(self):
+        self.vs.add_notification(100, 123456)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Virtual_Guest', 'createObject')
+
+    def test_notification_del(self):
+        self.vs.remove_notification(100)
+        self.assert_called_with('SoftLayer_User_Customer_Notification_Virtual_Guest', 'deleteObjects')

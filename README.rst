@@ -139,6 +139,12 @@ System Requirements
 * A valid SoftLayer Employee  API username, password, Yubi Key
 * A connection to SoftLayer's Employee VPN 
 
+
+Python 3.6 Support
+------------------
+As of version 6.0.0 SoftLayer-Python will no longer support python3.6, which is `End of Life as of 2022 <https://endoflife.date/python>`_.
+If you cannot install python 3.8+ for some reason, you will need to use a version of softlayer-python <= 6.0.0
+
 Python 2.7 Support
 ------------------
 Python 2.7 is  `End Of Life as of 2020 <https://www.python.org/dev/peps/pep-0373/>`_ . Its not supported, you will need to upgrade to python 3.7 at least.
@@ -146,13 +152,16 @@ Python 2.7 is  `End Of Life as of 2020 <https://www.python.org/dev/peps/pep-0373
 
 Python Packages
 ---------------
-* prettytable >= 2.0.0
-* click >= 7
+* prettytable >= 2.5.0
+* click >= 8.0.4
 * requests >= 2.20.0
 * prompt_toolkit >= 2
 * pygments >= 2.0.0
 * urllib3 >= 1.24
-* Rich
+* rich == 12.3.0
+
+*NOTE* If `ptable` (not prettytable) is installed, this will cause issues rendering tables.
+
 
 Copyright
 ---------

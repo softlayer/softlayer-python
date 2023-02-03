@@ -5,7 +5,6 @@
 
     :license: MIT, see LICENSE for more details.
 """
-# pylint: disable=no-self-use
 
 from re import match
 
@@ -17,7 +16,7 @@ ITEM_MASK = '''id, keyName, description, itemCategory, categories, prices'''
 
 PACKAGE_MASK = '''id, name, keyName, isActive, type'''
 
-PRESET_MASK = '''id, name, keyName, description, categories, prices, locations'''
+PRESET_MASK = '''id, name, keyName, description, prices[id, hourlyRecurringFee, recurringFee], locations'''
 
 
 class OrderingManager(object):
@@ -717,3 +716,24 @@ class OrderingManager(object):
             if location.get('regions', default_regions)[index_first].get('keyname') == location_key:
                 return location_name
         raise exceptions.SoftLayerError("Location {} does not exist".format(location_key))
+
+    def get_items(self, package_id, storage_filter=None):
+        """"Returns the items .
+
+
+        :param int package_id: The package for which to get the items.
+        :param dict storage_filter: object filter.
+        """
+
+        return self.client.call('SoftLayer_Product_Package', 'getItems', filter=storage_filter,
+                                id=package_id)
+
+    def get_regions(self, package_id, location=None):
+        """returns the all regions.
+
+        :param int package_id: The package for which to get the items.
+        """
+        _filter = ''
+        if location:
+            _filter = {"regions": {"location": {"location": {"name": {"operation": location}}}}}
+        return self.client.call('SoftLayer_Product_Package', 'getRegions', id=package_id, filter=_filter)

@@ -35,8 +35,8 @@ def cli(env, sortby, datacenter, identifier, subnet_type, network_space, ipv4, i
     mgr = SoftLayer.NetworkManager(env.client)
 
     table = formatting.Table([
-        'id', 'identifier', 'type', 'network_space', 'datacenter', 'vlan_id',
-        'IPs', 'hardware', 'vs',
+        'Id', 'Identifier', 'Network', 'Type', 'VLAN', 'Location', 'Target',
+        'IPs', 'Hardware', 'Vs', 'Tags', 'Note'
     ])
     table.sortby = sortby
 
@@ -55,18 +55,36 @@ def cli(env, sortby, datacenter, identifier, subnet_type, network_space, ipv4, i
     )
 
     for subnet in subnets:
+        subnet_type = subnet.get('subnetType', formatting.blank())
+        if subnet_type == 'PRIMARY' or subnet_type == 'PRIMARY_6' or subnet_type == 'ADDITIONAL_PRIMARY':
+            subnet_type = 'Primary'
+        if subnet_type == 'SECONDARY_ON_VLAN':
+            subnet_type = 'Portable'
+        if subnet_type == 'STATIC_IP_ROUTED':
+            subnet_type = 'Static'
+        if subnet_type == 'GLOBAL_IP':
+            subnet_type = 'Global'
+
+        network = subnet.get('addressSpace', formatting.blank())
+        if network is not None:
+            network = str(network).capitalize()
+
+        vlan = utils.lookup(subnet, 'networkVlan', 'fullyQualifiedName')
+        if vlan is None:
+            vlan = 'Unrouted'
         table.add_row([
             subnet['id'],
             '%s/%s' % (subnet['networkIdentifier'], str(subnet['cidr'])),
-            subnet.get('subnetType', formatting.blank()),
-            utils.lookup(subnet,
-                         'networkVlan',
-                         'networkSpace') or formatting.blank(),
-            utils.lookup(subnet, 'datacenter', 'name',) or formatting.blank(),
-            subnet['networkVlanId'],
+            network,
+            subnet_type,
+            vlan,
+            utils.lookup(subnet, 'datacenter', 'name') or formatting.blank(),
+            utils.lookup(subnet, 'endPointIpAddress', 'ipAddress') or formatting.blank(),
             subnet['ipAddressCount'],
             len(subnet['hardware']),
             len(subnet['virtualGuests']),
+            formatting.tags(subnet.get('tagReferences')),
+            utils.lookup(subnet, 'note') or formatting.blank(),
         ])
 
     env.fout(table)

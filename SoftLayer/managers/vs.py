@@ -28,7 +28,7 @@ EXTRA_CATEGORIES = ['pri_ipv6_addresses',
                     'software_guard_extensions']
 
 
-# pylint: disable=no-self-use,too-many-lines
+# pylint: disable=,too-many-lines
 
 
 class VSManager(utils.IdentifierMixin, object):
@@ -246,6 +246,10 @@ class VSManager(utils.IdentifierMixin, object):
                 '''billingItem[id,nextInvoiceTotalRecurringAmount,
                                package[id,keyName],
                                children[description,categoryCode,nextInvoiceTotalRecurringAmount],
+                               nextInvoiceChildren[description,
+                                                   categoryCode,
+                                                   recurringFee,
+                                                   nextInvoiceTotalRecurringAmount],
                                orderItem[id,
                                          order.userRecord[username],
                                          preset.keyName]],'''
@@ -360,7 +364,7 @@ class VSManager(utils.IdentifierMixin, object):
                     'prices': get_item_price(item['prices'], location_group_id)
                 })
 
-            elif category.__contains__('guest_disk'):
+            elif 'guest_disk' in category:
                 local_disk.append({
                     'name': item['description'],
                     'capacity': item['capacity'],
@@ -992,7 +996,7 @@ class VSManager(utils.IdentifierMixin, object):
 
             disks_to_capture.append(block_device)
 
-        return self.guest.createArchiveTransaction(
+        return self.guest.createArchiveTemplate(
             name, disks_to_capture, notes, id=instance_id)
 
     def upgrade(self, instance_id, cpus=None, memory=None, nic_speed=None, public=True, preset=None, disk=None):
@@ -1043,7 +1047,7 @@ class VSManager(utils.IdentifierMixin, object):
             disk_number = 0
             vsi_disk = self.get_instance(instance_id)
             for item in vsi_disk.get('billingItem').get('children'):
-                if item.get('categoryCode').__contains__('guest_disk'):
+                if 'guest_disk' in item.get('categoryCode'):
                     if disk_number < int("".join(filter(str.isdigit, item.get('categoryCode')))):
                         disk_number = int("".join(filter(str.isdigit, item.get('categoryCode'))))
             for disk_guest in disk:
@@ -1064,8 +1068,11 @@ class VSManager(utils.IdentifierMixin, object):
                                                        'Unable to find %s option with value %s' % (
                                                            ('disk', disk_guest.get('capacity'))))
 
+                category_id = self.get_disk_category_id_by_disk_number(disk_guest.get('capacity'), disk_number)
+                if category_id is None:
+                    raise exceptions.SoftLayerError('Invalid disk number to this disk capacity')
                 category = {'categories': [{
-                    'categoryCode': 'guest_disk' + str(disk_number),
+                    'id': category_id,
                     'complexType': "SoftLayer_Product_Item_Category"}],
                     'complexType': 'SoftLayer_Product_Item_Price',
                     'id': price_id}
@@ -1096,6 +1103,43 @@ class VSManager(utils.IdentifierMixin, object):
             self.client['Product_Order'].placeOrder(order)
             return True
         return False
+
+    def get_disk_category_id_by_disk_number(self, capacity, disk_number):
+        """Uses Product_Package::getItemPrices to get all disk items with its categories and
+
+        disk_key_names dictionary to convert disk numbers (int) to ordinal numbers (string)
+        """
+        disk_key_names = {
+            1: "First Disk",
+            2: "Second Disk",
+            3: "Third Disk",
+            4: "Fourth Disk",
+            5: "Fifth Disk",
+        }
+        category_to_request = disk_key_names.get(disk_number)
+        if category_to_request is None:
+            return None
+
+        key_name = "*= GUEST_DISK_"+str(capacity)+"_GB_SAN"
+        object_filter = {
+            "itemPrices": {
+                "locationGroupId": {"operation": "is null"},
+                "item": {
+                    "keyName": {"operation": key_name}
+                }
+            }
+        }
+        mask = "mask[id,locationGroupId,item[capacity,description,keyName],categories]"
+        disk_items = self.client.call(
+            'SoftLayer_Product_Package', 'getItemPrices', id=46, mask=mask, filter=object_filter
+        )
+        category_id = None
+        for disk_item in disk_items:
+            for category in disk_item.get('categories'):
+                if category.get('name') == category_to_request:
+                    category_id = category.get('id')
+                    break
+        return category_id
 
     def order_guest(self, guest_object, test=False):
         """Uses Product_Order::placeOrder to create a virtual guest.
@@ -1318,7 +1362,7 @@ class VSManager(utils.IdentifierMixin, object):
         }
         category_code = option_category[option]
         for item in package_items:
-            is_private = (item.get('units') == 'PRIVATE_CORE')
+            is_private = item.get('units') == 'PRIVATE_CORE'
             for price in item['prices']:
                 if 'locationGroupId' in price and price['locationGroupId']:
                     # Skip location based prices
@@ -1447,3 +1491,32 @@ class VSManager(utils.IdentifierMixin, object):
                                   disk_id, id=vs_id)
 
         return result
+
+    def browser_access_log(self, identifier):
+        """A virtual guest’s browser access logs.
+
+        :param int identifier: Virtual server id.
+
+
+        :return: SoftLayer_Virtual_BrowserConsoleAccessLog.
+        """
+        mask = 'createDate,eventType,id,message,sourceIp,sourcePort,username'
+        return self.client.call('SoftLayer_Virtual_Guest', 'getBrowserConsoleAccessLogs', mask=mask, id=identifier)
+
+    def get_notifications(self, vs_id):
+        """Returns all virtual notifications."""
+        return self.client.call('SoftLayer_User_Customer_Notification_Virtual_Guest', 'findByGuestId', vs_id)
+
+    def add_notification(self, virtual_id, user_id):
+        """Create a user virtual notification entry"""
+
+        template = {"guestId": virtual_id, "userId": user_id}
+        mask = 'user'
+        return self.client.call('SoftLayer_User_Customer_Notification_Virtual_Guest',
+                                'createObject', template, mask=mask)
+
+    def remove_notification(self, identifier):
+        """Remove a user vs notification entry"""
+
+        template = [{'id': identifier}]
+        return self.client.call('SoftLayer_User_Customer_Notification_Virtual_Guest', 'deleteObjects', template)

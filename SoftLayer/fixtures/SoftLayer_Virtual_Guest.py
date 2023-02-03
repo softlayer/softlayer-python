@@ -34,6 +34,60 @@ getObject = {
                 'nextInvoiceTotalRecurringAmount': 1
             }
         ],
+        "nextInvoiceChildren": [
+            {
+                "allowCancellationFlag": 1,
+                "associatedBillingItemId": "738974962",
+                "cancellationDate": "2022-11-03T23:00:01-06:00",
+                "categoryCode": "os_usage",
+                "createDate": "2022-10-04T17:00:08-06:00",
+                "cycleStartDate": "2022-10-04T17:00:08-06:00",
+                "description": "CentOS 8.x Usage is 743.9997 hours Used",
+                "id": 999303609,
+                "laborFee": "0",
+                "laborFeeTaxRate": "0",
+                "lastBillDate": None,
+                "modifyDate": None,
+                "nextBillDate": "2022-11-03T23:00:00-06:00",
+                "oneTimeFee": "0",
+                "oneTimeFeeTaxRate": "0",
+                "orderItemId": None,
+                "parentId": None,
+                "recurringFee": "0",
+                "recurringFeeTaxRate": "0",
+                "recurringMonths": 1,
+                "serviceProviderId": 1,
+                "setupFee": "0",
+                "setupFeeTaxRate": "0",
+                "associatedBillingItem": None
+            },
+            {
+                "allowCancellationFlag": 1,
+                "associatedBillingItemId": "738974962",
+                "cancellationDate": "2022-11-03T23:00:01-06:00",
+                "categoryCode": "guest_core_usage",
+                "createDate": "2022-10-04T17:00:09-06:00",
+                "cycleStartDate": "2022-10-04T17:00:09-06:00",
+                "description": "CPU Cores: a suspendable product.",
+                "id": 999303621,
+                "laborFee": "0",
+                "laborFeeTaxRate": "0",
+                "lastBillDate": None,
+                "modifyDate": None,
+                "nextBillDate": "2022-11-03T23:00:00-06:00",
+                "oneTimeFee": "0",
+                "oneTimeFeeTaxRate": "0",
+                "orderItemId": None,
+                "parentId": None,
+                "recurringFee": "1.54",
+                "recurringFeeTaxRate": "0",
+                "recurringMonths": 1,
+                "serviceProviderId": 1,
+                "setupFee": "0",
+                "setupFeeTaxRate": "0",
+                "associatedBillingItem": None
+            },
+        ],
         'package': {
             "id": 835,
             "keyName": "PUBLIC_CLOUD_SERVER"
@@ -75,7 +129,7 @@ getObject = {
         'passwords': [{'username': 'user', 'password': 'pass'}],
         'softwareLicense': {
             'softwareDescription': {'version': '12.04-64 Minimal for VSI',
-                                    'name': 'Ubuntu'}}
+                                    'name': 'Ubuntu', 'referenceCode': 'UBUNTU_8_64', }}
     },
     'softwareComponents': [{
         'passwords': [{'username': 'user', 'password': 'pass'}],
@@ -317,7 +371,7 @@ getCreateObjectOptions = {
                     'item': {'description': '2 GB'},
                     'hourlyRecurringFee': '.06',
                     'recurringFee': '42'
-            },
+                },
             'template': {'maxMemory': 2048}
         },
         {
@@ -662,14 +716,15 @@ generateOrderTemplate = {
 setUserMetadata = ['meta']
 reloadOperatingSystem = 'OK'
 setTags = True
-createArchiveTransaction = {
+createArchiveTemplate = {
     'createDate': '2018-12-10T17:29:18-06:00',
     'elapsedSeconds': 0,
     'guestId': 12345678,
     'hardwareId': None,
     'id': 12345,
     'modifyDate': '2018-12-10T17:29:18-06:00',
-    'statusChangeDate': '2018-12-10T17:29:18-06:00'
+    'statusChangeDate': '2018-12-10T17:29:18-06:00',
+    'globalIdentifier': '495c47c2-80af-4fef-87a9-97faf132345678'
 }
 
 executeRescueLayer = True
@@ -920,3 +975,23 @@ attachDiskImage = {
     "createDate": "2021-03-22T13:15:31-06:00",
     "id": 1234567
 }
+
+getBrowserConsoleAccessLogs = [
+    {
+        "createDate": "2022-03-07T05:32:23-06:00",
+        "eventType": "CONNECTED",
+        "id": 509636,
+        "message": "User connected",
+        "sourceIp": "44.200.9.0",
+        "sourcePort": 47097,
+        "username": "testuser@ibm.com@ibm.com"
+    },
+    {
+        "createDate": "2022-03-07T07:58:27-06:00",
+        "eventType": "CONNECTED",
+        "id": 509024,
+        "message": "User connected",
+        "sourceIp": "44.200.9.0",
+        "sourcePort": 41185,
+        "username": "testuser@ibm.com"
+    }]

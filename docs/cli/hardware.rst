@@ -120,10 +120,6 @@ This function updates the firmware of a server. If already at the latest version
    :prog: hardware storage
    :show-nested:
 
-.. click:: SoftLayer.CLI.hardware.guests:cli
-   :prog: hardware guests
-   :show-nested:
-
 .. click:: SoftLayer.CLI.hardware.authorize_storage:cli
    :prog: hardware authorize-storage
    :show-nested:
@@ -134,4 +130,20 @@ This function updates the firmware of a server. If already at the latest version
 
 .. click:: SoftLayer.CLI.hardware.sensor:cli
    :prog: hardware sensor
+   :show-nested:
+
+.. click:: SoftLayer.CLI.hardware.notifications:cli
+   :prog: hardware notifications
+   :show-nested:
+
+.. click:: SoftLayer.CLI.hardware.notification_add:cli
+   :prog: hardware notification-add
+   :show-nested:
+
+.. click:: SoftLayer.CLI.hardware.notification_delete:cli
+   :prog: hardware notification-delete
+   :show-nested:
+
+.. click:: SoftLayer.CLI.hardware.create_credential:cli
+   :prog: hardware create-credential
    :show-nested:

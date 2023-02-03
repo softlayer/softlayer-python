@@ -199,9 +199,9 @@ def _parse_create_args(client, args):
 @click.option('--router-private', type=click.INT,
               help="The ID of the private ROUTER on which you want the virtual server placed")
 @helpers.multi_option('--public-security-group', '-S',
-                      help=('Security group ID to associate with the public interface'))
+                      help='Security group ID to associate with the public interface')
 @helpers.multi_option('--private-security-group', '-s',
-                      help=('Security group ID to associate with the private interface'))
+                      help='Security group ID to associate with the private interface')
 @click.option('--wait', type=click.INT,
               help="Wait until VS is finished provisioning for up to X seconds before returning")
 @click.option('--placementgroup',
@@ -221,13 +221,11 @@ def cli(env, **args):
     network = SoftLayer.NetworkManager(env.client)
 
     pods = network.get_closed_pods()
-    closure = []
 
     if do_create:
         for pod in pods:
             if args.get('datacenter') in str(pod['name']):
-                closure.append(pod['name'])
-        click.secho(click.style('Warning: Closed soon: %s' % (', '.join(closure)), fg='yellow'))
+                click.secho('Warning: Closed soon: {}'.format(pod['name']), fg='yellow')
         if not (env.skip_confirmations or formatting.confirm(
                 "This action will incur charges on your account. Continue?")):
             raise exceptions.CLIAbort('Aborting virtual server order.')

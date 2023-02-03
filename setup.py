@@ -15,8 +15,9 @@ else:
     LONG_DESCRIPTION = DESCRIPTION
 
 setup(
+<<<<<<< HEAD
     name='SoftLayer-Internal',
-    version='6.0.2',
+    version='6.1.3',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/x-rst',
@@ -39,7 +40,7 @@ setup(
         'prompt_toolkit >= 2',
         'pygments >= 2.0.0',
         'urllib3 >= 1.24',
-        'rich == 12.3.0'
+        'rich == 13.3.1'
     ],
     keywords=['islcli'],
     classifiers=[
@@ -53,6 +54,8 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],

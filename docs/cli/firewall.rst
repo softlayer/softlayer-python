@@ -22,3 +22,7 @@ Firewall Management
 .. click:: SoftLayer.CLI.firewall.list:cli
     :prog: firewall list
     :show-nested:
+
+.. click:: SoftLayer.CLI.firewall.monitoring:cli
+    :prog: firewall monitoring
+    :show-nested:
