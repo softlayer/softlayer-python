@@ -1120,7 +1120,7 @@ class VSManager(utils.IdentifierMixin, object):
         if category_to_request is None:
             return None
 
-        key_name = "*= GUEST_DISK_"+str(capacity)+"_GB_SAN"
+        key_name = "*= GUEST_DISK_" + str(capacity) + "_GB_SAN"
         object_filter = {
             "itemPrices": {
                 "locationGroupId": {"operation": "is null"},

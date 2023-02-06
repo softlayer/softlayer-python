@@ -299,6 +299,9 @@ If no timezone is specified, IMS local time (CST) will be assumed, which might n
 .. click:: SoftLayer.CLI.virt.create:cli
     This command is an alias for `slcli dedicatedhost create`
    :prog: virtual host-create
+
+.. click:: SoftLayer.CLI.virt.os_available:cli
+   :prog: virtual os-available
    :show-nested:
 
 Manages the migration of virutal guests. Supports migrating virtual guests on Dedicated Hosts as well.

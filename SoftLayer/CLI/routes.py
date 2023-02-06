@@ -59,6 +59,7 @@ ALL_ROUTES = [
     ('virtual:notification-delete', 'SoftLayer.CLI.virt.notification_delete:cli'),
     ('virtual:host-list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
     ('virtual:host-create', 'SoftLayer.CLI.dedicatedhost.create:cli'),
+    ('virtual:os-available', 'SoftLayer.CLI.virt.os_available:cli'),
 
     ('dedicatedhost', 'SoftLayer.CLI.dedicatedhost'),
     ('dedicatedhost:list', 'SoftLayer.CLI.dedicatedhost.list:cli'),
