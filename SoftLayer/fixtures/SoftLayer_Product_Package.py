@@ -2276,3 +2276,33 @@ getVSDiskItemPrices = [
         }
     }
 ]
+
+getItemsOS = [{
+    "description": "Debian GNU/Linux 6.x Squeeze/Stable - LAMP Install (64 bit)",
+    "id": 3975,
+    "itemTaxCategoryId": 166,
+    "keyName": "OS_DEBIAN_6_X_SQUEEZE_LAMP_64_BIT",
+    "softwareDescriptionId": 881,
+    "itemCategory": {
+        "categoryCode": "os",
+        "id": 12,
+        "name": "Operating System",
+    },
+    "prices": [
+        {
+            "hourlyRecurringFee": "0",
+            "id": 14056,
+            "itemId": 3975,
+            "laborFee": "0",
+            "recurringFee": "0",
+            "setupFee": "0",
+            "packageReferences": [
+                {
+                    "id": 74660,
+                    "itemPriceId": 14056,
+                    "packageId": 46
+                }
+            ]
+        }
+    ]
+}]

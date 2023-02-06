@@ -995,3 +995,9 @@ class VirtTests(testing.TestCase):
     def test_notification_delete(self):
         result = self.run_command(['vs', 'notification-delete', '100'])
         self.assert_no_fail(result)
+
+    def test_os_available(self):
+        _mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        _mock.return_value = SoftLayer_Product_Package.getItemsOS
+        result = self.run_command(['vs', 'os-available'])
+        self.assert_no_fail(result)
