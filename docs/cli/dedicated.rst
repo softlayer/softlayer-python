@@ -35,3 +35,7 @@ Dedicated Host Commands
 .. click:: SoftLayer.CLI.dedicatedhost.list:cli
     :prog: virtual host-list
     :show-nested:
+
+.. click:: SoftLayer.CLI.dedicatedhost.create:cli
+    :prog: virtual host-create
+    :show-nested:
