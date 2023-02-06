@@ -11,17 +11,17 @@ MULTIPLE = '(Multiple allowed)'
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
-@click.option('--hardware-id', '-h', multiple=True,
-              help='The id of one SoftLayer_Hardware to authorize ' + MULTIPLE)
-@click.option('--virtual-id', '-v', multiple=True,
-              help='The id of one SoftLayer_Virtual_Guest to authorize ' + MULTIPLE)
+@click.option('--hardware-id', '-d', multiple=True,
+              help='The ID of one hardware server to authorize. ' + MULTIPLE)
 @click.option('--ip-address-id', '-i', multiple=True,
-              help='The id of one SoftLayer_Network_Subnet_IpAddress to authorize ' + MULTIPLE)
+              help='The ID of one SoftLayer_Network_Subnet_IpAddress to authorize. ' + MULTIPLE)
 @click.option('--ip-address', multiple=True,
-              help='An IP address to authorize ' + MULTIPLE)
+              help='An IP address to authorize. ' + MULTIPLE)
+@click.option('--virtual-id', '-v', multiple=True,
+              help='The ID of one virtual server to authorize. ' + MULTIPLE)
 @environment.pass_env
 def cli(env, volume_id, hardware_id, virtual_id, ip_address_id, ip_address):
-    """Authorizes hosts to access a given volume"""
+    """Authorize hosts to access a given volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
     ip_address_id_list = list(ip_address_id)
 

@@ -13,7 +13,7 @@ from SoftLayer import utils
 @click.command(cls=SLCommand)
 @environment.pass_env
 def cli(env):
-    """List AutoScale Groups."""
+    """List all Autoscale Groups on your account."""
 
     autoscale = AutoScaleManager(env.client)
     groups = autoscale.list()
