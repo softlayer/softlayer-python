@@ -551,7 +551,7 @@ class NetworkManager(object):
 
         kwargs['iter'] = True
         if limit > 0:
-            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), limit=limit, iter=False)
+            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), limit=limit, iter=True)
         else:
             return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), iter=True)
 
