@@ -11,11 +11,11 @@ from SoftLayer.CLI import formatting
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume-id')
-@click.option('--reason', help="An optional reason for cancellation")
+@click.option('--reason', help="An optional reason for cancellation.")
 @click.option('--immediate',
               is_flag=True,
               help="Cancels the snapshot space immediately instead "
-                   "of on the billing anniversary")
+                   "of on the billing anniversary.")
 @environment.pass_env
 def cli(env, volume_id, reason, immediate):
     """Cancel existing snapshot space for a given volume."""

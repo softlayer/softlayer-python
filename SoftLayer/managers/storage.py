@@ -381,7 +381,7 @@ class StorageManager(utils.IdentifierMixin, object):
                                 **kwargs)
 
     def order_snapshot_space(self, volume_id, capacity, tier, upgrade,
-                             **kwargs):
+                             iops=None, **kwargs):
         """Orders snapshot space for the given block volume.
 
         :param integer volume_id: The id of the volume
@@ -395,8 +395,11 @@ class StorageManager(utils.IdentifierMixin, object):
                       'staasVersion,hasEncryptionAtRest'
         volume = self.get_volume_details(volume_id, mask=object_mask, **kwargs)
 
+        if iops is None:
+            iops = int(volume['provisionedIops'])
+
         order = storage_utils.prepare_snapshot_order_object(
-            self, volume, capacity, tier, upgrade)
+            self, volume, capacity, tier, upgrade, iops)
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
