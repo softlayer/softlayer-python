@@ -4,7 +4,8 @@
 import click
 
 from SoftLayer.CLI.command import SLCommand as SLCommand
-from SoftLayer.CLI.email.list import build_statistics_table
+# Commented this line until we fix EmailManager.GetStatistics() method in golang plugin
+# from SoftLayer.CLI.email.list import build_statistics_table
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers.email import EmailManager
@@ -33,10 +34,9 @@ def cli(env, identifier):
     table.add_row(['type_description', utils.lookup(result, 'type', 'description')])
     table.add_row(['type', utils.lookup(result, 'type', 'keyName')])
     table.add_row(['vendor', utils.lookup(result, 'vendor', 'keyName')])
-
-    statistics = email_manager.get_statistics(identifier)
-
-    for statistic in statistics:
-        table.add_row(['statistics', build_statistics_table(statistic)])
-
+    # Commented these lines until we fix EmailManager.GetStatistics() method in golang plugin
+    # statistics = email_manager.get_statistics(identifier)
+    #
+    # for statistic in statistics:
+    #     table.add_row(['statistics', build_statistics_table(statistic)])
     env.fout(table)
