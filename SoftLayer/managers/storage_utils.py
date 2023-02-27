@@ -423,7 +423,7 @@ def find_snapshot_schedule_id(volume, snapshot_schedule_keyname):
                      "the given storage volume")
 
 
-def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
+def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade, iops):
     """Prepare the snapshot space order object for the placeOrder() method
 
     :param manager: The File or Block manager calling this function
@@ -466,7 +466,7 @@ def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
                 raise exceptions.SoftLayerError(
                     "Snapshot space cannot be ordered for this performance "
                     "volume since it does not support Encryption at Rest.")
-            iops = int(volume['provisionedIops'])
+
             prices = [find_saas_snapshot_space_price(
                 package, capacity, iops=iops)]
         else:

@@ -446,7 +446,7 @@ class BlockTests(testing.TestCase):
         order_mock.return_value = {}
 
         result = self.run_command(['block', 'snapshot-order', '1234',
-                                   '--capacity=10', '--tier=0.25'])
+                                   '--size=10', '--tier=0.25', '--iops=100'])
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,
@@ -458,7 +458,7 @@ class BlockTests(testing.TestCase):
         order_mock.side_effect = ValueError('failure!')
 
         result = self.run_command(['block', 'snapshot-order', '1234',
-                                   '--capacity=10', '--tier=0.25'])
+                                   '--size=10', '--tier=0.25', '--iops=100'])
 
         self.assertEqual(2, result.exit_code)
         self.assertEqual('Argument Error: failure!', result.exception.message)
@@ -475,7 +475,7 @@ class BlockTests(testing.TestCase):
         }
 
         result = self.run_command(['block', 'snapshot-order', '1234',
-                                   '--capacity=10', '--tier=0.25'])
+                                   '--size=10', '--tier=0.25', '--iops=100'])
 
         self.assert_no_fail(result)
         self.assertEqual(result.output,

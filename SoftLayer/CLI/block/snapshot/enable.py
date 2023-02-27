@@ -10,24 +10,24 @@ from SoftLayer.CLI import exceptions
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
 @click.option('--schedule-type',
-              help='Snapshot schedule [INTERVAL|HOURLY|DAILY|WEEKLY]',
+              help='Snapshot schedule [INTERVAL|HOURLY|DAILY|WEEKLY].',
               required=True)
 @click.option('--retention-count',
-              help='Number of snapshots to retain',
+              help='Number of snapshots to retain.',
               required=True)
 @click.option('--minute',
-              help='Minute of the day when snapshots should be taken',
+              help='Minute of the day when snapshots should be taken.',
               default=0)
 @click.option('--hour',
-              help='Hour of the day when snapshots should be taken',
+              help='Hour of the day when snapshots should be taken.',
               default=0)
 @click.option('--day-of-week',
-              help='Day of the week when snapshots should be taken',
+              help='Day of the week when snapshots should be taken.',
               default='SUNDAY')
 @environment.pass_env
 def cli(env, volume_id, schedule_type, retention_count,
         minute, hour, day_of_week):
-    """Enables snapshots for a given volume on the specified schedule"""
+    """Enables snapshots for a given volume on the specified schedule."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
 
     valid_schedule_types = {'INTERVAL', 'HOURLY', 'DAILY', 'WEEKLY'}

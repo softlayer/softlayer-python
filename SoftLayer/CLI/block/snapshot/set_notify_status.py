@@ -12,12 +12,12 @@ from SoftLayer.CLI import environment
     '--enable/--disable',
     default=True,
     help="""
-    Enable/Disable snapshot notification. Use `slcli block snapshot-set-notification volumeId --enable` to enable
+    Enable/Disable snapshot notification. Use `slcli block snapshot-set-notification volumeId --enable` to enable.
     """,
     required=True)
 @environment.pass_env
 def cli(env, volume_id, enable):
-    """Enables/Disables snapshot space usage threshold warning for a given volume"""
+    """Enables/Disables snapshot space usage threshold warning for a given volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
 
     status = block_manager.set_volume_snapshot_notification(volume_id, enable)
