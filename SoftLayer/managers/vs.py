@@ -1441,15 +1441,6 @@ class VSManager(utils.IdentifierMixin, object):
         """
         return self.guest.migrateDedicatedHost(host_id, id=instance_id)
 
-    def get_hardware_guests(self):
-        """Returns all virtualHost capable hardware objects and their guests.
-
-        :return SoftLayer_Hardware[].
-        """
-        object_filter = {"hardware": {"virtualHost": {"id": {"operation": "not null"}}}}
-        mask = "mask[virtualHost[guests[powerState]]]"
-        return self.client.call('SoftLayer_Account', 'getHardware', mask=mask, filter=object_filter)
-
     def authorize_storage(self, vs_id, username_storage):
         """Authorize File or Block Storage to a Virtual Server.
 
