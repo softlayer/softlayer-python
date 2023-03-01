@@ -30,3 +30,7 @@ Disk Image Commands
 .. click:: SoftLayer.CLI.image.datacenter:cli
     :prog: image datacenter
     :show-nested:
+
+.. click:: SoftLayer.CLI.image.share:cli
+    :prog: image share
+    :show-nested:
