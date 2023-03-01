@@ -208,6 +208,7 @@ ALL_ROUTES = [
     ('image:import', 'SoftLayer.CLI.image.import:cli'),
     ('image:export', 'SoftLayer.CLI.image.export:cli'),
     ('image:datacenter', 'SoftLayer.CLI.image.datacenter:cli'),
+    ('image:share', 'SoftLayer.CLI.image.share:cli'),
 
     ('ipsec', 'SoftLayer.CLI.vpn.ipsec'),
     ('ipsec:configure', 'SoftLayer.CLI.vpn.ipsec.configure:cli'),
