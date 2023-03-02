@@ -177,7 +177,7 @@ class BaseClient(object):
                     endpoint_url=url,
                     proxy=self.settings['softlayer'].get('proxy'),
                     # prevents an exception incase timeout is a float number.
-                    timeout=int(self.settings['softlayer'].getfloat('timeout')),
+                    timeout=int(self.settings['softlayer'].getfloat('timeout', 0)),
                     user_agent=consts.USER_AGENT,
                     verify=self.settings['softlayer'].getboolean('verify'),
                 )
@@ -186,7 +186,7 @@ class BaseClient(object):
                 transport = transports.XmlRpcTransport(
                     endpoint_url=url,
                     proxy=self.settings['softlayer'].get('proxy'),
-                    timeout=int(self.settings['softlayer'].getfloat('timeout')),
+                    timeout=int(self.settings['softlayer'].getfloat('timeout', 0)),
                     user_agent=consts.USER_AGENT,
                     verify=self.settings['softlayer'].getboolean('verify'),
                 )

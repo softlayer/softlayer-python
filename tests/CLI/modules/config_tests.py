@@ -31,12 +31,21 @@ class TestHelpShow(testing.TestCase):
     def test_show(self):
         result = self.run_command(['config', 'show'])
         self.assert_no_fail(result)
-        self.assertEqual(json.loads(result.output),
-                         {'Username': 'username',
-                          'API Key': 'api-key',
-                          'Endpoint URL': 'http://endpoint-url',
-                          'Timeout': 'not set',
-                          'Theme': 'dark'})
+        default_config = {
+            'Username': 'username',
+            'API Key': 'api-key',
+            'Endpoint URL': 'http://endpoint-url',
+            'Timeout': 'not set',
+            'Theme': 'dark'
+        }
+        result_config = json.loads(result.output)
+
+        self.assertEqual(result_config.get('Username'), default_config.get('Username'))
+        self.assertEqual(result_config.get('API Key'), default_config.get('API Key'))
+        self.assertEqual(result_config.get('Endpoint URL'), default_config.get('Endpoint URL'))
+        self.assertEqual(result_config.get('Timeout'), default_config.get('Timeout'))
+        # Could be either theme since were not setting it in this test
+        self.assertIn(result_config.get('Theme'), ['dark', 'light'])
 
 
 class TestHelpSetup(testing.TestCase):
