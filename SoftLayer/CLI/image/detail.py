@@ -42,6 +42,8 @@ def cli(env, identifier):
         formatting.listing(_get_transaction_groups(children_images), separator=','),
     ])
     table.add_row(['account', image.get('accountId', formatting.blank())])
+    table.add_row(['created', image.get('createDate')])
+    table.add_row(['total_size', formatting.b_to_gb(total_size)])
     table.add_row(['visibility',
                    image_mod.PUBLIC_TYPE if image['publicFlag']
                    else image_mod.PRIVATE_TYPE])
@@ -52,9 +54,9 @@ def cli(env, identifier):
                    )])
     table.add_row(['flex', image.get('flexImageFlag')])
     table.add_row(['note', image.get('note')])
-    table.add_row(['created', image.get('createDate')])
-    table.add_row(['total_size', formatting.b_to_gb(total_size)])
     table.add_row(['datacenters', _get_datacenter_table(children_images)])
+    table.add_row(['virtual disks', _get_virtual_disks(children_images)])
+    table.add_row(['share image', _get_share_image(image)])
 
     env.fout(table)
 
@@ -85,3 +87,51 @@ def _get_transaction_groups(children_images):
         transactions.add(utils.lookup(child, 'transaction', 'transactionGroup', 'name'))
 
     return transactions
+
+
+def _get_virtual_disks(children_images):
+    """Returns image details as datacenter, size, and transaction within a formatting table.
+
+      :param children_images: A list of images.
+      """
+
+    table_virtual_disks = formatting.Table(['Device', 'capacity', 'size on disk'])
+
+    if utils.lookup(children_images[0], 'blockDevices'):
+        for block_devices in children_images[0]['blockDevices']:
+            device_name = utils.lookup(block_devices, 'diskImage', 'name')
+            software_references = utils.lookup(block_devices, 'diskImage', 'softwareReferences')
+            if len(software_references) > 0:
+                device_name = utils.lookup(software_references[0], 'softwareDescription', 'longDescription')
+
+            size_on_disk = formatting.b_to_gb(block_devices.get('diskSpace', 0))
+            if block_devices.get('diskSpace', 0) == 0:
+                size_on_disk = 'N/A'
+
+            capacity = str(utils.lookup(block_devices, 'diskImage', 'capacity')) + \
+                ' ' + utils.lookup(block_devices, 'diskImage', 'units')
+
+            table_virtual_disks.add_row([
+                device_name,
+                capacity,
+                size_on_disk
+            ])
+
+    return table_virtual_disks
+
+
+def _get_share_image(image):
+    """Returns image details as datacenter, size, and transaction within a formatting table.
+
+      :param image: Detail information about image.
+      """
+    table_share_account = formatting.Table(['Account', 'shared on'])
+    if utils.lookup(image, 'accountReferences'):
+        for account in image['accountReferences']:
+            if account['accountId'] != image['accountId']:
+                table_share_account.add_row([
+                    utils.lookup(account, 'accountId'),
+                    utils.lookup(account, 'createDate'),
+                ])
+
+    return table_share_account
