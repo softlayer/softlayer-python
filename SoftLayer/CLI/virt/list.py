@@ -75,9 +75,10 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
 
     guests = []
     if search is not None:
+        object_mask = f"mask[resource(SoftLayer_Virtual_Guest)[{columns.mask()}]]"
         search_manager = SoftLayer.SearchManager(env.client)
         guests = search_manager.search_instances(hostname=hostname, domain=domain, datacenter=datacenter,
-                                                 tags=tag, search_string=search, mask=columns.mask())
+                                                 tags=tag, search_string=search, mask=object_mask)
     else:
         vsi = SoftLayer.VSManager(env.client)
         guests = vsi.list_instances(hourly=hourly, monthly=monthly, hostname=hostname, domain=domain,
