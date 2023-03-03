@@ -9,7 +9,6 @@ from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
-from SoftLayer import utils
 
 # pylint: disable=unnecessary-lambda
 
@@ -45,12 +44,6 @@ DEFAULT_COLUMNS = [
     'action',
 ]
 
-def search_callback(ctx, param, value):
-    print(f"SEARCH_CALLBACK: value: {value}")
-    if not value:
-        print("Value is true now")
-        value = True
-    return value
 
 @click.command(cls=SLCommand, short_help="List virtual servers.")
 @click.option('--cpu', '-c', help='Number of CPU cores', type=click.INT)
@@ -62,7 +55,7 @@ def search_callback(ctx, param, value):
 @click.option('--hourly', is_flag=True, help='Show only hourly instances')
 @click.option('--monthly', is_flag=True, help='Show only monthly instances')
 @click.option('--transient', help='Filter by transient instances', type=click.BOOL)
-@click.option('--search', is_flag=False, flag_value="", default=None, 
+@click.option('--search', is_flag=False, flag_value="", default=None,
               help="Use the more flexible Search API to list instances. See `slcli search --types` for list " +
               "of searchable fields.")
 @helpers.multi_option('--tag', help='Filter by tags')
@@ -82,9 +75,9 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
 
     guests = []
     if search is not None:
-        sm = SoftLayer.SearchManager(env.client)
-        guests = sm.search_instances(hostname=hostname, domain=domain, datacenter=datacenter,
-                                     tags=tag, search_string=search, mask=columns.mask())
+        search_manager = SoftLayer.SearchManager(env.client)
+        guests = search_manager.search_instances(hostname=hostname, domain=domain, datacenter=datacenter,
+                                                 tags=tag, search_string=search, mask=columns.mask())
     else:
         vsi = SoftLayer.VSManager(env.client)
         guests = vsi.list_instances(hourly=hourly, monthly=monthly, hostname=hostname, domain=domain,
@@ -99,4 +92,3 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
                        for value in columns.row(guest)])
 
     env.fout(table)
-

@@ -41,7 +41,7 @@ class SearchManager(object):
         Also takes in a few search terms as **kwargs. such as hostname, datacenter, domain and tags
         """
 
-        # This forces the Search API to do a fuzzy search on our term, kinda. Not sure why the ** are 
+        # This forces the Search API to do a fuzzy search on our term, kinda. Not sure why the ** are
         # Required but it will do an exact search without them.
         if search_string:
             search_string = f"*{search_string}*"
@@ -54,11 +54,10 @@ class SearchManager(object):
             search_string = f"{search_string} datacenter.longName: *{kwargs.get('datacenter')}*"
         if kwargs.get('tags'):
             tags = " ".join(kwargs.get("tags", []))
-            search_string = f"{search_string} internalTagReferences.tag.name: {kwargs.get('tags')}"
-        result = self.search_manager.advancedSearch(search_string)
+            search_string = f"{search_string} internalTagReferences.tag.name: {tags}"
+        result = self.search_manager.advancedSearch(search_string, mask=mask)
         guests = []
-        for x in result:
-            guests.append(x.get('resource'))
+        for resource in result:
+            guests.append(resource.get('resource'))
 
         return guests
-
