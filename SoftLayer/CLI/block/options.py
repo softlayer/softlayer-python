@@ -22,7 +22,7 @@ def cli(env, prices, location=None):
     """List all options for ordering a block storage"""
 
     order_manager = SoftLayer.OrderingManager(env.client)
-    items = order_manager.get_items(PACKAGE_STORAGE)
+    items = order_manager.get_items(PACKAGE_STORAGE, mask="mask[categories]")
     datacenters = order_manager.get_regions(PACKAGE_STORAGE, location)
 
     tables = []
@@ -67,7 +67,7 @@ def _block_ios_get_table(items, prices):
             if block_item['itemCategory']['categoryCode'] == 'storage_tier_level':
                 table.add_row([block_item.get('id'), block_item.get('description'),
                                block_item.get('keyName')])
-    table.sortby = 'Id'
+    table.sortby = 'KeyName'
     table.align = 'l'
     return table
 
@@ -86,7 +86,7 @@ def _block_storage_table(items, prices):
             if block_item['itemCategory']['categoryCode'] == 'performance_storage_space':
                 table.add_row([block_item.get('id'), block_item.get('description'),
                                block_item.get('keyName'), block_item.get('capacityMinimum') or '-', ])
-    table.sortby = 'Id'
+    table.sortby = 'KeyName'
     table.align = 'l'
     return table
 
@@ -101,9 +101,16 @@ def _block_snapshot_get_table(items, prices):
     else:
         table = formatting.Table(['Id', 'Description', 'KeyName'], title='Snapshot')
         for block_item in items:
-            if block_item['itemCategory']['categoryCode'] == 'storage_snapshot_space':
-                table.add_row([block_item.get('id'), block_item.get('description'),
-                               block_item.get('keyName')])
-    table.sortby = 'Id'
+            if is_snapshot_category(block_item.get('categories', [])):
+                table.add_row([block_item.get('id'), block_item.get('description'), block_item.get('keyName')])
+    table.sortby = 'KeyName'
     table.align = 'l'
     return table
+
+
+def is_snapshot_category(categories):
+    """Checks if storage_snapshot_space is one of the categories"""
+    for item in categories:
+        if item.get('categoryCode') == "storage_snapshot_space":
+            return True
+    return False

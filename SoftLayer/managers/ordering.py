@@ -717,7 +717,7 @@ class OrderingManager(object):
                 return location_name
         raise exceptions.SoftLayerError("Location {} does not exist".format(location_key))
 
-    def get_items(self, package_id, storage_filter=None):
+    def get_items(self, package_id, storage_filter=None, mask=None):
         """"Returns the items .
 
 
@@ -726,7 +726,7 @@ class OrderingManager(object):
         """
 
         return self.client.call('SoftLayer_Product_Package', 'getItems', filter=storage_filter,
-                                id=package_id)
+                                id=package_id, mask=mask)
 
     def get_regions(self, package_id, location=None):
         """returns the all regions.
