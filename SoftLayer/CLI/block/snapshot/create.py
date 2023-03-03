@@ -9,10 +9,10 @@ from SoftLayer.CLI import environment
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
 @click.option('--notes', '-n',
-              help='Notes to set on the new snapshot')
+              help='Notes to set on the new snapshot.')
 @environment.pass_env
 def cli(env, volume_id, notes):
-    """Creates a snapshot on a given volume"""
+    """Creates a snapshot on a given volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
     snapshot = block_manager.create_snapshot(volume_id, notes=notes)
 
