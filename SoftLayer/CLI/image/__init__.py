@@ -3,8 +3,8 @@
 from SoftLayer.CLI import formatting
 
 
-MASK = ('id,accountId,name,globalIdentifier,parentId,publicFlag,flexImageFlag,'
-        'imageType')
+MASK = ('id,createDate,note,accountId,name,globalIdentifier,parentId,publicFlag,flexImageFlag,'
+        'imageType,children[blockDevices[diskImage[softwareReferences[softwareDescription]]]]')
 DETAIL_MASK = MASK + (',firstChild,children[id,blockDevicesDiskSpaceTotal,datacenter,'
                       'transaction[transactionGroup,transactionStatus]],'
                       'note,createDate,status,transaction')
