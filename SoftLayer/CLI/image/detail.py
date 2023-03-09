@@ -90,7 +90,7 @@ def _get_transaction_groups(children_images):
 
 
 def _get_virtual_disks(children_images):
-    """Returns image details as datacenter, size, and transaction within a formatting table.
+    """Returns datacenters as a table.
 
       :param children_images: A list of images.
       """
@@ -121,7 +121,7 @@ def _get_virtual_disks(children_images):
 
 
 def _get_share_image(image):
-    """Returns image details as datacenter, size, and transaction within a formatting table.
+    """Returns shares image as a table.
 
       :param image: Detail information about image.
       """
