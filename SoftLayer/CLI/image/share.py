@@ -1,4 +1,4 @@
-"""Get details for an image."""
+"""Share an image template with another account."""
 # :license: MIT, see LICENSE for more details.
 
 import click
@@ -13,7 +13,7 @@ from SoftLayer.CLI import helpers
 @click.option('--account-id', help='Account Id for another account to share image template', required=True)
 @environment.pass_env
 def cli(env, identifier, account_id):
-    """Permit share an image template to another account."""
+    """Share an image template with another account."""
 
     image_mgr = SoftLayer.ImageManager(env.client)
     image_id = helpers.resolve_id(image_mgr.resolve_ids, identifier, 'image')
