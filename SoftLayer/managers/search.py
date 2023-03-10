@@ -89,8 +89,8 @@ class SearchManager(object):
             tags = " ".join(kwargs.get("tags", []))
             search_string = f"{search_string} internalTagReferences.tag.name: {tags}"
         result = self.search_manager.advancedSearch(search_string, mask=mask)
-        hw = []
+        servers = []
         for resource in result:
-            hw.append(resource.get('resource'))
+            servers.append(resource.get('resource'))
 
-        return hw
+        return servers
