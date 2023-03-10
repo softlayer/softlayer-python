@@ -53,3 +53,15 @@ class ImageTests(testing.TestCase):
     def test_datacenter_remove_fails(self):
         result = self.run_command(['image', 'datacenter', '100', '--remove'])
         self.assertEqual(2, result.exit_code)
+
+    def test_deny_share(self):
+        result = self.run_command(['image', 'share-deny', '123456', '--account-id', '654321'])
+        self.assert_no_fail(result)
+
+    def test_deny_share_without_id(self):
+        result = self.run_command(['image', 'share-deny'])
+        self.assertEqual(2, result.exit_code)
+
+    def test_deny_share_without_id_account(self):
+        result = self.run_command(['image', 'share-deny', "123456"])
+        self.assertEqual(2, result.exit_code)
