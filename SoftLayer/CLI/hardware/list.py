@@ -65,7 +65,7 @@ def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, search,
     """List hardware servers."""
 
     if search is not None:
-        object_mask = f"mask[resource(SoftLayer_Hardware)]"
+        object_mask = "mask[resource(SoftLayer_Hardware)]"
         search_manager = SoftLayer.SearchManager(env.client)
         servers = search_manager.search_hadrware_instances(hostname=hostname, domain=domain, datacenter=datacenter,
                                                            tags=tag, search_string=search, mask=object_mask)

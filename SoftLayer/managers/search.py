@@ -90,7 +90,6 @@ class SearchManager(object):
             search_string = f"{search_string} internalTagReferences.tag.name: {tags}"
         result = self.search_manager.advancedSearch(search_string, mask=mask)
         hw = []
-        print(search_string)
         for resource in result:
             hw.append(resource.get('resource'))
 
