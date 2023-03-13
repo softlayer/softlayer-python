@@ -9,7 +9,6 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
-
 # pylint: disable=unnecessary-lambda
 
 COLUMNS = [
@@ -47,6 +46,9 @@ DEFAULT_COLUMNS = [
 @click.option('--hostname', '-H', help='Filter by hostname')
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
+@click.option('--search', is_flag=False, flag_value="", default=None,
+              help="Use the more flexible Search API to list instances. See `slcli search --types` for list " +
+                   "of searchable fields.")
 @helpers.multi_option('--tag', help='Filter by tags')
 @click.option('--sortby', help='Column to sort by', default='hostname', show_default=True)
 @click.option('--columns',
@@ -59,19 +61,26 @@ DEFAULT_COLUMNS = [
               default=100,
               show_default=True)
 @environment.pass_env
-def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, tag, columns, limit):
+def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, search, tag, columns, limit):
     """List hardware servers."""
 
-    manager = SoftLayer.HardwareManager(env.client)
-    servers = manager.list_hardware(hostname=hostname,
-                                    domain=domain,
-                                    cpus=cpu,
-                                    memory=memory,
-                                    datacenter=datacenter,
-                                    nic_speed=network,
-                                    tags=tag,
-                                    mask="mask(SoftLayer_Hardware_Server)[%s]" % columns.mask(),
-                                    limit=limit)
+    if search is not None:
+        object_mask = "mask[resource(SoftLayer_Hardware)]"
+        search_manager = SoftLayer.SearchManager(env.client)
+        servers = search_manager.search_hadrware_instances(hostname=hostname, domain=domain, datacenter=datacenter,
+                                                           tags=tag, search_string=search, mask=object_mask)
+
+    else:
+        manager = SoftLayer.HardwareManager(env.client)
+        servers = manager.list_hardware(hostname=hostname,
+                                        domain=domain,
+                                        cpus=cpu,
+                                        memory=memory,
+                                        datacenter=datacenter,
+                                        nic_speed=network,
+                                        tags=tag,
+                                        mask="mask(SoftLayer_Hardware_Server)[%s]" % columns.mask(),
+                                        limit=limit)
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby
