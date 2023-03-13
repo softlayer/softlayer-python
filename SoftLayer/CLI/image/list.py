@@ -29,7 +29,7 @@ def cli(env, name, public):
         for image in image_mgr.list_public_images(name=name, mask=image_mod.MASK):
             images.append(image)
 
-    table = formatting.Table(['id', 'name', 'type', 'visibility', 'account', 'os', 'created', 'notes'])
+    table = formatting.Table(['Id', 'Name', 'Type', 'Visibility', 'Account', 'OS', 'Created', 'Notes'])
 
     images = [image for image in images if not image['parentId']]
     for image in images:
