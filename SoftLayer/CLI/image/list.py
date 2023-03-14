@@ -30,6 +30,8 @@ def cli(env, name, public):
             images.append(image)
 
     table = formatting.Table(['Id', 'Name', 'Type', 'Visibility', 'Account', 'OS', 'Created', 'Notes'])
+    table.align['OS'] = 'l'
+    table.align['Notes'] = 'l'
 
     images = [image for image in images if not image['parentId']]
     for image in images:
@@ -51,7 +53,7 @@ def cli(env, name, public):
             visibility,
             image.get('accountId', formatting.blank()),
             operative_system,
-            image.get('createDate', formatting.blank()),
+            utils.clean_time(image.get('createDate', formatting.blank())),
             image.get('note', formatting.blank()),
         ])
 
