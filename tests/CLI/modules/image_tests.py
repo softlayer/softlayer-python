@@ -57,11 +57,14 @@ class ImageTests(testing.TestCase):
     def test_share(self):
         result = self.run_command(['image', 'share', '123456', '--account-id', '654321'])
         self.assert_no_fail(result)
+        self.assertIn("Image template 123456 was shared to account 654321.", result.output)
 
     def test_share_without_id(self):
         result = self.run_command(['image', 'share'])
         self.assertEqual(2, result.exit_code)
+        self.assertIn("Error: Missing argument 'IDENTIFIER'.", result.output)
 
     def test_share_without_id_account(self):
         result = self.run_command(['image', 'share', "123456"])
         self.assertEqual(2, result.exit_code)
+        self.assertIn("Error: Missing option '--account-id'.", result.output)
