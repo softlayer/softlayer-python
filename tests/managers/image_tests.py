@@ -223,3 +223,9 @@ class ImageTests(testing.TestCase):
             100,
             locations
         )
+
+    def test_deny_share_image(self):
+        result = self.image.deny_share_image(image_id=123456, account_id=654321)
+
+        self.assert_called_with(IMAGE_SERVICE, 'denySharingAccess', identifier=123456, args=(654321,))
+        self.assertEqual(True, result)
