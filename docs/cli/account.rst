@@ -51,3 +51,7 @@ Account Commands
 .. click:: SoftLayer.CLI.account.bandwidth_pools_detail:cli
     :prog: account bandwidth-pools-detail
     :show-nested:
+
+.. click:: SoftLayer.CLI.account.hooks:cli
+    :prog: account hooks
+    :show-nested:
