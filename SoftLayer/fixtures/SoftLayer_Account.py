@@ -1469,3 +1469,14 @@ getNetworkGateways = [{
         'keyName': 'ACTIVE'
     }
 }]
+
+getPostProvisioningHooks = [{
+    "id": 147258369,
+    "name": "testProv",
+    "uri": "http://test.com"
+},
+    {
+        "id": 123654,
+        "name": "GettestProv12345",
+        "uri": "http://test.com"
+    }]

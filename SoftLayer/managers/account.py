@@ -387,3 +387,11 @@ class AccountManager(utils.IdentifierMixin, object):
         virtualGuests[outboundPublicBandwidthUsage,bandwidthAllotmentDetail[allocation]],
         bareMetalInstances[outboundBandwidthUsage,bandwidthAllotmentDetail[allocation]]"""
         return self.client['SoftLayer_Network_Bandwidth_Version1_Allotment'].getObject(id=identifier, mask=_mask)
+
+    def get_provisioning_scripts(self):
+        """Gets a provisioning hooks.
+
+        :returns: provisioning hook
+        """
+
+        return self.client.call('Account', 'getPostProvisioningHooks')
