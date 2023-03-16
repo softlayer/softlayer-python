@@ -145,6 +145,23 @@ class VirtTests(testing.TestCase):
 
         self.assert_no_fail(result)
 
+    def test_list_vs_search_noargs(self):
+        result = self.run_command(['vs', 'list', '--search'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Search', 'advancedSearch', args=('_objectType:SoftLayer_Virtual_Guest ',))
+
+    def test_list_vs_search_noargs_domain(self):
+        result = self.run_command(['vs', 'list', '--search', '-Dtest'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Search', 'advancedSearch',
+                                args=('_objectType:SoftLayer_Virtual_Guest  domain: *test*',))
+
+    def test_list_vs_search_args(self):
+        result = self.run_command(['vs', 'list', '--search=thisTerm'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Search', 'advancedSearch',
+                                args=('_objectType:SoftLayer_Virtual_Guest *thisTerm*',))
+
     @mock.patch('SoftLayer.utils.lookup')
     def test_detail_vs_empty_billing(self, mock_lookup):
         def mock_lookup_func(dic, key, *keys):
@@ -918,10 +935,6 @@ class VirtTests(testing.TestCase):
         self.assert_not_called_with('SoftLayer_Account', 'getVirtualGuests')
         self.assert_called_with('SoftLayer_Virtual_Guest', 'migrate', identifier=100)
         self.assert_not_called_with('SoftLayer_Virtual_Guest', 'migrateDedicatedHost', args=(999), identifier=100)
-
-    def test_list_vsi(self):
-        result = self.run_command(['vs', 'list', '--hardware'])
-        self.assert_no_fail(result)
 
     def test_credentail(self):
         result = self.run_command(['vs', 'credentials', '100'])

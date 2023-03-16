@@ -24,6 +24,7 @@ ALL_ROUTES = [
     ('account:cancel-item', 'SoftLayer.CLI.account.cancel_item:cli'),
     ('account:orders', 'SoftLayer.CLI.account.orders:cli'),
     ('account:bandwidth-pools', 'SoftLayer.CLI.account.bandwidth_pools:cli'),
+    ('account:hooks', 'SoftLayer.CLI.account.hooks:cli'),
 
     ('virtual', 'SoftLayer.CLI.virt'),
     ('virtual:bandwidth', 'SoftLayer.CLI.virt.bandwidth:cli'),
@@ -209,6 +210,7 @@ ALL_ROUTES = [
     ('image:export', 'SoftLayer.CLI.image.export:cli'),
     ('image:datacenter', 'SoftLayer.CLI.image.datacenter:cli'),
     ('image:share', 'SoftLayer.CLI.image.share:cli'),
+    ('image:share-deny', 'SoftLayer.CLI.image.share_deny:cli'),
 
     ('ipsec', 'SoftLayer.CLI.vpn.ipsec'),
     ('ipsec:configure', 'SoftLayer.CLI.vpn.ipsec.configure:cli'),

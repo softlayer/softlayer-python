@@ -2688,7 +2688,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_snapshot_order_object,
-            self.block, mock_volume, 10, None, False
+            self.block, mock_volume, 10, None, False, 100
         )
 
         self.assertEqual(
@@ -2703,7 +2703,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_snapshot_order_object,
-            self.block, mock_volume, 10, None, False
+            self.block, mock_volume, 10, None, False, 100
         )
 
         self.assertEqual(
@@ -2730,7 +2730,7 @@ class StorageUtilsTests(testing.TestCase):
         }
 
         result = storage_utils.prepare_snapshot_order_object(
-            self.block, mock_volume, 10, 2, False
+            self.block, mock_volume, 10, 2, False, 100
         )
 
         self.assertEqual(expected_object, result)
@@ -2753,7 +2753,7 @@ class StorageUtilsTests(testing.TestCase):
         }
 
         result = storage_utils.prepare_snapshot_order_object(
-            self.block, mock_volume, 20, None, True
+            self.block, mock_volume, 20, None, True, 100
         )
 
         self.assertEqual(expected_object, result)
@@ -2769,7 +2769,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_snapshot_order_object,
-            self.block, mock_volume, 10, None, False
+            self.block, mock_volume, 10, None, False, 100
         )
 
         self.assertEqual(
@@ -2797,7 +2797,7 @@ class StorageUtilsTests(testing.TestCase):
         }
 
         result = storage_utils.prepare_snapshot_order_object(
-            self.block, mock_volume, 10, None, False
+            self.block, mock_volume, 10, None, False, 100
         )
 
         self.assertEqual(expected_object, result)
@@ -2812,7 +2812,7 @@ class StorageUtilsTests(testing.TestCase):
         exception = self.assertRaises(
             exceptions.SoftLayerError,
             storage_utils.prepare_snapshot_order_object,
-            self.block, mock_volume, 10, None, False
+            self.block, mock_volume, 10, None, False, 100
         )
 
         self.assertEqual(
@@ -2842,7 +2842,7 @@ class StorageUtilsTests(testing.TestCase):
         }
 
         result = storage_utils.prepare_snapshot_order_object(
-            self.block, mock_volume, 10, 2, False
+            self.block, mock_volume, 10, 2, False, 100
         )
 
         self.assertEqual(expected_object, result)
@@ -2867,7 +2867,7 @@ class StorageUtilsTests(testing.TestCase):
         }
 
         result = storage_utils.prepare_snapshot_order_object(
-            self.block, mock_volume, 20, None, False
+            self.block, mock_volume, 20, None, False, 100
         )
 
         self.assertEqual(expected_object, result)
@@ -2891,7 +2891,7 @@ class StorageUtilsTests(testing.TestCase):
         }
 
         result = storage_utils.prepare_snapshot_order_object(
-            self.block, mock_volume, 20, None, False
+            self.block, mock_volume, 20, None, False, 100
         )
 
         self.assertEqual(expected_object, result)

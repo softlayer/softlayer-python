@@ -32,27 +32,28 @@ def cli(env):
                                    utils.lookup(email, 'vendor', 'keyName')])
 
         overview_table = _build_overview_table(email_manager.get_account_overview(email.get('id')))
-        statistics = email_manager.get_statistics(email.get('id'))
+        # Commented this line until we fix EmailManager.GetStatistics() method in golang plugin
+        # statistics = email_manager.get_statistics(email.get('id'))
 
         table.add_row(['email_information', table_information])
         table.add_row(['email_overview', overview_table])
-        for statistic in statistics:
-            table.add_row(['statistics', build_statistics_table(statistic)])
+        # Commented these lines until we fix EmailManager.GetStatistics() method in golang plugin
+        # for statistic in statistics:
+        #     table.add_row(['statistics', build_statistics_table(statistic)])
 
     env.fout(table)
 
 
 def _build_overview_table(email_overview):
     table = formatting.Table(
-        ['credit_allowed', 'credits_remain', 'credits_overage', 'credits_used',
-         'package', 'reputation', 'requests'])
+        ['package', 'reputation'])
     table.align['name'] = 'r'
     table.align['value'] = 'l'
 
-    table.add_row([email_overview.get('creditsAllowed'), email_overview.get('creditsRemain'),
-                   email_overview.get('creditsOverage'), email_overview.get('creditsUsed'),
-                   email_overview.get('package'), email_overview.get('reputation'),
-                   email_overview.get('requests')])
+    table.add_row([
+        utils.lookup(email_overview, 'profile', 'package'),
+        utils.lookup(email_overview, 'profile', 'reputation')
+    ])
 
     return table
 

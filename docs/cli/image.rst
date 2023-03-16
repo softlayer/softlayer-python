@@ -34,3 +34,7 @@ Disk Image Commands
 .. click:: SoftLayer.CLI.image.share:cli
     :prog: image share
     :show-nested:
+
+.. click:: SoftLayer.CLI.image.share_deny:cli
+    :prog: image share-deny
+    :show-nested:

@@ -1,25 +1,10 @@
-name: Release Snapcraft and PyPi
+name: Release to PyPi
 
 on:
   release:
     types: [published]
 
 jobs:
-  snap-release:
-    runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        arch: ['armhf','amd64','arm64','ppc64el','s390x']
-    steps:
-      - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v1.2.0
-        with:
-          snapcraft_token: ${{ secrets.snapcraft_token }}
-      - name: Push to stable
-        run: |
-          VERSION=`snapcraft list-revisions slcli --arch ${{ matrix.arch }} | grep "edge\*" | awk '{print $1}'`
-          echo Publishing $VERSION on ${{ matrix.arch }}
-          snapcraft release slcli $VERSION stable
   build-n-publish:
     name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
     runs-on: ubuntu-latest

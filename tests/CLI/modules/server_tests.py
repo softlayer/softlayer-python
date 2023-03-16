@@ -1057,3 +1057,14 @@ class ServerCLITests(testing.TestCase):
                                    '--username', 'testslcli', '--password', 'test-123456',
                                    '--notes', 'test slcli', '--system', 'system'])
         self.assert_no_fail(result)
+
+    def test_list_hw_search_noargs(self):
+        result = self.run_command(['hw', 'list', '--search'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Search', 'advancedSearch', args=('_objectType:SoftLayer_Hardware ',))
+
+    def test_list_hw_search_noargs_domain(self):
+        result = self.run_command(['hw', 'list', '--search', '-Dtest'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Search', 'advancedSearch',
+                                args=('_objectType:SoftLayer_Hardware  domain: *test*',))
