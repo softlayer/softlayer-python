@@ -8,7 +8,7 @@ Make sure you use the HTTPS url `https://internal.app0lb.dal10.softlayer.local/v
 
 Documentation
 -------------
-DThis project is based off the  `SLCLI <https://github.com/softlayer/softlayer-python>`_ , and most things that work there will work here.
+This project is based off the  `SLCLI <https://github.com/softlayer/softlayer-python>`_ , and most things that work there will work here.
 
 There is no internal API documentation like SLDN.
 
