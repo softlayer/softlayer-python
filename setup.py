@@ -15,7 +15,6 @@ else:
     LONG_DESCRIPTION = DESCRIPTION
 
 setup(
-<<<<<<< HEAD
     name='SoftLayer-Internal',
     version='6.1.3',
     description=DESCRIPTION,
