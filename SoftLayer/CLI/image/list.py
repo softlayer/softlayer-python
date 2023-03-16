@@ -29,11 +29,20 @@ def cli(env, name, public):
         for image in image_mgr.list_public_images(name=name, mask=image_mod.MASK):
             images.append(image)
 
-    table = formatting.Table(['id', 'name', 'type', 'visibility', 'account'])
+    table = formatting.Table(['Id', 'Name', 'Type', 'Visibility', 'Account', 'OS', 'Created', 'Notes'])
+    table.align['OS'] = 'l'
+    table.align['Notes'] = 'l'
 
     images = [image for image in images if not image['parentId']]
     for image in images:
-
+        operative_system = '-'
+        if image.get('children') and len(image.get('children')) != 0:
+            if image.get('children')[0].get('blockDevices') and len(image.get('children')[0].get('blockDevices')) != 0:
+                for block_device in image.get('children')[0].get('blockDevices'):
+                    if block_device.get('diskImage').get('softwareReferences') and \
+                            len(block_device.get('diskImage').get('softwareReferences')) != 0:
+                        operative_system = block_device.get('diskImage').get('softwareReferences')[0].\
+                            get('softwareDescription').get('longDescription')
         visibility = (image_mod.PUBLIC_TYPE if image['publicFlag'] else image_mod.PRIVATE_TYPE)
         table.add_row([
             image.get('id', formatting.blank()),
@@ -43,6 +52,9 @@ def cli(env, name, public):
                 utils.lookup(image, 'imageType', 'name')),
             visibility,
             image.get('accountId', formatting.blank()),
+            operative_system,
+            utils.clean_time(image.get('createDate', formatting.blank())),
+            image.get('note', formatting.blank()),
         ])
 
     env.fout(table)
