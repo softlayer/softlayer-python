@@ -761,6 +761,23 @@ class FileTests(testing.TestCase):
         result = self.run_command(['file', 'volume-limits'])
         self.assert_no_fail(result)
 
+    def test_volume_limit_empty_datacenter(self):
+        expect_result = {
+            'global': 700,
+            'null': 50
+        }
+        result = self.run_command(['file', 'volume-limits'])
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output), expect_result)
+
+    def test_volume_limit_datacenter(self):
+        expect_result = {
+            "dal13": 52
+        }
+        result = self.run_command(['file', 'volume-limits', '-d', 'dal13'])
+        self.assert_no_fail(result)
+        self.assertEqual(json.loads(result.output), expect_result)
+
     def test_dupe_refresh(self):
         result = self.run_command(['file', 'volume-refresh', '102', '103'])
 
