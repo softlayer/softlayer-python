@@ -781,6 +781,7 @@ class BlockTests(testing.TestCase):
 
     def test_volume_limit_empty_datacenter(self):
         expect_result = {
+            'dal13': 52,
             'global': 700,
             'null': 50
         }
