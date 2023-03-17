@@ -238,6 +238,15 @@ class ImageManager(utils.IdentifierMixin, object):
 
         return locations_ids
 
+    def share_image(self, image_id, account_id):
+        """Permit sharing image template with another account.
+
+        :param int image_id: The ID of the image.
+        :param int account_id: The ID of the another account to share the image.
+        """
+
+        return self.vgbdtg.permitSharingAccess(account_id, id=image_id)
+
     def deny_share_image(self, image_id, account_id):
         """Deny sharing image template with another account.
 
