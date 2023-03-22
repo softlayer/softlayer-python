@@ -5,6 +5,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
 from SoftLayer import utils
 
 
@@ -56,8 +57,11 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
         if user == "CUSTOMER":
             username = user_data.get(log['userId'])
             if username is None:
-                username = user_mgr.get_user(log['userId'], "mask[username]")['username']
-                user_data[log['userId']] = username
+                try:
+                    username = user_mgr.get_user(log['userId'], "mask[username]")['username']
+                    user_data[log['userId']] = username
+                except ValueError as ex:
+                    raise exceptions.ArgumentError("You do not have permission to access this user.  %s" % ex)
             user = username
 
         if metadata:
