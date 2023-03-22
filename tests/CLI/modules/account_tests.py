@@ -164,3 +164,8 @@ class AccountCLITests(testing.TestCase):
         result = self.run_command(['account', 'hooks'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getPostProvisioningHooks')
+
+    def test_created_provisioning_hook(self):
+        result = self.run_command(['account', 'hook-create', '--name', 'testslcli', '--uri', 'http://slclitest.com'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Provisioning_Hook', 'createObject')

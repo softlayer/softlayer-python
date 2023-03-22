@@ -25,6 +25,7 @@ ALL_ROUTES = [
     ('account:orders', 'SoftLayer.CLI.account.orders:cli'),
     ('account:bandwidth-pools', 'SoftLayer.CLI.account.bandwidth_pools:cli'),
     ('account:hooks', 'SoftLayer.CLI.account.hooks:cli'),
+    ('account:hook-create', 'SoftLayer.CLI.account.hook_create:cli'),
 
     ('virtual', 'SoftLayer.CLI.virt'),
     ('virtual:bandwidth', 'SoftLayer.CLI.virt.bandwidth:cli'),
