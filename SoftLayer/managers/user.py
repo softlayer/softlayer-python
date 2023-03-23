@@ -82,7 +82,7 @@ class UserManager(utils.IdentifierMixin, object):
         :returns: A list of dictionaries that contains all valid permissions
         """
         if self.all_permissions is None:
-            permissions = self.client.call('User_Customer_CustomerPermission_Permission', 'getAllObjects')
+            permissions = self.client.call('User_Permission_Action', 'getAllObjects')
             self.all_permissions = sorted(permissions, key=itemgetter('keyName'))
         return self.all_permissions
 

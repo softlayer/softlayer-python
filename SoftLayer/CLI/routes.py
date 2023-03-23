@@ -25,6 +25,7 @@ ALL_ROUTES = [
     ('account:orders', 'SoftLayer.CLI.account.orders:cli'),
     ('account:bandwidth-pools', 'SoftLayer.CLI.account.bandwidth_pools:cli'),
     ('account:hooks', 'SoftLayer.CLI.account.hooks:cli'),
+    ('account:hook-create', 'SoftLayer.CLI.account.hook_create:cli'),
 
     ('virtual', 'SoftLayer.CLI.virt'),
     ('virtual:bandwidth', 'SoftLayer.CLI.virt.bandwidth:cli'),
@@ -398,11 +399,6 @@ ALL_ROUTES = [
     ('report', 'SoftLayer.CLI.report'),
     ('report:bandwidth', 'SoftLayer.CLI.report.bandwidth:cli'),
     ('report:datacenter-closures', 'SoftLayer.CLI.report.dc_closures:cli'),
-
-    ('autoscale', 'SoftLayer.CLI.autoscale'),
-    ('autoscale:list', 'SoftLayer.CLI.autoscale.list:cli'),
-    ('autoscale:detail', 'SoftLayer.CLI.autoscale.detail:cli'),
-    ('autoscale:delete', 'SoftLayer.CLI.autoscale.delete:cli'),
 ]
 
 ALL_ALIASES = {
