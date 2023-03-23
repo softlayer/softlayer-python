@@ -39,7 +39,7 @@ def cli(env, identifier, username, password, notes, software):
 
     result = mgr.create_credential(template)
 
-    table = formatting.KeyValueTable(['name', 'value'])
+    table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'r'
     table.align['Value'] = 'l'
     table.add_row(['Software Credential Id', result['id']])
