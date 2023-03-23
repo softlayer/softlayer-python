@@ -165,6 +165,11 @@ class AccountCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getPostProvisioningHooks')
 
+    def test_created_provisioning_hook(self):
+        result = self.run_command(['account', 'hook-create', '--name', 'testslcli', '--uri', 'http://slclitest.com'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Provisioning_Hook', 'createObject')
+
     def test_delete_provisioning_hook(self):
         result = self.run_command(['account', 'hook-delete', '123456'])
         self.assert_no_fail(result)

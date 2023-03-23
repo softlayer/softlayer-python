@@ -234,11 +234,21 @@ createSnapshot = {
 enableSnapshots = True
 disableSnapshots = True
 
-getVolumeCountLimits = {
-    'datacenterName': 'global',
-    'maximumAvailableCount': 300,
-    'provisionedCount': 100
-}
+getVolumeCountLimits = [{
+    "datacenterName": "global",
+    "maximumAvailableCount": 700,
+    "provisionedCount": 2632
+},
+    {
+        "maximumAvailableCount": 50,
+        "provisionedCount": 2632
+    },
+    {
+        "datacenterName": "dal13",
+        "maximumAvailableCount": 52,
+        "provisionedCount": 30
+    },
+]
 
 refreshDuplicate = {
     'dependentDuplicate': 1

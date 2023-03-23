@@ -56,6 +56,10 @@ Account Commands
     :prog: account hooks
     :show-nested:
 
+.. click:: SoftLayer.CLI.account.hook_create:cli
+    :prog: account hook-create
+    :show-nested:
+
 .. click:: SoftLayer.CLI.account.hook_delete:cli
     :prog: account hook-delete
     :show-nested:
