@@ -180,3 +180,7 @@ class AccountManagerTests(testing.TestCase):
     def test_get_provisioning_scripts(self):
         self.manager.get_provisioning_scripts()
         self.assert_called_with("SoftLayer_Account", "getPostProvisioningHooks")
+
+    def test_delete_provisioning_scripts(self):
+        self.manager.delete_provisioning(123456)
+        self.assert_called_with("SoftLayer_Provisioning_Hook", "deleteObject")

@@ -1,0 +1,1 @@
+deleteObject = True
