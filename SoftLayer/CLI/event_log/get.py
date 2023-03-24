@@ -60,8 +60,8 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
                 try:
                     username = user_mgr.get_user(log['userId'], "mask[username]")['username']
                     user_data[log['userId']] = username
-                except ValueError as ex:
-                    raise exceptions.ArgumentError("You do not have permission to access this user.  %s" % ex)
+                except exceptions.SoftLayerAPIError:
+                    username = log['userId']
             user = username
 
         if metadata:
