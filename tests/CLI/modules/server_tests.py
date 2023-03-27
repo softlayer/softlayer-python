@@ -1055,7 +1055,7 @@ class ServerCLITests(testing.TestCase):
     def test_create_credential(self):
         result = self.run_command(['hw', 'create-credential', '123456',
                                    '--username', 'testslcli', '--password', 'test-123456',
-                                   '--notes', 'test slcli', '--system', 'system'])
+                                   '--notes', 'test slcli', '--software', 'system'])
         self.assert_no_fail(result)
 
     def test_list_hw_search_noargs(self):
