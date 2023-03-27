@@ -5,3 +5,4 @@ createObject = {
                 'uri': 'http://slclitest.com',
                 'hookType': {}
 }
+deleteObject = True
