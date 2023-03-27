@@ -1,5 +1,10 @@
 # Change Log
 
+## [6.1.6] - 2023-03-27
+
+From now on changes will be published only on GitHub https://github.com/softlayer/softlayer-python/releases
+
+
 ## [6.1.3] - 2022-11-30
 
 #### What's Changed
