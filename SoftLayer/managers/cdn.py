@@ -269,3 +269,12 @@ class CDNManager(utils.IdentifierMixin, object):
         cache_result = '%s: %s' % (cache_type, cache['description'])
 
         return cache_result
+
+    def delete_cdn(self, unique_id):
+        """Delete CDN domain mapping for a particular customer.
+
+        :param str unique_id: The unique ID associated with the CDN.
+        :returns: The cdn that is being deleted.
+        """
+
+        return self.cdn_configuration.deleteDomainMapping(unique_id)

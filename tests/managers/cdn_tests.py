@@ -150,3 +150,13 @@ class CDNTests(testing.TestCase):
         self.assert_called_with(
             'SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
             'listDomainMappings',)
+
+    def test_delete_cdn(self):
+        uniqueId = "123465"
+        self.cdn_client.delete_cdn(uniqueId)
+
+        args = (uniqueId,)
+
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
+                                'deleteDomainMapping',
+                                args=args)
