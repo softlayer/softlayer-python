@@ -14,44 +14,37 @@ from SoftLayer.CLI import formatting
 @click.option('--username', '-U', required=True, help="The username part of the username/password pair")
 @click.option('--password', '-P', required=True, help="The password part of the username/password pair.")
 @click.option('--notes', '-n', help="A note string stored for this username/password pair.")
-@click.option('--system', required=True, help="The name of this specific piece of software.")
+@click.option('--software', required=True, help="The name of this specific piece of software.")
 @environment.pass_env
-def cli(env, identifier, username, password, notes, system):
+def cli(env, identifier, username, password, notes, software):
     """Create a password for a software component."""
 
     mgr = SoftLayer.HardwareManager(env.client)
 
-    software = mgr.get_software_components(identifier)
-    sw_id = ''
+    software_components = mgr.get_software_components(identifier)
+    software_id = ''
     try:
-        for sw_instance in software:
-            if (sw_instance['softwareLicense']['softwareDescription']['name']).lower() == system:
-                sw_id = sw_instance['id']
+        for software_component in software_components:
+            if software_component['softwareLicense']['softwareDescription']['name'].lower() == software.lower():
+                software_id = software_component['id']
     except KeyError as ex:
-        raise exceptions.CLIAbort('System id not found') from ex
+        raise exceptions.CLIAbort('Software not found') from ex
 
     template = {
         "notes": notes,
         "password": password,
-        "softwareId": sw_id,
-        "username": username,
-        "software": {
-            "hardwareId": identifier,
-            "softwareLicense": {
-                "softwareDescription": {
-                    "name": system
-                }
-            }
-        }}
+        "softwareId": software_id,
+        "username": username
+    }
 
     result = mgr.create_credential(template)
 
-    table = formatting.KeyValueTable(['name', 'value'])
-    table.align['name'] = 'r'
-    table.align['value'] = 'l'
-    table.add_row(['Software Id', result['id']])
+    table = formatting.KeyValueTable(['Name', 'Value'])
+    table.align['Name'] = 'r'
+    table.align['Value'] = 'l'
+    table.add_row(['Software Credential Id', result['id']])
     table.add_row(['Created', result['createDate']])
     table.add_row(['Username', result['username']])
     table.add_row(['Password', result['password']])
-    table.add_row(['Notes', result['notes']])
+    table.add_row(['Notes', result.get('notes') or formatting.blank()])
     env.fout(table)

@@ -73,7 +73,7 @@ class UserManagerTests(testing.TestCase):
 
     def test_get_all_permissions(self):
         self.manager.get_all_permissions()
-        self.assert_called_with('SoftLayer_User_Customer_CustomerPermission_Permission', 'getAllObjects')
+        self.assert_called_with('SoftLayer_User_Permission_Action', 'getAllObjects')
 
     def test_add_permissions(self):
         self.manager.add_permissions(1234, ['TEST'])
@@ -168,7 +168,7 @@ class UserManagerTests(testing.TestCase):
 
     def test_format_permission_object(self):
         result = self.manager.format_permission_object(['TEST'])
-        self.assert_called_with('SoftLayer_User_Customer_CustomerPermission_Permission', 'getAllObjects')
+        self.assert_called_with('SoftLayer_User_Permission_Action', 'getAllObjects')
         self.assertEqual([{'keyName': 'TEST'}], result)
 
     def test_format_permission_object_all(self):
@@ -176,7 +176,7 @@ class UserManagerTests(testing.TestCase):
             {'key': 'T_2', 'keyName': 'TEST', 'name': 'A Testing Permission'},
             {'key': 'T_1', 'keyName': 'TICKET_VIEW', 'name': 'View Tickets'}
         ]
-        service_name = 'SoftLayer_User_Customer_CustomerPermission_Permission'
+        service_name = 'SoftLayer_User_Permission_Action'
         permission_mock = self.set_mock(service_name, 'getAllObjects')
         permission_mock.return_value = expected
         result = self.manager.format_permission_object(['ALL'])
