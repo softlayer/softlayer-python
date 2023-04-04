@@ -81,6 +81,7 @@ ALL_ROUTES = [
     ('cdn:origin-list', 'SoftLayer.CLI.cdn.origin_list:cli'),
     ('cdn:origin-remove', 'SoftLayer.CLI.cdn.origin_remove:cli'),
     ('cdn:purge', 'SoftLayer.CLI.cdn.purge:cli'),
+    ('cdn:delete', 'SoftLayer.CLI.cdn.delete:cli'),
 
     ('config', 'SoftLayer.CLI.config'),
     ('config:setup', 'SoftLayer.CLI.config.setup:cli'),

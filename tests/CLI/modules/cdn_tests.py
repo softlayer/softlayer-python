@@ -123,3 +123,8 @@ class CdnTests(testing.TestCase):
         self.assert_no_fail(result)
         header_result = json.loads(result.output)
         self.assertEqual('include: test', header_result['Cache key optimization'])
+
+    def test_delete_cdn(self):
+        result = self.run_command(['cdn', 'delete', '123456'])
+        self.assert_no_fail(result)
+        self.assertIn("Cdn with uniqueId: 123456 was deleted.", result.output)
