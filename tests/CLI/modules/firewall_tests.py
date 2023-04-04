@@ -73,7 +73,7 @@ class FirewallTests(testing.TestCase):
                                      'src_mask': '0.0.0.0'}]})
 
     def test_detail_multi_vlan_firewall(self):
-        result = self.run_command(['firewall', 'detail', 'multiVlan:1234', '--credentials', 'true'])
+        result = self.run_command(['firewall', 'detail', 'multiVlan:1234', '--password'])
         self.assert_no_fail(result)
         json_result = json.loads(result.output)
         self.assertEqual(json_result['rules'][0]['action'], 'permit')
