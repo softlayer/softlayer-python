@@ -15,7 +15,6 @@ def cli(env, unique_id):
 
     manager = SoftLayer.CDNManager(env.client)
 
-    # cdn_mapping = manager.get_cdn(unique_id)
     cdn = manager.delete_cdn(unique_id)
 
     if cdn:
