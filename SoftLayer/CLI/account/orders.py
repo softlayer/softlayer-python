@@ -12,17 +12,17 @@ from SoftLayer import utils
 
 def upgrade_table(upgrades):
     """Formats a table for upgrade orders"""
-    upgrade_table = formatting.Table(['Id', 'Maintance window', 'Status', 'Created Date',
+    table = formatting.Table(['Id', 'Maintance window', 'Status', 'Created Date',
                                       'Case'], title="Upgrade orders")
-    upgrade_table.align['Subject'] = 'l'
-    upgrade_table.align['Impacted Resources'] = 'l'
+    table.align['Subject'] = 'l'
+    table.align['Impacted Resources'] = 'l'
     for upgrade in upgrades:
-        upgrade_table.add_row([upgrade.get('id'),
+        table.add_row([upgrade.get('id'),
                                upgrade.get('maintenanceStartTimeUtc'),
                                upgrade.get('statusId'),
                                upgrade.get('createDate'),
                                upgrade.get('ticketId') or '--'])
-    return upgrade_table
+    return table
 
 
 @click.command(cls=SLCommand)
