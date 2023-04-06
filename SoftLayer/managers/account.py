@@ -407,3 +407,7 @@ class AccountManager(utils.IdentifierMixin, object):
             'uri': uri
         }
         return self.client.call('SoftLayer_Provisioning_Hook', 'createObject', template)
+
+    def get_account_upgrade_orders(self, limit=100):
+        """Gets upgrade order list"""
+        return self.client.call('SoftLayer_Account', 'getUpgradeRequests', limit=limit)

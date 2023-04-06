@@ -169,3 +169,8 @@ class AccountCLITests(testing.TestCase):
         result = self.run_command(['account', 'hook-create', '--name', 'testslcli', '--uri', 'http://slclitest.com'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Provisioning_Hook', 'createObject')
+
+    def test_order_upgrade(self):
+        result = self.run_command(['account', 'orders', '--upgrades'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getUpgradeRequests')
