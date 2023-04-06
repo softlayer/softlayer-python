@@ -408,6 +408,15 @@ class AccountManager(utils.IdentifierMixin, object):
         }
         return self.client.call('SoftLayer_Provisioning_Hook', 'createObject', template)
 
+    def delete_provisioning(self, identifier):
+        """Delete a provisioning script
+
+        param: identifier provisioning script identifier
+
+        Returns: boolean
+        """
+        return self.client.call("SoftLayer_Provisioning_Hook", "deleteObject", id=identifier)
+
     def get_account_upgrade_orders(self, limit=100):
         """Gets upgrade order list"""
         return self.client.call('SoftLayer_Account', 'getUpgradeRequests', limit=limit)

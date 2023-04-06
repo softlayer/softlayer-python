@@ -50,3 +50,27 @@ updateDomainMapping = [
         "cacheKeyQueryRule": "include: test"
     }
 ]
+
+deleteDomainMapping = [
+    {
+        "akamaiCname": "wildcard.appdomain.mdc.edgekey.net",
+        "certificateType": "NO_CERT",
+        "cname": "cdnakayq9fye4t88239.cdn.appdomain.cloud",
+        "createDate": "2023-03-29T07:33:42-06:00",
+        "domain": "www.test.com",
+        "header": "www.header.com",
+        "httpPort": 80,
+        "httpsPort": None,
+        "modifyDate": "2023-03-29T07:33:46-06:00",
+        "originHost": "67.228.227.82",
+        "originType": "HOST_SERVER",
+        "path": "/path/*",
+        "performanceConfiguration": "General web delivery",
+        "protocol": "HTTP",
+        "respectHeaders": False,
+        "serveStale": True,
+        "status": "DELETING",
+        "uniqueId": "303727924488685",
+        "vendorName": "akamai"
+    }
+]

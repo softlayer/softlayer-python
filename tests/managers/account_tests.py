@@ -185,6 +185,10 @@ class AccountManagerTests(testing.TestCase):
         self.manager.create_provisioning('testslcli', 'http://slclitest.com')
         self.assert_called_with('SoftLayer_Provisioning_Hook', 'createObject')
 
+    def test_delete_provisioning_scripts(self):
+        self.manager.delete_provisioning(123456)
+        self.assert_called_with("SoftLayer_Provisioning_Hook", "deleteObject")
+
     def test_get_upgrades_orders(self):
         self.manager.get_account_upgrade_orders()
         self.assert_called_with("SoftLayer_Account", "getUpgradeRequests")
