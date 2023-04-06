@@ -13,15 +13,15 @@ from SoftLayer import utils
 def upgrade_table(upgrades):
     """Formats a table for upgrade orders"""
     table = formatting.Table(['Id', 'Maintance window', 'Status', 'Created Date',
-                                      'Case'], title="Upgrade orders")
+                              'Case'], title="Upgrade orders")
     table.align['Subject'] = 'l'
     table.align['Impacted Resources'] = 'l'
     for upgrade in upgrades:
         table.add_row([upgrade.get('id'),
-                               upgrade.get('maintenanceStartTimeUtc'),
-                               upgrade.get('statusId'),
-                               upgrade.get('createDate'),
-                               upgrade.get('ticketId') or '--'])
+                       upgrade.get('maintenanceStartTimeUtc'),
+                       upgrade.get('statusId'),
+                       upgrade.get('createDate'),
+                       upgrade.get('ticketId') or '--'])
     return table
 
 
