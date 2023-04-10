@@ -74,3 +74,28 @@ deleteDomainMapping = [
         "vendorName": "akamai"
     }
 ]
+createDomainMapping = [
+    {
+        "bucketName": "test-bucket-name",
+        "akamaiCname": "wildcard.appdomain.mdc.edgekey.net",
+        "cacheKeyQueryRule": "include-all",
+        "certificateType": "WILDCARD_CERT",
+        "cname": "test.cdn.appdomain.cloud",
+        "createDate": "2020-09-29T15:19:01-06:00",
+        "domain": "test.com",
+        "header": "header.test.com",
+        "httpPort": 80,
+        "httpsPort": None,
+        "modifyDate": "2021-06-24T09:02:22-06:00",
+        "originHost": "10.32.12.125",
+        "originType": "HOST_SERVER",
+        "path": "/*",
+        "performanceConfiguration": "General web delivery",
+        "protocol": "HTTP",
+        "respectHeaders": True,
+        "serveStale": True,
+        "status": "CNAME_CONFIGURATION",
+        "uniqueId": "354034879028850",
+        "vendorName": "akamai"
+    }
+]

@@ -160,3 +160,16 @@ class CDNTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
                                 'deleteDomainMapping',
                                 args=args)
+
+    def test_create_cdn(self):
+        hostname = "test.com"
+        origin = "123.123.123.123"
+        origin_type = "server"
+        http = 80
+        newCdn = ({"domain": hostname, "origin": origin, "originType": "HOST_SERVER",
+                  "vendorName": "akamai", "httpPort": http, "protocol": "HTTP"},)
+        self.cdn_client.create_cdn(hostname, origin, origin_type, http)
+
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
+                                'createDomainMapping',
+                                args=newCdn)

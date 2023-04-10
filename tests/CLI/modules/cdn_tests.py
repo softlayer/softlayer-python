@@ -128,3 +128,35 @@ class CdnTests(testing.TestCase):
         result = self.run_command(['cdn', 'delete', '123456'])
         self.assert_no_fail(result)
         self.assertIn("Cdn with uniqueId: 123456 was deleted.", result.output)
+
+    def test_create_cdn(self):
+        result = self.run_command(['cdn', 'create', '--hostname', 'www.example.com',
+                                  '--origin', '123.123.123.123', '--http', '80'])
+        self.assert_no_fail(result)
+        self.assertIn("CDN Unique ID", result.output)
+        self.assertIn("354034879028850", result.output)
+        self.assertIn("Hostname", result.output)
+        self.assertIn("test.com", result.output)
+        self.assertIn("header", result.output)
+        self.assertIn("header.test.com", result.output)
+        self.assertIn("Http Port", result.output)
+        self.assertIn("80", result.output)
+        self.assertIn("Path", result.output)
+        self.assertIn("/*", result.output)
+
+    def test_create_cdn_without_hostname(self):
+        result = self.run_command(['cdn', 'create'])
+        self.assertEqual(2, result.exit_code)
+        print(result.output)
+        self.assertIn("Error: Missing option '--hostname'.", result.output)
+
+    def test_create_cdn_without_origin(self):
+        result = self.run_command(['cdn', 'create', '--hostname', 'www.example.com'])
+        self.assertEqual(2, result.exit_code)
+        print(result.output)
+        self.assertIn("Error: Missing option '--origin'.", result.output)
+
+    def test_create_cdn_without_http_or_https(self):
+        result = self.run_command(['cdn', 'create', '--hostname', 'www.example.com', '--origin', '123.123.123.123'])
+        self.assertEqual(2, result.exit_code)
+        self.assertIn("Is needed http or https options", result.exception.message)

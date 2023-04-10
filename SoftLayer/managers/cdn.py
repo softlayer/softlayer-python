@@ -278,3 +278,62 @@ class CDNManager(utils.IdentifierMixin, object):
         """
 
         return self.cdn_configuration.deleteDomainMapping(unique_id)
+
+    def create_cdn(self, hostname=None, origin=None, origin_type=None, http=None, https=None, bucket_name=None,
+                   cname=None, header=None, path=None, ssl=None):
+        """Create CDN domain mapping for a particular customer.
+
+        :param str hostname: The unique ID associated with the CDN.
+        :param str origin: ip address or hostname if origin_type=server, API endpoint for
+                           your S3 object storage if origin_type=storage
+        :param str origin_type: it can be 'server' or 'storage' types.
+        :param int http: http port
+        :param int https: https port
+        :param str bucket_name: name of the available resource
+        :param str cname: globally unique subdomain
+        :param str header: the edge server uses the host header to communicate with the origin.
+                            It defaults to hostname. (optional)
+        :param str path: relative path to the domain provided, e.g. "/articles/video"
+        :param str ssl: ssl certificate
+        :returns: The cdn that is being created.
+        """
+        types = {'server': 'HOST_SERVER', 'storage': 'OBJECT_STORAGE'}
+        ssl_certificate = {'wilcard': 'WILDCARD_CERT', 'dvSan': 'SHARED_SAN_CERT'}
+
+        new_origin = {
+            'domain': hostname,
+            'origin': origin,
+            'originType': types.get(origin_type),
+            'vendorName': 'akamai',
+        }
+
+        protocol = ''
+        if http:
+            protocol = 'HTTP'
+            new_origin['httpPort'] = http
+        if https:
+            protocol = 'HTTPS'
+            new_origin['httpsPort'] = https
+            new_origin['certificateType'] = ssl_certificate.get(ssl)
+        if http and https:
+            protocol = 'HTTP_AND_HTTPS'
+
+        new_origin['protocol'] = protocol
+
+        if types.get(origin_type) == 'OBJECT_STORAGE':
+            new_origin['bucketName'] = bucket_name
+            new_origin['header'] = header
+
+        if cname:
+            new_origin['cname'] = cname + '.cdn.appdomain.cloud'
+
+        if header:
+            new_origin['header'] = header
+
+        if path:
+            new_origin['path'] = '/' + path
+
+        origin = self.cdn_configuration.createDomainMapping(new_origin)
+
+        # The method createOriginPath() returns an array but there is only 1 object
+        return origin[0]
