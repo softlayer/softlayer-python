@@ -260,6 +260,7 @@ ALL_ROUTES = [
     ('object-storage:accounts', 'SoftLayer.CLI.object_storage.list_accounts:cli'),
     ('object-storage:endpoints', 'SoftLayer.CLI.object_storage.list_endpoints:cli'),
     ('object-storage:credential', 'SoftLayer.CLI.object_storage.credential:cli'),
+    ('object-storage:cancel', 'SoftLayer.CLI.object_storage.cancel:cli'),
 
     ('order', 'SoftLayer.CLI.order'),
     ('order:category-list', 'SoftLayer.CLI.order.category_list:cli'),
