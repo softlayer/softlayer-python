@@ -22,12 +22,14 @@ def cli(env, volume_id):
     table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'r'
     table.align['Value'] = 'l'
-
+    capacity = '0'
+    if file_volume['capacityGb'] != '':
+        capacity = "%iGB" % file_volume['capacityGb']
     storage_type = file_volume['storageType']['keyName'].split('_').pop(0)
     table.add_row(['ID', file_volume['id']])
     table.add_row(['Username', file_volume['username']])
     table.add_row(['Type', storage_type])
-    table.add_row(['Capacity (GB)', "%iGB" % file_volume['capacityGb']])
+    table.add_row(['Capacity (GB)', capacity])
 
     used_space = int(file_volume['bytesUsed']) \
         if file_volume['bytesUsed'] else 0
