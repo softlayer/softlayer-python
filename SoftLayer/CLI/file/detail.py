@@ -10,6 +10,7 @@ from SoftLayer import utils
 
 
 def get_capacity(file_volume):
+    """Get the capacity Gb with validate the data"""
     capacity = '0'
     if file_volume['capacityGb'] != '':
         capacity = "%iGB" % file_volume['capacityGb']
@@ -34,7 +35,7 @@ def cli(env, volume_id):
     table.add_row(['ID', file_volume['id']])
     table.add_row(['Username', file_volume['username']])
     table.add_row(['Type', storage_type])
-    table.add_row(['Capacity (GB)', get_capacity(file_volume['capacity'])])
+    table.add_row(['Capacity (GB)', get_capacity(file_volume)])
 
     used_space = int(file_volume['bytesUsed']) \
         if file_volume['bytesUsed'] else 0
