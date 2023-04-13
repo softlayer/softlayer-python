@@ -22,6 +22,7 @@ def cli(env, volume_id):
     table = formatting.KeyValueTable(['Name', 'Value'])
     table.align['Name'] = 'r'
     table.align['Value'] = 'l'
+
     capacity = '0'
     if file_volume['capacityGb'] != '':
         capacity = "%iGB" % file_volume['capacityGb']
