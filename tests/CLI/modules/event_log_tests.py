@@ -6,6 +6,7 @@
 
 import json
 
+from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
 
 
@@ -91,3 +92,17 @@ class EventLogTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects')
         self.assertEqual(8, result.output.count("\n"))
+
+    def test_issues1905(self):
+        """https://github.com/softlayer/softlayer-python/issues/1905"""
+        getUser = self.set_mock('SoftLayer_User_Customer', 'getObject')
+        getUser.side_effect = SoftLayerAPIError(
+            "SoftLayer_Exception_PermissionDenied",
+            "You do not have permission to access this user")
+        result = self.run_command(['event-log', 'get', '-l -1'])
+        print(result.output)
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects')
+        self.assert_called_with('SoftLayer_User_Customer', 'getObject', identifier=400)
+        user_calls = self.calls('SoftLayer_User_Customer', 'getObject')
+        self.assertEqual(1, len(user_calls))
