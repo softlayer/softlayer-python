@@ -60,4 +60,7 @@ Version 5.6.0 introduces the ability to interact with user accounts from the cli
     :prog: user grant-access
     :show-nested:
 
+.. click:: SoftLayer.CLI.user.vpn_password:cli
+    :prog: user vpn-password
+    :show-nested:
 

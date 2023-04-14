@@ -330,3 +330,7 @@ class UserManagerTests(testing.TestCase):
     def test_remove_dedicated(self):
         self.manager.remove_dedicated_access(123456, 369852)
         self.assert_called_with('SoftLayer_User_Customer', 'removeDedicatedHostAccess')
+
+    def test_update_vpn_password(self):
+        self.manager.update_vpn_password(123456, "Mypassword1.")
+        self.assert_called_with('SoftLayer_User_Customer', 'updateVpnPassword')
