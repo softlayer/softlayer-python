@@ -65,9 +65,14 @@ def basic_info(user, keys):
 
     table.add_row(['Id', user.get('id', '-')])
     table.add_row(['Username', user.get('username', '-')])
-    if keys:
-        for key in user.get('apiAuthenticationKeys'):
+    keys_array = user.get('apiAuthenticationKeys')
+    if keys and len(keys_array) != 0:
+        for key in keys_array:
             table.add_row(['APIKEY', key.get('authenticationKey')])
+    elif keys_array is not None and len(keys_array) != 0:
+        table.add_row(['APIKEY', 'Yes'])
+    else:
+        table.add_row(['APIKEY', 'No'])
     table.add_row(['Name', "%s %s" % (user.get('firstName', '-'), user.get('lastName', '-'))])
     table.add_row(['Email', user.get('email')])
     table.add_row(['OpenID', user.get('openIdConnectUserName')])
