@@ -120,3 +120,13 @@ class ObjectStorageTests(testing.TestCase):
         resolve_id_mock.return_value = 100
         result = self.run_command(['object-storage', 'credential', 'list', 'test'])
         self.assert_no_fail(result)
+
+    def test_object_storage_cancel(self):
+        result = self.run_command([
+            '--really', 'object-storage', 'cancel', '1234'])
+
+        self.assert_no_fail(result)
+        self.assertEqual('Object storage with id 1234 has been marked'
+                         ' for cancellation\n', result.output)
+        self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
+                                args=(False, True, None))
