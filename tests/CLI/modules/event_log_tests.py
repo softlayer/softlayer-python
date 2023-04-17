@@ -100,7 +100,6 @@ class EventLogTests(testing.TestCase):
             "SoftLayer_Exception_PermissionDenied",
             "You do not have permission to access this user")
         result = self.run_command(['event-log', 'get', '-l -1'])
-        print(result.output)
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects')
         self.assert_called_with('SoftLayer_User_Customer', 'getObject', identifier=400)
