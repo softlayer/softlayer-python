@@ -901,3 +901,7 @@ class OrderingTests(testing.TestCase):
     def test_get_regions(self):
         self.ordering.get_regions(123)
         self.assert_called_with('SoftLayer_Product_Package', 'getRegions')
+
+    def test_delete_quote(self):
+        self.ordering.delete_quote(123)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'deleteQuote')
