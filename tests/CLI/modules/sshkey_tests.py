@@ -118,7 +118,7 @@ class SshKeyTests(testing.TestCase):
                          {'id': 1234, 'label': 'label', 'notes': 'notes'})
 
     def test_print_key_file(self):
-        if(sys.platform.startswith("win")):
+        if sys.platform.startswith("win"):
             self.skipTest("Test doesn't work in Windows")
         with tempfile.NamedTemporaryFile() as sshkey_file:
             service = self.client['Security_Ssh_Key']
