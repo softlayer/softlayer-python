@@ -334,3 +334,15 @@ class UserManagerTests(testing.TestCase):
     def test_update_vpn_password(self):
         self.manager.update_vpn_password(123456, "Mypassword1.")
         self.assert_called_with('SoftLayer_User_Customer', 'updateVpnPassword')
+
+    def test_add_api_authentication_key(self):
+        self.manager.add_api_authentication_key(123456)
+        self.assert_called_with('SoftLayer_User_Customer', 'addApiAuthenticationKey')
+
+    def test_get_api_authentication_keys(self):
+        self.manager.get_api_authentication_keys(123456)
+        self.assert_called_with('SoftLayer_User_Customer', 'getApiAuthenticationKeys')
+
+    def test_remove_api_authentication_key(self):
+        self.manager.remove_api_authentication_key(123456)
+        self.assert_called_with('SoftLayer_User_Customer', 'removeApiAuthenticationKey')

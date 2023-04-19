@@ -389,6 +389,7 @@ ALL_ROUTES = [
     ('user:remove-access', 'SoftLayer.CLI.user.remove_access:cli'),
     ('user:grant-access', 'SoftLayer.CLI.user.grant_access:cli'),
     ('user:vpn-password', 'SoftLayer.CLI.user.vpn_password:cli'),
+    ('user:apikey', 'SoftLayer.CLI.user.apikey:cli'),
 
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:create', 'SoftLayer.CLI.vlan.create:cli'),

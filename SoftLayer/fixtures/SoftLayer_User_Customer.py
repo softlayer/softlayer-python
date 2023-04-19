@@ -84,7 +84,8 @@ addBulkPortalPermission = True
 removeBulkPortalPermission = True
 createObject = getObject
 editObject = True
-addApiAuthenticationKey = True
+addApiAuthenticationKey = "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a"
+removeApiAuthenticationKey = True
 updateVpnUser = True
 removeDedicatedHostAccess = True
 removeHardwareAccess = True
@@ -93,6 +94,17 @@ addDedicatedHostAccess = True
 addHardwareAccess = True
 addVirtualGuestAccess = True
 updateVpnPassword = True
+
+getApiAuthenticationKeys = [
+    {
+        "authenticationKey": "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a",
+        "id": 123456,
+        "timestampKey": 12121212,
+        "userId": 111111
+    }
+]
+
+getEmptyApiAuthenticationKeys = []
 
 getHardware = [{
         "domain": "testedit.com",
