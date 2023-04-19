@@ -476,6 +476,16 @@ class UserManager(utils.IdentifierMixin, object):
         """
         return self.user_service.getVirtualGuests(id=user_id)
 
+    def update_vpn_password(self, user_id, password):
+        """Update a user's VPN password.
+
+        :param int user_id:
+        :param string password:
+
+        :returns: true
+        """
+        return self.user_service.updateVpnPassword(password, id=user_id)
+
 
 def _keyname_search(haystack, needle):
     for item in haystack:

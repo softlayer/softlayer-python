@@ -12,10 +12,10 @@ from SoftLayer import utils
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
-@click.option('--credentials', type=click.BOOL,
+@click.option('--password', is_flag=True,
               help="Display FortiGate username and FortiGate password to multi vlans.")
 @environment.pass_env
-def cli(env, identifier, credentials):
+def cli(env, identifier, password):
     """Detail firewall.
 
     EXAMPLES:
@@ -63,7 +63,7 @@ def cli(env, identifier, credentials):
             table.add_row(['private vlan', utils.lookup(_firewall, 'networkGateway', 'privateVlan', 'vlanNumber')])
             table.add_row(['type', _firewall.get('firewallType')])
 
-            if credentials:
+            if password:
                 table.add_row(['fortiGate username', utils.lookup(_firewall, 'managementCredentials', 'username')])
                 table.add_row(['fortiGate password', utils.lookup(_firewall, 'managementCredentials', 'password')])
 

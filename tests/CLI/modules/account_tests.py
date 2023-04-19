@@ -174,3 +174,8 @@ class AccountCLITests(testing.TestCase):
         result = self.run_command(['account', 'hook-delete', '123456'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Provisioning_Hook', 'deleteObject')
+
+    def test_order_upgrade(self):
+        result = self.run_command(['account', 'orders', '--upgrades'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getUpgradeRequests')

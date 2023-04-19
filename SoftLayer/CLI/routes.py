@@ -81,6 +81,8 @@ ALL_ROUTES = [
     ('cdn:origin-list', 'SoftLayer.CLI.cdn.origin_list:cli'),
     ('cdn:origin-remove', 'SoftLayer.CLI.cdn.origin_remove:cli'),
     ('cdn:purge', 'SoftLayer.CLI.cdn.purge:cli'),
+    ('cdn:delete', 'SoftLayer.CLI.cdn.delete:cli'),
+    ('cdn:create', 'SoftLayer.CLI.cdn.create:cli'),
 
     ('config', 'SoftLayer.CLI.config'),
     ('config:setup', 'SoftLayer.CLI.config.setup:cli'),
@@ -261,6 +263,7 @@ ALL_ROUTES = [
     ('object-storage:accounts', 'SoftLayer.CLI.object_storage.list_accounts:cli'),
     ('object-storage:endpoints', 'SoftLayer.CLI.object_storage.list_endpoints:cli'),
     ('object-storage:credential', 'SoftLayer.CLI.object_storage.credential:cli'),
+    ('object-storage:cancel', 'SoftLayer.CLI.object_storage.cancel:cli'),
 
     ('order', 'SoftLayer.CLI.order'),
     ('order:category-list', 'SoftLayer.CLI.order.category_list:cli'),
@@ -385,6 +388,7 @@ ALL_ROUTES = [
     ('user:vpn-subnet', 'SoftLayer.CLI.user.vpn_subnet:cli'),
     ('user:remove-access', 'SoftLayer.CLI.user.remove_access:cli'),
     ('user:grant-access', 'SoftLayer.CLI.user.grant_access:cli'),
+    ('user:vpn-password', 'SoftLayer.CLI.user.vpn_password:cli'),
 
     ('vlan', 'SoftLayer.CLI.vlan'),
     ('vlan:create', 'SoftLayer.CLI.vlan.create:cli'),

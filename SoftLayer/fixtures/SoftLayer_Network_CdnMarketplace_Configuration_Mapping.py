@@ -50,3 +50,52 @@ updateDomainMapping = [
         "cacheKeyQueryRule": "include: test"
     }
 ]
+
+deleteDomainMapping = [
+    {
+        "akamaiCname": "wildcard.appdomain.mdc.edgekey.net",
+        "certificateType": "NO_CERT",
+        "cname": "cdnakayq9fye4t88239.cdn.appdomain.cloud",
+        "createDate": "2023-03-29T07:33:42-06:00",
+        "domain": "www.test.com",
+        "header": "www.header.com",
+        "httpPort": 80,
+        "httpsPort": None,
+        "modifyDate": "2023-03-29T07:33:46-06:00",
+        "originHost": "67.228.227.82",
+        "originType": "HOST_SERVER",
+        "path": "/path/*",
+        "performanceConfiguration": "General web delivery",
+        "protocol": "HTTP",
+        "respectHeaders": False,
+        "serveStale": True,
+        "status": "DELETING",
+        "uniqueId": "303727924488685",
+        "vendorName": "akamai"
+    }
+]
+createDomainMapping = [
+    {
+        "bucketName": "test-bucket-name",
+        "akamaiCname": "wildcard.appdomain.mdc.edgekey.net",
+        "cacheKeyQueryRule": "include-all",
+        "certificateType": "WILDCARD_CERT",
+        "cname": "test.cdn.appdomain.cloud",
+        "createDate": "2020-09-29T15:19:01-06:00",
+        "domain": "test.com",
+        "header": "header.test.com",
+        "httpPort": 80,
+        "httpsPort": None,
+        "modifyDate": "2021-06-24T09:02:22-06:00",
+        "originHost": "10.32.12.125",
+        "originType": "HOST_SERVER",
+        "path": "/*",
+        "performanceConfiguration": "General web delivery",
+        "protocol": "HTTP",
+        "respectHeaders": True,
+        "serveStale": True,
+        "status": "CNAME_CONFIGURATION",
+        "uniqueId": "354034879028850",
+        "vendorName": "akamai"
+    }
+]

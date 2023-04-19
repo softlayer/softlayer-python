@@ -31,3 +31,11 @@ Interacting with CDN
 .. click:: SoftLayer.CLI.cdn.edit:cli
    :prog: cdn edit
    :show-nested:
+
+.. click:: SoftLayer.CLI.cdn.delete:cli
+   :prog: cdn delete
+   :show-nested:
+
+.. click:: SoftLayer.CLI.cdn.create:cli
+   :prog: cdn create
+   :show-nested:
