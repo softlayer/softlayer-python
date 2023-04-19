@@ -140,7 +140,7 @@ Quotes
     :show-nested:
 
 .. click:: SoftLayer.CLI.order.quote_delete:cli
-    :prog: order place-delete
+    :prog: order quote-delete
     :show-nested:
 
 Lookup

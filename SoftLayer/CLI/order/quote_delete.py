@@ -4,9 +4,7 @@ import click
 
 from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
-from SoftLayer.utils import lookup
 
 
 @click.command(cls=SLCommand)
