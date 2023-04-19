@@ -647,8 +647,7 @@ class VirtCreateTests(testing.TestCase):
                     'datacenter': {
                         'name': 'TEST00'
                     }
-                },
-        )
+                },)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
         self.assertEqual([], self.calls('SoftLayer_Virtual_Guest', 'setTags'))
 
