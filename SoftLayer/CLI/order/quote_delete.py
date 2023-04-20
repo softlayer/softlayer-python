@@ -11,7 +11,7 @@ from SoftLayer.managers import ordering
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """View a quote"""
+    """Delete the quote of an order"""
 
     manager = ordering.OrderingManager(env.client)
     result = manager.delete_quote(identifier)
