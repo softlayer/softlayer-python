@@ -15,4 +15,3 @@ dist/*
 .cache
 .idea
 .pytest_cache/*
-slcli
