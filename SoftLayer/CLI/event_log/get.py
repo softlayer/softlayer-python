@@ -5,7 +5,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
+from SoftLayer import exceptions
 from SoftLayer import utils
 
 
@@ -40,6 +40,7 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
     request_filter = event_mgr.build_filter(date_min, date_max, obj_event, obj_id, obj_type, utc_offset)
     logs = event_mgr.get_event_logs(request_filter)
     log_time = "%Y-%m-%dT%H:%M:%S.%f%z"
+    # A list of IDs that we have looked up user information about.
     user_data = {}
 
     if metadata:
@@ -59,9 +60,11 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
             if username is None:
                 try:
                     username = user_mgr.get_user(log['userId'], "mask[username]")['username']
-                    user_data[log['userId']] = username
+                # Some users might not be able to access information about this specific userId
                 except exceptions.SoftLayerAPIError:
                     username = log['userId']
+            # This keeps track of any users we asked the API about, so we can make fewer calls.
+            user_data[log['userId']] = username
             user = username
 
         if metadata:
