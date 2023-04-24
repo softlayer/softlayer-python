@@ -467,7 +467,7 @@ def clean_table(data, delimiter):
 
             if str(type(value)) == "<class 'SoftLayer.CLI.formatting.Table'>":
                 string_io = io.StringIO()
-                write_csv_format(string_io, value, delimiter)
+                write_csv_format(string_io, value, delimiter, quoting=csv.QUOTE_MINIMAL)
 
                 nested_table_converted = string_io.getvalue()
                 nested_table_converted = nested_table_converted.replace('\r', '').split('\n')
@@ -488,8 +488,8 @@ def clean_table(data, delimiter):
     return data
 
 
-def write_csv_format(support_output, data, delimiter):
+def write_csv_format(support_output, data, delimiter, quoting=csv.QUOTE_NONNUMERIC):
     """Write csv format to supported output"""
-    writer = csv.writer(support_output, delimiter=delimiter)
+    writer = csv.writer(support_output, delimiter=delimiter, quoting=quoting)
     writer.writerow(data.columns)
     writer.writerows(data.rows)
