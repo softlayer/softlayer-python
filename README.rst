@@ -98,6 +98,7 @@ is equivalent to
 
   $ slcli -vvv --format=json vs list
 
+
 Getting Help
 ------------
 Bugs and feature requests about this library should have a `GitHub issue <https://github.com/softlayer/softlayer-python/issues>`_ opened about them. 
@@ -109,6 +110,12 @@ Examples
 --------
 
 A curated list of examples on how to use this library can be found at `SLDN <https://softlayer.github.io/python/>`_
+
+Development
+-----------
+To get started working with this project please read the `CONTRIBUTING <https://github.com/softlayer/softlayer-python/blob/master/CONTRIBUTING.md>`_ document.
+
+You can quickly test local changes by running the './slcli' file, which will load the local softlayer-python code instead of the system's softlayer-python codebase.
 
 Debugging
 ---------
