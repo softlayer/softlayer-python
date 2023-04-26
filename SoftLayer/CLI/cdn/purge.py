@@ -1,5 +1,6 @@
 """Purge cached files from all edge nodes."""
 # :license: MIT, see LICENSE for more details.
+import datetime
 
 import click
 
@@ -28,8 +29,9 @@ def cli(env, unique_id, path):
     table = formatting.Table(['Date', 'Path', 'Saved', 'Status'])
 
     for data in result:
+        date = datetime.datetime.fromtimestamp(int(data['date']))
         table.add_row([
-            data['date'],
+            date,
             data['path'],
             data['saved'],
             data['status']

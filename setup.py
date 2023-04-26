@@ -40,7 +40,7 @@ setup(
         'prompt_toolkit >= 2',
         'pygments >= 2.0.0',
         'urllib3 >= 1.24',
-        'rich == 13.3.3'
+        'rich == 13.3.4'
     ],
     keywords=['softlayer', 'cloud', 'slcli'],
     classifiers=[
