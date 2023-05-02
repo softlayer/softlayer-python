@@ -1,4 +1,4 @@
-"""List active quotes on an account."""
+"""List all cancelation."""
 # :license: MIT, see LICENSE for more details.
 import click
 
@@ -6,7 +6,6 @@ from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.managers import ordering
-from SoftLayer.utils import clean_time
 
 
 @click.command(cls=SLCommand)
