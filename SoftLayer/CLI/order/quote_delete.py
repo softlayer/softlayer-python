@@ -17,4 +17,4 @@ def cli(env, identifier):
     result = manager.delete_quote(identifier)
 
     if result:
-        env.fout("Quote id: {} was deleted.".format(identifier))
+        env.fout(f"Quote id: {identifier} was deleted.")
