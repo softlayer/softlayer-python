@@ -139,6 +139,10 @@ Quotes
     :prog: order place-quote
     :show-nested:
 
+.. click:: SoftLayer.CLI.order.cancelation:cli
+    :prog: order cancelation
+    :show-nested:
+
 Lookup
 ======
 .. click:: SoftLayer.CLI.order.lookup:cli

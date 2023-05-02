@@ -737,3 +737,14 @@ class OrderingManager(object):
         if location:
             _filter = {"regions": {"location": {"location": {"name": {"operation": location}}}}}
         return self.client.call('SoftLayer_Product_Package', 'getRegions', id=package_id, filter=_filter)
+
+    def get_all_cancelation(self):
+        """returns the all cancelations, completed orders"""
+
+        mask = 'mask[id,itemCount,modifyDate,createDate,ticketId,' \
+               'ticket[assignedUserId,id,attachedHardware[id,hostname,domain],' \
+               'attachedVirtualGuests[id,hostname,domain],' \
+               'attachedDedicatedHosts[id,name],serviceProviderResourceId],' \
+               'status[name,id],user[id,firstName,lastName],' \
+               'items[billingItem[cancellationDate,categoryCode,pendingCancellationFlag]]]'
+        return self.client.call('SoftLayer_Billing_Item_Cancellation_Request', 'getAllCancellationRequests', mask=mask)
