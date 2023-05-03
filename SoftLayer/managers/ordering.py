@@ -19,6 +19,7 @@ PACKAGE_MASK = '''id, name, keyName, isActive, type'''
 PRESET_MASK = '''id, name, keyName, description, prices[id, hourlyRecurringFee, recurringFee], locations'''
 
 
+# pylint: disable=R0904
 class OrderingManager(object):
     """Manager to help ordering via the SoftLayer API.
 
@@ -746,7 +747,6 @@ class OrderingManager(object):
 
         return self.client['SoftLayer_Billing_Order_Quote'].deleteQuote(id=quote_id)
 
-    # pylint: disable=R0904
     def get_all_cancelation(self):
         """returns the all cancelations, completed orders"""
 
