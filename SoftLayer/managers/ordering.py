@@ -746,6 +746,7 @@ class OrderingManager(object):
 
         return self.client['SoftLayer_Billing_Order_Quote'].deleteQuote(id=quote_id)
 
+    # pylint: disable=R0904
     def get_all_cancelation(self):
         """returns the all cancelations, completed orders"""
 
