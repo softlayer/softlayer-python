@@ -11,7 +11,7 @@ from SoftLayer.managers import ordering
 @click.command(cls=SLCommand)
 @environment.pass_env
 def cli(env):
-    """List all active quotes on an account"""
+    """List all account cancelations"""
     table = formatting.Table([
         'Case Number', 'Number Of Items Cancelled', 'Created', 'Status', 'Requested by'])
     table.align['Name'] = 'l'
