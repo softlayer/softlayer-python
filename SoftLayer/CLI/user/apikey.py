@@ -38,17 +38,10 @@ def cli(env, identifier, add, remove, refresh):
     mgr = SoftLayer.UserManager(env.client)
     user_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'username')
 
-    if add:
+    if remove or refresh:
+        mgr.remove_api_authentication_key(user_id)
+        click.secho('Successfully removed API authentication key', fg='green')
+
+    if add or refresh:
         api_authentication_key = mgr.add_api_authentication_key(user_id)
         click.secho(f'Successfully added. New API Authentication Key: {api_authentication_key}', fg='green')
-    else:
-        api_authentication_keys = mgr.get_api_authentication_keys(user_id)
-        if len(api_authentication_keys) == 0:
-            raise exceptions.CLIAbort('The user has not API authentication keys')
-
-        mgr.remove_api_authentication_key(api_authentication_keys[0]['id'])
-        if remove:
-            click.secho('Successfully removed API authentication key', fg='green')
-        else:
-            api_authentication_key = mgr.add_api_authentication_key(user_id)
-            click.secho(f'Successfully refreshed. New API Authentication Key: {api_authentication_key}', fg='green')

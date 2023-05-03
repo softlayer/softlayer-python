@@ -10,7 +10,6 @@ import unittest
 
 from unittest import mock as mock
 
-from SoftLayer.fixtures import SoftLayer_User_Customer
 from SoftLayer import testing
 
 
@@ -406,13 +405,6 @@ class UserCLITests(testing.TestCase):
     def test_remove_api_authentication_key(self):
         result = self.run_command(['user', 'apikey', '123456', '--remove'])
         self.assert_no_fail(result)
-
-    def test_remove_api_authentication_key_does_not_exist(self):
-        mock = self.set_mock('SoftLayer_User_Customer', 'getApiAuthenticationKeys')
-        mock.return_value = SoftLayer_User_Customer.getEmptyApiAuthenticationKeys
-        result = self.run_command(['user', 'apikey', '123456', '--remove'])
-        self.assertEqual(2, result.exit_code)
-        self.assertIn('The user has not API authentication keys', result.exception.message)
 
     def test_refresh_api_authentication_key(self):
         result = self.run_command(['user', 'apikey', '123456', '--refresh'])
