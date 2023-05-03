@@ -447,6 +447,11 @@ class OrderTests(testing.TestCase):
         self.assertIn('Ordered By', result.output)
         self.assertIn('Initial Invoice', result.output)
 
+    def test_quote_delete(self):
+        result = self.run_command(['order', 'quote-delete', '12345'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'deleteQuote', identifier='12345')
+
 
 def _get_all_packages():
     package_type = {'keyName': 'BARE_METAL_CPU'}

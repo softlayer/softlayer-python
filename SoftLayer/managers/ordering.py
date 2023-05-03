@@ -738,6 +738,14 @@ class OrderingManager(object):
             _filter = {"regions": {"location": {"location": {"name": {"operation": location}}}}}
         return self.client.call('SoftLayer_Product_Package', 'getRegions', id=package_id, filter=_filter)
 
+    def delete_quote(self, quote_id):
+        """Delete the quote of an order.
+
+        :param quote_id: ID number of target quote
+        """
+
+        return self.client['SoftLayer_Billing_Order_Quote'].deleteQuote(id=quote_id)
+
     def get_all_cancelation(self):
         """returns the all cancelations, completed orders"""
 

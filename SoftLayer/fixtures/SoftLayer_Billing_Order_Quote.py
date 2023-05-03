@@ -104,3 +104,4 @@ placeOrder = {
 }
 
 saveQuote = getObject
+deleteQuote = getObject
