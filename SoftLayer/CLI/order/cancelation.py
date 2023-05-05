@@ -13,7 +13,7 @@ from SoftLayer.managers import ordering
 def cli(env):
     """List all account cancelations"""
     table = formatting.Table([
-        'Case Number', 'Number Of Items Cancelled', 'Created', 'Status', 'Requested by'])
+        'Case Number', 'Items', 'Created', 'Status', 'Requested by'])
     table.align['Name'] = 'l'
     table.align['Package Name'] = 'r'
     table.align['Package Id'] = 'l'
