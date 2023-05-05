@@ -747,13 +747,11 @@ class OrderingManager(object):
 
         return self.client['SoftLayer_Billing_Order_Quote'].deleteQuote(id=quote_id)
 
-    def get_all_cancelation(self):
+    def get_all_cancelation(self, limit=50):
         """returns the all cancelations, completed orders"""
 
         mask = 'mask[id,itemCount,modifyDate,createDate,ticketId,' \
-               'ticket[assignedUserId,id,attachedHardware[id,hostname,domain],' \
-               'attachedVirtualGuests[id,hostname,domain],' \
-               'attachedDedicatedHosts[id,name],serviceProviderResourceId],' \
-               'status[name,id],user[id,firstName,lastName],' \
-               'items[billingItem[cancellationDate,categoryCode,pendingCancellationFlag]]]'
-        return self.client.call('SoftLayer_Billing_Item_Cancellation_Request', 'getAllCancellationRequests', mask=mask)
+               'ticket[assignedUserId,id,' \
+               'serviceProviderResourceId],status[name,id],user[id,firstName,lastName]]'
+        return self.client.call('SoftLayer_Billing_Item_Cancellation_Request', 'getAllCancellationRequests',
+                                mask=mask, limit=limit)
