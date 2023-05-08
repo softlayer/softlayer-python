@@ -109,7 +109,7 @@ class CDNTests(testing.TestCase):
                                 args=args)
 
     def test_purge_content(self):
-        self.cdn_client.purge_content("12345", "example1")
+        self.cdn_client.purge_content("12345", "/example1")
 
         args = ("12345",
                 "/example1")

@@ -140,7 +140,6 @@ class CDNManager(utils.IdentifierMixin, object):
         :param str path: A string of url or path that should be purged.
         :returns: A Container_Network_CdnMarketplace_Configuration_Cache_Purge array object
         """
-        path = f"/{path}"
         return self.cdn_purge.createPurge(unique_id, path)
 
     def get_usage_metrics(self, unique_id, history=30, frequency="aggregate"):
