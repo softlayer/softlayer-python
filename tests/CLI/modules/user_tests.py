@@ -10,6 +10,7 @@ import unittest
 
 from unittest import mock as mock
 
+from SoftLayer.fixtures import SoftLayer_User_Customer
 from SoftLayer import testing
 
 
@@ -397,6 +398,12 @@ class UserCLITests(testing.TestCase):
         result = self.run_command(['user', 'apikey', '123456', '--add', '--remove', '--refresh'])
         self.assertEqual(2, result.exit_code)
         self.assertIn('Can only specify one option', result.exception.message)
+
+    def test_remove_api_authentication_key_without_api_key(self):
+        mock = self.set_mock('SoftLayer_User_Customer', 'getApiAuthenticationKeys')
+        mock.return_value = SoftLayer_User_Customer.getEmptyApiAuthenticationKeys
+        result = self.run_command(['user', 'apikey', '123456', '--remove'])
+        self.assert_no_fail(result)
 
     def test_add_api_authentication_key(self):
         result = self.run_command(['user', 'apikey', '123456', '--add'])
