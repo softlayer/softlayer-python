@@ -692,7 +692,7 @@ class VirtCreateTests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
 
     def test_create_vs_export(self):
-        if (sys.platform.startswith("win")):
+        if sys.platform.startswith("win"):
             self.skipTest("Test doesn't work in Windows")
         with tempfile.NamedTemporaryFile() as config_file:
             result = self.run_command(['vs', 'create', '--hostname', 'TEST', '--export', config_file.name,

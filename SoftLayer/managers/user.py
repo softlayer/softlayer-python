@@ -332,6 +332,26 @@ class UserManager(utils.IdentifierMixin, object):
         """
         return self.user_service.addApiAuthenticationKey(id=user_id)
 
+    def get_api_authentication_keys(self, user_id):
+        """Calls SoftLayer_User_Customer::getApiAuthenticationKeys
+
+        :param int user_id: User to add API key to
+        """
+        return self.user_service.getApiAuthenticationKeys(id=user_id)
+
+    def remove_api_authentication_key(self, user_id):
+        """Calls SoftLayer_User_Customer::getApiAuthenticationKeys and
+
+        SoftLayer_User_Customer::removeApiAuthenticationKey
+
+        :param int user_id: User to remove API key
+        """
+        api_authentication_keys = self.get_api_authentication_keys(user_id)
+        if len(api_authentication_keys) == 0:
+            return True
+
+        return self.user_service.removeApiAuthenticationKey(api_authentication_keys[0]['id'])
+
     def vpn_manual(self, user_id, value):
         """Enable or disable the manual config of subnets.
 
