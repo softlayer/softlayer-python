@@ -279,6 +279,7 @@ ALL_ROUTES = [
     ('order:quote-save', 'SoftLayer.CLI.order.quote_save:cli'),
     ('order:quote', 'SoftLayer.CLI.order.quote:cli'),
     ('order:lookup', 'SoftLayer.CLI.order.lookup:cli'),
+    ('order:cancelation', 'SoftLayer.CLI.order.cancelation:cli'),
 
     ('hardware', 'SoftLayer.CLI.hardware'),
     ('hardware:bandwidth', 'SoftLayer.CLI.hardware.bandwidth:cli'),

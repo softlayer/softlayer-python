@@ -415,6 +415,11 @@ class OrderTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getActiveQuotes')
 
+    def test_cancelation(self):
+        result = self.run_command(['order', 'cancelation'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Billing_Item_Cancellation_Request', 'getAllCancellationRequests')
+
     def _get_order_items(self):
         item1 = {'keyName': 'ITEM1', 'description': 'description1',
                  'itemCategory': {'categoryCode': 'cat1'},
