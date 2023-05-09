@@ -203,7 +203,7 @@ class AccountManager(utils.IdentifierMixin, object):
             limit=100
         )
 
-    def get_account_billing_items(self, mask=None):
+    def get_account_billing_items(self, create=None, category=None, mask=None):
         """Gets all the topLevelBillingItems currently active on the account
 
         :param string mask: Object Mask
@@ -225,6 +225,13 @@ class AccountManager(utils.IdentifierMixin, object):
                 "createDate": utils.query_filter_orderby()
             }
         }
+
+        if category:
+            object_filter = utils.dict_merge(object_filter,
+                                             {"allTopLevelBillingItems": {"categoryCode": {"operation": category}}})
+        if create:
+            object_filter = utils.dict_merge(object_filter,
+                                             {"allTopLevelBillingItems": {"createDate": {"operation": create}}})
 
         return self.client.call('Account', 'getAllTopLevelBillingItems',
                                 mask=mask, filter=object_filter, iter=True, limit=100)

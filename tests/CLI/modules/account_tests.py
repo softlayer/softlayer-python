@@ -127,6 +127,21 @@ class AccountCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getAllTopLevelBillingItems')
 
+    def test_account_billing_items_by_category(self):
+        result = self.run_command(['account', 'billing-items', '--category', 'server'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getAllTopLevelBillingItems')
+
+    def test_account_billing_items_by_ordered(self):
+        result = self.run_command(['account', 'billing-items', '--ordered', 'Test'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getAllTopLevelBillingItems')
+
+    def test_account_billing_items_create(self):
+        result = self.run_command(['account', 'billing-items', '--create', '04-21-2023'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getAllTopLevelBillingItems')
+
     # slcli account item-detail
     def test_account_get_billing_item_detail(self):
         result = self.run_command(['account', 'item-detail', '12345'])
