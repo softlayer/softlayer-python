@@ -14,7 +14,7 @@ from SoftLayer import utils
 def cli(env):
     """Displays bandwidth pool information
 
-    Similiar to https://cloud.ibm.com/classic/network/bandwidth/vdr
+    Similiar to https://cloud.ibm.com/classic-bandwidth/pools
     """
 
     manager = AccountManager(env.client)
@@ -22,12 +22,13 @@ def cli(env):
 
     table = formatting.Table([
         "Id",
-        "Pool Name",
+        "Name",
         "Region",
-        "Servers",
+        "Devices",
         "Allocation",
         "Current Usage",
-        "Projected Usage"
+        "Projected Usage",
+        "Cost"
     ], title="Bandwidth Pools")
     table.align = 'l'
     for item in items:
@@ -36,8 +37,20 @@ def cli(env):
         region = utils.lookup(item, 'locationGroup', 'name')
         servers = manager.get_bandwidth_pool_counts(identifier=item.get('id'))
         allocation = "{} GB".format(item.get('totalBandwidthAllocated', 0))
-        current = "{} GB".format(utils.lookup(item, 'billingCyclePublicBandwidthUsage', 'amountOut'))
+
+        current = utils.lookup(item, 'billingCyclePublicBandwidthUsage', 'amountOut')
+        if current is not None:
+            current = "{} GB".format(current)
+        else:
+            current = "0 GB"
+
         projected = "{} GB".format(item.get('projectedPublicBandwidthUsage', 0))
 
-        table.add_row([id_bandwidth, name, region, servers, allocation, current, projected])
+        cost = utils.lookup(item, 'billingItem', 'nextInvoiceTotalRecurringAmount')
+        if cost is not None:
+            cost = "${}".format(cost)
+        else:
+            cost = "$0.0"
+
+        table.add_row([id_bandwidth, name, region, servers, allocation, current, projected, cost])
     env.fout(table)
