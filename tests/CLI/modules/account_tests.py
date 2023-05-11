@@ -185,17 +185,17 @@ class AccountCLITests(testing.TestCase):
         result = self.run_command(['account', 'events', '--date-min', '5/9/2023'])
         self.assert_no_fail(result)
         self.assert_called_with(self.SLNOE, 'getAllObjects')
-    
+
     def test_account_planned_events(self):
         result = self.run_command(['account', 'events', '--planned'])
         self.assert_no_fail(result)
         self.assert_called_with(self.SLNOE, 'getAllObjects')
-    
+
     def test_account_unplanned_events(self):
         result = self.run_command(['account', 'events', '--unplanned'])
         self.assert_no_fail(result)
         self.assert_called_with(self.SLNOE, 'getAllObjects')
-    
+
     def test_account_announcement_events(self):
         result = self.run_command(['account', 'events', '--announcement'])
         self.assert_no_fail(result)
