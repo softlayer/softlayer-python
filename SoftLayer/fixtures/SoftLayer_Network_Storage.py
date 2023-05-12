@@ -257,3 +257,9 @@ refreshDuplicate = {
 convertCloneDependentToIndependent = {
     'dependentDuplicate': 1
 }
+
+getDuplicateConversionStatus = {
+    'activeConversionStartTime': '2023-01-01',
+    'deDuplicateConversionPercentage': 50,
+    'volumeUsername': 'testUser'
+}
