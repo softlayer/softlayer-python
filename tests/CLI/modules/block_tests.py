@@ -858,3 +858,9 @@ class BlockTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getObject')
         self.assert_called_with('SoftLayer_Network_Storage_Hub_Cleversafe_Account', 'getEndpoints')
+
+    def test_block_duplicate_covert_status(self):
+        result = self.run_command(['block', 'duplicate-convert-status', '12345678'])
+
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Storage', 'getDuplicateConversionStatus')
