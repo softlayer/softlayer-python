@@ -138,7 +138,8 @@ class Environment(object):
 
                 # offset is used to exclude the path that the caller requested.
                 offset = len(path_str) + 1 if path_str else 0
-                commands.append(command[offset:])
+                if ':' not in command[offset:]:
+                    commands.append(command[offset:])
 
         return sorted(commands)
 
