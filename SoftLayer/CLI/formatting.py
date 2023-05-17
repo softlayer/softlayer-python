@@ -112,7 +112,7 @@ def gb(gigabytes):  # pylint: disable=C0103
 
 
 def convert_sizes(value, unit='GB', round_result=False):
-    """ Converts a data storage value to an appropriate unit.
+    """Converts a data storage value to an appropriate unit.
 
     :param str value: The value to convert.
     :param str unit: The unit of the value ('B', 'KB', 'MB', 'GB', 'TB').
