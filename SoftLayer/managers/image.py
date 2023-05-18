@@ -70,7 +70,7 @@ class ImageManager(utils.IdentifierMixin, object):
         account = self.client['Account']
         return account.getPrivateBlockDeviceTemplateGroups(**kwargs)
 
-    def list_public_images(self, guid=None, name=None, **kwargs):
+    def list_public_images(self, guid=None, name=None, limit=100, **kwargs):
         """List all public images.
 
         :param string guid: filter based on GUID
@@ -89,7 +89,7 @@ class ImageManager(utils.IdentifierMixin, object):
 
         kwargs['filter'] = _filter.to_dict()
 
-        return self.vgbdtg.getPublicImages(**kwargs)
+        return self.vgbdtg.getPublicImages(**kwargs, limit=limit)
 
     def _get_ids_from_name_public(self, name):
         """Get public images which match the given name."""
