@@ -331,6 +331,20 @@ ALL_ROUTES = [
      'SoftLayer.CLI.securitygroup.interface:remove'),
     ('securitygroup:event-log', 'SoftLayer.CLI.securitygroup.event_log:get_by_request_id'),
 
+    ('sshkey', 'SoftLayer.CLI.sshkey'),
+    ('sshkey:add', 'SoftLayer.CLI.security.sshkey_add:cli'),
+    ('sshkey:remove', 'SoftLayer.CLI.security.sshkey_remove:cli'),
+    ('sshkey:edit', 'SoftLayer.CLI.security.sshkey_edit:cli'),
+    ('sshkey:list', 'SoftLayer.CLI.security.sshkey_list:cli'),
+    ('sshkey:print', 'SoftLayer.CLI.security.sshkey_print:cli'),
+
+    ('ssl', 'SoftLayer.CLI.ssl'),
+    ('ssl:add', 'SoftLayer.CLI.security.cert_add:cli'),
+    ('ssl:download', 'SoftLayer.CLI.security.cert_download:cli'),
+    ('ssl:edit', 'SoftLayer.CLI.security.cert_edit:cli'),
+    ('ssl:list', 'SoftLayer.CLI.security.cert_list:cli'),
+    ('ssl:remove', 'SoftLayer.CLI.security.cert_remove:cli'),
+
     ('security', 'SoftLayer.CLI.security'),
     ('security:sshkey-add', 'SoftLayer.CLI.security.sshkey_add:cli'),
     ('security:sshkey-remove', 'SoftLayer.CLI.security.sshkey_remove:cli'),
