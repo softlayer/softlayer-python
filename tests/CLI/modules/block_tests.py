@@ -122,7 +122,6 @@ class BlockTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assertEqual([
             {
-                'bytes_used': None,
                 'capacity_gb': 20,
                 'datacenter': 'dal05',
                 'id': 100,
