@@ -9,12 +9,7 @@ Python Bindings project.
 Code Organization
 -----------------
 
-* **docs** - Where The source to this documentation lives.
-* **SoftLayer** - All the source lives under here.
-
-  * **API** - Primary API client.
-  * **CLI** - Code for the command-line interface.
-  * **managers** - API Managers. Abstractions to help use the API.
+.. image: _static/SoftLayer-Python.png
 
 
 Setting Up A Dev Environment
@@ -121,15 +116,7 @@ to build the docs:
 
 ::
 
-  fab make_html
-
-The documentation will be built in `docs/_build/html`. If you don't have
-fabric, use the following commands.
-
-::
-
   cd docs
-  make html
   sphinx-build -b html ./  ./html
 
 The primary docs are built at

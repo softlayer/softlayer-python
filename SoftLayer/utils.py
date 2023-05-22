@@ -3,8 +3,8 @@
     ~~~~~~~~~~~~~~~
     Utility function/classes.
 
-    :license: MIT, see LICENSE for more details.
 """
+
 import collections
 import datetime
 from json import JSONDecoder
@@ -247,7 +247,6 @@ class IdentifierMixin(object):
 
     This mixin provides an interface to provide multiple methods for
     converting an 'indentifier' to an id
-
     """
     resolvers = []
 
@@ -375,7 +374,7 @@ def verify_date(date):
     """Verify if the date format is correct
 
     :param string date: A date in format string
-    :return a exception if the date is not the correct format
+    :return Exception: a exception if the date is not the correct format
     """
     try:
         date = datetime.datetime.strptime(date, '%m/%d/%Y')
