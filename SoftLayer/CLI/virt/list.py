@@ -9,6 +9,7 @@ from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
+from SoftLayer import utils
 
 # pylint: disable=unnecessary-lambda
 
@@ -30,6 +31,10 @@ COLUMNS = [
         'tags',
         lambda server: formatting.tags(server.get('tagReferences')),
         mask="tagReferences.tag.name"),
+    column_helper.Column(
+        'createDate',
+        lambda guest: utils.clean_time(guest.get('createDate'),
+                                       in_format='%Y-%m-%dT%H:%M:%S', out_format='%Y-%m-%d %H:%M'), mask="createDate"),
 ]
 
 DEFAULT_COLUMNS = [
