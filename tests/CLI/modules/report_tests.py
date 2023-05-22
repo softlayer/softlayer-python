@@ -13,289 +13,28 @@ from pprint import pprint as pp
 
 
 class ReportTests(testing.TestCase):
-
-    def test_bandwidth_invalid_date(self):
-        result = self.run_command(
-            [
-                'report',
-                'bandwidth',
-                '--start=welp',
-                '--end=2016-01-01',
-            ],
-        )
-        self.assertTrue('Invalid value for "--start"', result.output)
-
-        result = self.run_command(
-            [
-                'report',
-                'bandwidth',
-                '--start=2016-01-01',
-                '--end=welp',
-            ],
-        )
-        self.assertTrue('Invalid value for "--end"', result.output)
-
-    def test_bandwidth_report(self):
-        racks = self.set_mock('SoftLayer_Account', 'getVirtualDedicatedRacks')
-        racks.return_value = [{
-            'id': 1,
-            'name': 'pool1',
-            'metricTrackingObjectId': 1,
-        }, {
-            'id': 2,
-            'name': 'pool2',
-        }, {
-            'id': 3,
-            'name': 'pool3',
-            'metricTrackingObjectId': 3,
-        }]
-        hardware = self.set_mock('SoftLayer_Account', 'getHardware')
-        hardware.return_value = [{
-            'id': 101,
-            'metricTrackingObject': {'id': 101},
-            'hostname': 'host1',
-        }, {
-            'id': 102,
-            'hostname': 'host2',
-            'virtualRack': {'id': 1, 'bandwidthAllotmentTypeId': 2},
-        }, {
-            'id': 103,
-            'metricTrackingObject': {'id': 103},
-            'hostname': 'host3',
-            'virtualRack': {'id': 1, 'bandwidthAllotmentTypeId': 2},
-        }]
-        guests = self.set_mock('SoftLayer_Account', 'getVirtualGuests')
-        guests.return_value = [{
-            'id': 201,
-            'metricTrackingObjectId': 201,
-            'hostname': 'host1',
-        }, {
-            'id': 202,
-            'hostname': 'host2',
-            'virtualRack': {'id': 2, 'bandwidthAllotmentTypeId': 2},
-        }, {
-            'id': 203,
-            'metricTrackingObjectId': 203,
-            'hostname': 'host3',
-            'virtualRack': {'id': 2, 'bandwidthAllotmentTypeId': 2},
-        }]
-        summary_data = self.set_mock('SoftLayer_Metric_Tracking_Object', 'getSummaryData')
-        summary_data.return_value = [
-            {'type': 'publicIn_net_octet', 'counter': 10},
-            {'type': 'publicOut_net_octet', 'counter': 20},
-            {'type': 'privateIn_net_octet', 'counter': 30},
-            {'type': 'privateOut_net_octet', 'counter': 40},
-        ]
-
-        result = self.run_command([
-            'report',
-            'bandwidth',
-            '--start=2016-02-04',
-            '--end=2016-03-04 12:34:56',
-        ])
+    def test_bandwidth_summary_report(self):
+        search_mock = self.set_mock('SoftLayer_Search', 'advancedSearch')
+        search_mock.side_effect = [_bandwidth_advanced_search(), [], [], []]
+        result = self.run_command(['report', 'bandwidth'])
 
         self.assert_no_fail(result)
-
-        stripped_output = '[' + result.output.split('[', 1)[1]
-        json_output = json.loads(stripped_output)
-        pp(json.loads(stripped_output))
-        print("======= ^^^^^^^^^ ==============")
-        self.assertEqual(json_output[0]['hostname'], 'pool1')
-        self.assertEqual(json_output[0]['private_in'], 30)
-
-        self.assertEqual(6, len(self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData')))
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=1)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=3)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=101)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=103)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=201)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=203)
-        call = self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=1)[0]
-        expected_args = ('2016-02-04 00:00:00 ', '2016-03-04 12:34:56 ',
-                         [{
-                             'keyName': 'PUBLICIN',
-                             'name': 'publicIn',
-                             'summaryType': 'sum',
-                         }, {
-                             'keyName': 'PUBLICOUT',
-                             'name': 'publicOut',
-                             'summaryType': 'sum',
-                         }, {
-                             'keyName': 'PRIVATEIN',
-                             'name': 'privateIn',
-                             'summaryType': 'sum',
-                         }, {
-                             'keyName': 'PRIVATEOUT',
-                             'name': 'privateOut',
-                             'summaryType': 'sum',
-                         }],
-                         300,
-                         )
-        self.assertEqual(expected_args, call.args)
-
-    def test_virtual_bandwidth_report(self):
-        racks = self.set_mock('SoftLayer_Account', 'getVirtualDedicatedRacks')
-        racks.return_value = [{
-            'id': 1,
-            'name': 'pool1',
-            'metricTrackingObjectId': 1,
-        }, {
-            'id': 2,
-            'name': 'pool2',
-        }, {
-            'id': 3,
-            'name': 'pool3',
-            'metricTrackingObjectId': 3,
-        }]
-        guests = self.set_mock('SoftLayer_Account', 'getVirtualGuests')
-        guests.return_value = [{
-            'id': 201,
-            'metricTrackingObjectId': 201,
-            'hostname': 'host1',
-        }, {
-            'id': 202,
-            'hostname': 'host2',
-            'virtualRack': {'id': 2, 'bandwidthAllotmentTypeId': 2},
-        }, {
-            'id': 203,
-            'metricTrackingObjectId': 203,
-            'hostname': 'host3',
-            'virtualRack': {'id': 2, 'bandwidthAllotmentTypeId': 2},
-        }]
-        summary_data = self.set_mock('SoftLayer_Metric_Tracking_Object',
-                                     'getSummaryData')
-        summary_data.return_value = [
-            {'type': 'publicIn_net_octet', 'counter': 10},
-            {'type': 'publicOut_net_octet', 'counter': 20},
-            {'type': 'privateIn_net_octet', 'counter': 30},
-            {'type': 'privateOut_net_octet', 'counter': 40},
-        ]
-
-        result = self.run_command([
-            'report',
-            'bandwidth',
-            '--start=2016-02-04',
-            '--end=2016-03-04 12:34:56',
-            '--virtual',
-        ])
-
-        self.assert_no_fail(result)
-        stripped_output = '[' + result.output.split('[', 1)[1]
-        json_output = json.loads(stripped_output)
-        self.assertEqual(json_output[0]['hostname'], 'pool1')
-        self.assertEqual(json_output[1]['private_out'], 40)
-        self.assertEqual(json_output[2]['private_in'], 30)
-        self.assertEqual(json_output[3]['type'], 'virtual')
-
-        self.assertEqual(4, len(self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData')))
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=1)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=3)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=201)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=203)
-        call = self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=1)[0]
-        expected_args = ('2016-02-04 00:00:00 ', '2016-03-04 12:34:56 ',
-                         [{
-                             'keyName': 'PUBLICIN',
-                             'name': 'publicIn',
-                             'summaryType': 'sum',
-                         }, {
-                             'keyName': 'PUBLICOUT',
-                             'name': 'publicOut',
-                             'summaryType': 'sum',
-                         }, {
-                             'keyName': 'PRIVATEIN',
-                             'name': 'privateIn',
-                             'summaryType': 'sum',
-                         }, {
-                             'keyName': 'PRIVATEOUT',
-                             'name': 'privateOut',
-                             'summaryType': 'sum',
-                         }],
-                         300,
-                         )
-        self.assertEqual(expected_args, call.args)
-
-    def test_server_bandwidth_report(self):
-        racks = self.set_mock('SoftLayer_Account', 'getVirtualDedicatedRacks')
-        racks.return_value = [{
-            'id': 1,
-            'name': 'pool1',
-            'metricTrackingObjectId': 1,
-        }, {
-            'id': 2,
-            'name': 'pool2',
-        }, {
-            'id': 3,
-            'name': 'pool3',
-            'metricTrackingObjectId': 3,
-        }]
-        hardware = self.set_mock('SoftLayer_Account', 'getHardware')
-        hardware.return_value = [{
-            'id': 101,
-            'metricTrackingObject': {'id': 101},
-            'hostname': 'host1',
-        }, {
-            'id': 102,
-            'hostname': 'host2',
-            'virtualRack': {'id': 1, 'bandwidthAllotmentTypeId': 2},
-        }, {
-            'id': 103,
-            'metricTrackingObject': {'id': 103},
-            'hostname': 'host3',
-            'virtualRack': {'id': 1, 'bandwidthAllotmentTypeId': 2},
-        }]
-
-        summary_data = self.set_mock('SoftLayer_Metric_Tracking_Object',
-                                     'getSummaryData')
-        summary_data.return_value = [
-            {'type': 'publicIn_net_octet', 'counter': 10},
-            {'type': 'publicOut_net_octet', 'counter': 20},
-            {'type': 'privateIn_net_octet', 'counter': 30},
-            {'type': 'privateOut_net_octet', 'counter': 40},
-        ]
-
-        result = self.run_command([
-            'report',
-            'bandwidth',
-            '--start=2016-02-04',
-            '--end=2016-03-04 12:34:56',
-            '--server',
-        ])
-
-        self.assert_no_fail(result)
-        stripped_output = '[' + result.output.split('[', 1)[1]
-        json_output = json.loads(stripped_output)
-        self.assertEqual(json_output[0]['hostname'], 'pool1')
-        self.assertEqual(json_output[1]['private_out'], 40)
-        self.assertEqual(json_output[2]['private_in'], 30)
-        self.assertEqual(json_output[3]['type'], 'hardware')
-
-        self.assertEqual(4, len(self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData')))
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=101)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=103)
-
-        call = self.calls('SoftLayer_Metric_Tracking_Object', 'getSummaryData', identifier=1)[0]
-        expected_args = ('2016-02-04 00:00:00 ', '2016-03-04 12:34:56 ',
-                         [{
-                             'keyName': 'PUBLICIN',
-                             'name': 'publicIn',
-                             'summaryType': 'sum',
-                         }, {
-                             'keyName': 'PUBLICOUT',
-                             'name': 'publicOut',
-                             'summaryType': 'sum',
-                         }, {
-                             'keyName': 'PRIVATEIN',
-                             'name': 'privateIn',
-                             'summaryType': 'sum',
-                         }, {
-                             'keyName': 'PRIVATEOUT',
-                             'name': 'privateOut',
-                             'summaryType': 'sum',
-                         }],
-                         300,
-                         )
-        self.assertEqual(expected_args, call.args)
+        self.assert_called_with('SoftLayer_Search', 'advancedSearch')
+        json_output = json.loads(result.output)
+        pp(json_output)
+        self.assertEqual(5, len(json_output))
+        self.assertEqual(100250634, json_output[0]['Id'])
+        self.assertEqual('TestRegion', json_output[0]['Pool'])
+        self.assertEqual('dal10', json_output[0]['Location'])
+        self.assertEqual(['tag test', 'tag test2'], json_output[0]['Tags'])
+        self.assertEqual('Virtual Private Rack', json_output[1]['Pool'])
+        self.assertEqual('1.04 GB', json_output[2]['Total usage'])
+        self.assertEqual('5.00 TB', json_output[2]['Allocation'])
+        self.assertEqual('Unlimited', json_output[3]['Allocation'])
+        self.assertEqual('Not Applicable', json_output[3]['Pool'])
+        self.assertEqual('0.00 MB', json_output[3]['Data in'])
+        self.assertEqual('0.00 MB', json_output[3]['Data out'])
+        self.assertEqual('Pay-As-You-Go', json_output[4]['Allocation'])
 
     def test_dc_closure_report(self):
         search_mock = self.set_mock('SoftLayer_Search', 'advancedSearch')
@@ -309,6 +48,181 @@ class ReportTests(testing.TestCase):
         pp(json_output)
         self.assertEqual(5, len(json_output))
         self.assertEqual('bcr01a.ams01', json_output[0]['POD'])
+
+
+def _bandwidth_advanced_search():
+    result = [
+        {
+            "matchedTerms": [],
+            "relevanceScore": "1",
+            "resource": {
+                "fullyQualifiedDomainName": "test.com",
+                "id": 100250634,
+                "bandwidthAllocation": "250",
+                "bandwidthAllotmentDetail": {
+                    "id": 53306635,
+                    "bandwidthAllotment": {
+                        "bandwidthAllotmentTypeId": 2,
+                        "id": 1289128,
+                        "name": "TestRegion"
+                    }
+                },
+                "billingItem": {
+                    "createDate": "2022-03-07T05:28:44-06:00",
+                    "id": 937460400,
+                    "lastBillDate": "2023-05-03T23:07:54-06:00"
+                },
+                "datacenter": {
+                    "id": 1441195,
+                    "name": "dal10"
+                },
+                "inboundPublicBandwidthUsage": ".16204",
+                "outboundPublicBandwidthUsage": ".01351",
+                "primaryIpAddress": "169.46.48.110",
+                "tagReferences": [
+                    {
+                        "id": 172236920,
+                        "tag": {
+                                    "id": 3414982,
+                                    "name": "tag test"
+                        }
+                    },
+                    {
+                        "id": 172236918,
+                        "tag": {
+                            "id": 3307656,
+                            "name": "tag test2"
+                        }
+                    }
+                ]
+            },
+            "resourceType": "SoftLayer_Virtual_Guest"
+        },
+        {
+            "matchedTerms": [],
+            "relevanceScore": "1",
+            "resource": {
+                "fullyQualifiedDomainName": "test.cloud",
+                "id": 1867001,
+                "bandwidthAllocation": "20000",
+                "bandwidthAllotmentDetail": {
+                    "id": 37331756,
+                    "bandwidthAllotment": {
+                        "bandwidthAllotmentTypeId": 1,
+                        "id": 138442,
+                        "name": "Virtual Private Rack"
+                    }
+                },
+                "billingItem": {
+                    "createDate": "2020-04-27T14:02:03-06:00",
+                    "id": 658642904,
+                    "lastBillDate": "2023-05-03T23:07:47-06:00"
+                },
+                "datacenter": {
+                    "id": 1441195,
+                    "name": "dal10"
+                },
+                "inboundPublicBandwidthUsage": ".48562",
+                "outboundPublicBandwidthUsage": ".1987",
+                "primaryIpAddress": "169.48.191.246",
+                "tagReferences": [
+                    {
+                        "id": 1060153378,
+                        "tag": {
+                                    "id": 4974546,
+                                    "name": "tags"
+                        }
+                    }
+                ]
+            },
+            "resourceType": "SoftLayer_Hardware"
+        },
+        {
+            "matchedTerms": [],
+            "relevanceScore": "1",
+            "resource": {
+                "fullyQualifiedDomainName": "testcommunity.cloud",
+                "id": 3190740,
+                "bandwidthAllocation": "5000",
+                "bandwidthAllotmentDetail": {
+                    "id": 50932574,
+                    "bandwidthAllotment": {
+                        "bandwidthAllotmentTypeId": 1,
+                        "id": 138442,
+                        "name": "Virtual Private Rack"
+                    }
+                },
+                "billingItem": {
+                    "createDate": "2022-08-11T11:39:55-06:00",
+                    "id": 983649084,
+                    "lastBillDate": "2023-05-03T23:07:48-06:00"
+                },
+                "datacenter": {
+                    "id": 1441195,
+                    "name": "dal10"
+                },
+                "inboundPublicBandwidthUsage": ".63179",
+                "outboundPublicBandwidthUsage": ".40786",
+                "primaryIpAddress": "52.118.38.243",
+                "tagReferences": []
+            },
+            "resourceType": "SoftLayer_Hardware"
+        },
+        {
+            "matchedTerms": [],
+            "relevanceScore": "1",
+            "resource": {
+                "id": 47758,
+                "name": "SLADC307608-jt48",
+                        "billingItem": {
+                            "createDate": "2022-02-11T09:49:16-06:00",
+                            "id": 931026566,
+                            "lastBillDate": "2023-05-03T23:08:02-06:00"
+                        },
+                "datacenter": {
+                            "id": 2017603,
+                            "name": "wdc07"
+                        },
+                "primaryIpAddress": "169.62.12.146",
+                "tagReferences": []
+            },
+            "resourceType": "SoftLayer_Network_Application_Delivery_Controller"
+        },
+        {
+            "matchedTerms": [],
+            "relevanceScore": "1",
+            "resource": {
+                "fullyQualifiedDomainName": "lab-web.test.com",
+                "id": 127890106,
+                "bandwidthAllocation": "0",
+                "bandwidthAllotmentDetail": {
+                    "id": 48915580,
+                    "bandwidthAllotment": {
+                        "bandwidthAllotmentTypeId": 1,
+                        "id": 138442,
+                        "name": "Virtual Private Rack"
+                    }
+                },
+                "billingItem": {
+                    "createDate": "2022-02-08T08:33:14-06:00",
+                    "id": 930164384,
+                    "lastBillDate": "2023-05-03T23:07:56-06:00"
+                },
+                "datacenter": {
+                    "id": 138124,
+                    "name": "dal05"
+                },
+                "inboundPrivateBandwidthUsage": ".00002",
+                "inboundPublicBandwidthUsage": ".19583",
+                "outboundPrivateBandwidthUsage": ".00002",
+                "outboundPublicBandwidthUsage": ".18446",
+                "primaryIpAddress": "108.168.148.26",
+                "tagReferences": []
+            },
+            "resourceType": "SoftLayer_Virtual_Guest"
+        }
+    ]
+    return result
 
 
 def _advanced_search():

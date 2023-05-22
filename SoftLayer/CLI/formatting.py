@@ -111,6 +111,74 @@ def gb(gigabytes):  # pylint: disable=C0103
     return FormattedItem(int(float(gigabytes)) * 1024, "%dG" % int(float(gigabytes)))
 
 
+def convert_sizes(value, unit='GB', round_result=False):
+    """Converts a data storage value to an appropriate unit.
+
+    :param str value: The value to convert.
+    :param str unit: The unit of the value ('B', 'KB', 'MB', 'GB', 'TB').
+    :param bool round_result: rounded result
+    :return: The converted value and its unit.
+    """
+
+    if not value:
+        return '0.00 MB'
+
+    value = float(value)
+
+    if value == 0:
+        return "0.00 MB"
+
+    units = ['B', 'KB', 'MB', 'GB', 'TB']
+    if unit not in units:
+        return "Invalid unit. Must be one of 'B', 'KB', 'MB', 'GB', 'TB'"
+
+    unit_index = units.index(unit)
+
+    while value > 999 and unit_index < len(units) - 1:
+        value /= 1024
+        unit_index += 1
+
+    while value < 1 and unit_index > 0:
+        value *= 1024
+        unit_index -= 1
+
+    if round_result:
+        value = round(value / 5) * 5
+    return "{:.2f} {}".format(value, units[unit_index])
+
+
+def sum_sizes(size1, size2):
+    """Sums two data storage values.
+
+    :param str size1: The first value and its unit.
+    :param str size2: The second value and its unit.
+    :return: The sum of the values and its unit.
+    """
+    if size1 == '0.00 MB':
+        return size2
+    if size2 == '0.00 MB':
+        return size1
+
+    value1, unit1 = float(size1.split()[0]), size1.split()[1]
+    value2, unit2 = float(size2.split()[0]), size2.split()[1]
+
+    units = ['B', 'KB', 'MB', 'GB', 'TB']
+    if unit1 not in units or unit2 not in units:
+        return "Invalid unit in one of the sizes. Unit must be one of 'B', 'KB', 'MB', 'GB', 'TB'"
+
+    value1 *= (1024 ** units.index(unit1))
+    value2 *= (1024 ** units.index(unit2))
+
+    total_value = value1 + value2
+
+    total_unit = 'B'
+    while total_value > 999 and total_unit != 'TB':
+        total_value /= 1024
+        total_unit = units[units.index(total_unit) + 1]
+
+    return "{:.2f} {}".format(total_value, total_unit)
+
+
 def blank():
     """Returns a blank FormattedItem."""
     return FormattedItem(None, '-')
