@@ -32,7 +32,7 @@ class SearchManager(object):
     def search_instances(self, search_string, mask=None, **kwargs):
         """Lists VSIs based in the search_string.
 
-        Also takes in a few search terms as \*\*kwargs. such as hostname, datacenter, domain and tags
+        Also takes in a few search terms as \\*\\*kwargs. such as hostname, datacenter, domain and tags
         """
 
         # This forces the Search API to do a fuzzy search on our term, kinda. Not sure why the ** are
@@ -59,7 +59,7 @@ class SearchManager(object):
     def search_hadrware_instances(self, search_string, mask=None, **kwargs):
         """Lists hardwares based in the search_string.
 
-        Also takes in a few search terms as \*\*kwargs. such as hostname, datacenter, domain and tags
+        Also takes in a few search terms as \\*\\*kwargs. such as hostname, datacenter, domain and tags
         """
 
         # This forces the Search API to do a fuzzy search on our term, kinda. Not sure why the ** are
