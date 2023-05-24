@@ -1,7 +1,7 @@
 .. _cli_security:
 
 SSH Keys and SSL Certificates
-========
+=============================
 
 .. click:: SoftLayer.CLI.security.sshkey_add:cli
     :prog: security sshkey-add
