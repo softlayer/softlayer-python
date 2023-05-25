@@ -1,4 +1,4 @@
-"""Bandwidth report for every pool/server."""
+"""Bandwidth summary for every pool/server."""
 import click
 
 from SoftLayer.CLI.command import SLCommand as SLCommand
@@ -7,14 +7,17 @@ from SoftLayer.CLI import formatting
 from SoftLayer import utils
 
 
-@click.command(cls=SLCommand, short_help="Bandwidth report for every pool/server")
+@click.command(cls=SLCommand, short_help="Bandwidth summary for every pool/server")
 @environment.pass_env
 def cli(env):
-    """Bandwidth report for every pool/server.
+    """Bandwidth summary for every pool/server.
 
-    This reports on the total data transfered for each virtual sever, hardware
+    This summary on the total data transfered for each virtual sever, hardware
     server and bandwidth pool.
     https://cloud.ibm.com/classic-bandwidth
+
+    More information
+    https://cloud.ibm.com/docs/bandwidth-metering?topic=bandwidth-metering-get-started-with-bandwidth-metering
     """
 
     table = formatting.Table([
