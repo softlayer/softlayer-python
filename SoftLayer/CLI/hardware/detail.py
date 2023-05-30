@@ -72,7 +72,7 @@ def cli(env, identifier, passwords, price, components):
     table.add_row(['last_transaction', last_transaction])
     table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else 'Monthly'])
 
-    vlan_table = formatting.Table(['type', 'number', 'id', 'Name', 'Netmask'])
+    vlan_table = formatting.Table(['type', 'number', 'id', 'name', 'netmask'])
     for vlan in result['networkVlans']:
         vlan_table.add_row([vlan['networkSpace'], vlan['vlanNumber'],
                             vlan['id'], vlan['fullyQualifiedName'],
