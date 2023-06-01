@@ -433,6 +433,110 @@ class BlockTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Billing_Item', 'cancelItem',
                                 args=(False, True, None))
 
+    @mock.patch('SoftLayer.BlockStorageManager.set_volume_snapshot_notification')
+    def test_block_snapshot_set_notify_status(self, set_s_notification):
+        set_s_notification.return_value = True
+        result = self.run_command(['block', 'snapshot-set-notification', '1234', '--enable'])
+
+        self.assert_no_fail(result)
+        self.assertEqual('Snapshots space usage threshold warning notification has bee set to'
+                         ' True for volume 1234\n', result.output)
+
+    def test_block_snapshot_cancel_immediate(self):
+        result = self.run_command(['--really',
+                                   'block', 'snapshot-cancel', '--immediate', '1234'])
+
+        self.assert_no_fail(result)
+        self.assertEqual('Block volume with id 1234 has been marked'
+                         ' for immediate snapshot cancellation\n', result.output)
+
+    @mock.patch('SoftLayer.BlockStorageManager.cancel_snapshot_space')
+    def test_block_snapshot_unable_cancel(self, cancel_snapshot_space):
+        cancel_snapshot_space.return_value = False
+        result = self.run_command(['--really',
+                                   'block', 'snapshot-cancel', '1234'])
+
+        self.assert_no_fail(result)
+        self.assertEqual('Unable to cancel snapshot space for block volume 1234\n', result.output)
+
+    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    def test_snapshot_cancel_aborted(self, no_going_back):
+        no_going_back.return_value = False
+        result = self.run_command(['block', 'snapshot-cancel', '1234'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_snapshot_delete(self):
+        result = self.run_command(['--really',
+                                   'block', 'snapshot-delete', '1234'])
+        self.assert_no_fail(result)
+
+    def test_block_snapshot_disable_not_in_schedule_type(self):
+        result = self.run_command(['block', 'snapshot-disable', '12345678',
+                                   '--schedule-type=ABCD'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertEqual(result.exception.message, "--schedule-type must be INTERVAL, HOURLY, DAILY, or WEEKLY")
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_block_snapshot_enable_not_in_schedule_type(self):
+        result = self.run_command(['block', 'snapshot-enable', '12345678',
+                                   '--schedule-type=ZYXW', '--minute=10',
+                                   '--retention-count=5'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertEqual(result.exception.message, "--schedule-type must be INTERVAL, HOURLY, DAILY,or WEEKLY,"
+                         " not ZYXW")
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_block_snapshot_enable_retention_count(self):
+        result = self.run_command(['block', 'snapshot-enable', '12345678',
+                                   '--schedule-type=INTERVAL', '--minute=-1',
+                                   '--retention-count=5'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertEqual(result.exception.message, "--minute value must be between 30 and 59")
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_block_snapshot_enable_minute(self):
+        result = self.run_command(['block', 'snapshot-enable', '12345678',
+                                   '--schedule-type=HOURLY', '--minute=-1',
+                                   '--retention-count=5'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertEqual(result.exception.message, "--minute value must be between 0 and 59")
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_block_snapshot_enable_hour(self):
+        result = self.run_command(['block', 'snapshot-enable', '12345678',
+                                   '--schedule-type=DAILY', '--hour=-1',
+                                   '--retention-count=5'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertEqual(result.exception.message, "--hour value must be between 0 and 23")
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_block_snapshot_enable_day_of_week(self):
+        result = self.run_command(['block', 'snapshot-enable', '12345678',
+                                   '--schedule-type=WEEKLY', '--day-of-week=EVERDAY',
+                                   '--retention-count=5'])
+        self.assertEqual(result.exit_code, 2)
+        self.assertEqual(result.exception.message, "--day_of_week value must be a valid day (ex: SUNDAY)")
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+
+    def test_snapshot_order_order_iops(self):
+        result = self.run_command(['block', 'snapshot-order', '1234',
+                                   '--size=10', '--tier=0.25', '--iops=1'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertEqual(result.exception.message, "Argument Error: Invalid value for '--iops' / '-i': '1' is not one"
+                         " of between 100 and 6000.")
+        self.assertIsInstance(result.exception, exceptions.ArgumentError)
+
+    def test_snapshot_order_order_iops_100(self):
+        result = self.run_command(['block', 'snapshot-order', '1234',
+                                   '--size=10', '--tier=0.25', '--iops=101'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertEqual(result.exception.message, "Argument Error: Invalid value for '--iops' / '-i': '101' is not"
+                         " a multiple of 100.")
+        self.assertIsInstance(result.exception, exceptions.ArgumentError)
+
     def test_snapshot_restore(self):
         result = self.run_command(['block', 'snapshot-restore', '12345678',
                                    '--snapshot-id=87654321'])
