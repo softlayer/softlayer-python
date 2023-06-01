@@ -26,7 +26,8 @@ def cli(env, identifier, no_vs, no_hardware):
     subnet_id = helpers.resolve_id(mgr.resolve_subnet_ids, identifier,
                                    name='subnet')
 
-    mask = 'mask[ipAddresses[id, ipAddress,note, hardware, virtualGuest], datacenter, virtualGuests, hardware,' \
+    mask = 'mask[ipAddresses[id, ipAddress, note, isBroadcast, isGateway, isNetwork, isReserved, ' \
+           'hardware, virtualGuest], datacenter, virtualGuests, hardware,' \
            ' networkVlan[networkSpace,primaryRouter]]'
 
     subnet = mgr.get_subnet(subnet_id, mask=mask)
@@ -55,14 +56,23 @@ def cli(env, identifier, no_vs, no_hardware):
 
     ip_address = subnet.get('ipAddresses')
 
-    ip_table = formatting.KeyValueTable(['id', 'ip', 'note'])
+    ip_table = formatting.KeyValueTable(['id', 'status', 'ip', 'note'])
     for address in ip_address:
         description = '-'
+        status = 'Reserved'
+        if address.get('isGateway'):
+            status = 'Gateway'
+        if address.get('isBroadcast'):
+            status = 'Broadcast'
+        if address.get('isNetwork'):
+            status = 'Network'
         if address.get('hardware') is not None:
             description = address['hardware']['fullyQualifiedDomainName']
+            status = 'In use'
         elif address.get('virtualGuest') is not None:
             description = address['virtualGuest']['fullyQualifiedDomainName']
-        ip_table.add_row([address.get('id'),
+            status = 'In use'
+        ip_table.add_row([address.get('id'), status,
                           address.get('ipAddress') + '/' + description, address.get('note', '-')])
 
     table.add_row(['ipAddresses', ip_table])
