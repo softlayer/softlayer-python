@@ -135,7 +135,7 @@ class BlockStorageManager(StorageManager):
 
     def order_block_volume(self, storage_type, location, size, os_type,
                            iops=None, tier_level=None, snapshot_size=None,
-                           service_offering='storage_as_a_service',
+                           service_offering="storage_as_a_service",
                            hourly_billing_flag=False):
         """Places an order for a block volume.
 
@@ -154,12 +154,12 @@ class BlockStorageManager(StorageManager):
         """
         order = storage_utils.prepare_volume_order_object(
             self, storage_type, location, size, iops, tier_level,
-            snapshot_size, service_offering, 'block', hourly_billing_flag
+            snapshot_size, service_offering, "block", hourly_billing_flag
         )
 
         order['osFormatType'] = {'keyName': os_type}
 
-        return self.client.call('Product_Order', 'placeOrder', order)
+        return self.client.call("Product_Order", "placeOrder", order)
 
     def cancel_block_volume(self, volume_id, reason='No longer needed', immediate=False):
         """Cancels the given block storage volume.
