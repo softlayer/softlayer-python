@@ -272,13 +272,13 @@ def resolve_ids(identifier, resolvers):
 
     # Before doing anything, let's see if this is an integer
     try:
-        return [int(identifier)]
+        # This looks like a globalIdentifier (UUID)
+        if len(identifier) == 36 and UUID_RE.match(identifier):
+            return [identifier]
+        else:
+            return [int(identifier)]
     except ValueError:
         pass  # It was worth a shot
-
-    # This looks like a globalIdentifier (UUID)
-    if len(identifier) == 36 and UUID_RE.match(identifier):
-        return [identifier]
 
     for resolver in resolvers:
         ids = resolver(identifier)
