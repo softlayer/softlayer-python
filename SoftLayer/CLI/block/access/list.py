@@ -14,12 +14,10 @@ from SoftLayer.CLI import storage_utils
 @click.argument('volume_id')
 @click.option('--columns',
               callback=column_helper.get_formatter(storage_utils.COLUMNS),
-              help='Columns to display. Options are: {0}.'.format(
-                  ', '.join(column.name for column in storage_utils.COLUMNS)),
+              help=f"Columns to display. Options are: { ', '.join(column.name for column in storage_utils.COLUMNS)}.",
               default=','.join(storage_utils.DEFAULT_COLUMNS))
 @click.option('--sortby',
-              help='Column to sort by. Options are: {0}.'.format(
-                  ', '.join(column.name for column in storage_utils.COLUMNS)),
+              help=f"Column to sort by. Options are: { ', '.join(column.name for column in storage_utils.COLUMNS)}.",
               default='name')
 @environment.pass_env
 def cli(env, columns, sortby, volume_id):
