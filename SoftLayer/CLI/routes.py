@@ -15,7 +15,7 @@ ALL_ROUTES = [
     ('account:invoice-detail', 'SoftLayer.CLI.account.invoice_detail:cli'),
     ('account:invoices', 'SoftLayer.CLI.account.invoices:cli'),
     ('account:events', 'SoftLayer.CLI.account.events:cli'),
-    ('account:bandwidth-pools-detail', 'SoftLayer.CLI.account.bandwidth_pools_detail:cli'),
+    ('account:bandwidth-pools-detail', 'SoftLayer.CLI.bandwidth.pools_detail:cli'),
     ('account:event-detail', 'SoftLayer.CLI.account.event_detail:cli'),
     ('account:licenses', 'SoftLayer.CLI.account.licenses:cli'),
     ('account:summary', 'SoftLayer.CLI.account.summary:cli'),
@@ -23,7 +23,7 @@ ALL_ROUTES = [
     ('account:item-detail', 'SoftLayer.CLI.account.item_detail:cli'),
     ('account:cancel-item', 'SoftLayer.CLI.account.cancel_item:cli'),
     ('account:orders', 'SoftLayer.CLI.account.orders:cli'),
-    ('account:bandwidth-pools', 'SoftLayer.CLI.account.bandwidth_pools:cli'),
+    ('account:bandwidth-pools', 'SoftLayer.CLI.bandwidth.pools:cli'),
     ('account:hooks', 'SoftLayer.CLI.account.hooks:cli'),
     ('account:hook-create', 'SoftLayer.CLI.account.hook_create:cli'),
     ('account:hook-delete', 'SoftLayer.CLI.account.hook_delete:cli'),
@@ -417,8 +417,13 @@ ALL_ROUTES = [
     ('search', 'SoftLayer.CLI.search:cli'),
 
     ('report', 'SoftLayer.CLI.report'),
-    ('report:bandwidth', 'SoftLayer.CLI.report.bandwidth:cli'),
+    ('report:bandwidth', 'SoftLayer.CLI.bandwidth.summary:cli'),
     ('report:datacenter-closures', 'SoftLayer.CLI.report.dc_closures:cli'),
+
+    ('bandwidth', 'SoftLayer.CLI.bandwidth'),
+    ('bandwidth:summary', 'SoftLayer.CLI.bandwidth.summary:cli'),
+    ('bandwidth:pools', 'SoftLayer.CLI.bandwidth.pools:cli'),
+    ('bandwidth:pools-detail', 'SoftLayer.CLI.bandwidth.pools_detail:cli'),
 ]
 
 ALL_ALIASES = {

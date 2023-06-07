@@ -1,4 +1,4 @@
-"""Displays information about the accounts bandwidth pools"""
+"""Displays information about the bandwidth pools"""
 # :license: MIT, see LICENSE for more details.
 import click
 
@@ -15,6 +15,9 @@ def cli(env):
     """Displays bandwidth pool information
 
     Similiar to https://cloud.ibm.com/classic-bandwidth/pools
+
+    More information
+    https://cloud.ibm.com/docs/bandwidth-metering?topic=bandwidth-metering-get-started-with-bandwidth-metering
     """
 
     manager = AccountManager(env.client)
