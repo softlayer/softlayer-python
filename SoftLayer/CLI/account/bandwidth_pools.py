@@ -36,19 +36,19 @@ def cli(env):
         name = item.get('name')
         region = utils.lookup(item, 'locationGroup', 'name')
         servers = manager.get_bandwidth_pool_counts(identifier=item.get('id'))
-        allocation = "{} GB".format(item.get('totalBandwidthAllocated', 0))
+        allocation = f"{item.get('totalBandwidthAllocated', 0)} GB"
 
         current = utils.lookup(item, 'billingCyclePublicBandwidthUsage', 'amountOut')
         if current is not None:
-            current = "{} GB".format(current)
+            current = f"{current} GB"
         else:
             current = "0 GB"
 
-        projected = "{} GB".format(item.get('projectedPublicBandwidthUsage', 0))
+        projected = f"{item.get('projectedPublicBandwidthUsage', 0)} GB"
 
         cost = utils.lookup(item, 'billingItem', 'nextInvoiceTotalRecurringAmount')
         if cost is not None:
-            cost = "${}".format(cost)
+            cost = f"${cost}"
         else:
             cost = "$0.0"
 

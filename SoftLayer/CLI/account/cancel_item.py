@@ -17,4 +17,4 @@ def cli(env, identifier):
     item = manager.cancel_item(identifier)
 
     if item:
-        env.fout("Item: {} was cancelled.".format(identifier))
+        env.fout(f"Item: {identifier} was cancelled.")
