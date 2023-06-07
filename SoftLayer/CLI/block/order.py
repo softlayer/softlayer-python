@@ -127,6 +127,6 @@ def cli(env, storage_type, size, iops, tier, os_type,
         for item in order['placedOrder']['items']:
             click.echo(" > %s" % item['description'])
         click.echo(f"\nYou may run 'slcli block volume-list --order {order['placedOrder']['id']}' "
-                   "to find this block volume after it is ready.")
+                   " to find this block volume after it is ready.")
     else:
         click.echo("Order could not be placed! Please verify your options and try again.")
