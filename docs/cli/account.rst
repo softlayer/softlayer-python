@@ -44,11 +44,11 @@ Account Commands
     :prog: account licenses
     :show-nested:
 
-.. click:: SoftLayer.CLI.account.bandwidth_pools:cli
+.. click:: SoftLayer.CLI.bandwidth.pools:cli
     :prog: account bandwidth-pools
     :show-nested:
 
-.. click:: SoftLayer.CLI.account.bandwidth_pools_detail:cli
+.. click:: SoftLayer.CLI.bandwidth.pools_detail:cli
     :prog: account bandwidth-pools-detail
     :show-nested:
 
