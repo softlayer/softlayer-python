@@ -77,10 +77,9 @@ def _validate_filter(ctx, param, value):  # pylint: disable=unused-argument
         try:
             _filter = json.loads(value)
             if not isinstance(_filter, dict):
-                raise exceptions.CLIAbort("\"{}\" should be a JSON object, but is a {} instead.".
-                                          format(_filter, type(_filter)))
+                raise exceptions.CLIAbort(f"\"{_filter}\" should be a JSON object, but is a {type(_filter)} instead.")
         except json.JSONDecodeError as error:
-            raise exceptions.CLIAbort("\"{}\" is not valid JSON. {}".format(value, error))
+            raise exceptions.CLIAbort(f"\"{value}\" is not valid JSON. {error}")
 
     return _filter
 
@@ -96,8 +95,8 @@ def _validate_parameters(ctx, param, value):  # pylint: disable=unused-argument
                 try:
                     parameter = json.loads(parameter)
                 except json.JSONDecodeError as error:
-                    click.secho("{} looked like json, but was invalid, passing to API as is. {}".
-                                format(parameter, error), fg='red')
+                    click.secho(f"{parameter} looked like json, but was invalid, passing to API as is. {error}",
+                                fg='red')
         validated_values.append(parameter)
     return validated_values
 
