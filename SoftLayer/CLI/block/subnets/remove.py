@@ -24,14 +24,14 @@ def cli(env, access_id, subnet_id):
         removed_subnets = block_manager.remove_subnets_from_acl(access_id, subnet_ids)
 
         for subnet in removed_subnets:
-            message = "Successfully removed subnet id: {} for allowed host id: {}".format(subnet, access_id)
+            message = f"Successfully removed subnet id: {subnet} for allowed host id: {access_id}"
             click.echo(message)
 
         failed_to_remove_subnets = list(set(subnet_ids) - set(removed_subnets))
         for subnet in failed_to_remove_subnets:
-            message = "Failed to remove subnet id: {} for allowed host id: {}".format(subnet, access_id)
+            message = f"Failed to remove subnet id: {subnet} for allowed host id: {access_id}"
             click.echo(message)
 
     except SoftLayer.SoftLayerAPIError as ex:
-        message = "Unable to remove subnets.\nReason: {}".format(ex.faultString)
+        message = f"Unable to remove subnets.\nReason: {ex.faultString}"
         click.echo(message)

@@ -31,9 +31,9 @@ def cli(env, access_id):
 
         table = formatting.Table(COLUMNS)
         for subnet in subnets:
-            row = ["{0}".format(subnet['id']),
-                   "{0}".format(subnet['networkIdentifier']),
-                   "{0}".format(subnet['cidr'])]
+            row = [f"{subnet['id']}",
+                   f"{subnet['networkIdentifier']}",
+                   f"{subnet['cidr']}"]
             table.add_row(row)
 
         env.fout(table)
