@@ -317,7 +317,7 @@ class BlockTests(testing.TestCase):
                          ' > Block Storage\n'
                          ' > 20 GB Storage Space\n'
                          ' > 200 IOPS\n'
-                         '\nYou may run "slcli block volume-list --order 10983647" to find this block volume '
+                         '\nYou may run \'slcli block volume-list --order 10983647\' to find this block volume '
                          'after it is ready.\n')
 
     @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
