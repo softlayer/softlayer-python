@@ -18,4 +18,3 @@ def cli(env, volume_id):
         click.echo(f"Disabled: Snapshots space usage threshold is disabled for volume {volume_id}")
     else:
         click.echo(f"Enabled: Snapshots space usage threshold is enabled for volume {volume_id}")
-
