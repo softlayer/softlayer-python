@@ -9,6 +9,7 @@ from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer import exceptions as ex
+from SoftLayer.fixtures import SoftLayer_Network_Vlan
 from SoftLayer.fixtures import SoftLayer_Product_Order
 from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
@@ -34,27 +35,15 @@ class VlanTests(testing.TestCase):
 
     def test_subnet_list(self):
         vlan_mock = self.set_mock('SoftLayer_Network_Vlan', 'getObject')
-        getObject = {
-            'primaryRouter': {
-                'datacenter': {'id': 1234, 'longName': 'TestDC'},
-                'fullyQualifiedDomainName': 'fcr01.TestDC'
-            },
-            'id': 1234,
-            'vlanNumber': 4444,
-            'firewallInterfaces': None,
-            'subnets': [
-                {
-                    'id': 99,
-                    'networkIdentifier': 1111111,
-                    'netmask': '255.255.255.0',
-                    'gateway': '12.12.12.12',
-                    'subnetType': 'TEST',
-                    'usableIpAddressCount': 1
-
-                }
-
-            ]
-        }
+        getObject = {'primaryRouter': {'datacenter': {'id': 1234, 'longName': 'TestDC'},
+                                       'fullyQualifiedDomainName': 'fcr01.TestDC'},
+                     'id': 1234,
+                     'vlanNumber': 4444,
+                     'firewallInterfaces': None,
+                     'subnets': [{'id': 99, 'networkIdentifier': 1111111, 'netmask': '255.255.255.0',
+                                  'gateway': '12.12.12.12', 'subnetType': 'TEST', 'usableIpAddressCount': 1}
+                                 ]
+                     }
         vlan_mock.return_value = getObject
         result = self.run_command(['vlan', 'detail', '1234'])
         self.assert_no_fail(result)
@@ -98,7 +87,7 @@ class VlanTests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.vlan.edit.click')
     def test_vlan_edit_not_any(self, click):
         result = self.run_command(['vlan', 'edit', '100'])
-        self.assertTrue(result.exit_code, 2)
+        self.assertEqual(result.exit_code, 2)
         self.assertEqual("At least one option is required", result.exception.message)
 
     def test_vlan_create_not_data_pod(self):
@@ -147,13 +136,10 @@ class VlanTests(testing.TestCase):
     def test_vlan_create_option(self, confirm_mock):
         confirm_mock.return_value = True
         datacenter_mock = self.set_mock('SoftLayer_Location_Datacenter', 'getDatacenters')
-        datacenter_mock.return_value = [{'id': 814994,
-                                         'name': 'ams03'
-                                         }]
+        datacenter_mock.return_value = [{'id': 814994, 'name': 'ams03'}]
         router_mock = self.set_mock('SoftLayer_Location_Datacenter', 'getHardwareRouters')
         router_mock.return_value = [{'hostname': 'bcr01a.ams03'}]
         result = self.run_command(['vlan', 'create-options'])
-        print(result.output)
         self.assert_no_fail(result)
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
@@ -161,9 +147,8 @@ class VlanTests(testing.TestCase):
         ngb_mock.return_value = True
         vlan_mock = self.set_mock('SoftLayer_Account', 'getNetworkVlans')
         gpods_mock = self.set_mock('SoftLayer_Network_Pod', 'getAllObjects')
-        vlan_mock.return_value = {'primaryRouter': {
-            'fullyQualifiedDomainName': 'bcr01a.fra02.softlayer.com',
-            'id': 462912},
+        vlan_mock.return_value = {'primaryRouter': {'fullyQualifiedDomainName': 'bcr01a.fra02.softlayer.com',
+                                                    'id': 462912},
                                   'tagReferences': ''}
         gpods_mock.return_value = [{'backendRouterId': 462912,
                                     'backendRouterName': 'bcr01a.fra02',
@@ -181,11 +166,9 @@ class VlanTests(testing.TestCase):
         ngb_mock.return_value = True
         vlan_mock = self.set_mock('SoftLayer_Account', 'getNetworkVlans')
         gpods_mock = self.set_mock('SoftLayer_Network_Pod', 'getAllObjects')
-        vlan_mock.return_value = {
-            'primaryRouter': {'fullyQualifiedDomainName': 'bcr01a.fra02.softlayer.com',
-                              'id': 462912
-                              },
-            'tagReferences': ''}
+        vlan_mock.return_value = {'primaryRouter': {'fullyQualifiedDomainName': 'bcr01a.fra02.softlayer.com',
+                                                    'id': 462912},
+                                  'tagReferences': ''}
         gpods_mock.return_value = [{'backendRouterId': 462912,
                                     'backendRouterName': 'bcr01a.fra02',
                                     'datacenterId': 449506,
@@ -198,57 +181,10 @@ class VlanTests(testing.TestCase):
         self.assert_no_fail(result)
 
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
-    def test_vlan_details_no_vs_no_hard_no_trunck(self, ngb_mock):
+    def test_vlan_details_no_vs_no_hard_no_trunk(self, ngb_mock):
         ngb_mock.return_value = True
         vlan_mock = self.set_mock('SoftLayer_Network_Vlan', 'getObject')
-        get_object = {'primaryRouter': {'fullyQualifiedDomainName': 'bcr02a.fra02.softlayer.com',
-                                        'id': 1186647,
-                                        'datacenter': {'id': 449506,
-                                                       'longName': 'Frankfurt 2',
-                                                       'name': 'fra02'}
-                                        },
-                      'id': 1186647,
-                      'vlanNumber': 932,
-                      'networkVlanFirewall': {
-                          'datacenter': {'id': 449506, 'longName': 'Frankfurt 2'},
-                          'fullyQualifiedDomainName': 'bcr02a.fra02.softlayer.com'
-                          },
-                      'subnets': [
-                          {'gateway': '10.85.154.1',
-                           'id': 1688651,
-                           'netmask': '255.255.255.192',
-                           'networkIdentifier': '10.85.154.0',
-                           'subnetType': 'ADDITIONAL_PRIMARY',
-                           'usableIpAddressCount': '61'}],
-                      'hardware': [
-                          {'domain': 'vmware.chechu.com',
-                           'hostname': 'host15',
-                           'primaryBackendIpAddress': '10.177.122.170',
-                           'primaryIpAddress': '169.46.48.107'}],
-                      'virtualGuests': [
-                          {'domain': 'ocp-virt.chechu.me',
-                           'hostname': 'haproxy',
-                           'primaryBackendIpAddress': '10.85.154.44',
-                           'primaryIpAddress': '158.177.72.67'}],
-                      'networkComponentTrunks': [
-                          {'networkComponent': {'hardwareId': 1483895, 'networkVlanId': 3285524,
-                                                'port': 12,
-                                                'downlinkComponent': {
-                                                    'networkVlanId': '', 'port': 0,
-                                                    'primaryIpAddress': '10.194.250.148',
-                                                    'hardware': {
-                                                        'domain': 'chechu.me',
-                                                        'fullyQualifiedDomainName': 'fra02-ocp-virt.chechu.me',
-                                                        'hostname': 'fra02-ocp-virt',
-                                                        'networkManagementIpAddress': '10.194.250.150',
-                                                        'tagReferences': []
-                                                        },
-                                                    'networkComponentGroup': {
-                                                        'groupTypeId': 1,
-                                                        'membersDescription': 'eth0/2'}}}}],
-                      'tagReferences': []}
-
-        vlan_mock.return_value = get_object
+        vlan_mock.return_value = SoftLayer_Network_Vlan.getObject_no_hard_no_vs_no_trunk
         result = self.run_command(['vlan', 'detail', '3284824'])
         self.assert_no_fail(result)
 
@@ -371,6 +307,5 @@ class VlanTests(testing.TestCase):
         vlan_mock.return_value = {}
         result = self.run_command(['vlan', 'cancel', '1234'])
         self.assertEqual(result.exit_code, 2)
-        print(result.exception)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
         self.assertIn("VLAN is an automatically assigned", result.exception.message)
