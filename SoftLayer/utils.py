@@ -263,6 +263,7 @@ class IdentifierMixin(object):
         return resolve_ids(identifier, self.resolvers)
 
 
+# pylint: disable=C0123
 def resolve_ids(identifier, resolvers):
     """Resolves IDs given a list of functions.
 
