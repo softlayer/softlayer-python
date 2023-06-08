@@ -266,7 +266,7 @@ class BlockTests(testing.TestCase):
                          ' > Endurance Storage\n > Block Storage\n'
                          ' > 0.25 IOPS per GB\n > 20 GB Storage Space\n'
                          ' > 10 GB Storage Space (Snapshot Space)\n'
-                         '\nYou may run "slcli block volume-list --order 478" to find this block volume '
+                         '\nYou may run \'slcli block volume-list --order 478\' to find this block volume '
                          'after it is ready.\n')
 
     @mock.patch('SoftLayer.BlockStorageManager.order_block_volume')
