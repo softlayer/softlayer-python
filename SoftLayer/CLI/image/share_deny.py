@@ -20,4 +20,4 @@ def cli(env, identifier, account_id):
     shared_image = image_mgr.deny_share_image(image_id, account_id)
 
     if shared_image:
-        env.fout(f"Image template {account_id} was deny shared to account {identifier}.")
+        env.fout(f"Image template {identifier} was deny shared to account {account_id}.")
