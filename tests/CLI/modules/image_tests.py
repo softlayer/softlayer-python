@@ -72,7 +72,7 @@ class ImageTests(testing.TestCase):
     def test_deny_share(self):
         result = self.run_command(['image', 'share-deny', '123456', '--account-id', '654321'])
         self.assert_no_fail(result)
-        self.assertIn('Image template 123456 was deny shared to account 654321.', result.output)
+        self.assertIn("Image template 123456 was deny shared to account 654321.", result.output)
 
     def test_deny_share_without_id(self):
         result = self.run_command(['image', 'share-deny'])
