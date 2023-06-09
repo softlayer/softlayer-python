@@ -28,13 +28,6 @@ META_MAPPING = {
     'ip': 'primary_ip',
 }
 
-# HELP = """Find details about the machine making these API calls.
-
-# .. csv-table:: Choices
-
-#     {choices}
-
-# """.format(choices="\n    ".join(META_CHOICES))
 NL = "\n    "
 HELP = f"""Find details about the machine making these API calls.
 
