@@ -54,10 +54,7 @@ def cli(env, network, quantity, endpoint_id, ipv6, test):
         result = mgr.add_subnet(network, quantity=quantity, endpoint_id=endpoint_id, version=version, test_order=test)
 
     except SoftLayer.SoftLayerAPIError as error:
-        raise exceptions.CLIAbort('Unable to order {} {} ipv{} , error: {}'.format(quantity,
-                                                                                   network,
-                                                                                   version,
-                                                                                   error.faultString))
+        raise exceptions.CLIAbort(f"Unable to order {quantity} {network} ipv{version} , error: {error.faultString}")
 
     table = formatting.Table(['Item', 'cost'])
     table.align['Item'] = 'r'
