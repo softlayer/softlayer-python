@@ -18,4 +18,4 @@ def cli(env, identifier):
     result = hardware.remove_notification(identifier)
 
     if result:
-        env.fout("The hardware notification instance: {} was deleted.".format(identifier))
+        env.fout(f"The hardware notification instance: {identifier} was deleted.")

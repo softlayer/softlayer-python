@@ -65,8 +65,8 @@ def cli(env, identifier, passwords, price, components):
     table.add_row(['created', result['provisionDate'] or formatting.blank()])
     table.add_row(['owner', owner or formatting.blank()])
 
-    last_transaction = "{} ({})".format(utils.lookup(result, 'lastTransaction', 'transactionGroup', 'name'),
-                                        utils.clean_time(utils.lookup(result, 'lastTransaction', 'modifyDate')))
+    last_transaction = f"{utils.lookup(result, 'lastTransaction', 'transactionGroup', 'name')}" + \
+        f"({utils.clean_time(utils.lookup(result, 'lastTransaction', 'modifyDate'))})"
 
     table.add_row(['last_transaction', last_transaction])
     table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else 'Monthly'])

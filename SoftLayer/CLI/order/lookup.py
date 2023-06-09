@@ -36,7 +36,7 @@ def cli(env, identifier, details):
 def get_order_table(order):
     """Formats a table for billing order"""
 
-    title = "Order {id}".format(id=order.get('id'))
+    title = f"Order {order.get('id')}"
     date_format = '%Y-%m-%d'
     table = formatting.Table(["Key", "Value"], title=title)
     table.align = 'l'
@@ -44,16 +44,16 @@ def get_order_table(order):
     ordered_by = "IBM"
     user = order.get('userRecord', None)
     if user:
-        ordered_by = "{} ({})".format(user.get('displayName'), utils.lookup(user, 'userStatus', 'name'))
+        ordered_by = f"{user.get('displayName')} ({utils.lookup(user, 'userStatus', 'name')})"
     table.add_row(['Ordered By', ordered_by])
 
     table.add_row(['Create Date', utils.clean_time(order.get('createDate'), date_format, date_format)])
     table.add_row(['Modify Date', utils.clean_time(order.get('modifyDate'), date_format, date_format)])
     table.add_row(['Order Approval Date', utils.clean_time(order.get('orderApprovalDate'), date_format, date_format)])
     table.add_row(['Status', order.get('status')])
-    table.add_row(['Order Total Amount', "{price:.2f}".format(price=float(order.get('orderTotalAmount', '0')))])
-    table.add_row(['Invoice Total Amount', "{price:.2f}".
-                  format(price=float(order.get('initialInvoice', {}).get('invoiceTotalAmount', '0')))])
+    table.add_row(['Order Total Amount', f"{float(order.get('orderTotalAmount', '0')):.2f}"])
+    table.add_row(['Invoice Total Amount', f"{float(order.get('initialInvoice', {}).get('invoiceTotalAmount', '0')): + \
+                                              .2f}"])
 
     items = order.get('items', [])
     item_table = formatting.Table(["Item Description"])
