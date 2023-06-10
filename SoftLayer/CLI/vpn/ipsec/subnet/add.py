@@ -49,8 +49,7 @@ def cli(env, context_id, subnet_id, subnet_type, network_identifier):
             raise ArgumentError('Either a network identifier or subnet id '
                                 'must be provided.')
         if subnet_type != 'remote':
-            raise ArgumentError('Unable to create {} subnets'
-                                .format(subnet_type))
+            raise ArgumentError(f'Unable to create {subnet_type} subnets')
         create_remote = True
 
     manager = SoftLayer.IPSECManager(env.client)
@@ -61,10 +60,7 @@ def cli(env, context_id, subnet_id, subnet_type, network_identifier):
                                               identifier=network_identifier[0],
                                               cidr=network_identifier[1])
         subnet_id = subnet['id']
-        env.out('Created subnet {}/{} #{}'
-                .format(network_identifier[0],
-                        network_identifier[1],
-                        subnet_id))
+        env.out(f'Created subnet {network_identifier[0]}/{network_identifier[1]} #{subnet_id}')
 
     succeeded = False
     if subnet_type == 'internal':
@@ -75,7 +71,6 @@ def cli(env, context_id, subnet_id, subnet_type, network_identifier):
         succeeded = manager.add_service_subnet(context_id, subnet_id)
 
     if succeeded:
-        env.out('Added {} subnet #{}'.format(subnet_type, subnet_id))
+        env.out(f'Added {subnet_type} subnet #{subnet_id}')
     else:
-        raise CLIHalt('Failed to add {} subnet #{}'
-                      .format(subnet_type, subnet_id))
+        raise CLIHalt(f'Failed to add {subnet_type} subnet #{subnet_id}')

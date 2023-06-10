@@ -39,7 +39,7 @@ def cli(env, identifier, start_date, end_date, summary_period, quite_summary):
 
     data = vsi.get_bandwidth_data(vsi_id, start_date, end_date, None, None)
 
-    title = "Bandwidth Report: %s - %s" % (start_date, end_date)
+    title = f"Bandwidth Report: {start_date} - {end_date}"
     table, sum_table = create_bandwidth_table(data, summary_period, title)
 
     env.fout(sum_table)

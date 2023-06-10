@@ -43,7 +43,7 @@ def _update_with_like_args(ctx, _, value):
                                        'keyName')
     if not like_args['flavor']:
         like_args['cpu'] = like_details['maxCpu']
-        like_args['memory'] = '%smb' % like_details['maxMemory']
+        like_args['memory'] = f"{like_details['maxMemory']}mb"
 
     tag_refs = like_details.get('tagReferences', None)
     if tag_refs is not None and len(tag_refs) > 0:
@@ -225,7 +225,7 @@ def cli(env, **args):
     if do_create:
         for pod in pods:
             if args.get('datacenter') in str(pod['name']):
-                click.secho('Warning: Closed soon: {}'.format(pod['name']), fg='yellow')
+                click.secho(f"Warning: Closed soon: {pod['name']}", fg='yellow')
         if not (env.skip_confirmations or formatting.confirm(
                 "This action will incur charges on your account. Continue?")):
             raise exceptions.CLIAbort('Aborting virtual server order.')
@@ -246,7 +246,7 @@ def cli(env, **args):
         if args.get('wait'):
             virtual_guests = utils.lookup(result, 'orderDetails', 'virtualGuests')
             guest_id = virtual_guests[0]['id']
-            click.secho("Waiting for %s to finish provisioning..." % guest_id, fg='green')
+            click.secho(f"Waiting for {guest_id} to finish provisioning...", fg='green')
             ready = vsi.wait_for_ready(guest_id, args.get('wait') or 1)
             if ready is False:
                 env.out(env.fmt(output))
@@ -255,7 +255,7 @@ def cli(env, **args):
 
 def _build_receipt_table(result, billing="hourly", test=False):
     """Retrieve the total recurring fee of the items prices"""
-    title = "OrderId: %s" % (result.get('orderId', 'No order placed'))
+    title = f"OrderId: {result.get('orderId', 'No order placed')}"
     table = formatting.Table(['Cost', 'Description'], title=title)
     table.align['Cost'] = 'r'
     table.align['Description'] = 'l'
@@ -273,7 +273,7 @@ def _build_receipt_table(result, billing="hourly", test=False):
             rate += float(item.get('recurringFee', 0.000))
         total += rate
         table.add_row([rate, item['item']['description']])
-    table.add_row(["%.3f" % total, "Total %s cost" % billing])
+    table.add_row([f"{total:.3f}" % total, f"Total {billing} cost"])
     return table
 
 

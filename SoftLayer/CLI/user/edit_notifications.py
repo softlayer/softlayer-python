@@ -30,6 +30,6 @@ def cli(env, enable, notification):
         result = mgr.disable_notifications(notification)
 
     if result:
-        click.secho("Notifications updated successfully: %s" % ", ".join(notification), fg='green')
+        click.secho(f"Notifications updated successfully: {', '.join(notification)}", fg='green')
     else:
-        click.secho("Failed to update notifications: %s" % ", ".join(notification), fg='red')
+        click.secho(f"Failed to update notifications: {', '.join(notification)}", fg='red')

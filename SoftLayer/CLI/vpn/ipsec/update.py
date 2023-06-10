@@ -96,6 +96,6 @@ def cli(env, context_id, friendly_name, remote_peer, preshared_key,
         phase2_key_ttl=phase2_key_ttl
     )
     if succeeded:
-        env.out('Updated context #{}'.format(context_id))
+        env.out(f'Updated context #{context_id}')
     else:
-        raise CLIHalt('Failed to update context #{}'.format(context_id))
+        raise CLIHalt(f'Failed to update context #{context_id}')

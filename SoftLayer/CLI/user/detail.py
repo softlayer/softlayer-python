@@ -73,12 +73,11 @@ def basic_info(user, keys):
         table.add_row(['APIKEY', 'Yes'])
     else:
         table.add_row(['APIKEY', 'No'])
-    table.add_row(['Name', "%s %s" % (user.get('firstName', '-'), user.get('lastName', '-'))])
+    table.add_row(['Name', f"{user.get('firstName', '-')} {user.get('lastName', '-')}"])
+    table.add_row(['Name', f"{user.get('firstName', '-')} {user.get('lastName', '-')}"])
     table.add_row(['Email', user.get('email')])
     table.add_row(['OpenID', user.get('openIdConnectUserName')])
-    address = "%s %s %s %s %s %s" % (
-        user.get('address1'), user.get('address2'), user.get('city'), user.get('state'),
-        user.get('country'), user.get('postalCode'))
+    address = f"{user.get('address1')} {user.get('address2')} {user.get('city')} {user.get('state')} {user.get('country')} {user.get('postalCode')}"
     table.add_row(['Address', address])
     table.add_row(['Company', user.get('companyName')])
     table.add_row(['Created', user.get('createDate')])
@@ -89,11 +88,11 @@ def basic_info(user, keys):
         ['Status', utils.lookup(user, 'userStatus', 'name')])
     table.add_row(['SSL VPN', user.get('sslVpnAllowedFlag', 'No')])
     for login in user.get('unsuccessfulLogins', {}):
-        login_string = "%s From: %s" % (login.get('createDate'), login.get('ipAddress'))
+        login_string = f"{login.get('createDate')} From: {login.get('ipAddress')}"
         table.add_row(['Last Failed Login', login_string])
         break
     for login in user.get('successfulLogins', {}):
-        login_string = "%s From: %s" % (login.get('createDate'), login.get('ipAddress'))
+        login_string = f"{login.get('createDate')} From: {login.get('ipAddress')}"
         table.add_row(['Last Login', login_string])
         break
 

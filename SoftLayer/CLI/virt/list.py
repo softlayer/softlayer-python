@@ -68,8 +68,7 @@ DEFAULT_COLUMNS = [
 @click.option('--sortby', default='hostname', show_default=True, help='Column to sort by')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. [options: %s]'
-              % ', '.join(column.name for column in COLUMNS),
+              help=f"Columns to display. [options: {', '.join(column.name for column in COLUMNS)}]",
               default=','.join(DEFAULT_COLUMNS),
               show_default=True)
 @click.option('--limit', '-l', default=100, show_default=True,

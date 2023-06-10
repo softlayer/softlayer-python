@@ -38,8 +38,8 @@ def reboot(env, identifier, hard):
     mgr = SoftLayer.VSManager(env.client)
     vs_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'VS')
     if not (env.skip_confirmations or
-            formatting.confirm('This will reboot the VS with id %s. '
-                               'Continue?' % vs_id)):
+            formatting.confirm(f'This will reboot the VS with id {vs_id}. '
+                               'Continue?')):
         raise exceptions.CLIAbort('Aborted.')
 
     if hard is True:
@@ -61,8 +61,8 @@ def power_off(env, identifier, hard):
     vsi = SoftLayer.VSManager(env.client)
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
     if not (env.skip_confirmations or
-            formatting.confirm('This will power off the VS with id %s. '
-                               'Continue?' % vs_id)):
+            formatting.confirm(f'This will power off the VS with id {vs_id}. '
+                               'Continue?')):
         raise exceptions.CLIAbort('Aborted.')
 
     if hard:
@@ -92,8 +92,7 @@ def pause(env, identifier):
     vs_id = helpers.resolve_id(vsi.resolve_ids, identifier, 'VS')
 
     if not (env.skip_confirmations or
-            formatting.confirm('This will pause the VS with id %s. Continue?'
-                               % vs_id)):
+            formatting.confirm(f'This will pause the VS with id {vs_id}. Continue?')):
         raise exceptions.CLIAbort('Aborted.')
 
     env.client['Virtual_Guest'].pause(id=vs_id)

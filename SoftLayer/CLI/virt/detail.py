@@ -71,8 +71,7 @@ def cli(env, identifier, passwords=False, price=False):
     table.add_row(['modified', result['modifyDate']])
     last_transaction = ''
     if result.get('lastTransaction'):
-        last_transaction = "{} ({})".format(utils.lookup(result, 'lastTransaction', 'transactionGroup', 'name'),
-                                            utils.clean_time(utils.lookup(result, 'lastTransaction', 'modifyDate')))
+        last_transaction = f"{utils.lookup(result, 'lastTransaction', 'transactionGroup', 'name')} ({utils.clean_time(utils.lookup(result, 'lastTransaction', 'modifyDate'))})"
 
     table.add_row(['last_transaction', last_transaction])
     table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else 'Monthly'])
@@ -175,7 +174,7 @@ def _cli_helper_dedicated_host(env, result, table):
             dedicated_host = env.client.call('Virtual_DedicatedHost', 'getObject',
                                              id=dedicated_host_id)
         except SoftLayer.SoftLayerAPIError:
-            LOGGER.error('Unable to get dedicated host id %s', dedicated_host_id)
+            LOGGER.error(f'Unable to get dedicated host id {dedicated_host_id}')
             dedicated_host = {}
         table.add_row(['dedicated_host',
                        dedicated_host.get('name') or formatting.blank()])

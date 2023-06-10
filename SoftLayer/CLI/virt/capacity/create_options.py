@@ -42,5 +42,5 @@ def get_price(item):
     the_price = "No Default Pricing"
     for price in item.get('prices', []):
         if not price.get('locationGroupId'):
-            the_price = "%0.4f" % float(price['hourlyRecurringFee'])
+            the_price = f"{float(price['hourlyRecurringFee']):.4f}"
     return the_price

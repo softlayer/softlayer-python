@@ -58,12 +58,12 @@ def cli(env, identifier, domain, userfile, tag, hostname, userdata,
     if vsi.edit(vs_id, **data):
         for key, value in data.items():
             if value is not None:
-                env.fout("The {} of virtual server instance: {} was updated.".format(key, vs_id))
+                env.fout(f"The {key} of virtual server instance: {vs_id} was updated.")
 
     if public_speed is not None:
         if vsi.change_port_speed(vs_id, True, int(public_speed)):
-            env.fout("The public speed of virtual server instance: {} was updated.".format(vs_id))
+            env.fout(f"The public speed of virtual server instance: {vs_id} was updated.")
 
     if private_speed is not None:
         if vsi.change_port_speed(vs_id, False, int(private_speed)):
-            env.fout("The private speed of virtual server instance: {} was updated.".format(vs_id))
+            env.fout(f"The private speed of virtual server instance: {vs_id} was updated.")

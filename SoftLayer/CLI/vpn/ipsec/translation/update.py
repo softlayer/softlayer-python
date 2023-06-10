@@ -41,6 +41,6 @@ def cli(env, context_id, translation_id, static_ip, remote_ip, note):
                                            remote_ip=remote_ip,
                                            notes=note)
     if succeeded:
-        env.out('Updated translation #{}'.format(translation_id))
+        env.out(f'Updated translation #{translation_id}')
     else:
-        raise CLIHalt('Failed to update translation #{}'.format(translation_id))
+        raise CLIHalt(f'Failed to update translation #{translation_id}')
