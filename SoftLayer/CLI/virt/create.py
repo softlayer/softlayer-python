@@ -273,7 +273,7 @@ def _build_receipt_table(result, billing="hourly", test=False):
             rate += float(item.get('recurringFee', 0.000))
         total += rate
         table.add_row([rate, item['item']['description']])
-    table.add_row([f"{total:.3f}" % total, f"Total {billing} cost"])
+    table.add_row([f"{total:.3f}", f"Total {billing} cost"])
     return table
 
 

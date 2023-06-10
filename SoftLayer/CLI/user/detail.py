@@ -77,7 +77,8 @@ def basic_info(user, keys):
     table.add_row(['Name', f"{user.get('firstName', '-')} {user.get('lastName', '-')}"])
     table.add_row(['Email', user.get('email')])
     table.add_row(['OpenID', user.get('openIdConnectUserName')])
-    address = f"{user.get('address1')} {user.get('address2')} {user.get('city')} {user.get('state')} {user.get('country')} {user.get('postalCode')}"
+    address = f"{user.get('address1')} \
+        {user.get('address2')} {user.get('city')} {user.get('state')} {user.get('country')} {user.get('postalCode')}"
     table.add_row(['Address', address])
     table.add_row(['Company', user.get('companyName')])
     table.add_row(['Created', user.get('createDate')])
