@@ -175,7 +175,7 @@ def _cli_helper_dedicated_host(env, result, table):
             dedicated_host = env.client.call('Virtual_DedicatedHost', 'getObject',
                                              id=dedicated_host_id)
         except SoftLayer.SoftLayerAPIError:
-            LOGGER.error(f'Unable to get dedicated host id {dedicated_host_id}')
+            LOGGER.error('Unable to get dedicated host id %s', dedicated_host_id)
             dedicated_host = {}
         table.add_row(['dedicated_host',
                        dedicated_host.get('name') or formatting.blank()])
