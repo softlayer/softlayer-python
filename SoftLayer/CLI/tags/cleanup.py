@@ -20,8 +20,8 @@ def cli(env, dry_run):
 
     for tag in empty_tags:
         if dry_run:
-            click.secho("(Dry Run) Removing {}".format(tag.get('name')), fg='yellow')
+            click.secho(f"(Dry Run) Removing {tag.get('name')}", fg='yellow')
         else:
             result = tag_manager.delete_tag(tag.get('name'))
             color = 'green' if result else 'red'
-            click.secho("Removing {}".format(tag.get('name')), fg=color)
+            click.secho(f"Removing {tag.get('name')}", fg=color)

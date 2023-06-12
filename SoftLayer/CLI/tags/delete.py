@@ -25,6 +25,6 @@ def cli(env, identifier, name):
 
     result = tag_manager.delete_tag(tag_name)
     if result:
-        click.secho("Tag {} has been removed".format(tag_name), fg='green')
+        click.secho(f"Tag {tag_name} has been removed", fg='green')
     else:
-        click.secho("Failed to remove tag {}".format(tag_name), fg='red')
+        click.secho(f"Failed to remove tag {tag_name}", fg='red')

@@ -52,8 +52,8 @@ def get_order_table(order):
     table.add_row(['Order Approval Date', utils.clean_time(order.get('orderApprovalDate'), date_format, date_format)])
     table.add_row(['Status', order.get('status')])
     table.add_row(['Order Total Amount', f"{float(order.get('orderTotalAmount', '0')):.2f}"])
-    table.add_row(
-        ['Invoice Total Amount', f"{float(order.get('initialInvoice', {}).get('invoiceTotalAmount', '0')):.2f}"])
+    table.add_row(['Invoice Total Amount',
+                   f"{float(order.get('initialInvoice', {}).get('invoiceTotalAmount', '0')):.2f}"])
 
     items = order.get('items', [])
     item_table = formatting.Table(["Item Description"])

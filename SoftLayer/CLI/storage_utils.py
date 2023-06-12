@@ -43,25 +43,22 @@ def build_output_table(env, volumes, columns, sortby):
 
 def _format_name(obj):
     if obj['type'] == 'VIRTUAL':
-        return "{0}.{1}".format(obj['hostname'], obj['domain'])
+        return f"{obj['hostname']}.{obj['domain']}"
 
     elif obj['type'] == 'HARDWARE':
-        return "{0}.{1}".format(obj['hostname'], obj['domain'])
+        return f"{obj['hostname']}.{obj['domain']}"
 
     elif obj['type'] == 'SUBNET':
-        name = "{0}/{1}".format(
-            obj['networkIdentifier'],
-            obj['cidr']
-        )
+        name = f"{obj['networkIdentifier']}/{obj['cidr']}"
         if 'note' in obj.keys():
-            name = "{0} ({1})".format(name, obj['note'])
+            name = f"{name} ({obj['note']})"
 
         return name
 
     elif obj['type'] == 'IP':
         name = obj['ipAddress']
         if 'note' in obj.keys():
-            name = "{0} ({1})".format(name, obj['note'])
+            name = f"{name} ({obj['note']})"
 
         return name
     else:
