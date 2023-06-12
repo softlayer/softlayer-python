@@ -103,12 +103,14 @@ class AccountManagerTests(testing.TestCase):
                 "cancellationDate": {
                     "operation": "is null"
                 },
-                "createDate": {
-                    'operation': 'orderBy',
-                    'options': [{
-                        'name': 'sort',
-                        'value': ['ASC']
-                    }]
+                "id": {
+                    "operation": "orderBy",
+                    "options": [
+                        {
+                            "name": "sort",
+                            "value": ["ASC"]
+                        }
+                    ]
                 }
             }
         }
