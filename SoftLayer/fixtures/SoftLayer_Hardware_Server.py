@@ -57,12 +57,20 @@ getObject = {
         {
             'networkSpace': 'PRIVATE',
             'vlanNumber': 1800,
-            'id': 9653
+            'id': 9653,
+            'fullyQualifiedName': 'dal10.bcr03.14752',
+            'primarySubnets': [{
+                'netmask': ''
+            }]
         },
         {
             'networkSpace': 'PUBLIC',
             'vlanNumber': 3672,
-            'id': 19082
+            'id': 19082,
+            'fullyQualifiedName': 'dal10.test03.123',
+            'primarySubnets': [{
+                'netmask': ''
+            }]
         },
     ],
     'tagReferences': [
