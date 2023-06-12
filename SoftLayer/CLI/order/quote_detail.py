@@ -19,7 +19,7 @@ def cli(env, quote):
     result = manager.get_quote_details(quote)
 
     package = result['order']['items'][0]['package']
-    title = "{} - Package: {}, Id {}".format(result.get('name'), package['keyName'], package['id'])
+    title = f"{result.get('name')} - Package: {package['keyName']}, Id {package['id']}"
     table = formatting.Table([
         'Category', 'Description', 'Quantity', 'Recurring', 'One Time'
     ], title=title)
