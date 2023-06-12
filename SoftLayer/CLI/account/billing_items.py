@@ -42,7 +42,7 @@ def item_table(items, ordered=None):
     table.align['Category Code'] = 'l'
     for item in items:
         description = item.get('description')
-        fqdn = "{}.{}".format(item.get('hostName', ''), item.get('domainName', ''))
+        fqdn = f"{item.get('hostName', '')}.{item.get('domainName', '')}"
         if fqdn != ".":
             description = fqdn
         user = utils.lookup(item, 'orderItem', 'order', 'userRecord')

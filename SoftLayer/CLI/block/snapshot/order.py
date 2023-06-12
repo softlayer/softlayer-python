@@ -53,8 +53,7 @@ def cli(env, volume_id, size, tier, upgrade, iops):
         raise exceptions.ArgumentError(str(ex))
 
     if 'placedOrder' in order.keys():
-        click.echo("Order #{0} placed successfully!".format(
-            order['placedOrder']['id']))
+        click.echo(f"Order #{order['placedOrder']['id']} placed successfully!")
         for item in order['placedOrder']['items']:
             click.echo(" > %s" % item['description'])
         if 'status' in order['placedOrder'].keys():

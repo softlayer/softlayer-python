@@ -24,14 +24,14 @@ def cli(env, access_id, subnet_id):
         assigned_subnets = block_manager.assign_subnets_to_acl(access_id, subnet_ids)
 
         for subnet in assigned_subnets:
-            message = "Successfully assigned subnet id: {} to allowed host id: {}".format(subnet, access_id)
+            message = f"Successfully assigned subnet id: {subnet} to allowed host id: {access_id}"
             click.echo(message)
 
         failed_to_assign_subnets = list(set(subnet_ids) - set(assigned_subnets))
         for subnet in failed_to_assign_subnets:
-            message = "Failed to assign subnet id: {} to allowed host id: {}".format(subnet, access_id)
+            message = f"Failed to assign subnet id: {subnet} to allowed host id: {access_id}"
             click.echo(message)
 
     except SoftLayer.SoftLayerAPIError as ex:
-        message = "Unable to assign subnets.\nReason: {}".format(ex.faultString)
+        message = f"Unable to assign subnets.\nReason: {ex.faultString}"
         click.echo(message)
