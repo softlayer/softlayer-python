@@ -9,12 +9,10 @@ Python Bindings project.
 Code Organization
 -----------------
 
-* **docs** - Where The source to this documentation lives.
-* **SoftLayer** - All the source lives under here.
 
-  * **API** - Primary API client.
-  * **CLI** - Code for the command-line interface.
-  * **managers** - API Managers. Abstractions to help use the API.
+.. image:: /images/SoftLayer-Python.png
+  :width: 800
+  :alt: SoftLayer-Python Architecture Diagram
 
 
 Setting Up A Dev Environment
@@ -115,25 +113,36 @@ Documentation
 -------------
 The project is documented in
 `reStructuredText <http://sphinx-doc.org/rest.html>`_ and built using
-`Sphinx <http://sphinx-doc.org/>`_. If you have
-`fabric <http://fabfile.org>`_ installed, you simply need to run the following
-to build the docs:
+`Sphinx <http://sphinx-doc.org/>`_. 
 
-::
-
-  fab make_html
-
-The documentation will be built in `docs/_build/html`. If you don't have
-fabric, use the following commands.
+For testing locally you can run the following command to build the HTML for this project
 
 ::
 
   cd docs
-  make html
   sphinx-build -b html ./  ./html
 
 The primary docs are built at
 `Read the Docs <http://softlayer-python.readthedocs.org/>`_.
+
+`Recent build output for reference <https://readthedocs.org/projects/softlayer-python/builds/20780252/>`_
+
+::
+
+  git clone --no-single-branch --depth 50 https://github.com/softlayer/softlayer-python.git .
+  git checkout --force origin/master
+  git clean -d -f -f
+  python3.7 -mvirtualenv $READTHEDOCS_VIRTUALENV_PATH
+  python -m pip install --upgrade --no-cache-dir pip setuptools
+  python -m pip install --upgrade --no-cache-dir pillow==5.4.1 mock==1.0.1 alabaster>=0.7,<0.8,!=0.7.5 commonmark==0.9.1 recommonmark==0.5.0 sphinx<2 sphinx-rtd-theme<0.5 readthedocs-sphinx-ext<2.3 jinja2<3.1.0
+  python -m pip install --exists-action=w --no-cache-dir -r docs/requirements.txt
+  cat docs/conf.py
+  python -m sphinx -T -E -b dirhtml -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html
+  python -m sphinx -T -E -b readthedocssinglehtmllocalmedia -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/htmlzip
+  python -m sphinx -T -E -b latex -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/pdf
+  cat latexmkrc
+  latexmk -r latexmkrc -pdf -f -dvi- -ps- -jobname=softlayer-python -interaction=nonstopmode
+  python -m sphinx -T -E -b epub -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/epub
 
 
 Style

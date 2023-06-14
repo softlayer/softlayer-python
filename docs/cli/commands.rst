@@ -36,8 +36,8 @@ Can be called with an un-authenticated API call.
     :prog: metadata
     :show-nested:
 
-search
-========
+Search
+======
 
 Is an API service that lets you make complex queries about data indexed by the service.
 Can be called with an un-authenticated API call.

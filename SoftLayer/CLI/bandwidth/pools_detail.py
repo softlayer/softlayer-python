@@ -24,15 +24,15 @@ def cli(env, identifier):
     table.add_row(['Id', bandwidths['id']])
     table.add_row(['Name', bandwidths['name']])
     table.add_row(['Create Date', utils.clean_time(bandwidths.get('createDate'), '%Y-%m-%d')])
-    current = "{} GB".format(utils.lookup(bandwidths, 'billingCyclePublicBandwidthUsage', 'amountOut'))
+    current = f"{utils.lookup(bandwidths, 'billingCyclePublicBandwidthUsage', 'amountOut')} GB"
     if current is None:
         current = '-'
     table.add_row(['Current Usage', current])
-    projected = "{} GB".format(bandwidths.get('projectedPublicBandwidthUsage', 0))
+    projected = f"{bandwidths.get('projectedPublicBandwidthUsage', 0)} GB"
     if projected is None:
         projected = '-'
     table.add_row(['Projected  Usage', projected])
-    inbound = "{} GB".format(bandwidths.get('inboundPublicBandwidthUsage', 0))
+    inbound = f"{bandwidths.get('inboundPublicBandwidthUsage', 0)} GB"
     if inbound is None:
         inbound = '-'
     table.add_row(['Inbound   Usage', inbound])
@@ -58,8 +58,8 @@ def _bw_table(bw_data):
     """Generates a bandwidth useage table"""
     table_data = formatting.Table(['Id', 'HostName', "IP Address", 'Amount', "Current Usage"])
     for bw_point in bw_data:
-        amount = "{} GB".format(utils.lookup(bw_point, 'bandwidthAllotmentDetail', 'allocation', 'amount'))
-        current = "{} GB".format(bw_point.get('outboundBandwidthUsage', 0))
+        amount = f"{utils.lookup(bw_point, 'bandwidthAllotmentDetail', 'allocation', 'amount')} GB"
+        current = f"{bw_point.get('outboundBandwidthUsage', 0)} GB"
         ip_address = bw_point.get('primaryIpAddress')
         if ip_address is None:
             ip_address = '-'
@@ -71,8 +71,8 @@ def _virtual_table(bw_data):
     """Generates a virtual bandwidth usage table"""
     table_data = formatting.Table(['Id', 'HostName', "IP Address", 'Amount', "Current Usage"])
     for bw_point in bw_data:
-        amount = "{} GB".format(utils.lookup(bw_point, 'bandwidthAllotmentDetail', 'allocation', 'amount'))
-        current = "{} GB".format(bw_point.get('outboundBandwidthUsage', 0))
+        amount = f"{utils.lookup(bw_point, 'bandwidthAllotmentDetail', 'allocation', 'amount')} GB"
+        current = f"{bw_point.get('outboundBandwidthUsage', 0)} GB"
         ip_address = bw_point.get('primaryIpAddress')
         if ip_address is None:
             ip_address = '-'

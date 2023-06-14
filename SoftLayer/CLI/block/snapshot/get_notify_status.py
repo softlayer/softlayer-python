@@ -15,6 +15,6 @@ def cli(env, volume_id):
     enabled = block_manager.get_volume_snapshot_notification_status(volume_id)
 
     if enabled == 0:
-        click.echo("Disabled: Snapshots space usage threshold is disabled for volume {}".format(volume_id))
+        click.echo(f"Disabled: Snapshots space usage threshold is disabled for volume {volume_id}")
     else:
-        click.echo("Enabled: Snapshots space usage threshold is enabled for volume {}".format(volume_id))
+        click.echo(f"Enabled: Snapshots space usage threshold is enabled for volume {volume_id}")

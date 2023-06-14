@@ -66,13 +66,13 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
     location_dc = network.get_datacenter_by_keyname(location)
     for pod in pods:
         if location_dc.get('name') in pod.get('name'):
-            click.secho('Warning: Closed soon: {}'.format(pod.get('name')), fg='yellow')
+            click.secho(f"Warning: Closed soon: {pod.get('name')}", fg='yellow')
 
     if extras:
         try:
             extras = json.loads(extras)
         except ValueError as err:
-            raise exceptions.CLIAbort("There was an error when parsing the --extras value: {}".format(err))
+            raise exceptions.CLIAbort(f"There was an error when parsing the --extras value: {err}")
 
     args = (package_keyname, location, order_items)
     kwargs = {'preset_keyname': preset,

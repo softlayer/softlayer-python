@@ -23,13 +23,13 @@ def item_table(item):
     """Formats a table for billing items"""
 
     date_format = '%Y-%m-%d'
-    table = formatting.Table(["Key", "Value"], title="{}".format(item.get('description', 'Billing Item')))
+    table = formatting.Table(["Key", "Value"], title=f"{item.get('description', 'Billing Item')}")
     table.add_row(['createDate', utils.clean_time(item.get('createDate'), date_format, date_format)])
     table.add_row(['cycleStartDate', utils.clean_time(item.get('cycleStartDate'), date_format, date_format)])
     table.add_row(['cancellationDate', utils.clean_time(item.get('cancellationDate'), date_format, date_format)])
     table.add_row(['description', item.get('description')])
     table.align = 'l'
-    fqdn = "{}.{}".format(item.get('hostName', ''), item.get('domainName', ''))
+    fqdn = f"{item.get('hostName', '')}.{item.get('domainName', '')}"
     if fqdn != ".":
         table.add_row(['FQDN', fqdn])
 
@@ -43,7 +43,7 @@ def item_table(item):
     ordered_by = "IBM"
     user = utils.lookup(item, 'orderItem', 'order', 'userRecord')
     if user:
-        ordered_by = "{} ({})".format(user.get('displayName'), utils.lookup(user, 'userStatus', 'name'))
+        ordered_by = f"{user.get('displayName')} ({utils.lookup(user, 'userStatus', 'name')})"
     table.add_row(['Ordered By', ordered_by])
     table.add_row(['Notes', item.get('notes')])
     table.add_row(['Location', utils.lookup(item, 'location', 'name')])

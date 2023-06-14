@@ -269,7 +269,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'lastTransaction[transactionGroup],'
                 'hourlyBillingFlag,'
                 'tagReferences[id,tag[name,id]],'
-                'networkVlans[id,vlanNumber,networkSpace],'
+                'networkVlans[id,vlanNumber,networkSpace, fullyQualifiedName,primarySubnets[ipAddresses]],'
                 'monitoringServiceComponent,networkMonitors[queryType,lastResult,responseAction],'
                 'remoteManagementAccounts[username,password]'
             )

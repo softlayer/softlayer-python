@@ -72,5 +72,5 @@ def get_resource_name(tag_manager, resource_id, tag_type):
         resource = tag_manager.reference_lookup(resource_id, tag_type)
         name = tag_manager.get_resource_name(resource, tag_type)
     except SoftLayerAPIError as exception:
-        name = "{}".format(exception.reason)
+        name = f"{exception.reason}"
     return name

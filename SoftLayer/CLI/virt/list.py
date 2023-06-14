@@ -59,6 +59,7 @@ DEFAULT_COLUMNS = [
 @click.option('--network', '-n', help='Network port speed in Mbps')
 @click.option('--hourly', is_flag=True, help='Show only hourly instances')
 @click.option('--monthly', is_flag=True, help='Show only monthly instances')
+@click.option('--tag', '-t', help='list of tags')
 @click.option('--transient', help='Filter by transient instances', type=click.BOOL)
 @click.option('--search', is_flag=False, flag_value="", default=None,
               help="Use the more flexible Search API to list instances. See `slcli search --types` for list " +

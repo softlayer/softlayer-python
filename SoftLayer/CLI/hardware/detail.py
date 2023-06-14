@@ -9,6 +9,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer import utils
 
+
 # pylint: disable=R0915
 
 
@@ -71,9 +72,11 @@ def cli(env, identifier, passwords, price, components):
     table.add_row(['last_transaction', last_transaction])
     table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else 'Monthly'])
 
-    vlan_table = formatting.Table(['type', 'number', 'id'])
+    vlan_table = formatting.Table(['type', 'number', 'id', 'name', 'netmask'])
     for vlan in result['networkVlans']:
-        vlan_table.add_row([vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
+        vlan_table.add_row([vlan['networkSpace'], vlan['vlanNumber'],
+                            vlan['id'], vlan['fullyQualifiedName'],
+                            vlan['primarySubnets'][0]['netmask']])
 
     table.add_row(['vlans', vlan_table])
 

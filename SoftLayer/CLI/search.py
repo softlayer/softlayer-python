@@ -30,6 +30,7 @@ def cli(env, query, types, advanced):
 
     Read More: https://sldn.softlayer.com/reference/services/SoftLayer_Search/search/
     Examples:
+
         slcli search test.com
         slcli search _objectType:SoftLayer_Virtual_Guest test.com
         slcli -vvv search _objectType:SoftLayer_Hardware hostname:testibm --advanced

@@ -222,7 +222,15 @@ class AccountManager(utils.IdentifierMixin, object):
                 "cancellationDate": {
                     "operation": "is null"
                 },
-                "createDate": utils.query_filter_orderby()
+                "id": {
+                    "operation": "orderBy",
+                    "options": [
+                        {
+                            "name": "sort",
+                            "value": ["ASC"]
+                        }
+                    ]
+                }
             }
         }
 
@@ -231,7 +239,7 @@ class AccountManager(utils.IdentifierMixin, object):
                                              {"allTopLevelBillingItems": {"categoryCode": {"operation": category}}})
         if create:
             object_filter = utils.dict_merge(object_filter,
-                                             {"allTopLevelBillingItems": {"createDate": {"operation": create}}})
+                                             {"allTopLevelBillingItems": {"createDate": {"operation": "*=" + create}}})
 
         return self.client.call('Account', 'getAllTopLevelBillingItems',
                                 mask=mask, filter=object_filter, iter=True, limit=100)
