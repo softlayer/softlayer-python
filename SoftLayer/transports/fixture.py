@@ -18,7 +18,7 @@ class FixtureTransport(object):
             module_path = 'SoftLayer.fixtures.%s' % call.service
             module = importlib.import_module(module_path)
         except ImportError as ex:
-            message = f'{call.servic} fixture is not implemented'
+            message = f'{call.service} fixture is not implemented'
             raise NotImplementedError(message) from ex
         try:
             return getattr(module, call.method)
