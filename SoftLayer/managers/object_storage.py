@@ -97,6 +97,6 @@ class ObjectStorageManager(utils.IdentifierMixin, object):
         if len(account) == 1:
             return [account[0]['id']]
         elif len(account) > 1:
-            raise SoftLayerError("Multiple object storage accounts found with the name: {}".format(username))
+            raise SoftLayerError(f"Multiple object storage accounts found with the name: {username}")
         else:
-            raise SoftLayerError("Unable to find object storage account id for: {}".format(username))
+            raise SoftLayerError(f"Unable to find object storage account id for: {username}")

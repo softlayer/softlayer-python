@@ -195,7 +195,7 @@ class TagTests(testing.TestCase):
         }
         in_out = [
             {'input': 'NETWORK_VLAN_FIREWALL', 'output': resource.get('primaryIpAddress')},
-            {'input': 'NETWORK_VLAN', 'output': "{} ({})".format(resource.get('vlanNumber'), resource.get('name'))},
+            {'input': 'NETWORK_VLAN', 'output': f"{resource.get('vlanNumber')} ({resource.get('name')})"},
             {'input': 'IMAGE_TEMPLATE', 'output': resource.get('name')},
             {'input': 'APPLICATION_DELIVERY_CONTROLLER', 'output': resource.get('name')},
             {'input': 'TICKET', 'output': resource.get('subjet')},

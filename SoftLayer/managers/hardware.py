@@ -400,7 +400,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             _mask = "mask[priceGroups]"
             dc_details = self.client.call('SoftLayer_Location', 'getDatacenters', mask=_mask, filter=_filter, limit=1)
             if not dc_details:
-                raise SoftLayerError("Unable to find a datacenter named {}".format(datacenter))
+                raise SoftLayerError(f"Unable to find a datacenter named {datacenter}")
             # A DC will have several price groups, no good way to deal with this other than checking each.
             # An item should only belong to one type of price group.
             for group in dc_details[0].get('priceGroups', []):
