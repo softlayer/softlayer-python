@@ -157,7 +157,7 @@ def output_diagnostics(env, result, verbose=0, **kwargs):
 
     if verbose > 1:
         for call in env.client.transport.get_last_calls():
-            call_table = formatting.Table([f"'', '{call.service}::{call.method}'"], align="left")
+            call_table = formatting.Table(['', f"'{call.service}::{call.method}'"], align="left")
             nice_mask = ''
             if call.mask is not None:
                 nice_mask = call.mask
