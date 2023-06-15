@@ -23,7 +23,7 @@ def parse_server(ctx, param, values):
         splitout = server.split(':')
         if len(splitout) != 3:
             raise exceptions.ArgumentError(
-                "--server needs a port and a weight. {} improperly formatted".format(server))
+                f"--server needs a port and a weight. {server} improperly formatted")
         server = {
             'address': splitout[0],
             'port': splitout[1],
@@ -69,7 +69,7 @@ def add(env, identifier, **args):
         mgr.add_lb_listener(uuid, new_listener)
         click.secho("Success", fg='green')
     except SoftLayerAPIError as exception:
-        click.secho("ERROR: {}".format(exception.faultString), fg='red')
+        click.secho(f"ERROR: {exception.faultString}", fg='red')
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -122,7 +122,7 @@ def edit(env, identifier, listener, **args):
         mgr.add_lb_listener(uuid, new_listener)
         click.secho("Success", fg='green')
     except SoftLayerAPIError as exception:
-        click.secho("ERROR: {}".format(exception.faultString), fg='red')
+        click.secho(f"ERROR: {exception.faultString}", fg='red')
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -141,7 +141,7 @@ def delete(env, identifier, listener):
         mgr.remove_lb_listener(uuid, listener)
         click.secho("Success", fg='green')
     except SoftLayerAPIError as exception:
-        click.secho("ERROR: {}".format(exception.faultString), fg='red')
+        click.secho(f"ERROR: {exception.faultString}", fg='red')
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -197,7 +197,7 @@ def l7pool_add(env, identifier, **args):
         mgr.add_lb_l7_pool(uuid, pool_main, pool_members, pool_health, pool_sticky)
         click.secho("Success", fg='green')
     except SoftLayerAPIError as exception:
-        click.secho("ERROR: {}".format(exception.faultString), fg='red')
+        click.secho(f"ERROR: {exception.faultString}", fg='red')
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -213,4 +213,4 @@ def l7pool_del(env, identifier):
         mgr.del_lb_l7_pool(identifier)
         click.secho("Success", fg='green')
     except SoftLayerAPIError as exception:
-        click.secho("ERROR: {}".format(exception.faultString), fg='red')
+        click.secho(f"ERROR: {exception.faultString}", fg='red')

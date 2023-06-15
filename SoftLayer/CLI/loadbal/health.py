@@ -31,7 +31,7 @@ def cli(env, identifier, uuid, interval, retry, timeout, url):
     mgr = SoftLayer.LoadBalancerManager(env.client)
     # Need to get the LBaaS uuid if it wasn't supplied
     lb_uuid, lb_id = mgr.get_lbaas_uuid_id(identifier)
-    print("UUID: {}, ID: {}".format(lb_uuid, lb_id))
+    print(f"UUID: {lb_uuid}, ID: {lb_id}")
 
     # Get the current health checks, and find the one we are updating.
     mask = "mask[healthMonitors, listeners[uuid,defaultPool[healthMonitor]]]"
@@ -58,7 +58,7 @@ def cli(env, identifier, uuid, interval, retry, timeout, url):
 
     try:
         mgr.update_lb_health_monitors(lb_uuid, [check])
-        click.secho('Health Check {} updated successfully'.format(uuid), fg='green')
+        click.secho(f'Health Check {uuid} updated successfully', fg='green')
     except SoftLayerAPIError as exception:
-        click.secho('Failed to update {}'.format(uuid), fg='red')
-        click.secho("ERROR: {}".format(exception.faultString), fg='red')
+        click.secho(f'Failed to update {uuid}', fg='red')
+        click.secho(f"ERROR: {exception.faultString}", fg='red')

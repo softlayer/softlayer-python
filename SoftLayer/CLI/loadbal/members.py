@@ -23,9 +23,9 @@ def remove(env, identifier, member):
 
     try:
         mgr.delete_lb_member(uuid, member)
-        click.secho("Member {} removed".format(member), fg='green')
+        click.secho(f"Member {member} removed", fg='green')
     except SoftLayerAPIError as exception:
-        click.secho("ERROR: {}".format(exception.faultString), fg='red')
+        click.secho(f"ERROR: {exception.faultString}", fg='red')
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -48,10 +48,10 @@ def add(env, identifier, private, member, weight):
 
     try:
         mgr.add_lb_member(uuid, to_add)
-        click.secho("Member {} added".format(member), fg='green')
+        click.secho(f"Member {member} added", fg='green')
     except SoftLayerAPIError as exception:
         if 'publicIpAddress must be a string' in exception.faultString:
             click.secho("This LB requires a Public IP address for its members and none was supplied", fg='red')
         elif 'privateIpAddress must be a string' in exception.faultString:
             click.secho("This LB requires a Private IP address for its members and none was supplied", fg='red')
-        click.secho("ERROR: {}".format(exception.faultString), fg='red')
+        click.secho(f"ERROR: {exception.faultString}", fg='red')

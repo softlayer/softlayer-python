@@ -104,7 +104,7 @@ def cli(env, **args):
     if do_create:
         for pod in pods:
             if args.get('datacenter') in pod['name']:
-                click.secho('Warning: Closed soon: {}'.format(pod['name']), fg='yellow')
+                click.secho(f"Warning: Closed soon: {pod['name']}", fg='yellow')
         if not (env.skip_confirmations or formatting.confirm(
                 "This action will incur charges on your account. Continue?")):
             raise exceptions.CLIAbort('Aborting dedicated server order.')
