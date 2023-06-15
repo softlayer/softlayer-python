@@ -32,7 +32,7 @@ DEFAULT_COLUMNS = [
               default='created')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help=f"Columns to display. Options: { ', '.join(column.name for column in COLUMNS)}",
+              help=f"Columns to display. Options: {', '.join(column.name for column in COLUMNS)}",
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, volume_id, sortby, columns):

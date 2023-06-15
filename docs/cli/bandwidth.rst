@@ -15,3 +15,7 @@ bandwidth Commands
 .. click:: SoftLayer.CLI.bandwidth.summary:cli
     :prog: bandwidth summary
     :show-nested:
+
+.. click:: SoftLayer.CLI.bandwidth.pools_create:cli
+    :prog: bandwidth pools-create
+    :show-nested:

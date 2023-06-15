@@ -146,3 +146,13 @@ getObject = {
         }
     }]
 }
+createObject = {
+    "accountId": 654321,
+    "bandwidthAllotmentTypeId": 2,
+    "createDate": "2023-05-31T07:22:27-06:00",
+    "endDate": None,
+    "id": 123456789,
+    "locationGroupId": 2,
+    "name": "NewRegion",
+    "serviceProviderId": 1
+}

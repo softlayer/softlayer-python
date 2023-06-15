@@ -14,6 +14,7 @@ import time
 from rich.console import Console
 from rich.theme import Theme
 from SoftLayer.CLI import exceptions
+
 # pylint: disable=no-member, invalid-name
 
 UUID_RE = re.compile(r'^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$', re.I)
@@ -262,6 +263,7 @@ class IdentifierMixin(object):
         return resolve_ids(identifier, self.resolvers)
 
 
+# pylint: disable=C0123
 def resolve_ids(identifier, resolvers):
     """Resolves IDs given a list of functions.
 
@@ -271,15 +273,12 @@ def resolve_ids(identifier, resolvers):
     """
 
     # Before doing anything, let's see if this is an integer
-    try:
+    if type(identifier) == int:
         return [int(identifier)]
-    except ValueError:
-        pass  # It was worth a shot
+    # It was worth a shot
 
-    # This looks like a globalIdentifier (UUID)
-    if len(identifier) == 36 and UUID_RE.match(identifier):
+    elif len(identifier) == 36 and UUID_RE.match(identifier):
         return [identifier]
-
     for resolver in resolvers:
         ids = resolver(identifier)
         if ids:

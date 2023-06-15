@@ -456,7 +456,8 @@ getClosedTickets = [ticket for ticket in getTickets
                     if ticket['statusId'] == 1002]
 
 getCurrentUser = {'id': 12345, 'username': 'testAccount',
-                  'apiAuthenticationKeys': [{'authenticationKey': 'A' * 64}]}
+                  'apiAuthenticationKeys': [{'authenticationKey': 'A' * 64}],
+                  'accountId': 123456789}
 
 getCdnAccounts = [
     {
