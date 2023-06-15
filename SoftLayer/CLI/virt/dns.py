@@ -39,7 +39,7 @@ def cli(env, identifier, a_record, aaaa_record, ptr, ttl):
         raise exceptions.CLIAbort('No primary IP address associated with this VS')
 
     go_for_it = env.skip_confirmations or formatting.confirm(
-        "Attempt to update DNS records for %s" % instance['fullyQualifiedDomainName'])
+        f"Attempt to update DNS records for {instance['fullyQualifiedDomainName']}")
 
     if not go_for_it:
         raise exceptions.CLIAbort("Aborting DNS sync")
@@ -61,5 +61,5 @@ def cli(env, identifier, a_record, aaaa_record, ptr, ttl):
             ipv6 = instance['primaryNetworkComponent']['primaryVersion6IpAddressRecord']['ipAddress']
             dns.sync_host_record(zone_id, instance['hostname'], ipv6, 'aaaa', ttl)
         except KeyError as ex:
-            message = "{} does not have an ipv6 address".format(instance['fullyQualifiedDomainName'])
+            message = f"{instance['fullyQualifiedDomainName']} does not have an ipv6 address"
             raise exceptions.CLIAbort(message) from ex

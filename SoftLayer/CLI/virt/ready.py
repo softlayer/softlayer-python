@@ -22,4 +22,4 @@ def cli(env, identifier, wait):
     if ready:
         env.fout("READY")
     else:
-        raise exceptions.CLIAbort("Instance %s not ready" % vs_id)
+        raise exceptions.CLIAbort(f"Instance {vs_id} not ready")

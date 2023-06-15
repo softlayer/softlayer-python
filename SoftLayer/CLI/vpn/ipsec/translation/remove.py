@@ -28,6 +28,6 @@ def cli(env, context_id, translation_id):
 
     succeeded = manager.remove_translation(context_id, translation_id)
     if succeeded:
-        env.out('Removed translation #{}'.format(translation_id))
+        env.out(f'Removed translation #{translation_id}')
     else:
-        raise CLIHalt('Failed to remove translation #{}'.format(translation_id))
+        raise CLIHalt(f'Failed to remove translation #{translation_id}')

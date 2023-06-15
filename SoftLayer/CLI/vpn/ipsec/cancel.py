@@ -28,4 +28,4 @@ def cli(env, identifier, immediate, reason):
     result = manager.cancel_item(context['billingItem']['id'], immediate, reason)
 
     if result:
-        env.fout("Ipsec {} was cancelled.".format(identifier))
+        env.fout(f"Ipsec {identifier} was cancelled.")

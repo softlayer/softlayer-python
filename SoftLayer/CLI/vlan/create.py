@@ -45,8 +45,7 @@ def cli(env, name, datacenter, pod, network, billing):
                     extras['routerId'] = router.get('backendRouterId')
                 break
         if not extras.get('routerId'):
-            raise exceptions.CLIAbort(
-                "Unable to find pod name: {}".format(pod))
+            raise exceptions.CLIAbort(f"Unable to find pod name: {pod}")
     if network == 'private':
         item_package = ['PRIVATE_NETWORK_VLAN']
 
