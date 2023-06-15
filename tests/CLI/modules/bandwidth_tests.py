@@ -46,6 +46,16 @@ class BandwidthTests(testing.TestCase):
         self.assertEqual('0.00 MB', json_output[3]['Data out'])
         self.assertEqual('Pay-As-You-Go', json_output[4]['Allocation'])
 
+    def test_create_bandwidth(self):
+        result = self.run_command(['bandwidth', 'pools-create', '--name=NewRegion', '--region=SJC/DAL/WDC/TOR/MON'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Bandwidth_Version1_Allotment', 'createObject')
+        json_output = json.loads(result.output)
+        pp(json_output)
+        self.assertEqual(123456789, json_output['Id'])
+        self.assertEqual('NewRegion', json_output['Name Pool'])
+        self.assertEqual('SJC/DAL/WDC/TOR/MON', json_output['Region'])
+
 
 def _bandwidth_advanced_search():
     result = [
