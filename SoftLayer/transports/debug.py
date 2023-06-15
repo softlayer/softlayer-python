@@ -45,7 +45,7 @@ class DebugTransport(object):
 
     def pre_transport_log(self, call):
         """Prints a warning before calling the API """
-        output = f"Calling: {call})"
+        output = f"Calling: {call}"
         self.logger.warning(output)
 
     def post_transport_log(self, call):
