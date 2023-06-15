@@ -56,6 +56,16 @@ class BandwidthTests(testing.TestCase):
         self.assertEqual('NewRegion', json_output['Name Pool'])
         self.assertEqual('SJC/DAL/WDC/TOR/MON', json_output['Region'])
 
+    def test_edit_bandwidth(self):
+        result = self.run_command(['bandwidth', 'pools-edit', '123456', '--name=MexRegionEdited'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Bandwidth_Version1_Allotment', 'editObject')
+        json_output = json.loads(result.output)
+        pp(json_output)
+        self.assertEqual(123456, json_output['Id'])
+        self.assertEqual('MexRegionEdited', json_output['Name Pool'])
+        self.assertEqual('MEX', json_output['Region'])
+
 
 def _bandwidth_advanced_search():
     result = [
