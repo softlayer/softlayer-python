@@ -18,4 +18,4 @@ def cli(env, unique_id):
     cdn = manager.delete_cdn(unique_id)
 
     if cdn:
-        env.fout("Cdn with uniqueId: {} was deleted.".format(unique_id))
+        env.fout(f"Cdn with uniqueId: {unique_id} was deleted.")
