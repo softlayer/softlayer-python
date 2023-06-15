@@ -74,7 +74,6 @@ def basic_info(user, keys):
     else:
         table.add_row(['APIKEY', 'No'])
     table.add_row(['Name', f"{user.get('firstName', '-')} {user.get('lastName', '-')}"])
-    table.add_row(['Name', f"{user.get('firstName', '-')} {user.get('lastName', '-')}"])
     table.add_row(['Email', user.get('email')])
     table.add_row(['OpenID', user.get('openIdConnectUserName')])
     address = f"{user.get('address1')} \

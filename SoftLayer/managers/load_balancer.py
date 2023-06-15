@@ -121,7 +121,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         object_filter = {'name': {'operation': name}}
         this_lbs = self.lbaas.getAllObjects(filter=object_filter, mask=mask)
         if not this_lbs:
-            raise exceptions.SoftLayerError("Unable to find LBaaS with name: {}".format(name))
+            raise exceptions.SoftLayerError(f"Unable to find LBaaS with name: {name}")
 
         return this_lbs[0]
 
