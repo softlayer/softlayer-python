@@ -93,7 +93,7 @@ class CallCliTests(testing.TestCase):
                                    '--id=100',
                                    '-f nested.property=5432',
                                    '--output-python'])
-        print("OUTPUT: \n{}".format(result.exception))
+        print(f"OUTPUT: \n{result.exception}")
         self.assert_no_fail(result)
 
         self.assertIsNotNone(result.output, """import SoftLayer
@@ -232,7 +232,7 @@ result = client.call(u'Service',
         self.assertEqual(result.exit_code, 1)
         self.assert_called_with(service, method)
         self.assertIsInstance(result.exception, SoftLayerAPIError)
-        output = '{} fixture is not implemented'.format(service)
+        output = f'{service} fixture is not implemented'
         self.assertIn(output, result.exception.faultString)
 
     def test_fixture_not_implemented_method(self):

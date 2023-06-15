@@ -16,7 +16,7 @@ DEFAULT_COLUMNS = storage_utils.REPLICATION_PARTNER_DEFAULT
 @click.argument('volume-id')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help=f"Columns to display. Options: { ', '.join(column.name for column in COLUMNS)}",
+              help=f"Columns to display. Options: {', '.join(column.name for column in COLUMNS)}",
               default=','.join(DEFAULT_COLUMNS))
 @click.option('--sortby', help='Column to sort by', default='Username')
 @environment.pass_env

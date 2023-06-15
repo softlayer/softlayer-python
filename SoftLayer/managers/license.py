@@ -47,7 +47,7 @@ class LicensesManager(object):
 
         if not vm_ware_find:
             raise exceptions.CLIAbort(
-                "Unable to find license key: {}".format(key))
+                f"Unable to find license key: {key}")
         return vm_ware_find
 
     def create(self, datacenter, item_package):

@@ -30,5 +30,5 @@ def cli(env, identifier, users):
                            notification['user']['username'], notification['user']['email'],
                            notification['user']['firstName'], notification['user']['lastName']])
         else:
-            raise exceptions.CLIAbort("User not found: {}.".format(user))
+            raise exceptions.CLIAbort(f"User not found: {user}.")
     env.fout(table)

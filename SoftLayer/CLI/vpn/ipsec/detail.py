@@ -142,7 +142,7 @@ def _get_tunnel_context_mask(address_translations=False,
         entries.append('staticRouteSubnets')
     if service_subnets:
         entries.append('serviceSubnets')
-    return '[mask[{}]]'.format(','.join(entries))
+    return f"[mask[{','.join(entries)}]]"
 
 
 def _get_context_table(context):

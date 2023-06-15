@@ -38,5 +38,4 @@ def cli(env, context_id, static_ip, remote_ip, note):
                                              static_ip=static_ip,
                                              remote_ip=remote_ip,
                                              notes=note)
-    env.out('Created translation from {} to {} #{}'
-            .format(static_ip, remote_ip, translation['id']))
+    env.out(f"Created translation from {static_ip} to {remote_ip} #{translation['id']}")

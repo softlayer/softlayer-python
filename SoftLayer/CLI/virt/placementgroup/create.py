@@ -29,4 +29,4 @@ def cli(env, **args):
     }
 
     result = manager.create(placement_object)
-    click.secho("Successfully created placement group: ID: %s, Name: %s" % (result['id'], result['name']), fg='green')
+    click.secho(f"Successfully created placement group: ID: {result['id']}, Name: {result['name']}", fg='green')

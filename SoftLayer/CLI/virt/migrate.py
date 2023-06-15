@@ -77,6 +77,6 @@ def migrate(vsi_manager, vsi_id, host_id=None):
             vsi_manager.migrate_dedicated(vsi_id, host_id)
         else:
             vsi_manager.migrate(vsi_id)
-        click.secho("Started a migration on {}".format(vsi_id), fg='green')
+        click.secho(f"Started a migration on {vsi_id}", fg='green')
     except SoftLayer.exceptions.SoftLayerAPIError as ex:
-        click.secho("Failed to migrate {}. {}".format(vsi_id, str(ex)), fg='red')
+        click.secho(f"Failed to migrate {vsi_id}. {str(ex)}", fg='red')

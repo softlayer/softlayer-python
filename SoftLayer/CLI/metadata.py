@@ -28,13 +28,14 @@ META_MAPPING = {
     'ip': 'primary_ip',
 }
 
-HELP = """Find details about the machine making these API calls.
+NL = "\n    "
+HELP = f"""Find details about the machine making these API calls.
 
 .. csv-table:: Choices
 
-    {choices}
+    {NL.join(META_CHOICES)}
 
-""".format(choices="\n    ".join(META_CHOICES))
+"""
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, help=HELP,

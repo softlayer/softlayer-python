@@ -29,8 +29,7 @@ DEFAULT_COLUMNS = [
 @click.argument('identifier')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. [options: %s]'
-              % ', '.join(column.name for column in COLUMNS),
+              help=f"Columns to display. [options: {', '.join(column.name for column in COLUMNS)}]",
               default=','.join(DEFAULT_COLUMNS),
               show_default=True)
 @environment.pass_env
@@ -47,7 +46,7 @@ def cli(env, identifier, columns):
     except KeyError:
         flavor = "Pending Approval..."
 
-    table = formatting.Table(columns.columns, title="%s - %s" % (result.get('name'), flavor))
+    table = formatting.Table(columns.columns, title=f"{result.get('name')} - {flavor}")
     # RCI = Reserved Capacity Instance
     for rci in result['instances']:
         guest = rci.get('guest', None)

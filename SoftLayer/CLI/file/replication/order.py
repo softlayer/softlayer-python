@@ -47,8 +47,7 @@ def cli(env, volume_id, snapshot_schedule, location, tier):
         raise exceptions.ArgumentError(str(ex))
 
     if 'placedOrder' in order.keys():
-        click.echo("Order #{0} placed successfully!".format(
-            utils.lookup(order, 'placedOrder', 'id')))
+        click.echo(f"Order #{utils.lookup(order, 'placedOrder', 'id')} placed successfully!")
         for item in utils.lookup(order, 'placedOrder', 'items'):
             click.echo(" > %s" % item.get('description'))
     else:

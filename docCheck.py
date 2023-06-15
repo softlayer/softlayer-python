@@ -16,7 +16,7 @@ class Checker():
     def getDocFiles(self, path=None):
         files = []
         if path is None:
-            path = ".{seper}docs{seper}cli".format(seper=os.path.sep)
+            path = f".{os.path.sep}docs{os.path.sep}cli"
         for file in glob.glob(path + '/*', recursive=True):
             if os.path.isdir(file):
                 files = files + self.getDocFiles(file)
@@ -81,10 +81,10 @@ class Checker():
             else:
                 if self.checkCommand(command, documented_commands):
                     if debug:
-                        print("{} is documented".format(command[0]))
+                        print(f"{command[0]} is documented")
                     
                 else:
-                    print("===> {} {} IS UNDOCUMENTED <===".format(command[0], command[1]))
+                    print(f"===> {command[0]} {command[1]} IS UNDOCUMENTED <===")
                     exitCode = 1
         sys.exit(exitCode)
 

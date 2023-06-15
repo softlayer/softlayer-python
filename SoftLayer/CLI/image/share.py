@@ -20,4 +20,4 @@ def cli(env, identifier, account_id):
     shared_image = image_mgr.share_image(image_id, account_id)
 
     if shared_image:
-        env.fout("Image template {} was shared to account {}.".format(identifier, account_id))
+        env.fout(f"Image template {identifier} was shared to account {account_id}.")

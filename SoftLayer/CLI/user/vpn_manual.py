@@ -20,9 +20,9 @@ def cli(env, user, enable):
     user_id = helpers.resolve_id(mgr.resolve_ids, user, 'username')
 
     result = mgr.vpn_manual(user_id, enable)
-    message = "{} vpn manual config {}".format(user, 'enable' if enable else 'disable')
+    message = f"{user} vpn manual config {'enable' if enable else 'disable'}"
 
     if result:
         click.secho(message, fg='green')
     else:
-        click.secho("Failed to update {}".format(user), fg='red')
+        click.secho(f"Failed to update {user}", fg='red')

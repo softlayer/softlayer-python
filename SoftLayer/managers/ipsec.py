@@ -120,8 +120,7 @@ class IPSECManager(utils.IdentifierMixin, object):
         contexts = self.account.getNetworkTunnelContexts(**kwargs)
         if len(contexts) == 0:
             raise SoftLayerAPIError('SoftLayer_Exception_ObjectNotFound',
-                                    'Unable to find object with id of \'{}\''
-                                    .format(context_id))
+                                    f'Unable to find object with id of \'{context_id}\'')
         return contexts[0]
 
     def get_translation(self, context_id, translation_id):
@@ -137,8 +136,7 @@ class IPSECManager(utils.IdentifierMixin, object):
                             if x['id'] == translation_id), None)
         if translation is None:
             raise SoftLayerAPIError('SoftLayer_Exception_ObjectNotFound',
-                                    'Unable to find object with id of \'{}\''
-                                    .format(translation_id))
+                                    f'Unable to find object with id of \'{translation_id}\'')
         return translation
 
     def get_translations(self, context_id):

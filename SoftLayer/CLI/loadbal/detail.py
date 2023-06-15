@@ -34,7 +34,7 @@ def lbaas_table(this_lb):
     table.add_row(['Type', SoftLayer.LoadBalancerManager.TYPE.get(this_lb.get('type'))])
     table.add_row(['Location', utils.lookup(this_lb, 'datacenter', 'longName')])
     table.add_row(['Description', this_lb.get('description')])
-    table.add_row(['Status', "{} / {}".format(this_lb.get('provisioningStatus'), this_lb.get('operatingStatus'))])
+    table.add_row(['Status', f"{this_lb.get('provisioningStatus')} / {this_lb.get('operatingStatus')}"])
 
     listener_table, pools = get_listener_table(this_lb)
     table.add_row(['Protocols', listener_table])
@@ -122,9 +122,9 @@ def get_listener_table(this_lb):
     listener_table = formatting.Table(['UUID', 'Max Connection', 'Mapping', 'Balancer', 'Modify', 'Active'])
     for listener in this_lb.get('listeners', []):
         pool = listener.get('defaultPool')
-        priv_map = "{}:{}".format(pool['protocol'], pool['protocolPort'])
+        priv_map = f"{pool['protocol']}:{pool['protocolPort']}"
         pools[pool['uuid']] = priv_map
-        mapping = "{}:{} -> {}".format(listener.get('protocol'), listener.get('protocolPort'), priv_map)
+        mapping = f"{listener.get('protocol')}:{listener.get('protocolPort')} -> {priv_map}"
         listener_table.add_row([
             listener.get('uuid'),
             listener.get('connectionLimit', 'None'),

@@ -298,7 +298,7 @@ class UserManager(utils.IdentifierMixin, object):
             if result:
                 notifications.append(result)
             else:
-                raise exceptions.SoftLayerError("{} is not a valid notification name".format(notification))
+                raise exceptions.SoftLayerError(f"{notification} is not a valid notification name")
         return notifications
 
     def create_user(self, user_object, password):
