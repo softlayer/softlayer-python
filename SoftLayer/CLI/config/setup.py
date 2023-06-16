@@ -76,7 +76,7 @@ def cli(env, auth):
 
     elif auth == 'cloud_key':
         username = 'apikey'
-        secret = env.getpass('Classic Infrastructue API Key', default=defaults['api_key'])
+        secret = env.getpass('Classic Infrastructure API Key', default=defaults['api_key'])
         new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
         api_key = get_api_key(new_client, username, secret)
 
@@ -84,8 +84,8 @@ def cli(env, auth):
         username, api_key = sso_login(env)
 
     else:
-        username = env.input('Classic Infrastructue Username', default=defaults['username'])
-        secret = env.getpass('Classic Infrastructue API Key', default=defaults['api_key'])
+        username = env.input('Classic Infrastructure Username', default=defaults['username'])
+        secret = env.getpass('Classic Infrastructure API Key', default=defaults['api_key'])
         new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
         api_key = get_api_key(new_client, username, secret)
 
