@@ -34,6 +34,6 @@ def cli(env, identifier, enable, permission, from_user):
         result = mgr.remove_permissions(user_id, permission)
 
     if result:
-        click.secho("Permissions updated successfully: %s" % ", ".join(permission), fg='green')
+        click.secho(f"Permissions updated successfully: {', '.join(permission)}", fg='green')
     else:
-        click.secho("Failed to update permissions: %s" % ", ".join(permission), fg='red')
+        click.secho(f"Failed to update permissions: {', '.join(permission)}", fg='red')

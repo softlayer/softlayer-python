@@ -36,7 +36,7 @@ def netscaler_table(this_lb):
     for subnet in this_lb.get('subnets', []):
         subnet_table.add_row([
             subnet.get('id'),
-            "{}/{}".format(subnet.get('networkIdentifier'), subnet.get('cidr')),
+            f"{subnet.get('networkIdentifier')}/{subnet.get('cidr')}",
             subnet.get('subnetType'),
             subnet.get('addressSpace')
         ])

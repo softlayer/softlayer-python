@@ -268,7 +268,7 @@ class OrderingManager(object):
 
         packages = self.package_svc.getAllObjects(mask=mask, filter=_filter)
         if len(packages) == 0:
-            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
+            raise exceptions.SoftLayerError(f"Package {package_keyname} does not exist")
 
         return packages.pop()
 
@@ -354,8 +354,7 @@ class OrderingManager(object):
 
         if len(presets) == 0:
             raise exceptions.SoftLayerError(
-                "Preset {} does not exist in package {}".format(preset_keyname,
-                                                                package_keyname))
+                f"Preset {preset_keyname} does not exist in package {package_keyname}")
 
         return presets[0]
 
@@ -711,7 +710,7 @@ class OrderingManager(object):
 
         default_region_keyname = 'unknown'
         if not location_key or location_key == default_region_keyname:
-            raise exceptions.SoftLayerError("Invalid location {}".format(location_key))
+            raise exceptions.SoftLayerError(f"Invalid location {location_key}")
 
         default_regions = [{'keyname': default_region_keyname}]
         index_first = 0
@@ -723,7 +722,7 @@ class OrderingManager(object):
                 return location_key
             if location.get('regions', default_regions)[index_first].get('keyname') == location_key:
                 return location_name
-        raise exceptions.SoftLayerError("Location {} does not exist".format(location_key))
+        raise exceptions.SoftLayerError(f"Location {location_key} does not exist")
 
     def get_items(self, package_id, storage_filter=None, mask=None):
         """"Returns the items .

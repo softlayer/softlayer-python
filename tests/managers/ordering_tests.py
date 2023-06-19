@@ -300,7 +300,7 @@ class OrderingTests(testing.TestCase):
                                     self.ordering.get_preset_by_key, 'PACKAGE_KEYNAME', keyname)
 
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', filter=preset_filter, mask=None)
-        self.assertEqual('Preset {} does not exist in package {}'.format(keyname, 'PACKAGE_KEYNAME'), str(exc))
+        self.assertEqual(f"Preset {keyname} does not exist in package PACKAGE_KEYNAME", str(exc))
 
     def test_get_price_id_list(self):
         category1 = {'categoryCode': 'cat1'}

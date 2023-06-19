@@ -176,7 +176,7 @@ class RestTransport(object):
 
         data = ''
         if request.payload is not None:
-            data = "-d '{}'".format(request.payload)
+            data = f"-d '{request.payload}'"
 
         headers = ['"{0}: {1}"'.format(k, v) for k, v in request.transport_headers.items()]
         headers = " -H ".join(headers)

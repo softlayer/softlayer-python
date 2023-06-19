@@ -293,7 +293,7 @@ class AccountManager(utils.IdentifierMixin, object):
 
         if note is None:
             user = self.client.call('Account', 'getCurrentUser', mask="mask[id,displayName,email,username]")
-            note = "Cancelled by {} with the SLCLI".format(user.get('username'))
+            note = f"Cancelled by {user.get('username')} with the SLCLI"
 
         return self.client.call('Billing_Item', 'cancelItem', False, True, reason, note, id=identifier)
 

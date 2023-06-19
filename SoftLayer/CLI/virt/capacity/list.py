@@ -28,6 +28,6 @@ def cli(env):
         except KeyError:
             flavor = "Unknown Billing Item"
         location = r_c['backendRouter']['hostname']
-        capacity = "%s%s" % (occupied_string, available_string)
+        capacity = f"{occupied_string}{available_string}"
         table.add_row([r_c['id'], r_c['name'], capacity, flavor, location, r_c['createDate']])
     env.fout(table)

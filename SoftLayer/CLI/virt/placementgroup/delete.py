@@ -31,20 +31,20 @@ def cli(env, identifier, purge):
         placement_group = manager.get_object(group_id)
         guest_list = ', '.join([guest['fullyQualifiedDomainName'] for guest in placement_group['guests']])
         if len(placement_group['guests']) < 1:
-            raise exceptions.CLIAbort('No virtual servers were found in placement group %s' % identifier)
+            raise exceptions.CLIAbort(f'No virtual servers were found in placement group {identifier}')
 
-        click.secho("You are about to delete the following guests!\n%s" % guest_list, fg='red')
+        click.secho(f"You are about to delete the following guests!\n{guest_list}", fg='red')
         if not (env.skip_confirmations or formatting.confirm("This action will cancel all guests! Continue?")):
             raise exceptions.CLIAbort('Aborting virtual server order.')
         vm_manager = VSManager(env.client)
         for guest in placement_group['guests']:
-            click.secho("Deleting %s..." % guest['fullyQualifiedDomainName'])
+            click.secho(f"Deleting {guest['fullyQualifiedDomainName']}...")
             vm_manager.cancel_instance(guest['id'])
         return
 
-    click.secho("You are about to delete the following placement group! %s" % identifier, fg='red')
+    click.secho(f"You are about to delete the following placement group! {identifier}", fg='red')
     if not (env.skip_confirmations or formatting.confirm("This action will cancel the placement group! Continue?")):
         raise exceptions.CLIAbort('Aborting virtual server order.')
     cancel_result = manager.delete(group_id)
     if cancel_result:
-        click.secho("Placement Group %s has been canceld." % identifier, fg='green')
+        click.secho(f"Placement Group {identifier} has been cancelled.", fg='green')

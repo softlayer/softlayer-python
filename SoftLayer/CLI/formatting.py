@@ -144,7 +144,7 @@ def convert_sizes(value, unit='GB', round_result=False):
 
     if round_result:
         value = round(value / 5) * 5
-    return "{:.2f} {}".format(value, units[unit_index])
+    return f"{value:.2f} {units[unit_index]}"
 
 
 def sum_sizes(size1, size2):
@@ -176,7 +176,7 @@ def sum_sizes(size1, size2):
         total_value /= 1024
         total_unit = units[units.index(total_unit) + 1]
 
-    return "{:.2f} {}".format(total_value, total_unit)
+    return f"{total_value:.2f} {total_unit}"
 
 
 def blank():

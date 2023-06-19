@@ -26,10 +26,10 @@ class IAMError(SoftLayerError):
         self.url = url
 
     def __repr__(self):
-        return "{} ({}): {}".format(self.url, self.faultCode, self.faultString)
+        return f"{self.url} ({self.faultCode}): {self.faultString}"
 
     def __str__(self):
-        return "{} ({}): {}".format(self.url, self.faultCode, self.faultString)
+        return f"{self.url} ({self.faultCode}): {self.faultString}"
 
 
 class SoftLayerAPIError(SoftLayerError):

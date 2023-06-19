@@ -37,9 +37,9 @@ def getFlags(arrayCommandByLine):
     for line in arrayFlagsTable:
         arrayFlags = line.split('│')
         if arrayFlags[1].strip() != '':
-            flags.append('{},{}: {}'.format(arrayFlags[1].strip(), arrayFlags[2].strip(), arrayFlags[3].strip()))
+            flags.append(f'{arrayFlags[1].strip()},{arrayFlags[2].strip()}: {arrayFlags[3].strip()}')
         else:
-            flags.append('{}: {}'.format(arrayFlags[2].strip(), arrayFlags[3].strip()))
+            flags.append(f'{arrayFlags[2].strip()}: {arrayFlags[3].strip()}')
     return flags
 
 
@@ -57,18 +57,18 @@ def findCommandNested(arrayCommandByLine):
 
 def printCommandName(TopLevelCommand, command, nestedCommandName=''):
     if nestedCommandName != '':
-        f.write('slcli {} {} {}\n'.format(TopLevelCommand, command, nestedCommandName))
+        f.write(f'slcli {TopLevelCommand} {command} {nestedCommandName}\n')
     else:
-        f.write('slcli {} {}\n'.format(TopLevelCommand, command))
+        f.write(f'slcli {TopLevelCommand} {command}\n')
 
 
 def printBody(commandArray):
     for flag in getFlags(commandArray):
-        f.write('\tFlag: {}\n'.format(flag))
+        f.write(f'\tFlag: {flag}\n')
     f.write("\t--------------------------------\n")
-    f.write('\tDescription: {}\n'.format(commandArray[2].strip()))
+    f.write(f'\tDescription: {commandArray[2].strip()}\n')
     f.write("\t--------------------------------\n")
-    f.write('\tUsage: {}\n'.format(commandArray[0]))
+    f.write(f'\tUsage: {commandArray[0]}\n')
     f.write("==============================================================\n")
 
 

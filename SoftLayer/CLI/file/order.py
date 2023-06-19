@@ -62,7 +62,7 @@ def cli(env, storage_type, size, iops, tier,
         hourly_billing_flag = True
 
     if service_offering != 'storage_as_a_service':
-        click.secho('{} is a legacy storage offering'.format(service_offering), fg='red')
+        click.secho(f'{service_offering} is a legacy storage offering', fg='red')
         if hourly_billing_flag:
             raise exceptions.CLIAbort(
                 'Hourly billing is only available for the storage_as_a_service service offering'
@@ -111,12 +111,11 @@ def cli(env, storage_type, size, iops, tier,
             raise exceptions.ArgumentError(str(ex))
 
     if 'placedOrder' in order.keys():
-        click.echo("Order #{0} placed successfully!".format(
-            order['placedOrder']['id']))
+        click.echo(f"Order #{order['placedOrder']['id']} placed successfully!")
         for item in order['placedOrder']['items']:
             click.echo(" > %s" % item['description'])
         click.echo(
-            '\nYou may run "slcli file volume-list --order {0}" to find this file volume after it '
-            'is ready.'.format(order['placedOrder']['id']))
+            f"\nYou may run \"slcli file volume-list --order {order['placedOrder']['id']}\" to find this file "
+            "volume after it is ready.")
     else:
         click.echo("Order could not be placed! Please verify your options and try again.")

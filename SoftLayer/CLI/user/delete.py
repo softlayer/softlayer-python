@@ -28,6 +28,6 @@ def cli(env, identifier):
 
     result = mgr.edit_user(user_id, user_template)
     if result:
-        click.secho("%s deleted successfully" % identifier, fg='green')
+        click.secho(f"{identifier} deleted successfully", fg='green')
     else:
-        click.secho("Failed to delete %s" % identifier, fg='red')
+        click.secho(f"Failed to delete {identifier}", fg='red')

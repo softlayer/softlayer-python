@@ -239,7 +239,7 @@ def find_saas_endurance_space_price(package, size, tier_level):
     """
     if tier_level != 0.25:
         tier_level = int(tier_level)
-    key_name = 'STORAGE_SPACE_FOR_{0}_IOPS_PER_GB'.format(tier_level)
+    key_name = f'STORAGE_SPACE_FOR_{tier_level}_IOPS_PER_GB'
     key_name = key_name.replace(".", "_")
     for item in package['items']:
         if key_name not in item['keyName']:
@@ -307,7 +307,7 @@ def find_saas_perform_space_price(package, size):
         if size < capacity_minimum or size > capacity_maximum:
             continue
 
-        key_name = '{0}_{1}_GBS'.format(capacity_minimum, capacity_maximum)
+        key_name = f'{capacity_minimum}_{capacity_maximum}_GBS'
         if item['keyName'] != key_name:
             continue
         price_id = _find_price_id(item['prices'], 'performance_storage_space')

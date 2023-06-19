@@ -30,4 +30,4 @@ class NetworkParamType(click.ParamType):
             ip_address, cidr = address
             return (ip_address, int(cidr))
         except ValueError:
-            self.fail('{} is not a valid network'.format(value), param, ctx)
+            self.fail(f'{value} is not a valid network', param, ctx)

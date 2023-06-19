@@ -8,6 +8,7 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.managers.account import AccountManager
+from SoftLayer.managers.bandwidth import BandwidthManager
 from SoftLayer.managers.block import BlockStorageManager
 from SoftLayer.managers.cdn import CDNManager
 from SoftLayer.managers.dedicated_host import DedicatedHostManager
@@ -36,6 +37,7 @@ from SoftLayer.managers.vs_placement import PlacementManager
 
 __all__ = [
     'AccountManager',
+    'BandwidthManager',
     'BlockStorageManager',
     'CapacityManager',
     'CDNManager',

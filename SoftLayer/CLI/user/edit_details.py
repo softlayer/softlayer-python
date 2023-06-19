@@ -37,10 +37,10 @@ def cli(env, user, template):
             for key in template_object:
                 user_template[key] = template_object[key]
         except ValueError as ex:
-            raise exceptions.ArgumentError("Unable to parse --template. %s" % ex)
+            raise exceptions.ArgumentError(f"Unable to parse --template. {ex}")
 
     result = mgr.edit_user(user_id, user_template)
     if result:
-        click.secho("%s updated successfully" % (user), fg='green')
+        click.secho(f"{user} updated successfully", fg='green')
     else:
-        click.secho("Failed to update %s" % (user), fg='red')
+        click.secho(f"Failed to update {user}", fg='red')

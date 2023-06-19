@@ -70,20 +70,13 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
         if metadata:
             metadata_data = log['metaData'].strip("\n\t")
 
-            click.secho("'{0}','{1}','{2}','{3}','{4}','{5}'".format(
-                log['eventName'],
-                label,
-                log['objectName'],
-                utils.clean_time(log['eventCreateDate'], in_format=log_time),
-                user,
-                metadata_data))
+            click.secho(f"'{log['eventName']}','{label}','{log['objectName']}',"
+                        f"'{utils.clean_time(log['eventCreateDate'], in_format=log_time)}',"
+                        f"'{user}','{metadata_data}'")
         else:
-            click.secho("'{0}','{1}','{2}','{3}','{4}'".format(
-                log['eventName'],
-                label,
-                log['objectName'],
-                utils.clean_time(log['eventCreateDate'], in_format=log_time),
-                user))
+            click.secho(f"'{log['eventName']}','{label}','{log['objectName']}',"
+                        f"'{utils.clean_time(log['eventCreateDate'],in_format=log_time)}',"
+                        f"'{user}'")
 
         row_count = row_count + 1
         if row_count >= limit and limit != -1:
