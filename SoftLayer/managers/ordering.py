@@ -387,8 +387,8 @@ class OrderingManager(object):
             # Need to find the item in the package that has a matching
             # keyName with the current item we are searching for
             for i in items:
-                referenceCode = utils.lookup(i, 'softwareDescription', 'referenceCode')
-                if i['keyName'] == item_keyname or referenceCode == item_keyname:
+                reference_code = utils.lookup(i, 'softwareDescription', 'referenceCode')
+                if i['keyName'] == item_keyname or reference_code == item_keyname:
                     matching_item.append(i)
 
             if len(matching_item) == 0:
