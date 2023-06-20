@@ -34,6 +34,8 @@ class OrderingManager(object):
         self.order_svc = client['Product_Order']
         self.billing_svc = client['Billing_Order']
         self.package_preset = client['Product_Package_Preset']
+        self.package_mask = 'id, description, capacity, itemCategory, keyName, prices[categories], ' \
+            'softwareDescription[id,referenceCode,longDescription]'
 
     def get_packages_of_type(self, package_types, mask=None):
         """Get packages that match a certain type.
@@ -384,15 +386,14 @@ class OrderingManager(object):
             matching_item = []
             # Need to find the item in the package that has a matching
             # keyName with the current item we are searching for
-            try:
                 for i in items:
                     referenceCode = utils.lookup(i, 'softwareDescription', 'referenceCode')
                     if i['keyName'] == item_keyname or referenceCode == item_keyname:
                         matching_item.append(i)
-            except IndexError as ex:
+
                 if len(matching_item) == 0:
                     message = f"Item {item_keyname} does not exist for package {package_keyname}"
-                    raise exceptions.SoftLayerError(message) from ex
+                    raise exceptions.SoftLayerError(message)
             matching_item = matching_item[0]
 
             # we want to get the price ID that has no location attached to it,
