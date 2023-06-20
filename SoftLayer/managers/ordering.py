@@ -10,6 +10,8 @@ from re import match
 
 from SoftLayer import exceptions
 
+from SoftLayer import utils
+
 CATEGORY_MASK = '''id, isRequired, itemCategory[id, name, categoryCode]'''
 
 ITEM_MASK = '''id, keyName, description, itemCategory, categories, prices'''
@@ -32,6 +34,8 @@ class OrderingManager(object):
         self.order_svc = client['Product_Order']
         self.billing_svc = client['Billing_Order']
         self.package_preset = client['Product_Package_Preset']
+        self.package_mask = 'id, description, capacity, itemCategory, keyName, prices[categories], ' \
+            'softwareDescription[id,referenceCode,longDescription]'
 
     def get_packages_of_type(self, package_types, mask=None):
         """Get packages that match a certain type.
@@ -370,7 +374,8 @@ class OrderingManager(object):
                   keynames in the given package
 
         """
-        mask = 'id, description, capacity, itemCategory, keyName, prices[categories]'
+        mask = 'id, description, capacity, itemCategory, keyName, prices[categories], ' \
+            'softwareDescription[id,referenceCode,longDescription]'
         items = self.list_items(package_keyname, mask=mask)
         item_capacity = self.get_item_capacity(items, item_keynames)
 
@@ -378,14 +383,18 @@ class OrderingManager(object):
         category_dict = {"gpu0": -1, "pcie_slot0": -1}
 
         for item_keyname in item_keynames:
-            try:
-                # Need to find the item in the package that has a matching
-                # keyName with the current item we are searching for
-                matching_item = [i for i in items
-                                 if i['keyName'] == item_keyname][0]
-            except IndexError as ex:
+            matching_item = []
+            # Need to find the item in the package that has a matching
+            # keyName with the current item we are searching for
+            for i in items:
+                reference_code = utils.lookup(i, 'softwareDescription', 'referenceCode')
+                if i['keyName'] == item_keyname or reference_code == item_keyname:
+                    matching_item.append(i)
+
+            if len(matching_item) == 0:
                 message = f"Item {item_keyname} does not exist for package {package_keyname}"
-                raise exceptions.SoftLayerError(message) from ex
+                raise exceptions.SoftLayerError(message)
+            matching_item = matching_item[0]
 
             # we want to get the price ID that has no location attached to it,
             # because that is the most generic price. verifyOrder/placeOrder
