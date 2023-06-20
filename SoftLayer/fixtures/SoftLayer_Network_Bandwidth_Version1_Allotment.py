@@ -158,3 +158,5 @@ createObject = {
 }
 
 editObject = True
+
+requestVdrCancellation = True

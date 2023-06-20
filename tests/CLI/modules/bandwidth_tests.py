@@ -61,6 +61,13 @@ class BandwidthTests(testing.TestCase):
         self.assertEqual('MexRegionEdited', json_output['Name Pool'])
         self.assertEqual('MEX', json_output['Region'])
 
+    def test_delete_bandwidth(self):
+        result = self.run_command(['bandwidth', 'pools-delete', '123456'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Network_Bandwidth_Version1_Allotment', 'requestVdrCancellation')
+        json_output = json.loads(result.output)
+        self.assertEqual("Bandwidth pool with ID 123456 was programmed to will delete", json_output)
+
 
 def _bandwidth_advanced_search():
     result = [
