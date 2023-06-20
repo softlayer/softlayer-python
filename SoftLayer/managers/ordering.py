@@ -372,8 +372,8 @@ class OrderingManager(object):
                   keynames in the given package
 
         """
-        mask = 'id, description, capacity, itemCategory, keyName, prices[categories], \
-                softwareDescription[id,referenceCode,longDescription]'
+        mask = 'id, description, capacity, itemCategory, keyName, prices[categories], ' \
+                'softwareDescription[id,referenceCode,longDescription]'
         items = self.list_items(package_keyname, mask=mask)
         item_capacity = self.get_item_capacity(items, item_keynames)
 
