@@ -342,7 +342,7 @@ class OrderingTests(testing.TestCase):
         price1 = {'id': 1234, 'locationGroupId': '', 'categories': [category1]}
         softwareDescription1 = {'id': 1234, 'longDescription': 'ABCD 1.2-34', 'referenceCode': 'ABCD_9_32'}
         item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': category1,
-                 'prices': [price1], 'softwareDescription': [softwareDescription1], }
+                 'prices': [price1], 'softwareDescription': softwareDescription1, }
 
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1]
