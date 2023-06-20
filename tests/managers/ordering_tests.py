@@ -316,7 +316,7 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask=self.package_mask)
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask=self.ordering.package_mask)
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_get_price_id_list_no_core(self):
