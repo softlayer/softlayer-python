@@ -52,13 +52,13 @@ LBaaS Commands
 .. click:: SoftLayer.CLI.loadbal.order:cancel
    :prog: loadbal cancel
    :show-nested:
-.. click:: SoftLayer.CLI.loadbal:protocol_add
+.. click:: SoftLayer.CLI.loadbal.protocol_add:cli
    :prog: loadbal protocol-add
    :show-nested:
-.. click:: SoftLayer.CLI.loadbal:protocol_edit
+.. click:: SoftLayer.CLI.loadbal.protocol_edit:cli
    :prog: loadbal protocol-edit
    :show-nested:
-.. click:: SoftLayer.CLI.loadbal:protocol_delete
+.. click:: SoftLayer.CLI.loadbal.protocol_delete:cli
    :prog: loadbal protocol-delete
    :show-nested:
 
