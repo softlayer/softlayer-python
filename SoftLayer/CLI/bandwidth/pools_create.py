@@ -22,15 +22,18 @@ location_groups = {
 }
 
 regions = ['SJC/DAL/WDC/TOR/MON', 'AMS/LON/MAD/PAR', 'SNG/HKG/OSA/TOK', 'SYD', 'MEX', 'SAO', 'CHE', 'MIL', 'SEO', 'FRA']
-help_stmt = "Ex: 'HKG' or 'SNG/HKG/OSA/TOK'"
+HELP_STMT = "Ex: 'HKG' or 'SNG/HKG/OSA/TOK'"
 
-def check_region_param(ctx,param,value):
+
+def check_region_param(ctx, param, value):
     """Check if provided region is region group or part of region"""
-    #:params string value: Region or Region-Groups
+
+    # :params string value: Region or Region-Groups
     # return string Region-Groups
 
+    _ = [ctx, param]
     region_group = None
-    for key in location_groups.keys():
+    for key in location_groups:
         if value in key or value is key:
             region_group = key
         else:
@@ -39,13 +42,15 @@ def check_region_param(ctx,param,value):
     if region_group:
         return region_group
     else:
-        raise click.BadParameter(f"{value} is not a region or part of any region. \nAvailable Choices: \033[1;32m{regions}")
+        raise click.BadParameter(f"{value} is not a region or part of any \
+                                 region. \nAvailable Choices: \033[1;32m{regions}")
+
 
 @click.command(cls=SLCommand)
 @click.option('--name', required=True, help="Pool name")
 @click.option('--region', required=True,
               help=f"Choose Region/Region-Group {regions}", callback=check_region_param)
-@click.help_option('--help','-h',help=f"Specify Region or Region group - \033[1;32m{help_stmt}")
+@click.help_option('--help', '-h', help=f"Specify Region or Region group - \033[1;32m{HELP_STMT}")
 @environment.pass_env
 def cli(env, name, region):
     """Create bandwidth pool."""
