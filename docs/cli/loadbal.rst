@@ -52,6 +52,15 @@ LBaaS Commands
 .. click:: SoftLayer.CLI.loadbal.order:cancel
    :prog: loadbal cancel
    :show-nested:
+.. click:: SoftLayer.CLI.loadbal:protocol_add
+   :prog: loadbal protocol-add
+   :show-nested:
+.. click:: SoftLayer.CLI.loadbal:protocol_edit
+   :prog: loadbal protocol-edit
+   :show-nested:
+.. click:: SoftLayer.CLI.loadbal:protocol_delete
+   :prog: loadbal protocol-delete
+   :show-nested:
 
 
 NetScaler Commands

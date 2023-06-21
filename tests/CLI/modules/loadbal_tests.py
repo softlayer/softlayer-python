@@ -315,3 +315,23 @@ class LoadBalancerTests(testing.TestCase):
         result = self.run_command(['loadbal', 'ns-detail', '11111'])
 
         self.assert_no_fail(result)
+
+    def test_lb_protocol_add(self):
+        result = self.run_command(['lb', 'protocol-add', '1111111', '--backend', 'HTTP:216',
+                                   '--frontend', 'HTTP:217', '--method', 'ROUNDROBIN', '-s', 'SOURCE_IP',
+                                   '--max', '190'])
+        self.assert_no_fail(result)
+
+    def test_lb_protocol_edit(self):
+        result = self.run_command(['lb', 'protocol-edit', '1111111',
+                                   '--uuid', '4d088a44-8c42-4f24-a437-9461ff4c9851', '--backend', 'HTTP:216',
+                                   '--frontend', 'HTTP:217', '--method', 'ROUNDROBIN', '-s', 'SOURCE_IP',
+                                   '--max', '190'])
+
+        self.assert_no_fail(result)
+
+    def test_lb_protocol_delete(self):
+        result = self.run_command(['lb', 'protocol-delete', '1111111',
+                                   '--uuid', '4d088a44-8c42-4f24-a437-9461ff4c9851'])
+
+        self.assert_no_fail(result)

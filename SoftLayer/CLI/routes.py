@@ -244,6 +244,9 @@ ALL_ROUTES = [
     ('loadbal:order', 'SoftLayer.CLI.loadbal.order:order'),
     ('loadbal:order-options', 'SoftLayer.CLI.loadbal.order:order_options'),
     ('loadbal:cancel', 'SoftLayer.CLI.loadbal.order:cancel'),
+    ('loadbal:protocol-add', 'SoftLayer.CLI.loadbal.protocol_add:cli'),
+    ('loadbal:protocol-edit', 'SoftLayer.CLI.loadbal.protocol_edit:cli'),
+    ('loadbal:protocol-delete', 'SoftLayer.CLI.loadbal.protocol_delete:cli'),
 
     ('loadbal:ns-detail', 'SoftLayer.CLI.loadbal.ns_detail:cli'),
     ('loadbal:ns-list', 'SoftLayer.CLI.loadbal.ns_list:cli'),
