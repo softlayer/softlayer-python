@@ -60,7 +60,6 @@ def cli(env, identifier, **args):
     table.align['value'] = 'l'
     table.add_row(['Id', protocol.get('id')])
     table.add_row(['UUI', protocol.get('uuid')])
-    table.add_row(['description', protocol.get('description')])
     table.add_row(['Address', protocol.get('address')])
     table.add_row(['Type', SoftLayer.LoadBalancerManager.TYPE.get(protocol.get('type'))])
     table.add_row(['Description', protocol.get('description')])
