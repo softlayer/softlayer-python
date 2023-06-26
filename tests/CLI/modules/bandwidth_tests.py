@@ -66,7 +66,7 @@ class BandwidthTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_Bandwidth_Version1_Allotment', 'requestVdrCancellation')
         json_output = json.loads(result.output)
-        self.assertEqual("Bandwidth pool with ID 123456 was programmed to will delete", json_output)
+        self.assertEqual("Bandwidth pool 123456 has been scheduled for deletion.", json_output)
 
 
 def _bandwidth_advanced_search():
