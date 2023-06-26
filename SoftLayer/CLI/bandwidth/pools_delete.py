@@ -14,6 +14,5 @@ def cli(env, identifier):
     """Delete bandwidth pool."""
 
     manager = BandwidthManager(env.client)
-    bandwidth_pool = manager.delete_pool(identifier)
-
+    manager.delete_pool(identifier)
     env.fout(f"Bandwidth pool {identifier} has been scheduled for deletion.")
