@@ -42,8 +42,8 @@ def check_region_param(ctx, param, value):
     if region_group:
         return region_group
     else:
-        raise click.BadParameter(f"{value} is not a region or part of any \
-                                 region. \nAvailable Choices: \033[1;32m{regions}")
+        raise click.BadParameter(f"{value} is not a region or part of any region.\
+                                 \nAvailable Choices: \033[1;32m{regions}")
 
 
 @click.command(cls=SLCommand)
