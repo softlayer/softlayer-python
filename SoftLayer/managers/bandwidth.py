@@ -69,3 +69,10 @@ class BandwidthManager(utils.IdentifierMixin, object):
         }
 
         return self.client.call('Network_Bandwidth_Version1_Allotment', 'editObject', template, id=identifier)
+
+    def delete_pool(self, identifier):
+        """Delete bandwidth pool
+
+        :return: Boolean value
+        """
+        return self.client.call('Network_Bandwidth_Version1_Allotment', 'requestVdrCancellation', id=identifier)
