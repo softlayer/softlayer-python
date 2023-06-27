@@ -67,7 +67,7 @@ class BandwidthTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_Bandwidth_Version1_Allotment', 'requestVdrCancellation')
         json_output = json.loads(result.output)
         self.assertEqual("Bandwidth pool 123456 has been scheduled for deletion.", json_output)
-   
+
     def test_create_bandwidth_single_region(self):
         result = self.run_command(['bandwidth', 'pools-create', '--name=NewRegion', '--region=AMS'])
         self.assert_no_fail(result)
