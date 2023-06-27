@@ -43,3 +43,36 @@ class BandwidthManager(utils.IdentifierMixin, object):
         }
 
         return self.client.call('Network_Bandwidth_Version1_Allotment', 'createObject', template)
+
+    def get_bandwidth_detail(self, identifier):
+        """Gets bandwidth pool detail.
+
+        :returns: bandwidth pool detail
+        """
+        _mask = """activeDetails[allocation],projectedPublicBandwidthUsage, billingCyclePublicBandwidthUsage,
+        hardware[outboundBandwidthUsage,bandwidthAllotmentDetail[allocation]],inboundPublicBandwidthUsage,
+        virtualGuests[outboundPublicBandwidthUsage,bandwidthAllotmentDetail[allocation]],
+        bareMetalInstances[outboundBandwidthUsage,bandwidthAllotmentDetail[allocation]]"""
+        return self.client['SoftLayer_Network_Bandwidth_Version1_Allotment'].getObject(id=identifier, mask=_mask)
+
+    def edit_pool(self, identifier, new_name_pool):
+        """Edit bandwidth pool name
+
+        :return: Bandwidth object
+        """
+        actual_bandwidth = self.get_bandwidth_detail(identifier)
+        template = {
+            "accountId": actual_bandwidth.get('accountId'),
+            "bandwidthAllotmentTypeId": actual_bandwidth.get('bandwidthAllotmentTypeId'),
+            "locationGroupId": actual_bandwidth.get('locationGroupId'),
+            "name": new_name_pool
+        }
+
+        return self.client.call('Network_Bandwidth_Version1_Allotment', 'editObject', template, id=identifier)
+
+    def delete_pool(self, identifier):
+        """Delete bandwidth pool
+
+        :return: Boolean value
+        """
+        return self.client.call('Network_Bandwidth_Version1_Allotment', 'requestVdrCancellation', id=identifier)

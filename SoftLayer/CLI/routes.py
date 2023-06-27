@@ -425,6 +425,8 @@ ALL_ROUTES = [
     ('bandwidth:pools', 'SoftLayer.CLI.bandwidth.pools:cli'),
     ('bandwidth:pools-detail', 'SoftLayer.CLI.bandwidth.pools_detail:cli'),
     ('bandwidth:pools-create', 'SoftLayer.CLI.bandwidth.pools_create:cli'),
+    ('bandwidth:pools-edit', 'SoftLayer.CLI.bandwidth.pools_edit:cli'),
+    ('bandwidth:pools-delete', 'SoftLayer.CLI.bandwidth.pools_delete:cli'),
 ]
 
 ALL_ALIASES = {

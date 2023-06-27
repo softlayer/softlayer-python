@@ -156,3 +156,7 @@ createObject = {
     "name": "NewRegion",
     "serviceProviderId": 1
 }
+
+editObject = True
+
+requestVdrCancellation = True
