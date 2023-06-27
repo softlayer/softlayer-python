@@ -28,15 +28,15 @@ def parse_proto(ctx, param, value):
 @click.option('--method', '-m', help="Balancing Method.", default='ROUNDROBIN', show_default=True,
               type=click.Choice(['ROUNDROBIN', 'LEASTCONNECTION', 'WEIGHTED_RR']))
 @click.option('--session', '-s', required=True,
-              help="Session stickiness type. Valid values are “SOURCE_IP” “HTTP_COOKIE”")
-@click.option('--max', help="Use a Public to Public loadbalancer.")
+              help="Session stickiness type. Valid values are SOURCE_IP or HTTP_COOKIE ")
+@click.option('--max', help="Max Connections setting", type=int)
 @environment.pass_env
 def cli(env, identifier, **args):
     """Add a new load balancer protocol."""
 
     mgr = SoftLayer.LoadBalancerManager(env.client)
 
-    uuid = mgr.get_lb(identifier)['uuid']
+    uuid = mgr.get_lb_uuid(identifier)
 
     backend = args.get('backend')
     frontend = args.get('frontend')
@@ -60,7 +60,7 @@ def cli(env, identifier, **args):
     table.add_row(['Id', protocol.get('id')])
     table.add_row(['UUI', protocol.get('uuid')])
     table.add_row(['Address', protocol.get('address')])
-    table.add_row(['Type', SoftLayer.LoadBalancerManager.TYPE.get(protocol.get('type'))])
+    table.add_row(['Type', mgr.get_lb_type(protocol.get('type'))])
     table.add_row(['Description', protocol.get('description')])
 
     env.fout(table)

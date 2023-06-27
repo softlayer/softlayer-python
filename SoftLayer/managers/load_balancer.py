@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import SoftLayer
 from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
@@ -295,3 +296,15 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         """
         return self.client.call('SoftLayer_Network_LBaaS_Listener', 'deleteLoadBalancerProtocols',
                                 uuid_lb, [uuid])
+
+    def get_lb_uuid(self, identifier):
+        """this sample show the uuid from loadbalancer.
+
+        :param identifier int: loadbalancer identifier.
+        """
+        lb = self.lbaas.getObject(id=identifier, mask="mask[id,uuid]")
+        return lb.get('uuid')
+
+    def get_lb_type(self, lb_type):
+
+        return SoftLayer.LoadBalancerManager.TYPE.get(lb_type)
