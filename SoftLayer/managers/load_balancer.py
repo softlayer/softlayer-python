@@ -302,9 +302,12 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
 
         :param identifier int: loadbalancer identifier.
         """
-        lb = self.lbaas.getObject(id=identifier, mask="mask[id,uuid]")
-        return lb.get('uuid')
+        load_balancer = self.lbaas.getObject(id=identifier, mask="mask[id,uuid]")
+        return load_balancer.get('uuid')
 
     def get_lb_type(self, lb_type):
+        """return the loadbalancer type.
 
+        :param lb_type: load balancer type
+        """
         return SoftLayer.LoadBalancerManager.TYPE.get(lb_type)
