@@ -89,7 +89,7 @@ class ImageManager(utils.IdentifierMixin, object):
 
         kwargs['filter'] = _filter.to_dict()
 
-        return self.vgbdtg.getPublicImages(**kwargs, limit=limit)
+        return self.client.call('Virtual_Guest_Block_Device_Template_Group', 'getPublicImages', **kwargs, limit=limit)
 
     def _get_ids_from_name_public(self, name):
         """Get public images which match the given name."""
