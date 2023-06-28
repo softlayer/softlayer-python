@@ -21,16 +21,42 @@ location_groups = {
     "FRA": "FRA"
 }
 
+regions = ['SJC/DAL/WDC/TOR/MON', 'AMS/LON/MAD/PAR', 'SNG/HKG/OSA/TOK', 'SYD', 'MEX', 'SAO', 'CHE', 'MIL', 'SEO', 'FRA']
+
+
+def check_region_param(ctx, param, value):  # pylint: disable=unused-argument
+    """Check if provided region is region group or part of region"""
+
+    # :params string value: Region or Region-Groups
+    # return string Region-Groups
+
+    region_group = None
+    for key in location_groups:
+        if value in key or value is key:
+            region_group = key
+
+    if region_group:
+        return region_group
+    else:
+        raise click.BadParameter(f"{value} is not a region or part of any region."
+                                 " Available Choices: ['SJC/DAL/WDC/TOR/MON', 'AMS/LON/MAD/PAR',"
+                                 " 'SNG/HKG/OSA/TOK', 'SYD', 'MEX', 'SAO', 'CHE', 'MIL', 'SEO', 'FRA']")
+
 
 @click.command(cls=SLCommand)
 @click.option('--name', required=True, help="Pool name")
 @click.option('--region', required=True,
-              type=click.Choice(['SJC/DAL/WDC/TOR/MON', 'AMS/LON/MAD/PAR', 'SNG/HKG/OSA/TOK',
-                                'SYD', 'MEX', 'SAO', 'CHE', 'MIL', 'SEO', 'FRA']),
-              help="Region selected")
+              help=f"Choose Region/Region-Group {regions}", callback=check_region_param)
+@click.help_option('--help', '-h')
 @environment.pass_env
 def cli(env, name, region):
-    """Create bandwidth pool."""
+    """Create bandwidth pool.
+
+    Region can be the full zone name 'SJC/DAL/WDC/TOR/MON', or just a single datacenter like 'SJC'.
+    Example::
+        slcli bandwidth pool-create --name testPool --region DAL
+        slcli bandwidth pool-create --name testPool --region SJC/DAL/WDC/TOR/MON
+        """
 
     manager = BandwidthManager(env.client)
     locations = manager.get_location_group()
