@@ -1420,6 +1420,7 @@ getBandwidthAllotments = [{
         'amountIn': '6.94517',
         'amountOut': '6.8859'
     },
+    "endDate": "2023-07-03T22:59:59-06:00",
     'id': 309961,
     'locationGroup': {
         'description': 'All Datacenters in Mexico',

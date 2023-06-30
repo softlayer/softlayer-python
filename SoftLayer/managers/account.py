@@ -374,7 +374,7 @@ class AccountManager(utils.IdentifierMixin, object):
         if mask is None:
             mask = """mask[totalBandwidthAllocated,locationGroup, id, name, projectedPublicBandwidthUsage,
                       billingCyclePublicBandwidthUsage[amountOut,amountIn],
-                      billingItem[id,nextInvoiceTotalRecurringAmount],outboundPublicBandwidthUsage,serviceProviderId,bandwidthAllotmentTypeId,activeDetailCount]
+                      billingItem[id,nextInvoiceTotalRecurringAmount],outboundPublicBandwidthUsage,serviceProviderId,bandwidthAllotmentTypeId,activeDetailCount,endDate]
                    """
 
         return self.client.call('SoftLayer_Account', 'getBandwidthAllotments', mask=mask, iter=True)

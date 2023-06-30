@@ -31,7 +31,8 @@ def cli(env):
         "Allocation",
         "Current Usage",
         "Projected Usage",
-        "Cost"
+        "Cost",
+        "Deletion"
     ], title="Bandwidth Pools")
     table.align = 'l'
     for item in items:
@@ -55,5 +56,7 @@ def cli(env):
         else:
             cost = "$0.0"
 
-        table.add_row([id_bandwidth, name, region, servers, allocation, current, projected, cost])
+        deletion = utils.clean_time(item.get('endDate'))
+
+        table.add_row([id_bandwidth, name, region, servers, allocation, current, projected, cost, deletion])
     env.fout(table)
