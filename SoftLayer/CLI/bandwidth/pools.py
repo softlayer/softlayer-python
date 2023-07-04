@@ -58,5 +58,8 @@ def cli(env):
 
         deletion = utils.clean_time(item.get('endDate'))
 
+        if deletion == '':
+            deletion = formatting.blank()
+
         table.add_row([id_bandwidth, name, region, servers, allocation, current, projected, cost, deletion])
     env.fout(table)

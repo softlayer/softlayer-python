@@ -24,7 +24,12 @@ def cli(env, identifier):
     table.add_row(['Id', bandwidths['id']])
     table.add_row(['Name', bandwidths['name']])
     table.add_row(['Create Date', utils.clean_time(bandwidths.get('createDate'), '%Y-%m-%d')])
-    table.add_row(['End Date', utils.clean_time(bandwidths.get('endDate'))])
+    end_date = utils.clean_time(bandwidths.get('endDate'))
+    if end_date == '':
+        end_date = formatting.blank()
+        table.add_row(['End Date', end_date])
+    else:
+        table.add_row(['End Date', utils.clean_time(bandwidths.get('endDate'))])
     current = f"{utils.lookup(bandwidths, 'billingCyclePublicBandwidthUsage', 'amountOut')} GB"
     if current is None:
         current = '-'
