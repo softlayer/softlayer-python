@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import SoftLayer
 from SoftLayer import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
@@ -70,7 +71,7 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         :returns: SoftLayer_Network_LBaaS_LoadBalancer
         """
         if mask is None:
-            mask = "mask[healthMonitors, l7Pools,  members, sslCiphers, " \
+            mask = "mask[healthMonitors, l7Pools, uuid, members, sslCiphers, " \
                    "listeners[defaultPool[healthMonitor, members, sessionAffinity],l7Policies]]"
 
         this_lb = self.lbaas.getObject(id=identifier, mask=mask)
@@ -275,3 +276,38 @@ class LoadBalancerManager(utils.IdentifierMixin, object):
         """
 
         return self.lbaas.cancelLoadBalancer(uuid)
+
+    def add_protocols(self, uuid, protocols):
+        """This sample shows how to add protocols to the LBaaS.
+
+        https://softlayer.github.io/reference/services/SoftLayer_Network_LBaaS_Listener/updateLoadBalancerProtocols/
+        :param uuid string: UUID of the LBaaS instance to add a new protocol
+        :param protocols SoftLayer_Network_LBaaS_LoadBalancerProtocolConfiguration[]: protocol configurations
+        """
+        return self.client.call('SoftLayer_Network_LBaaS_Listener', 'updateLoadBalancerProtocols',
+                                uuid, protocols)
+
+    def delete_protocol(self, uuid_lb, uuid):
+        """This sample shows how to delete protocols to the LBaaS.
+
+        https://softlayer.github.io/reference/services/SoftLayer_Network_LBaaS_Listener/updateLoadBalancerProtocols/
+        :param uuid string: UUID of the LBaaS instance to add a new protocol
+        :param protocols SoftLayer_Network_LBaaS_LoadBalancerProtocolConfiguration[]: protocol configurations
+        """
+        return self.client.call('SoftLayer_Network_LBaaS_Listener', 'deleteLoadBalancerProtocols',
+                                uuid_lb, [uuid])
+
+    def get_lb_uuid(self, identifier):
+        """this sample show the uuid from loadbalancer.
+
+        :param identifier int: loadbalancer identifier.
+        """
+        load_balancer = self.lbaas.getObject(id=identifier, mask="mask[id,uuid]")
+        return load_balancer.get('uuid')
+
+    def get_lb_type(self, lb_type):
+        """return the loadbalancer type.
+
+        :param lb_type: load balancer type
+        """
+        return SoftLayer.LoadBalancerManager.TYPE.get(lb_type)

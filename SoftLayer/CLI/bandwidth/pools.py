@@ -38,9 +38,11 @@ def cli(env):
         "Allocation",
         "Current Usage",
         "Projected Usage",
-        "Cost"
+        "Cost",
+        "Deletion"
     ], title="Bandwidth Pools")
     table.align = 'l'
+
     start_m = time.perf_counter()
 
     with cf.ThreadPoolExecutor(max_workers=5) as executor:
