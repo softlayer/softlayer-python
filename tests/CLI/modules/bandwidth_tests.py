@@ -61,6 +61,28 @@ class BandwidthTests(testing.TestCase):
         self.assertEqual('MexRegionEdited', json_output['Name Pool'])
         self.assertEqual('MEX', json_output['Region'])
 
+    def test_bandwidth_pools_no_amount(self):
+        bandwidth_mock = self.set_mock('SoftLayer_Account', 'getBandwidthAllotments')
+        bandwidth_mock.return_value = [{
+            'billingCyclePublicBandwidthUsage': {
+                'amountIn': '6.94517'
+                },
+            'id': 309961,
+            'locationGroup': {
+                'description': 'All Datacenters in Mexico',
+                'id': 262,
+                'locationGroupTypeId': 1,
+                'name': 'MEX',
+                'securityLevelId': None
+                },
+            'billingItem': {'nextInvoiceTotalRecurringAmount': 0.0},
+            'name': 'MexRegion',
+            'projectedPublicBandwidthUsage': 9.88,
+            'totalBandwidthAllocated': 3361
+            }]
+        result = self.run_command(['bandwidth', 'pools'])
+        self.assert_no_fail(result)
+
 
 def _bandwidth_advanced_search():
     result = [
