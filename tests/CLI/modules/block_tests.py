@@ -5,6 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.CLI import exceptions
+from SoftLayer.fixtures import SoftLayer_Network_Storage
 from SoftLayer import SoftLayerAPIError
 from SoftLayer import testing
 
@@ -95,6 +96,16 @@ class BlockTests(testing.TestCase):
                  'Value': 'test-original-snapshot-name'}
             ]
         }, json.loads(result.output))
+
+    def test_block_detail_issue1732(self):
+        lun_mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        lun_mock.return_value = SoftLayer_Network_Storage.BLOCK_LIST_ISSUES_1732
+        result = self.run_command(['--format=table',  'block', 'volume-detail', '1234'])
+        self.assert_no_fail(result)
+        self.assertIn('│                 Username │ SL02SEL307608-60                          │', result.output)
+        self.assertIn('│            Capacity (GB) │ 16000GB                                   │', result.output)
+        self.assertIn('│       Replication Status │ FAILBACK_COMPLETED                        │', result.output)
+        self.assertIn('│                    Notes │ test                                      │', result.output)
 
     def test_volume_detail_name_identifier(self):
         result = self.run_command(['block', 'volume-detail', 'SL-12345'])
