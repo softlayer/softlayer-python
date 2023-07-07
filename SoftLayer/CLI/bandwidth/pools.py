@@ -69,7 +69,11 @@ def cli(env):
             else:
                 cost = "$0.0"
 
-            table.add_row([id_bandwidth, name, region, servers, allocation, current, projected, cost])
+            deletion = utils.clean_time(item.get('endDate'))
+            if deletion == '':
+                deletion = formatting.blank()
+
+            table.add_row([id_bandwidth, name, region, servers, allocation, current, projected, cost, deletion])
 
     end_m = time.perf_counter()
     LOGGER.debug('Total API Call time %s', end_m - start_m)
