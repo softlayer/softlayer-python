@@ -263,3 +263,75 @@ getDuplicateConversionStatus = {
     'deDuplicateConversionPercentage': 50,
     'volumeUsername': 'testUser'
 }
+
+BLOCK_LIST_ISSUES_1732 = {
+    'capacityGb': 16000,
+    'id': 167214314,
+    'notes': 'test',
+    'username': 'SL02SEL307608-60',
+    'activeTransactionCount': 0,
+    'replicationPartnerCount': 1,
+    'lunId': '1',
+    'parentVolume': {
+        'accountId': 307608,
+        'capacityGb': 16000,
+        'createDate': '2020-09-02T14:55:32-06:00',
+        'guestId': None,
+        'hardwareId': None,
+        'hostId': None,
+        'id': 167214302,
+        'nasType': 'NAS_CONTAINER',
+        'serviceProviderId': 1,
+        'storageTypeId': '3',
+        'upgradableFlag': True,
+        'username': 'SL02SEVC307608_60',
+        'serviceResourceBackendIpAddress': 'fsf-mex0101b-fz.service.softlayer.com',
+        'serviceResourceName': 'Storage Type 02 Aggregate stxf-mex0101b',
+        'snapshotSizeBytes': '831488'
+    },
+    'provisionedIops': '4096',
+    'replicationPartners': [{
+        'id': 167236648,
+        'username': 'SL02SEL307608_60_REP_1',
+        'replicationSchedule': {
+            'active': 1,
+            'createDate': '2020-09-02T17:10:04-06:00',
+            'id': 542062,
+            'modifyDate': None,
+            'name': 'SL02SEVC307608_60_WEEKLY',
+            'partnershipId': None,
+            'typeId': 34,
+            'volumeId': 167214302,
+            'type': {
+                'keyname': 'REPLICATION_WEEKLY'
+            }
+        },
+        'serviceResource': {
+            'backendIpAddress': 'fsf-sao0102c-fz.service.softlayer.com',
+            'id': 30650,
+            'name': 'Storage Type 02 Aggregate stxf-sao0102c',
+            'datacenter': {
+                'name': 'sao01'
+            },
+            'type': {
+                'type': 'NETAPP_STOR_AGGR'
+            }
+        },
+        'serviceResourceBackendIpAddress': '10.200.14.72'
+    }],
+    'replicationStatus': 'FAILBACK_COMPLETED',
+    'serviceResource': {
+        'backendIpAddress': 'fsf-mex0101b-fz.service.softlayer.com',
+        'id': 9291,
+        'name': 'Storage Type 02 Aggregate stxf-mex0101b',
+        'datacenter': {
+            'name': 'mex01'
+        }
+    },
+    'serviceResourceBackendIpAddress': '10.2.190.99',
+    'snapshotCapacityGb': '1000',
+    'storageTierLevel': 'LOW_INTENSITY_TIER',
+    'storageType': {
+        'keyName': 'ENDURANCE_BLOCK_STORAGE'
+    }
+    }
