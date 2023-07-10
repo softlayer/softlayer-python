@@ -3,28 +3,18 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-
-
-# pylint: disable=unused-argument
-def parse_proto(ctx, param, value):
-    """Parses the frontend and backend cli options"""
-    proto = {'protocol': 'HTTP', 'port': 80}
-    splitout = value.split(':')
-    if len(splitout) != 2:
-        raise exceptions.ArgumentError("{}={} is not properly formatted.".format(param, value))
-    proto['protocol'] = splitout[0]
-    proto['port'] = int(splitout[1])
-    return proto
+from SoftLayer. CLI. loadbal import protocol_add
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--uuid', help="Load Balancer Uuid.")
-@click.option('--frontend', '-f', required=True, default='HTTP:80', show_default=True, callback=parse_proto,
+@click.option('--frontend', '-f', required=True, default='HTTP:80', show_default=True,
+              callback=protocol_add.parse_proto,
               help='PROTOCOL:PORT string for incoming internet connections.')
-@click.option('--backend', '-b', required=True, default='HTTP:80', show_default=True, callback=parse_proto,
+@click.option('--backend', '-b', required=True, default='HTTP:80', show_default=True,
+              callback=protocol_add.parse_proto,
               help='PROTOCOL:PORT string for connecting to backend servers.')
 @click.option('--method', '-m', help="Balancing Method.", default='ROUNDROBIN', show_default=True,
               type=click.Choice(['ROUNDROBIN', 'LEASTCONNECTION', 'WEIGHTED_RR']))
