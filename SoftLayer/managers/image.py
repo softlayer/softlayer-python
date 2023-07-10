@@ -46,7 +46,7 @@ class ImageManager(utils.IdentifierMixin, object):
         """
         self.vgbdtg.deleteObject(id=image_id)
 
-    def list_private_images(self, guid=None, name=None, limit=100, **kwargs):
+    def list_private_images(self, guid=None, name=None, **kwargs):
         """List all private images.
 
         :param string guid: filter based on GUID
@@ -68,7 +68,7 @@ class ImageManager(utils.IdentifierMixin, object):
         kwargs['filter'] = _filter.to_dict()
 
         account = self.client['Account']
-        return account.getPrivateBlockDeviceTemplateGroups(**kwargs, limit=limit)
+        return account.getPrivateBlockDeviceTemplateGroups(**kwargs)
 
     def list_public_images(self, guid=None, name=None, limit=100, **kwargs):
         """List all public images.
