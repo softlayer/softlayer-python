@@ -4,7 +4,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-from SoftLayer. CLI. loadbal import protocol_add
+from SoftLayer.CLI.loadbal import protocol_add
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
