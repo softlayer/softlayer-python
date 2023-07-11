@@ -24,6 +24,7 @@ object_types = {'ticket': 'SoftLayer_Ticket',
 @click.argument('query', nargs=-1)
 @click.option('--types', is_flag=True, default=False, is_eager=True, help="Display searchable types.")
 @click.option('--advanced', is_flag=True, help="Calls the AdvancedSearh API.")
+@click.help_option('--help', '-h')
 @environment.pass_env
 def cli(env, query, types, advanced):
     """Perform a query against the SoftLayer search database.
@@ -35,6 +36,23 @@ def cli(env, query, types, advanced):
         slcli search _objectType:SoftLayer_Virtual_Guest test.com
         slcli -vvv search _objectType:SoftLayer_Hardware hostname:testibm --advanced
     """
+
+    # Before any Search operation
+    def check_opt(list_opt=None):
+        check = False
+        for input_ in list_opt:
+            if input_ is True:
+                check = True
+                break
+        return check
+
+    list_opt = [query, types, advanced]
+
+    if check_opt(list_opt):
+        pass
+    else:
+        raise click.UsageError('Search query must be provided')
+
     search = SearchManager(env.client)
     # query is in array, so we need to convert it to a normal string for the API
     query = " ".join(query)
