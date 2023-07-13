@@ -17,3 +17,7 @@ class FindTests(testing.TestCase):
     def test_find_advanced(self):
         result = self.run_command(['search', 'hardware', '--advanced'])
         self.assert_no_fail(result)
+
+    def test_no_options(self):
+        result = self.run_command(['search'])
+        self.assertEqual(result.exit_code, 2)
