@@ -48,9 +48,7 @@ def cli(env, query, types, advanced):
 
     list_opt = [query, types, advanced]
 
-    if check_opt(list_opt):
-        pass
-    else:
+    if not check_opt(list_opt):
         raise click.UsageError('Search query must be provided')
 
     search = SearchManager(env.client)
