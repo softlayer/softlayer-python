@@ -14,19 +14,23 @@ from SoftLayer import utils
 @click.option('--name', default=None, help='Filter on image name')
 @click.option('--public/--private', is_flag=True, default=None,
               help='Display only public or private images')
+@click.option('--limit', '-l',
+              help='How many results to get in one api call',
+              default=100,
+              show_default=True)
 @environment.pass_env
-def cli(env, name, public):
+def cli(env, name, public, limit):
     """List images."""
 
     image_mgr = SoftLayer.ImageManager(env.client)
 
     images = []
     if public in [False, None]:
-        for image in image_mgr.list_private_images(name=name, mask=image_mod.MASK):
+        for image in image_mgr.list_private_images(name=name, limit=limit, mask=image_mod.MASK):
             images.append(image)
 
     if public in [True, None]:
-        for image in image_mgr.list_public_images(name=name, mask=image_mod.MASK):
+        for image in image_mgr.list_public_images(name=name, limit=limit, mask=image_mod.MASK):
             images.append(image)
 
     table = formatting.Table(['Id', 'Name', 'Type', 'Visibility', 'Account', 'OS', 'Created', 'Notes'])
