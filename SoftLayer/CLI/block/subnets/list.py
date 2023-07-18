@@ -21,9 +21,9 @@ COLUMNS = [
 def cli(env, access_id):
     """Example:
 
-                slcli block subnets-list 12345678 
+                slcli block subnets-list 12345678
                 ACCESS_ID is the host_id obtained by: softlayer slcli block access-list <volume_id>
-    
+
     List block storage assigned subnets for the given host id.
 
     access_id is the host_id obtained by: slcli block access-list <volume_id>
