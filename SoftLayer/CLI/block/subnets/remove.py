@@ -12,14 +12,13 @@ from SoftLayer.CLI import environment
               help="ID of the subnets to remove; e.g.: --subnet-id 1234")
 @environment.pass_env
 def cli(env, access_id, subnet_id):
-    """Example:
+    """Remove block storage subnets for the given host id.
+
+    Example::
 
                 slcli block subnets-remove 111111 --subnet-id 222222
                 slcli block subnets-remove 111111 --subnet-id 222222 --subnet-id 333333
                 ACCESS_ID is the host_id obtained by: slcli block access-list <volume_id>
-
-
-    Remove block storage subnets for the given host id.
 
     access_id is the host_id obtained by: slcli block access-list <volume_id>
 
