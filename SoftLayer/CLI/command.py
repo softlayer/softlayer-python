@@ -233,7 +233,7 @@ class SLCommand(click.Command):
 
             # secondary_opts are usually for flags --enable/--disable
             if len(param.secondary_opts) == 1:
-                opt2 += Text(f"|") + self.highlighter(param.secondary_opts[0])
+                opt2 += Text("|") + self.highlighter(param.secondary_opts[0])
 
             help_record = param.get_help_record(ctx)
             help_message = ""
@@ -244,7 +244,6 @@ class SLCommand(click.Command):
             if isinstance(param.type, click.Choice):
                 choices = ", ".join(param.type.choices)
                 help_message += f" Choices: {choices}"
-
 
             options_table.add_row(opt1, opt2, self.highlighter(help_message))
 

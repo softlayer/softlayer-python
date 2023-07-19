@@ -21,7 +21,7 @@ class CapacityCommands(CommandLoader):
     """
 
     def __init__(self, **attrs):
-        click.MultiCommand.__init__(self, **attrs)
+        CommandLoader.__init__(self, **attrs)
         self.path = os.path.dirname(__file__)
         self.highlighter = OptionHighlighter()
         self.env = None
