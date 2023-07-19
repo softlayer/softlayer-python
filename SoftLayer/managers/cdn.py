@@ -175,7 +175,7 @@ class CDNManager(utils.IdentifierMixin, object):
         return self._end_date
 
     def edit(self, identifier, header=None, http_port=None, https_port=None, origin=None,
-             respect_headers=None, cache=None, performance_configuration=None):
+             respect_headers=None, cache=None, cache_description=None, performance_configuration=None):
         """Edit the cdn object.
 
         :param string identifier: The CDN identifier.
@@ -223,12 +223,12 @@ class CDNManager(utils.IdentifierMixin, object):
         if respect_headers:
             config['respectHeaders'] = respect_headers
 
-        if cache:
+        if cache or cache_description:
             if 'include-specified' in cache['cacheKeyQueryRule']:
-                cache_key_rule = self.get_cache_key_query_rule('include', cache)
+                cache_key_rule = self.get_cache_key_query_rule('include', cache_description)
                 config['cacheKeyQueryRule'] = cache_key_rule
             elif 'ignore-specified' in cache['cacheKeyQueryRule']:
-                cache_key_rule = self.get_cache_key_query_rule('ignore', cache)
+                cache_key_rule = self.get_cache_key_query_rule('ignore', cache_description)
                 config['cacheKeyQueryRule'] = cache_key_rule
             else:
                 config['cacheKeyQueryRule'] = cache['cacheKeyQueryRule']
@@ -254,7 +254,7 @@ class CDNManager(utils.IdentifierMixin, object):
         return result
 
     @staticmethod
-    def get_cache_key_query_rule(cache_type, cache):
+    def get_cache_key_query_rule(cache_type, cache_description):
         """Get the cdn object detail.
 
         :param string cache_type: Cache type.
@@ -262,10 +262,10 @@ class CDNManager(utils.IdentifierMixin, object):
 
         :return: string value.
         """
-        if 'description' not in cache:
+        if cache_description is None:
             raise SoftLayer.SoftLayerError('Please add a description to be able to update the'
                                            ' cache.')
-        cache_result = '%s: %s' % (cache_type, cache['description'])
+        cache_result = '%s: %s' % (cache_type, cache_description)
 
         return cache_result
 
