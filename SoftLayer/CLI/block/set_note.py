@@ -16,9 +16,9 @@ from SoftLayer.CLI import helpers
 @environment.pass_env
 def cli(env, volume_id, note):
     """Set note for an existing block storage volume.
-    
+
     EXAMPLE::
-    
+
             slcli block volume-set-note 12345678 --note 'this is my note'
     """
     block_manager = SoftLayer.BlockStorageManager(env.client)
