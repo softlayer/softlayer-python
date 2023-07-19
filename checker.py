@@ -1,6 +1,7 @@
 from SoftLayer.CLI import environment
 from click.testing import CliRunner
 from SoftLayer.CLI.core import cli
+import itertools
 
 runner = CliRunner()
 env = environment.Environment()
@@ -68,7 +69,10 @@ def printBody(commandArray):
     f.write("\t--------------------------------\n")
     f.write(f'\tDescription: {commandArray[2].strip()}\n')
     f.write("\t--------------------------------\n")
-    f.write(f'\tUsage: {commandArray[0]}\n')
+    list_of_strings = "".join(commandArray[0])
+    command_strings=list_of_strings.replace("Usage: cli","Usage: slcli")
+    grouped_strings = ["".join(g) for k, g in itertools.groupby(command_strings, lambda x: x == " ") if not k]
+    f.write(f'\t{" ".join(grouped_strings)}\n')
     f.write("==============================================================\n")
 
 
