@@ -5,12 +5,14 @@ import importlib
 import os
 
 import click
+from SoftLayer.CLI.command import CommandLoader
+from SoftLayer.CLI.command import OptionHighlighter
 
 CONTEXT = {'help_option_names': ['-h', '--help'],
            'max_content_width': 999}
 
 
-class PlacementGroupCommands(click.MultiCommand):
+class PlacementGroupCommands(CommandLoader):
     """Loads module for placement group related commands.
 
     Currently the base command loader only supports going two commands deep.
@@ -20,6 +22,9 @@ class PlacementGroupCommands(click.MultiCommand):
     def __init__(self, **attrs):
         click.MultiCommand.__init__(self, **attrs)
         self.path = os.path.dirname(__file__)
+        self.highlighter = OptionHighlighter()
+        self.env = None
+        self.console = None
 
     def list_commands(self, ctx):
         """List all sub-commands."""
