@@ -14,15 +14,16 @@ from SoftLayer.CLI import formatting
 @click.option('--firewall-type', required=True, show_default=True, default='vlan',
               type=click.Choice(['vlan', 'server'], case_sensitive=False),
               help='Firewall type.')
+@click.option('-f', '--force',  default=False, is_flag=True, help="Force cancel firewall of the server")
 @environment.pass_env
-def cli(env, identifier, firewall_type):
+def cli(env, identifier, firewall_type, force):
     """Cancels a firewall."""
 
     mgr = SoftLayer.FirewallManager(env.client)
-
-    if not (env.skip_confirmations or
-            formatting.confirm("This action will cancel a firewall from your account. Continue?")):
-        raise exceptions.CLIAbort('Aborted.')
+    if not force:
+        if not (env.skip_confirmations or
+                formatting.confirm("This action will cancel a firewall from your account. Continue?")):
+            raise exceptions.CLIAbort('Aborted.')
 
     if firewall_type == 'server':
         mgr.cancel_firewall(identifier, dedicated=False)

@@ -21,7 +21,7 @@ class FirewallTests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_add_vs(self, confirm_mock):
         confirm_mock.return_value = True
-        result = self.run_command(['firewall', 'add', '1000', '--firewall-type=vlan', '-ha'])
+        result = self.run_command(['firewall', 'add', '1000', '--firewall-type=vlan', '-h'])
         self.assert_no_fail(result)
         self.assertIn("Firewall is being created!", result.output)
 
@@ -158,3 +158,24 @@ class FirewallTests(testing.TestCase):
     def test_monitoring(self):
         result = self.run_command(['firewall', 'monitoring', '123456'])
         print(result.output)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_add_firewall_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['firewall', 'add', '1000', '--firewall-type=vlan', '-h', '--force'])
+        self.assert_no_fail(result)
+        self.assertIn("Firewall is being created!", result.output)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_add_firewall_no_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['firewall', 'add', '1000', '--firewall-type=vlan', '-h'])
+        self.assertEqual(2, result.exit_code)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_cancel_firewall_no_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['firewall', 'cancel', 'vlan:1234'])
+        self.assertEqual(2, result.exit_code)
+        print(result.output)
+        self.assertEqual('Aborted.', result.exception.message)
