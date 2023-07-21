@@ -33,7 +33,11 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               type=click.Choice(['0.25', '2', '4', '10']))
 @environment.pass_env
 def cli(env, volume_id, new_size, new_iops, new_tier):
-    """Modify an existing file storage volume."""
+    """Modify an existing file storage volume.
+    
+    Examples:
+            slcli file volume-modify 12345678 --new-size 1000 --new-iops 400
+    """
     file_manager = SoftLayer.FileStorageManager(env.client)
 
     if new_tier is not None:
