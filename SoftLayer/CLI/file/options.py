@@ -20,7 +20,7 @@ PACKAGE_STORAGE = 759
 @environment.pass_env
 def cli(env, prices, location=None):
     """List all options for ordering a block storage
-    
+
     Examples:
             slcli file volume-options
             slcli file volume-options --prices dal13
