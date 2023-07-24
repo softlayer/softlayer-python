@@ -18,7 +18,13 @@ from SoftLayer.CLI import environment
               help='The ID of one SoftLayer_Virtual_Guest to revoke authorization.')
 @environment.pass_env
 def cli(env, volume_id, hardware_id, virtual_id, ip_address_id, ip_address):
-    """Revoke authorization for hosts that are accessing a specific volume."""
+    """Revoke authorization for hosts that are accessing a specific volume.
+    
+    EXAMPLE::
+    
+            slcli block access-revoke 12345678 --virtual-id 87654321
+            This command revokes access of virtual server with ID 87654321 to volume with ID 12345678.
+    """
     block_manager = SoftLayer.BlockStorageManager(env.client)
     ip_address_id_list = list(ip_address_id)
 

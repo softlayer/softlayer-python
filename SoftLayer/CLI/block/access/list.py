@@ -21,7 +21,13 @@ from SoftLayer.CLI import storage_utils
               default='name')
 @environment.pass_env
 def cli(env, columns, sortby, volume_id):
-    """List hosts that are authorized to access the volume."""
+    """List hosts that are authorized to access the volume.
+    
+    EXAMPLE::
+    
+            slcli block access-list 12345678 --sortby id 
+            This command lists all hosts that are authorized to access volume with ID 12345678 and sorts them by ID.
+    """
     block_manager = SoftLayer.BlockStorageManager(env.client)
     resolved_id = helpers.resolve_id(block_manager.resolve_ids, volume_id, 'Volume Id')
     access_list = block_manager.get_block_volume_access_list(
