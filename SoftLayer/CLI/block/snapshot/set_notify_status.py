@@ -20,9 +20,8 @@ def cli(env, volume_id, enable):
     """Enables/Disables snapshot space usage threshold warning for a given volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
 
-    status = block_manager.set_volume_snapshot_notification(volume_id, enable)
+    block_manager.set_volume_snapshot_notification(volume_id, enable)
 
-    if status:
-        click.echo(
+    click.echo(
             'Snapshots space usage threshold warning notification has bee set to %s for volume %s'
             % (enable, volume_id))

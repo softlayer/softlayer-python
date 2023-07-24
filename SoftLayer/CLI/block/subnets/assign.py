@@ -14,6 +14,12 @@ from SoftLayer.CLI import environment
 def cli(env, access_id, subnet_id):
     """Assign block storage subnets to the given host id.
 
+    EXAMPLE::
+
+                slcli block subnets-assign 111111 --subnet-id 222222
+                slcli block subnets-assign 111111 --subnet-id 222222 --subnet-id 333333
+                ACCESS_ID is the host_id obtained by: softlayer slcli block access-list <volume_id>
+
     access_id is the host_id obtained by: slcli block access-list <volume_id>
 
     SoftLayer_Account::iscsiisolationdisabled must be False to use this command
