@@ -22,7 +22,7 @@ MULTIPLE = '(Multiple allowed)'
 @environment.pass_env
 def cli(env, volume_id, hardware_id, virtual_id, ip_address_id, ip_address):
     """Authorize hosts to access a given volume.
-    
+
     EXAMPLE::
 
             slcli block access-authorize 12345678 --virtual-id 87654321

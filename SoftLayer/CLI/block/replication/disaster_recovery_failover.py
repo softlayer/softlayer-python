@@ -9,7 +9,8 @@ from SoftLayer.CLI import formatting
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand,
-               epilog="""If a volume (with replication) becomes inaccessible due to a disaster event, this method can be used to immediately
+               epilog="""If a volume (with replication) becomes inaccessible due to a disaster event,
+this method can be used to immediately
 failover to an available replica in another location. This method does not allow for failback via API.
 After using this method, to failback to the original volume, please open a support ticket.
 If you wish to test failover, please use replica-failover.""")
@@ -18,8 +19,9 @@ If you wish to test failover, please use replica-failover.""")
 @environment.pass_env
 def cli(env, volume_id, replicant_id):
     """Failover an inaccessible block volume to its available replicant volume.
-    
+
     EXAMPLE::
+
             slcli block disaster-recovery-failover 12345678 87654321
             This command performs failover operation for volume with ID 12345678 to replica volume with ID 87654321.
     """
