@@ -64,9 +64,10 @@ class CDNManager(utils.IdentifierMixin, object):
 
         return self.cdn_path.listOriginPath(unique_id, **kwargs)
 
-    def add_origin(self, unique_id, origin, path, origin_type="server", header=None,
-                   port=80, protocol='http', bucket_name=None, file_extensions=None,
-                   optimize_for="web", cache_query="include all"):
+    def add_origin(self, unique_id, origin, path, dynamic_path, origin_type="server", header=None,
+                   port=80, https_port=None, protocol='http', bucket_name=None, file_extensions=None,
+                   optimize_for="web", compression=None, prefetching=None,
+                   cache_query="include all"):
         """Creates an origin path for an existing CDN.
 
         :param str unique_id: The unique ID associated with the CDN.
@@ -94,7 +95,8 @@ class CDNManager(utils.IdentifierMixin, object):
         performance_config = {
             'web': 'General web delivery',
             'video': 'Video on demand optimization',
-            'file': 'Large file optimization'
+            'file': 'Large file optimization',
+            "dynamic": "Dynamic content acceleration"
         }
 
         new_origin = {
@@ -103,10 +105,16 @@ class CDNManager(utils.IdentifierMixin, object):
             'origin': origin,
             'originType': types.get(origin_type),
             'httpPort': port,
+            'httpsPort': https_port,
             'protocol': protocol.upper(),
             'performanceConfiguration': performance_config.get(optimize_for, 'General web delivery'),
             'cacheKeyQueryRule': cache_query
         }
+
+        if optimize_for == 'dynamic':
+            new_origin['DetectionPath']=  "/" + str(dynamic_path)
+            new_origin['PrefetchEnabled']= prefetching
+            new_origin['MobileImageCompressionEnabled']= compression
 
         if header:
             new_origin['header'] = header
