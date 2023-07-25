@@ -69,9 +69,9 @@ DEFAULT_NOTES_SIZE = 20
 def cli(env, sortby, columns, datacenter, username, storage_type, order):
     """List file storage.
 
-    Example:
+    Example::
             slcli file volume-list -d dal10 --storage-type endurance --sortby capacity_gb
-            """
+    """
     file_manager = SoftLayer.FileStorageManager(env.client)
     file_volumes = file_manager.list_file_volumes(datacenter=datacenter,
                                                   username=username,
