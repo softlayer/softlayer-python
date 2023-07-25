@@ -65,27 +65,34 @@ class CDNManager(utils.IdentifierMixin, object):
         return self.cdn_path.listOriginPath(unique_id, **kwargs)
 
     def add_origin(self, unique_id, origin, path, dynamic_path, origin_type="server", header=None,
-                   port=80, https_port=None, protocol='http', bucket_name=None, file_extensions=None,
+                   http_port=80, https_port=None, protocol='http', bucket_name=None, file_extensions=None,
                    optimize_for="web", compression=None, prefetching=None,
                    cache_query="include all"):
         """Creates an origin path for an existing CDN.
 
         :param str unique_id: The unique ID associated with the CDN.
         :param str path: relative path to the domain provided, e.g. "/articles/video"
+        :param str dynamic_path: The path that Akamai edge servers periodically fetch the test object from.
+                                example = /detection-test-object.html
         :param str origin: ip address or hostname if origin_type=server, API endpoint for
                            your S3 object storage if origin_type=storage
         :param str origin_type: it can be 'server' or 'storage' types.
         :param str header: the edge server uses the host header to communicate with the origin.
                            It defaults to hostname. (optional)
-        :param int port: the http port number (default: 80)
+        :param int http_port: the http port number (default: 80)
+        :param int https_port: the https port number
         :param str protocol: the protocol of the origin (default: HTTP)
         :param str bucket_name: name of the available resource
         :param str file_extensions: file extensions that can be stored in the CDN, e.g. "jpg,png"
         :param str optimize_for: performance configuration, available options: web, video, and file where:
 
-                                    - 'web' = 'General web delivery'
-                                    - 'video' = 'Video on demand optimization'
-                                    - 'file' = 'Large file optimization'
+                                - 'web' = 'General web delivery'
+                                - 'video' = 'Video on demand optimization'
+                                - 'file' = 'Large file optimization'
+                                - 'dynamic' = 'Dynamic content acceleration'
+        :param bool compression: Enable or disable compression of JPEG images for requests over
+                                certain network conditions.
+        :param bool prefetching: Enable or disable the embedded object prefetching feature.
         :param str cache_query: rules with the following formats: 'include-all', 'ignore-all',
                                'include: space separated query-names',
                                'ignore: space separated query-names'.'
@@ -104,17 +111,19 @@ class CDNManager(utils.IdentifierMixin, object):
             'path': path,
             'origin': origin,
             'originType': types.get(origin_type),
-            'httpPort': port,
+            'httpPort': http_port,
             'httpsPort': https_port,
             'protocol': protocol.upper(),
-            'performanceConfiguration': performance_config.get(optimize_for, 'General web delivery'),
-            'cacheKeyQueryRule': cache_query
+            'performanceConfiguration': performance_config.get(optimize_for),
+            'cacheKeyQueryRule': cache_query,
         }
 
         if optimize_for == 'dynamic':
-            new_origin['DetectionPath']=  "/" + str(dynamic_path)
-            new_origin['PrefetchEnabled']= prefetching
-            new_origin['MobileImageCompressionEnabled']= compression
+            new_origin['dynamicContentAcceleration'] = {
+                'detectionPath': "/" + str(dynamic_path),
+                'prefetchEnabled': bool(prefetching),
+                'mobileImageCompressionEnabled': bool(compression)
+            }
 
         if header:
             new_origin['header'] = header

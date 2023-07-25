@@ -66,15 +66,30 @@ class CdnTests(testing.TestCase):
 
         self.assert_no_fail(result)
 
+    def test_add_origin_server_dynamic(self):
+        result = self.run_command(
+            ['cdn', 'origin-add', '-t', 'server', '-H=test.example.com', '-s', 81, '-o', 'dynamic', '-c=include-all',
+             '-P', 'HTTPS', '-d', 'abc.html', '-g', True, '-i', True, '1234', '10.10.10.1', '/example/videos2', ])
+
+        self.assert_no_fail(result)
+
     def test_add_origin_storage(self):
         result = self.run_command(['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-H=test.example.com',
                                    '-p', 80, '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
 
         self.assert_no_fail(result)
 
+    def test_add_origin_storage_dynamic(self):
+        result = self.run_command(['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-H=test.example.com',
+                                   '-s', 81, '-o', 'dynamic', '-c=include-all', '1234', '10.10.10.1',
+                                   '/example/videos2', '-g', True, '-i', True])
+
+        self.assert_no_fail(result)
+
     def test_add_origin_without_storage(self):
         result = self.run_command(['cdn', 'origin-add', '-t', 'storage', '-H=test.example.com', '-p', 80,
-                                   '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
+                                   '-P', 'HTTPS', '-o', 'web', '-c=include-all',
+                                   '1234', '10.10.10.1', '/example/videos2'])
 
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.ArgumentError)
@@ -83,6 +98,15 @@ class CdnTests(testing.TestCase):
         result = self.run_command(
             ['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-e', 'jpg', '-H=test.example.com', '-p', 80,
              '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
+
+        self.assert_no_fail(result)
+
+    def test_add_origin_storage_with_file_extensions_dynamic(self):
+        result = self.run_command(
+            ['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-e', 'jpg', '-H=test.example.com', '-s', 81,
+             '-P', 'HTTPS', '-o', 'dynamic', '-d', 'abc.html', '-g', True, '-i', True,
+             '-c=include-all', '1234', '10.10.10.1', '/example/videos2',
+             ])
 
         self.assert_no_fail(result)
 
