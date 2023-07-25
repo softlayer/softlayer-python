@@ -37,7 +37,7 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 def cli(env, volume_id, new_size, new_iops, new_tier, force):
     """Modify an existing file storage volume.
 
-    Examples:
+    Example::
             slcli file volume-modify 12345678 --new-size 1000 --new-iops 400
     """
     if not force:
