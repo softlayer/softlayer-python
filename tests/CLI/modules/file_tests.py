@@ -820,3 +820,11 @@ class FileTests(testing.TestCase):
     def test_volume_options(self):
         result = self.run_command(['file', 'volume-options'])
         self.assert_no_fail(result)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_modify_order_no_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['file', 'volume-modify', '102'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Aborted', result.exception.message)

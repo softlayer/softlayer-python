@@ -19,7 +19,12 @@ PACKAGE_STORAGE = 759
                    'add it to the --prices option using location short name, e.g. --prices dal13')
 @environment.pass_env
 def cli(env, prices, location=None):
-    """List all options for ordering a block storage"""
+    """List all options for ordering a block storage
+
+    Example::
+            slcli file volume-options
+            slcli file volume-options --prices dal13
+    """
 
     order_manager = SoftLayer.OrderingManager(env.client)
     items = order_manager.get_items(PACKAGE_STORAGE)

@@ -5,6 +5,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 
 
 CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
@@ -31,9 +32,19 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
                    'be 0.25. If original IOPS/GB for the volume is greater than 0.25, new IOPS/GB for the volume '
                    'must also be greater than 0.25.]',
               type=click.Choice(['0.25', '2', '4', '10']))
+@click.option('--force',  default=False, is_flag=True, help="Force modify")
 @environment.pass_env
-def cli(env, volume_id, new_size, new_iops, new_tier):
-    """Modify an existing file storage volume."""
+def cli(env, volume_id, new_size, new_iops, new_tier, force):
+    """Modify an existing file storage volume.
+
+    Example::
+            slcli file volume-modify 12345678 --new-size 1000 --new-iops 400
+    """
+    if not force:
+        if not (env.skip_confirmations or
+                formatting.confirm("This action will incur charges on your account. Continue?")):
+            raise exceptions.CLIAbort('Aborted')
+
     file_manager = SoftLayer.FileStorageManager(env.client)
 
     if new_tier is not None:
