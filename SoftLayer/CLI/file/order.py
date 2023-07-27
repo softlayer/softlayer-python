@@ -5,6 +5,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 
 
 CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
@@ -26,7 +27,7 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 @click.option('--tier',
               help='Endurance Storage Tier (IOP per GB) [required for storage-type endurance]',
               type=click.Choice(['0.25', '2', '4', '10']))
-@click.option('--location',
+@click.option('-l', '--location',
               help='Datacenter short name (e.g.: dal09)',
               required=True)
 @click.option('--snapshot-size',
@@ -46,16 +47,30 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               type=click.Choice(['hourly', 'monthly']),
               default='monthly',
               help="Optional parameter for Billing rate (default to monthly)")
+@click.option('--force', default=False, is_flag=True, help="Force order file storage volume without confirmation")
 @environment.pass_env
 def cli(env, storage_type, size, iops, tier,
-        location, snapshot_size, service_offering, billing):
+        location, snapshot_size, service_offering, billing, force):
     """Order a file storage volume.
+
+    Example::
+        slcli file volume-order --storage-type performance --size 1000 --iops 4000 -d dal09
+        This command orders a performance volume with size is 1000GB, IOPS is 4000, located at dal09.
+
+        slcli file volume-order --storage-type endurance --size 500 --tier 4 -d dal09 --snapshot-size 500
+        This command orders an endurance volume with size is 500GB, tier level is 4 IOPS per GB,\
+located at dal09 with an additional snapshot space size of 500GB
 
     Valid size and iops options can be found here:
     https://cloud.ibm.com/docs/FileStorage/index.html#provisioning-considerations
     """
     file_manager = SoftLayer.FileStorageManager(env.client)
     storage_type = storage_type.lower()
+
+    if not force:
+        if not (env.skip_confirmations or
+                formatting.confirm("This action will incur charges on your account. Continue?")):
+            raise exceptions.CLIAbort('Aborted')
 
     hourly_billing_flag = False
     if billing.lower() == "hourly":

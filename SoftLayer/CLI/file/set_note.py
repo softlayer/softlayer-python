@@ -15,7 +15,12 @@ from SoftLayer.CLI import helpers
               help='Public notes related to a Storage volume')
 @environment.pass_env
 def cli(env, volume_id, note):
-    """Set note for an existing file storage volume."""
+    """Set note for an existing file storage volume.
+
+    Example::
+        slcli file volume-set-note 12345678 --note 'this is my note'
+    """
+
     file_manager = SoftLayer.FileStorageManager(env.client)
     file_volume_id = helpers.resolve_id(file_manager.resolve_ids, volume_id, 'File Storage')
 
