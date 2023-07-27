@@ -13,7 +13,14 @@ from SoftLayer.CLI import environment
               help="Cancel current refresh process and initiates the new refresh.")
 @environment.pass_env
 def cli(env, volume_id, snapshot_id, force_refresh):
-    """Refresh a duplicate volume with a snapshot from its parent."""
+    """Refresh a duplicate volume with a snapshot from its parent.
+
+    Example::
+        slcli file volume-refresh volume_id snapshot_id
+
+        Refresh a duplicate volume_id with a snapshot from its parent snapshot_id.
+        Refresh a duplicate volume with a snapshot from its parent.
+    """
     file_manager = SoftLayer.FileStorageManager(env.client)
     resp = file_manager.refresh_dupe(volume_id, snapshot_id, force_refresh)
 
