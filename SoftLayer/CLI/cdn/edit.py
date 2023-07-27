@@ -31,11 +31,16 @@ from SoftLayer.CLI import helpers
               type=click.Choice(['1', '0']),
               help="Respect headers. The value 1 is On and 0 is Off."
               )
-@click.option('--cache', '-c', multiple=True, type=str,
+@click.option('--cache', '-c', type=str,
               help="Cache key optimization. These are the valid options to choose: 'include-all', 'ignore-all', "
                    "'include-specified', 'ignore-specified'. If you select 'include-specified' or 'ignore-specified' "
-                   "please add a description too using again --cache, "
-                   "e.g --cache=include-specified --cache=description."
+                   "please add to option --cache-description.\n"
+                   " e.g --cache=include-specified --cache-description=description."
+              )
+@click.option('--cache-description', '-C', type=str,
+              help="In cache option, if you select 'include-specified' or 'ignore-specified', "
+                   "please add a description too using this option.\n"
+                   "e.g --cache include-specified --cache-description description."
               )
 @click.option('--performance-configuration', '-p',
               type=click.Choice(['General web delivery', 'Large file optimization', 'Video on demand optimization']),
@@ -43,7 +48,8 @@ from SoftLayer.CLI import helpers
                    "the Dynamic content acceleration option is not added because this has a special configuration."
               )
 @environment.pass_env
-def cli(env, identifier, header, http_port, https_port, origin, respect_headers, cache, performance_configuration):
+def cli(env, identifier, header, http_port, https_port, origin, respect_headers, cache,
+        cache_description, performance_configuration):
     """Edit a CDN Account.
 
        Note: You can use the hostname or uniqueId as IDENTIFIER.
@@ -53,15 +59,14 @@ def cli(env, identifier, header, http_port, https_port, origin, respect_headers,
     cdn_id = helpers.resolve_id(manager.resolve_ids, identifier, 'CDN')
 
     cache_result = {}
-    if cache:
+    if cache or cache_description:
         if len(cache) > 1:
-            cache_result['cacheKeyQueryRule'] = cache[0]
-            cache_result['description'] = cache[1]
+            cache_result['cacheKeyQueryRule'] = cache
         else:
             cache_result['cacheKeyQueryRule'] = cache[0]
 
     cdn_result = manager.edit(cdn_id, header=header, http_port=http_port, https_port=https_port, origin=origin,
-                              respect_headers=respect_headers, cache=cache_result,
+                              respect_headers=respect_headers, cache=cache_result, cache_description=cache_description,
                               performance_configuration=performance_configuration)
 
     table = formatting.KeyValueTable(['name', 'value'])

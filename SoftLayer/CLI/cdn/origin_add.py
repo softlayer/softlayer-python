@@ -24,20 +24,33 @@ from SoftLayer.CLI import formatting
 @click.option('--bucket-name', '-b',
               type=click.STRING,
               help="The name of the available resource [required if --origin-type=storage]")
-@click.option('--port', '-p',
+@click.option('--http-port', '-p',
               type=click.INT,
-              help="The http port number.",
-              default=80,
-              show_default=True)
+              help="The http port number. [http or https is required]")
+@click.option('--https-port', '-s',
+              type=click.INT,
+              help="The https port number. [http or https is required]"
+              )
 @click.option('--protocol', '-P',
               type=click.STRING,
               help="The protocol used by the origin.",
               default='http',
               show_default=True)
 @click.option('--optimize-for', '-o',
-              type=click.Choice(['web', 'video', 'file']),
+              type=click.Choice(['web', 'video', 'file', 'dynamic']),
               help="Performance configuration",
               default='web',
+              show_default=True)
+@click.option('--dynamic-path', '-d',
+              help="The path that Akamai edge servers periodically fetch the test object from."
+              "example = /detection-test-object.html")
+@click.option('--compression', '-i',
+              help="Enable or disable compression of JPEG images for requests over certain network conditions.",
+              default='true',
+              show_default=True)
+@click.option('--prefetching', '-g',
+              help="Enable or disable the embedded object prefetching feature.",
+              default='true',
               show_default=True)
 @click.option('--extensions', '-e',
               type=click.STRING,
@@ -50,7 +63,9 @@ from SoftLayer.CLI import formatting
               show_default=True)
 @environment.pass_env
 def cli(env, unique_id, origin, path, origin_type, header,
-        bucket_name, port, protocol, optimize_for, extensions, cache_query):
+        bucket_name, http_port, https_port, protocol, optimize_for,
+        dynamic_path, compression, prefetching,
+        extensions, cache_query):
     """Create an origin path for an existing CDN mapping.
 
     For more information see the following documentation: \n
@@ -62,10 +77,12 @@ def cli(env, unique_id, origin, path, origin_type, header,
     if origin_type == 'storage' and not bucket_name:
         raise exceptions.ArgumentError('[-b | --bucket-name] is required when [-t | --origin-type] is "storage"')
 
-    result = manager.add_origin(unique_id, origin, path, origin_type=origin_type,
-                                header=header, port=port, protocol=protocol,
+    result = manager.add_origin(unique_id, origin, path, dynamic_path, origin_type=origin_type,
+                                header=header, http_port=http_port, https_port=https_port, protocol=protocol,
                                 bucket_name=bucket_name, file_extensions=extensions,
-                                optimize_for=optimize_for, cache_query=cache_query)
+                                optimize_for=optimize_for,
+                                compression=compression, prefetching=prefetching,
+                                cache_query=cache_query)
 
     table = formatting.Table(['Item', 'Value'])
     table.align['Item'] = 'r'
@@ -78,8 +95,11 @@ def cli(env, unique_id, origin, path, origin_type, header,
 
     table.add_row(['Origin', result['origin']])
     table.add_row(['Origin Type', result['originType']])
+    table.add_row(['Header', result['header']])
     table.add_row(['Path', result['path']])
-    table.add_row(['Port', result['httpPort']])
+    table.add_row(['Http Port', result['httpPort']])
+    table.add_row(['Https Port', result['httpsPort']])
+    table.add_row(['Cache Key Rule', result['cacheKeyQueryRule']])
     table.add_row(['Configuration', result['performanceConfiguration']])
     table.add_row(['Status', result['status']])
 

@@ -64,27 +64,35 @@ class CDNManager(utils.IdentifierMixin, object):
 
         return self.cdn_path.listOriginPath(unique_id, **kwargs)
 
-    def add_origin(self, unique_id, origin, path, origin_type="server", header=None,
-                   port=80, protocol='http', bucket_name=None, file_extensions=None,
-                   optimize_for="web", cache_query="include all"):
+    def add_origin(self, unique_id, origin, path, dynamic_path, origin_type="server", header=None,
+                   http_port=80, https_port=None, protocol='http', bucket_name=None, file_extensions=None,
+                   optimize_for="web", compression=None, prefetching=None,
+                   cache_query="include all"):
         """Creates an origin path for an existing CDN.
 
         :param str unique_id: The unique ID associated with the CDN.
         :param str path: relative path to the domain provided, e.g. "/articles/video"
+        :param str dynamic_path: The path that Akamai edge servers periodically fetch the test object from.
+                                example = /detection-test-object.html
         :param str origin: ip address or hostname if origin_type=server, API endpoint for
                            your S3 object storage if origin_type=storage
         :param str origin_type: it can be 'server' or 'storage' types.
         :param str header: the edge server uses the host header to communicate with the origin.
                            It defaults to hostname. (optional)
-        :param int port: the http port number (default: 80)
+        :param int http_port: the http port number (default: 80)
+        :param int https_port: the https port number
         :param str protocol: the protocol of the origin (default: HTTP)
         :param str bucket_name: name of the available resource
         :param str file_extensions: file extensions that can be stored in the CDN, e.g. "jpg,png"
         :param str optimize_for: performance configuration, available options: web, video, and file where:
 
-                                    - 'web' = 'General web delivery'
-                                    - 'video' = 'Video on demand optimization'
-                                    - 'file' = 'Large file optimization'
+                                - 'web' = 'General web delivery'
+                                - 'video' = 'Video on demand optimization'
+                                - 'file' = 'Large file optimization'
+                                - 'dynamic' = 'Dynamic content acceleration'
+        :param bool compression: Enable or disable compression of JPEG images for requests over
+                                certain network conditions.
+        :param bool prefetching: Enable or disable the embedded object prefetching feature.
         :param str cache_query: rules with the following formats: 'include-all', 'ignore-all',
                                'include: space separated query-names',
                                'ignore: space separated query-names'.'
@@ -94,7 +102,8 @@ class CDNManager(utils.IdentifierMixin, object):
         performance_config = {
             'web': 'General web delivery',
             'video': 'Video on demand optimization',
-            'file': 'Large file optimization'
+            'file': 'Large file optimization',
+            "dynamic": "Dynamic content acceleration"
         }
 
         new_origin = {
@@ -102,11 +111,19 @@ class CDNManager(utils.IdentifierMixin, object):
             'path': path,
             'origin': origin,
             'originType': types.get(origin_type),
-            'httpPort': port,
+            'httpPort': http_port,
+            'httpsPort': https_port,
             'protocol': protocol.upper(),
-            'performanceConfiguration': performance_config.get(optimize_for, 'General web delivery'),
-            'cacheKeyQueryRule': cache_query
+            'performanceConfiguration': performance_config.get(optimize_for),
+            'cacheKeyQueryRule': cache_query,
         }
+
+        if optimize_for == 'dynamic':
+            new_origin['dynamicContentAcceleration'] = {
+                'detectionPath': "/" + str(dynamic_path),
+                'prefetchEnabled': bool(prefetching),
+                'mobileImageCompressionEnabled': bool(compression)
+            }
 
         if header:
             new_origin['header'] = header
@@ -175,7 +192,7 @@ class CDNManager(utils.IdentifierMixin, object):
         return self._end_date
 
     def edit(self, identifier, header=None, http_port=None, https_port=None, origin=None,
-             respect_headers=None, cache=None, performance_configuration=None):
+             respect_headers=None, cache=None, cache_description=None, performance_configuration=None):
         """Edit the cdn object.
 
         :param string identifier: The CDN identifier.
@@ -223,12 +240,12 @@ class CDNManager(utils.IdentifierMixin, object):
         if respect_headers:
             config['respectHeaders'] = respect_headers
 
-        if cache:
+        if cache or cache_description:
             if 'include-specified' in cache['cacheKeyQueryRule']:
-                cache_key_rule = self.get_cache_key_query_rule('include', cache)
+                cache_key_rule = self.get_cache_key_query_rule('include', cache_description)
                 config['cacheKeyQueryRule'] = cache_key_rule
             elif 'ignore-specified' in cache['cacheKeyQueryRule']:
-                cache_key_rule = self.get_cache_key_query_rule('ignore', cache)
+                cache_key_rule = self.get_cache_key_query_rule('ignore', cache_description)
                 config['cacheKeyQueryRule'] = cache_key_rule
             else:
                 config['cacheKeyQueryRule'] = cache['cacheKeyQueryRule']
@@ -254,7 +271,7 @@ class CDNManager(utils.IdentifierMixin, object):
         return result
 
     @staticmethod
-    def get_cache_key_query_rule(cache_type, cache):
+    def get_cache_key_query_rule(cache_type, cache_description):
         """Get the cdn object detail.
 
         :param string cache_type: Cache type.
@@ -262,10 +279,10 @@ class CDNManager(utils.IdentifierMixin, object):
 
         :return: string value.
         """
-        if 'description' not in cache:
+        if cache_description is None:
             raise SoftLayer.SoftLayerError('Please add a description to be able to update the'
                                            ' cache.')
-        cache_result = '%s: %s' % (cache_type, cache['description'])
+        cache_result = '%s: %s' % (cache_type, cache_description)
 
         return cache_result
 
