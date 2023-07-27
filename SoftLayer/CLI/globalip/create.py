@@ -12,9 +12,15 @@ from SoftLayer.CLI import formatting
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('-v6', '--ipv6', is_flag=True, help='Order a IPv6 IP')
 @click.option('--test', help='test order')
+@click.option('-f', '--force', default=False, is_flag=True, help="Force operation without confirmation")
 @environment.pass_env
-def cli(env, ipv6, test):
-    """Creates a global IP."""
+def cli(env, ipv6, test, force):
+    """Creates a global IP.
+
+    Example::
+        slcli globalip create -v6
+        This command creates an IPv6 address.
+    """
 
     mgr = SoftLayer.NetworkManager(env.client)
 
@@ -22,10 +28,10 @@ def cli(env, ipv6, test):
     if ipv6:
         version = 6
 
-    if not (test or env.skip_confirmations):
-        if not formatting.confirm("This action will incur charges on your "
-                                  "account. Continue?"):
-            raise exceptions.CLIAbort('Cancelling order.')
+    if not force:
+        if not (test or env.skip_confirmations):
+            if not formatting.confirm("This action will incur charges on your account. Continue?"):
+                raise exceptions.CLIAbort('Cancelling order.')
 
     result = mgr.add_global_ip(version=version, test_order=test)
 

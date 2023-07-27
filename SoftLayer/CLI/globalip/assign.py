@@ -20,7 +20,12 @@ target_types = {'vlan': 'SoftLayer_Network_Vlan',
 @click.option('--target-id', help='The identifier for the destination resource to route this subnet to. ')
 @environment.pass_env
 def cli(env, identifier, target, target_id):
-    """Assigns the subnet to a target."""
+    """Assigns the subnet to a target.
+
+    Example::
+        slcli globalip assign 12345678 9.111.123.456
+        This command assigns IP address with ID 12345678 to a target device whose IP address is 9.111.123.456
+    """
 
     mgr = SoftLayer.NetworkManager(env.client)
     mgr.route(identifier, target_types.get(target), target_id)
