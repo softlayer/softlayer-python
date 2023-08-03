@@ -13,7 +13,11 @@ from SoftLayer.CLI import formatting
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """Gets bandwidth details for a firewall from the past 30 days."""
+    """Gets bandwidth details for a firewall from the past 30 days.
+
+    Example::
+        slcli firewall monitoring vs:12345
+    """
 
     mgr = SoftLayer.FirewallManager(env.client)
 

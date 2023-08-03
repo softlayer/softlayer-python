@@ -39,8 +39,7 @@ class DnsTests(testing.TestCase):
         no_going_back_mock.return_value = False
         result = self.run_command(['globalip', 'cancel', '1'])
 
-        self.assertEqual(result.exit_code, 2)
-        self.assertIsInstance(result.exception, exceptions.CLIAbort)
+        self.assertEqual(result.exit_code, 0)
 
     def test_ip_list(self):
         result = self.run_command(['globalip', 'list', '--ip-version=v4'])
@@ -85,3 +84,27 @@ class DnsTests(testing.TestCase):
         result = self.run_command(['globalip', 'unassign', '1'])
         self.assert_no_fail(result)
         self.assertEqual(result.output, "")
+
+    def test_ip_cancel_force(self):
+        result = self.run_command(['globalip', 'cancel', '1', '--force'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.exit_code, 0)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_ip_cancel_no_abort(self, confirm_mock):
+        # Test with confirmation and responding negatively
+        confirm_mock.return_value = True
+        result = self.run_command(['globalip', 'cancel', '1'])
+
+        self.assert_no_fail(result)
+        self.assertEqual(result.exit_code, 0)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_ip_cancel_abort(self, confirm_mock):
+        # Test with confirmation and responding negatively
+        confirm_mock.return_value = False
+        result = self.run_command(['globalip', 'cancel', '1'])
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIsInstance(result.exception, exceptions.CLIAbort)
