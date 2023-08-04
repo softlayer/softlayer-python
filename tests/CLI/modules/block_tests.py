@@ -978,3 +978,18 @@ class BlockTests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_Storage', 'getDuplicateConversionStatus')
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_cancel_block_volume_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['block', 'volume-cancel', '12345678', '--immediate', '--force'])
+        self.assert_no_fail(result)
+        self.assertEqual('Block volume with id 12345678 has been marked'
+                         ' for immediate cancellation\n', result.output)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_cancel_block_volume_no_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['block', 'volume-cancel', '12345678'])
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Aborted', result.exception.message)
