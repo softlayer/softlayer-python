@@ -16,16 +16,13 @@ from SoftLayer.CLI import exceptions
               help='Number of snapshots to retain.',
               required=True)
 @click.option('--minute',
-              help='Minute of the hour when snapshots should be taken, '
-              'integer between 0 to 59.',
+              help='Minute of the hour when snapshots should be taken, integer between 0 to 59.',
               default=0)
 @click.option('--hour',
-              help='Hour of the day when snapshots should be taken, '
-              'integer between 0 to 23.',
+              help='Hour of the day when snapshots should be taken, integer between 0 to 23.',
               default=0)
 @click.option('--day-of-week',
-              help='Day of the week when snapshots should be taken, '
-              'integer between 0 to 6',
+              help='Day of the week when snapshots should be taken, integer between 0 to 6',
               default='SUNDAY')
 @environment.pass_env
 def cli(env, volume_id, schedule_type, retention_count,
