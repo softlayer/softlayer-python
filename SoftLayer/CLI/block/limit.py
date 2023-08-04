@@ -18,7 +18,13 @@ DEFAULT_COLUMNS = [
 @click.option('--datacenter', '-d', help='Filter by datacenter')
 @environment.pass_env
 def cli(env, sortby, datacenter):
-    """List number of block storage volumes limit per datacenter."""
+    """List number of block storage volumes limit per datacenter.
+
+    EXAMPLE::
+        slcli block volume-limits
+        This command lists the storage limits per datacenter for this account.
+"""
+
     block_manager = SoftLayer.BlockStorageManager(env.client)
     block_volumes = block_manager.list_block_volume_limit()
 
