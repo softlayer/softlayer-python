@@ -38,7 +38,7 @@ def cli(env, volume_id, new_size, new_iops, new_tier):
     Example::
         slcli block volume-modify 12345678 --new-size 1000 --new-iops 4000
         This command modify a volume 12345678 with size is 1000GB, IOPS is 4000.
-        
+
         slcli block volume-modify 12345678 --new-size 500 --new-tier 4
         This command modify a volume 12345678 with size is 500GB, tier level is 4 IOPS per GB.
 """
