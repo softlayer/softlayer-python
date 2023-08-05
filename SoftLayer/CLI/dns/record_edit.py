@@ -19,7 +19,16 @@ from SoftLayer.CLI import helpers
               help='TTL value in seconds, such as 86400')
 @environment.pass_env
 def cli(env, zone_id, by_record, by_id, data, ttl):
-    """Update DNS record."""
+    """Update DNS record.
+
+    Example::
+        slcli dns record-edit ibm.com --by-id 12345678 --data 127.0.0.2 --ttl 3600
+        This command edits records under the zone: ibm.com, whose ID is 12345678, \
+and sets its data to "127.0.0.2" and ttl to 3600.
+
+        slcli dns record-edit ibm.com --by-record kibana --ttl 3600
+        This command edits records under the zone: ibm.com, whose host is "kibana", and sets their ttl all to 3600.
+"""
     manager = SoftLayer.DNSManager(env.client)
     zone_id = helpers.resolve_id(manager.resolve_ids, zone_id, name='zone')
 
