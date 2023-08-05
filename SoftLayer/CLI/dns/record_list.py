@@ -19,7 +19,13 @@ from SoftLayer.CLI import helpers
 @click.option('--type', 'record_type', help='Record type, such as A or CNAME')
 @environment.pass_env
 def cli(env, zone, data, record, ttl, record_type):
-    """List all records in a zone."""
+    """List all records in a zone.
+
+    Exmaple::
+        slcli dns record-list ibm.com --record elasticsearch --type A --ttl 900
+        This command lists all A records under the zone: ibm.com, and \
+filters by host is elasticsearch and ttl is 900 seconds.
+"""
 
     manager = SoftLayer.DNSManager(env.client)
     table = formatting.Table(['id', 'record', 'type', 'ttl', 'data'])
