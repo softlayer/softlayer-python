@@ -25,7 +25,13 @@ MULTIPLE = '(Multiple allowed)'
 @environment.pass_env
 def cli(env, volume_id, hardware_id, virtual_id, ip_address_id,
         ip_address, subnet_id):
-    """Authorizes hosts to access a given volume"""
+    """Authorizes hosts to access a given volume
+
+    Example::
+        slcli file access-authorize 12345678 --virtual-id 87654321
+        This command authorizes virtual server with ID 87654321 to access volume with ID 12345678.
+"""
+
     file_manager = SoftLayer.FileStorageManager(env.client)
     ip_address_id_list = list(ip_address_id)
 
