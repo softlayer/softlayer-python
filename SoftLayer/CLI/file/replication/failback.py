@@ -11,7 +11,12 @@ from SoftLayer.CLI import environment
 @click.argument('volume-id')
 @environment.pass_env
 def cli(env, volume_id):
-    """Failback a file volume from the given replicant volume."""
+    """Failback a file volume from the given replicant volume.
+
+    Exmaple::
+        slcli file replica-failback 12345678
+        This command performs failback operation for volume with ID 12345678.
+"""
     file_storage_manager = SoftLayer.FileStorageManager(env.client)
 
     success = file_storage_manager.failback_from_replicant(volume_id)
