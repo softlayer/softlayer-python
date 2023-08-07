@@ -45,7 +45,15 @@ def permission_table(user_permissions, all_permissions):
     table.align['Assigned'] = 'l'
     for perm in all_permissions:
         assigned = user_permissions.get(perm['keyName'], False)
-        table.add_row([perm['name'], perm['keyName'], assigned])
+        if (perm['keyName'] == 'ACCOUNT_SUMMARY_VIEW' or perm['keyName'] == 'REQUEST_COMPLIANCE_REPORT' or
+           perm['keyName'] == 'COMPANY_EDIT' or perm['keyName'] == 'ONE_TIME_PAYMENTS' or
+           perm['keyName'] == 'UPDATE_PAYMENT_DETAILS' or perm['keyName'] == 'EU_LIMITED_PROCESSING_MANAGE'
+           or perm['keyName'] == 'TICKET_ADD' or perm['keyName'] == 'TICKET_EDIT'
+           or perm['keyName'] == 'TICKET_SEARCH' or perm['keyName'] == 'TICKET_VIEW'
+           or perm['keyName'] == 'TICKET_VIEW_ALL'):
+            table.add_row(["", "", ""])
+        else:
+            table.add_row([perm['name'], perm['keyName'], assigned])
     return table
 
 
