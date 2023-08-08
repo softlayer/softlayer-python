@@ -13,7 +13,7 @@ from SoftLayer.CLI import environment
 def cli(env, volume_id):
     """Failback a file volume from the given replicant volume.
 
-    Exmaple::
+    Example::
         slcli file replica-failback 12345678
         This command performs failback operation for volume with ID 12345678.
 """
