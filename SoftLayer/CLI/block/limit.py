@@ -20,7 +20,7 @@ DEFAULT_COLUMNS = [
 def cli(env, sortby, datacenter):
     """List number of block storage volumes limit per datacenter.
 
-    EXAMPLE::
+    Example::
         slcli block volume-limits
         This command lists the storage limits per datacenter for this account.
 """
