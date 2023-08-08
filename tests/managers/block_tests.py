@@ -14,6 +14,7 @@ from SoftLayer.fixtures import SoftLayer_Network_Storage_Allowed_Host
 from SoftLayer.fixtures import SoftLayer_Product_Order
 from SoftLayer.fixtures import SoftLayer_Product_Package
 from SoftLayer import testing
+from unittest import mock as mock
 
 
 class BlockTests(testing.TestCase):
@@ -280,6 +281,14 @@ class BlockTests(testing.TestCase):
             args=(True, True, 'No longer needed'),
             identifier=123,
         )
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_snapshot_cancel_no_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['block', 'snapshot-cancel', '102'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Aborted', result.exception.message)
 
     def test_cancel_snapshot_hourly_billing_immediate_true(self):
         mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
