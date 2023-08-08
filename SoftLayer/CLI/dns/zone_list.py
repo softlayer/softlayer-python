@@ -12,7 +12,12 @@ from SoftLayer.utils import clean_time
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @environment.pass_env
 def cli(env):
-    """List all zones."""
+    """List all zones.
+
+    Example::
+        slcli dns zone-list
+        This command lists all zones under current account.
+"""
 
     manager = SoftLayer.DNSManager(env.client)
     object_mask = "mask[id,name,serial,updateDate,resourceRecordCount]"
