@@ -19,7 +19,13 @@ from SoftLayer.CLI import storage_utils
               default=','.join(storage_utils.DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, columns, sortby, volume_id):
-    """List ACLs."""
+    """List ACLs.
+
+    Example::
+        slcli file access-list 12345678 --sortby id
+        This command lists all hosts that are authorized to access volume with ID 12345678 and sorts them by ID.
+"""
+
     file_manager = SoftLayer.FileStorageManager(env.client)
     resolved_id = helpers.resolve_id(file_manager.resolve_ids, volume_id, 'Volume Id')
     access_list = file_manager.get_file_volume_access_list(
