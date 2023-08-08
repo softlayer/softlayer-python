@@ -29,7 +29,12 @@ DEFAULT_COLUMNS = [
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, columns, sortby, volume_id):
-    """List suitable replication datacenters for the given volume."""
+    """List suitable replication datacenters for the given volume.
+
+    Example::
+        slcl file replica-locations 12345678
+        This command lists suitable replication data centers for block volume with ID 12345678.
+    """
     file_storage_manager = SoftLayer.FileStorageManager(env.client)
 
     legal_centers = file_storage_manager.get_replication_locations(
