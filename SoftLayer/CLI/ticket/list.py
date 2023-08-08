@@ -12,15 +12,16 @@ from SoftLayer.CLI import formatting
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.option('--open / --closed', 'is_open', default=True,
               help="Display only open or closed tickets")
+@click.option('--limit', default=100, show_default=True, type=click.INT, help="Result limit")
 @environment.pass_env
-def cli(env, is_open):
+def cli(env, is_open, limit):
     """List tickets."""
     ticket_mgr = SoftLayer.TicketManager(env.client)
     table = formatting.Table([
         'id', 'Case_Number', 'assigned_user', 'title', 'last_edited', 'status', 'updates', 'priority'
     ])
 
-    tickets = ticket_mgr.list_tickets(open_status=is_open, closed_status=not is_open)
+    tickets = ticket_mgr.list_tickets(open_status=is_open, closed_status=not is_open, limit=limit)
     for ticket in tickets:
         user = formatting.blank()
         if ticket.get('assignedUser'):
