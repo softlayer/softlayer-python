@@ -64,7 +64,14 @@ DEFAULT_COLUMNS = [
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, sortby, columns, datacenter, username, storage_type, order):
-    """List block storage."""
+    """List block storage.
+
+    Example::
+        slcli block volume-list -d dal09 -t endurance --sortby capacity_gb
+        This command lists all endurance volumes on current account \
+that are located at dal09, and sorts them by capacity.
+"""
+
     block_manager = SoftLayer.BlockStorageManager(env.client)
     block_volumes = block_manager.list_block_volumes(datacenter=datacenter,
                                                      username=username,
