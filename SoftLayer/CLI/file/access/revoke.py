@@ -27,7 +27,7 @@ def cli(env, volume_id, hardware_id, virtual_id, ip_address_id,
         ip_address, subnet_id):
     """Revokes authorization for hosts accessing a given volume
 
-    Exmaple::
+    Example::
         slcli file access-revoke 12345678 --virtual-id 87654321
         This command revokes access of virtual server with ID 87654321 to volume with ID 12345678.
 """
