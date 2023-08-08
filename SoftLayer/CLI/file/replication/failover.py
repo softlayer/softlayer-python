@@ -13,7 +13,7 @@ from SoftLayer.CLI import environment
 def cli(env, volume_id, replicant_id):
     """Failover a file volume to the given replicant volume.
 
-    Exmaple::
+    Example::
         slcli file replica-failover 12345678 87654321
         This command performs failover operation for volume with ID 12345678 to replica volume with ID 87654321.
 """
