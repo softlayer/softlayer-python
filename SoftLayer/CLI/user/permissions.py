@@ -49,9 +49,7 @@ def permission_table(user_permissions, all_permissions):
                                 'COMPANY_EDIT', 'ONE_TIME_PAYMENTS', 'UPDATE_PAYMENT_DETAILS',
                                 'EU_LIMITED_PROCESSING_MANAGE', 'TICKET_ADD', 'TICKET_EDIT',
                                 'TICKET_SEARCH', 'TICKET_VIEW', 'TICKET_VIEW_ALL']
-        if perm['keyName'] in hide_permission_list:
-            table.add_row(["", "", ""])
-        else:
+        if perm['keyName'] not in hide_permission_list:
             table.add_row([perm['name'], perm['keyName'], assigned])
     return table
 
