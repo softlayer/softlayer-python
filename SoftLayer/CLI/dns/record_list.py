@@ -21,7 +21,7 @@ from SoftLayer.CLI import helpers
 def cli(env, zone, data, record, ttl, record_type):
     """List all records in a zone.
 
-    Exmaple::
+    Example::
         slcli dns record-list ibm.com --record elasticsearch --type A --ttl 900
         This command lists all A records under the zone: ibm.com, and \
 filters by host is elasticsearch and ttl is 900 seconds.
