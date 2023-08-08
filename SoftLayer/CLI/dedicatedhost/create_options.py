@@ -22,7 +22,7 @@ from SoftLayer.CLI import formatting
 def cli(env, **kwargs):
     """host order options for a given dedicated host.
 
-    Exmaple::
+    Example::
         To get a list of available backend routers see example:
         slcli dh create-options --datacenter dal05 --flavor 56_CORES_X_242_RAM_X_1_4_TB
 """
