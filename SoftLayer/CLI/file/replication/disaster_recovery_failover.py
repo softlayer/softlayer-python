@@ -21,7 +21,7 @@ If you wish to test failover, please use replica-failover.
 def cli(env, volume_id, replicant_id):
     """Failover an inaccessible file volume to its available replicant volume.
 
-    Exmaple::
+    Example::
         slcli file disaster-recovery-failover 12345678 87654321
         This command performs failover operation for volume with ID 12345678 to replica volume with ID 87654321.
 """
