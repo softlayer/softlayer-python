@@ -6,9 +6,9 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import helpers
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
+from SoftLayer.CLI import helpers
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -16,7 +16,7 @@ from SoftLayer.CLI import formatting
 @environment.pass_env
 def vpn_enable(env, user):
     """Enable vpn for a user.
-    
+
     Example::
         slcli user vpn-enable 1234567
     """
@@ -28,16 +28,12 @@ def vpn_enable(env, user):
             formatting.confirm(f'This will enable vpn with the id {user_id}. '
                                'Continue?')):
         raise exceptions.CLIAbort('Aborted.')
-    
+
     result = mgr.vpn_enable_or_disable(user_id, True)
     message = f"{user} vpn is successfully enabled"
 
     if result:
         click.secho(message, fg='green')
-    else:
-        click.secho(f"{user} vpn enable is not successful", fg='red')
-
-
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -57,11 +53,9 @@ def vpn_disable(env, user):
             formatting.confirm(f'This will disable vpn with the id {user_id}. '
                                'Continue?')):
         raise exceptions.CLIAbort('Aborted.')
-    
+
     result = mgr.vpn_enable_or_disable(user_id, False)
     message = f"{user} vpn is successfully disabled"
 
     if result:
         click.secho(message, fg='green')
-    else:
-        click.secho(f"{user} vpn disable is not successfully", fg='red')

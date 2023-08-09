@@ -75,17 +75,6 @@ class UserManager(utils.IdentifierMixin, object):
             objectmask = "mask[userStatus[name], parent[id, username]]"
         return self.account_service.getCurrentUser(mask=objectmask)
 
-    # def hide_values(self, list_of_dicts, values_to_hide):
-    #     hide_list = []
-    #     for item in list_of_dicts:
-    #         hide_item = {
-    #             key: '' if value in values_to_hide 
-    #             else value
-    #             for key, value in item.items() 
-    #         }
-    #         hide_list.append(hide_item)
-    #     return hide_list
-
     def get_all_permissions(self):
         """Calls SoftLayer_User_CustomerPermissions_Permission::getAllObjects
 
@@ -95,9 +84,6 @@ class UserManager(utils.IdentifierMixin, object):
         if self.all_permissions is None:
             permissions = self.client.call('User_Permission_Action', 'getAllObjects')
             self.all_permissions = sorted(permissions, key=itemgetter('keyName'))
-            # values_to_hide = ['ACCOUNT_SUMMARY_VIEW']
-            # self.all_permissions = self.hide_values(self.all_permissions, values_to_hide)
-            # print("ZZZZZ: ",type(itemgetter('keyName')))
         return self.all_permissions
 
     def get_all_notifications(self):
