@@ -403,6 +403,8 @@ ALL_ROUTES = [
     ('user:device-access', 'SoftLayer.CLI.user.device_access:cli'),
     ('user:vpn-manual', 'SoftLayer.CLI.user.vpn_manual:cli'),
     ('user:vpn-subnet', 'SoftLayer.CLI.user.vpn_subnet:cli'),
+    ('user:vpn-enable', 'SoftLayer.CLI.user.vpn_enable_or_disable:vpn_enable'),
+    ('user:vpn-disable', 'SoftLayer.CLI.user.vpn_enable_or_disable:vpn_disable'),
     ('user:remove-access', 'SoftLayer.CLI.user.remove_access:cli'),
     ('user:grant-access', 'SoftLayer.CLI.user.grant_access:cli'),
     ('user:vpn-password', 'SoftLayer.CLI.user.vpn_password:cli'),
