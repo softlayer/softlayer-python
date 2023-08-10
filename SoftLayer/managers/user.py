@@ -362,12 +362,12 @@ class UserManager(utils.IdentifierMixin, object):
         return self.edit_user(user_id, user_object)
 
     def vpn_enable_or_disable(self, user_id, value):
-        """Enable or Disable vs power on/off for a user.
+        """Enable or Disable vpn for a user.
 
         :param int user_id: User to edit.
-        :param bool value: Value for vs power enable flag.
+        :param bool value: Value for vpn enable flag.
         or
-        :param bool value: Value for vs power disable flag.
+        :param bool value: Value for vpn disable flag.
         """
         user_object = {'sslVpnAllowedFlag': value}
         return self.edit_user(user_id, user_object)
