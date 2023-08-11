@@ -6,8 +6,6 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
-from SoftLayer.CLI import exceptions
-from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
 
@@ -23,11 +21,6 @@ def vpn_enable(env, user):
 
     mgr = SoftLayer.UserManager(env.client)
     user_id = helpers.resolve_id(mgr.resolve_ids, user, 'username')
-
-    if not (env.skip_confirmations or
-            formatting.confirm(f'This will enable vpn with the id {user_id}. '
-                               'Continue?')):
-        raise exceptions.CLIAbort('Aborted.')
 
     result = mgr.vpn_enable_or_disable(user_id, True)
     message = f"{user} vpn is successfully enabled"
@@ -48,11 +41,6 @@ def vpn_disable(env, user):
 
     mgr = SoftLayer.UserManager(env.client)
     user_id = helpers.resolve_id(mgr.resolve_ids, user, 'username')
-
-    if not (env.skip_confirmations or
-            formatting.confirm(f'This will disable vpn with the id {user_id}. '
-                               'Continue?')):
-        raise exceptions.CLIAbort('Aborted.')
 
     result = mgr.vpn_enable_or_disable(user_id, False)
     message = f"{user} vpn is successfully disabled"
