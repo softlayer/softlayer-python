@@ -22,7 +22,7 @@ class TicketManager(utils.IdentifierMixin, object):
         self.account = self.client['Account']
         self.ticket = self.client['Ticket']
 
-    def list_tickets(self, open_status=True, closed_status=True, limit=None, all_tickets=None):
+    def list_tickets(self, open_status=True, closed_status=True, limit=None, all_tickets=False):
         """List all tickets.
 
         :param boolean open_status: include open tickets
@@ -33,7 +33,6 @@ class TicketManager(utils.IdentifierMixin, object):
                   createDate, lastEditDate, accountId, status, updateCount]"""
 
         call = 'getTickets'
-        # print('All Checks ',open_status, closed_status,all_tickets)
         if not all([open_status, closed_status]):
             if open_status:
                 call = 'getOpenTickets'
@@ -42,10 +41,7 @@ class TicketManager(utils.IdentifierMixin, object):
             else:
                 raise ValueError("open_status and closed_status cannot both be False")
 
-        if all([open_status, all_tickets]):
-            return self.client.call('Account', call, mask=mask, iter=all_tickets, limit=limit)
-
-        return self.client.call('Account', call, mask=mask, iter=False, limit=limit)
+        return self.client.call('Account', call, mask=mask, iter=all_tickets, limit=limit)
 
     def list_subjects(self):
         """List all ticket subjects."""
