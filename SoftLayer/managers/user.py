@@ -361,6 +361,17 @@ class UserManager(utils.IdentifierMixin, object):
         user_object = {'vpnManualConfig': value}
         return self.edit_user(user_id, user_object)
 
+    def vpn_enable_or_disable(self, user_id, value):
+        """Enable or Disable vpn for a user.
+
+        :param int user_id: User to edit.
+        :param bool value: Value for vpn enable flag.
+        or
+        :param bool value: Value for vpn disable flag.
+        """
+        user_object = {'sslVpnAllowedFlag': value}
+        return self.edit_user(user_id, user_object)
+
     def vpn_subnet_add(self, user_id, subnet_ids):
         """Add subnets for a user.
 

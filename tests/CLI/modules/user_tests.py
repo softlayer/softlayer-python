@@ -8,10 +8,9 @@ import json
 import sys
 import unittest
 
-from unittest import mock as mock
-
 from SoftLayer.fixtures import SoftLayer_User_Customer
 from SoftLayer import testing
+from unittest import mock as mock
 
 
 class UserCLITests(testing.TestCase):
@@ -416,3 +415,27 @@ class UserCLITests(testing.TestCase):
     def test_refresh_api_authentication_key(self):
         result = self.run_command(['user', 'apikey', '123456', '--refresh'])
         self.assert_no_fail(result)
+
+    def test_vpn_disable(self):
+        result = self.run_command(['user', 'vpn-disable', '8344458'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=8344458)
+
+        result = self.run_command(['user', 'vpn-disable', '8344458'])
+        permission_m = self.set_mock('SoftLayer_User_Customer', 'editObject')
+        permission_m.return_value = {'sslVpnAllowedFlag': False}
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=8344458)
+        self.assertEqual('8344458 vpn is successfully disabled\n', result.output)
+
+    def test_vpn_enable(self):
+        result = self.run_command(['user', 'vpn-enable', '8344458'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=8344458)
+
+        result = self.run_command(['user', 'vpn-enable', '8344458'])
+        permission_m = self.set_mock('SoftLayer_User_Customer', 'editObject')
+        permission_m.return_value = {'sslVpnAllowedFlag': True}
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=8344458)
+        self.assertEqual('8344458 vpn is successfully enabled\n', result.output)
