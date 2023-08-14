@@ -183,6 +183,24 @@ class UserManagerTests(testing.TestCase):
         self.assert_called_with(service_name, 'getAllObjects')
         self.assertEqual(expected, result)
 
+    def test_hide_permissions(self):
+        result = self.manager.get_all_permissions()
+        hide_permissions = [
+            {'keyName': 'ACCOUNT_SUMMARY_VIEW'},
+            {'keyName': 'REQUEST_COMPLIANCE_REPORT'},
+            {'keyName': 'COMPANY_EDIT'},
+            {'keyName': 'ONE_TIME_PAYMENTS'},
+            {'keyName': 'UPDATE_PAYMENT_DETAILS'},
+            {'keyName': 'EU_LIMITED_PROCESSING_MANAGE'},
+            {'keyName': 'TICKET_ADD'},
+            {'keyName': 'TICKET_EDIT'},
+            {'keyName': 'TICKET_SEARCH'},
+            {'keyName': 'TICKET_VIEW'},
+            {'keyName': 'TICKET_VIEW_ALL'}
+        ]
+        self.assert_called_with('SoftLayer_User_Permission_Action', 'getAllObjects')
+        self.assertNotEqual(hide_permissions, result)
+
     def test_get_current_user(self):
         result = self.manager.get_current_user()
         self.assert_called_with('SoftLayer_Account', 'getCurrentUser', mask=mock.ANY)

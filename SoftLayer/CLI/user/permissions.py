@@ -45,7 +45,12 @@ def permission_table(user_permissions, all_permissions):
     table.align['Assigned'] = 'l'
     for perm in all_permissions:
         assigned = user_permissions.get(perm['keyName'], False)
-        table.add_row([perm['name'], perm['keyName'], assigned])
+        hide_permission_list = ['ACCOUNT_SUMMARY_VIEW', 'REQUEST_COMPLIANCE_REPORT',
+                                'COMPANY_EDIT', 'ONE_TIME_PAYMENTS', 'UPDATE_PAYMENT_DETAILS',
+                                'EU_LIMITED_PROCESSING_MANAGE', 'TICKET_ADD', 'TICKET_EDIT',
+                                'TICKET_SEARCH', 'TICKET_VIEW', 'TICKET_VIEW_ALL']
+        if perm['keyName'] not in hide_permission_list:
+            table.add_row([perm['name'], perm['keyName'], assigned])
     return table
 
 
