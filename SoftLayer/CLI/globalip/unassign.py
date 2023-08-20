@@ -12,7 +12,7 @@ from SoftLayer.CLI import helpers
 @click.argument('identifier')
 @click.option('--details', help='Shows very detailed list of charges')
 @environment.pass_env
-def cli(env, identifier):
+def cli(env, identifier, details):
     """Unassigns a global IP from a target."""
 
     mgr = SoftLayer.NetworkManager(env.client)
