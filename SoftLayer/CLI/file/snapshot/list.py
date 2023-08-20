@@ -36,7 +36,7 @@ DEFAULT_COLUMNS = [
 @environment.pass_env
 def cli(env, volume_id, sortby, columns):
     """List file storage snapshots.
-    
+
     Example::
     slcli file snapshot-list 12345678 --sortby id
     This command lists all snapshots of volume with ID 12345678 and sorts them by ID.
