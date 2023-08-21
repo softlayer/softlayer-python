@@ -9,6 +9,7 @@ from SoftLayer.CLI import helpers
 
 # pylint: disable=too-many-instance-attributes
 
+
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--details', help='Shows very detailed list of charges')
