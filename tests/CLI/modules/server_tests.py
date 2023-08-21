@@ -922,6 +922,7 @@ class ServerCLITests(testing.TestCase):
                                    '--network=TEST_NETWORK', '--os=UBUNTU_12_64'])
 
         self.assertEqual(result.exit_code, 2)
+        self.assertEqual('Aborting dedicated server order.', result.exception.message)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_authorize_hw_no_confirm(self, confirm_mock):

@@ -1052,3 +1052,11 @@ class HardwareHelperTests(testing.TestCase):
         item_public = {'attributes': [{'attributeTypeKeyName': 'NOT_PRIVATE_NETWORK_ONLY'}]}
         self.assertTrue(managers.hardware._is_private_port_speed_item(item_private))
         self.assertFalse(managers.hardware._is_private_port_speed_item(item_public))
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_hardware_cancel_no_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hardware', 'cancel', '102'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Aborted', result.exception.message)
