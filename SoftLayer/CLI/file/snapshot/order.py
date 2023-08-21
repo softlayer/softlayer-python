@@ -25,7 +25,12 @@ from SoftLayer.CLI import exceptions
               is_flag=True)
 @environment.pass_env
 def cli(env, volume_id, capacity, tier, upgrade):
-    """Order snapshot space for a file storage volume."""
+    """Order snapshot space for a file storage volume.
+
+    Example::
+    slcli file snapshot-order 12345678 -s 1000 -t 4
+    This command orders snapshot space for volume with ID 12345678, the size is 1000GB, the tier level is 4 IOPS per GB.
+"""
     file_manager = SoftLayer.FileStorageManager(env.client)
 
     if tier is not None:

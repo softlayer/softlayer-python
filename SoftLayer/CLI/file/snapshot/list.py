@@ -35,7 +35,12 @@ DEFAULT_COLUMNS = [
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, volume_id, sortby, columns):
-    """List file storage snapshots."""
+    """List file storage snapshots.
+
+    Example::
+    slcli file snapshot-list 12345678 --sortby id
+    This command lists all snapshots of volume with ID 12345678 and sorts them by ID.
+"""
     file_manager = SoftLayer.FileStorageManager(env.client)
     resolved_id = helpers.resolve_id(file_manager.resolve_ids, volume_id, 'Volume Id')
     snapshots = file_manager.get_file_volume_snapshot_list(

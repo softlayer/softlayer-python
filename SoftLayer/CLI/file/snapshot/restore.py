@@ -13,7 +13,12 @@ from SoftLayer.CLI import environment
               ' to restore the block volume')
 @environment.pass_env
 def cli(env, volume_id, snapshot_id):
-    """Restore file volume using a given snapshot"""
+    """Restore file volume using a given snapshot
+
+    Example::
+    slcli file snapshot-restore 12345678 -s 87654321
+    This command restores volume with ID 12345678 from snapshot with ID 87654321.
+"""
     file_manager = SoftLayer.FileStorageManager(env.client)
     success = file_manager.restore_from_snapshot(volume_id, snapshot_id)
 
