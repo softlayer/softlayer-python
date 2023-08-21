@@ -7,12 +7,12 @@ import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import helpers
 
-
+# pylint: disable=details
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
 @click.option('--details', help='Shows very detailed list of charges')
 @environment.pass_env
-def cli(env, identifier, details):         # pylint: disable=details
+def cli(env, identifier, details):
     """Unassigns a global IP from a target."""
 
     mgr = SoftLayer.NetworkManager(env.client)
