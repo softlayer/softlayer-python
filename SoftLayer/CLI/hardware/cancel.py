@@ -20,8 +20,9 @@ from SoftLayer.CLI import helpers
               help="An optional comment to add to the cancellation ticket")
 @click.option('--reason',
               help="An optional cancellation reason. See cancel-reasons for a list of available options")
+@click.option('--force',  default=False, is_flag=True, help="Force modify")
 @environment.pass_env
-def cli(env, identifier, immediate, comment, reason):
+def cli(env, identifier, immediate, comment, reason, force):
     """Cancel a dedicated server."""
 
     mgr = SoftLayer.HardwareManager(env.client)
@@ -29,5 +30,10 @@ def cli(env, identifier, immediate, comment, reason):
 
     if not (env.skip_confirmations or formatting.no_going_back(hw_id)):
         raise exceptions.CLIAbort('Aborted')
+
+    if not force:
+        if not (env.skip_confirmations or
+                formatting.confirm("This action will incur charges on your account. Continue?")):
+            raise exceptions.CLIAbort('Aborted')
 
     mgr.cancel_hardware(hw_id, reason, comment, immediate)

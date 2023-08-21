@@ -37,8 +37,9 @@ from SoftLayer.CLI import template
               help="The ID of the private ROUTER on which you want the virtual server placed")
 @helpers.multi_option('--key', '-k', help="SSH keys to add to the root user")
 @helpers.multi_option('--extra', '-e', help="Extra option Key Names")
+@click.option('--force',  default=False, is_flag=True, help="Force modify")
 @environment.pass_env
-def cli(env, **args):
+def cli(env, force, **args):
     """Order/create a dedicated server."""
     mgr = SoftLayer.HardwareManager(env.client)
     network = SoftLayer.NetworkManager(env.client)
@@ -105,9 +106,10 @@ def cli(env, **args):
         for pod in pods:
             if args.get('datacenter') in pod['name']:
                 click.secho(f"Warning: Closed soon: {pod['name']}", fg='yellow')
-        if not (env.skip_confirmations or formatting.confirm(
-                "This action will incur charges on your account. Continue?")):
-            raise exceptions.CLIAbort('Aborting dedicated server order.')
+        if not force:
+            if not (env.skip_confirmations or formatting.confirm(
+                    "This action will incur charges on your account. Continue?")):
+                raise exceptions.CLIAbort('Aborting dedicated server order.')
 
         result = mgr.place_order(**order)
 
