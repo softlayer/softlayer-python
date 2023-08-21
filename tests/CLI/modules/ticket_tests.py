@@ -358,3 +358,33 @@ class TicketTests(testing.TestCase):
                     'update 3': 'By emp1 (Employee) employee says something'}
         self.assert_no_fail(result)
         self.assertEqual(json.loads(result.output), expected)
+
+    def test_list_limit(self):
+        result = self.run_command(['ticket', 'list', '--limit', '1'])
+
+        expected = [{
+            'assigned_user': 'John Smith',
+            'Case_Number': 'CS123456',
+            'id': 102,
+            'last_edited': '2013-08-01',
+            'priority': 0,
+            'status': 'Open',
+            'title': 'Cloud Instance Cancellation - 08/01/13',
+            'updates': 0}]
+        self.assert_no_fail(result)
+        self.assertEqual(expected, json.loads(result.output))
+
+    def test_list_all_open(self):
+        result = self.run_command(['ticket', 'list', '--all'])
+
+        expected = [{
+            'assigned_user': 'John Smith',
+            'Case_Number': 'CS123456',
+            'id': 102,
+            'last_edited': '2013-08-01',
+            'priority': 0,
+            'status': 'Open',
+            'title': 'Cloud Instance Cancellation - 08/01/13',
+            'updates': 0}]
+        self.assert_no_fail(result)
+        self.assertEqual(expected, json.loads(result.output))
