@@ -18,10 +18,11 @@ from SoftLayer import utils
 @environment.pass_env
 def cli(env, identifier, uuid, interval, retry, timeout, url):
     """Manage LBaaS health checks.
-    
+
     Example::
 
-        slcli loadbal health-edit (--lb-id LOADBAL_ID) (--health-uuid HEALTH_CHECK_UUID) [-i, --interval INTERVAL] [-r, --retry RETRY] [-t, --timeout TIMEOUT] [-u, --url URL]
+        slcli loadbal health-edit (--lb-id LOADBAL_ID) (--health-uuid HEALTH_CHECK_UUID) [-i, --interval INTERVAL]
+        [-r, --retry RETRY] [-t, --timeout TIMEOUT] [-u, --url URL]
     """
 
     if not any([interval, retry, timeout, url]):

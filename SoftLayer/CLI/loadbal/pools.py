@@ -172,7 +172,10 @@ def l7pool_add(env, identifier, **args):
 
     Example::
 
-        slcli loadbal l7pool-add (--id LOADBAL_ID) (-n, --name NAME) [-m, --method METHOD] [-s, --server BACKEND_IP:PORT] [-p, --protocol PROTOCOL] [--health-path PATH] [--health-interval INTERVAL] [--health-retry RETRY] [--health-timeout TIMEOUT] [--sticky cookie | source-ip]
+        slcli loadbal l7pool-add (--id LOADBAL_ID) (-n, --name NAME) [-m, --method METHOD]
+        [-s, --server BACKEND_IP:PORT] [-p, --protocol PROTOCOL] [--health-path PATH]
+        [--health-interval INTERVAL] [--health-retry RETRY]
+        [--health-timeout TIMEOUT] [--sticky cookie | source-ip]
     """
 
     mgr = SoftLayer.LoadBalancerManager(env.client)

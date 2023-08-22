@@ -14,7 +14,7 @@ from SoftLayer.CLI import formatting
 @environment.pass_env
 def policies(env, protocol_id):
     """List policies of the front-end protocol (listener).
-    
+
     Example::
 
         slcli loadbal l7policies (--protocol-id PROTOCOL_ID)
