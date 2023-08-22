@@ -17,7 +17,12 @@ from SoftLayer import utils
 @click.option('--url', '-u', help="Url path for HTTP/HTTPS checks.")
 @environment.pass_env
 def cli(env, identifier, uuid, interval, retry, timeout, url):
-    """Manage LBaaS health checks."""
+    """Manage LBaaS health checks.
+    
+    Example::
+
+        slcli loadbal health-edit (--lb-id LOADBAL_ID) (--health-uuid HEALTH_CHECK_UUID) [-i, --interval INTERVAL] [-r, --retry RETRY] [-t, --timeout TIMEOUT] [-u, --url URL]
+    """
 
     if not any([interval, retry, timeout, url]):
         raise exceptions.ArgumentError("Specify either interval, retry, timeout, url")
