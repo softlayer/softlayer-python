@@ -9,8 +9,10 @@ from SoftLayer.CLI import formatting
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
+@click.option('--sortby', help='Column to sort by',
+              default='created')
 @environment.pass_env
-def cli(env):
+def cli(env, sortby):
     """List IPSec VPN tunnel contexts"""
     manager = SoftLayer.IPSECManager(env.client)
     contexts = manager.get_tunnel_contexts()
@@ -21,6 +23,8 @@ def cli(env):
                               'internal peer IP address',
                               'remote peer IP address',
                               'created'])
+    table.sortby = sortby
+
     for context in contexts:
         table.add_row([context.get('id', ''),
                        context.get('name', ''),
