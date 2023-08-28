@@ -16,14 +16,21 @@ from SoftLayer.CLI import formatting
               is_flag=True,
               help="Cancels the snapshot space immediately instead "
                    "of on the billing anniversary")
+@click.option('--force', default=False, is_flag=True, help="Force cancel block volume without confirmation")
 @environment.pass_env
-def cli(env, volume_id, reason, immediate):
-    """Cancel existing snapshot space for a given volume."""
+def cli(env, volume_id, reason, immediate, force):
+    """Cancel existing snapshot space for a given volume.
+
+    Example::
+        slcli file snapshot-cancel 12345678 --immediate -f
+        This command cancels snapshot with ID 12345678 immediately without asking for confirmation.
+    """
 
     file_storage_manager = SoftLayer.FileStorageManager(env.client)
 
-    if not (env.skip_confirmations or formatting.no_going_back(volume_id)):
-        raise exceptions.CLIAbort('Aborted')
+    if not force:
+        if not (env.skip_confirmations or formatting.no_going_back(volume_id)):
+            raise exceptions.CLIAbort('Aborted.')
 
     cancelled = file_storage_manager.cancel_snapshot_space(
         volume_id, reason, immediate)

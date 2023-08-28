@@ -828,3 +828,25 @@ class FileTests(testing.TestCase):
 
         self.assertEqual(2, result.exit_code)
         self.assertEqual('Aborted', result.exception.message)
+
+    def test_file_replica_order_iops(self):
+        result_1 = self.run_command(['file', 'replica-order', '4917309', '-s', 'HOURLY', '-l', 'dal09', '-i', '121'])
+        self.assertEqual("-i|--iops must be a multiple of 100. "
+                         "Run 'slcli block volume-options' to check available options.\n", result_1.output)
+        result_2 = self.run_command(['file', 'replica-order', '4917309', '-s', 'HOURLY', '-l', 'dal09', '-i', '90'])
+        self.assertEqual("-i|--iops must be between 100 and 6000, inclusive. "
+                         "Run 'slcli block volume-options' to check available options.\n", result_2.output)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_file_replica_order_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['file', 'replica-order', '4917309', '-s', 'HOURLY', '-l', 'dal09'])
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Aborted.', result.exception.message)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_file_snapshot_cancel_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['file', 'snapshot-cancel', '4917309'])
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Aborted.', result.exception.message)
