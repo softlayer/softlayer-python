@@ -13,7 +13,12 @@ from SoftLayer.CLI import formatting
               help="Front-end Protocol identifier")
 @environment.pass_env
 def policies(env, protocol_id):
-    """List policies of the front-end protocol (listener)."""
+    """List policies of the front-end protocol (listener).
+
+    Example::
+
+        slcli loadbal l7policies (--protocol-id PROTOCOL_ID)
+    """
     mgr = SoftLayer.LoadBalancerManager(env.client)
 
     if protocol_id:

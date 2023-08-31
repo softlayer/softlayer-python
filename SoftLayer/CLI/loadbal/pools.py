@@ -169,6 +169,13 @@ def l7pool_add(env, identifier, **args):
     """Adds a new l7 pool
 
     -S is in colon deliminated format to make grouping IP:port:weight a bit easier.
+
+    Example::
+
+        slcli loadbal l7pool-add (--id LOADBAL_ID) (-n, --name NAME) [-m, --method METHOD]
+        [-s, --server BACKEND_IP:PORT] [-p, --protocol PROTOCOL] [--health-path PATH]
+        [--health-interval INTERVAL] [--health-retry RETRY]
+        [--health-timeout TIMEOUT] [--sticky cookie | source-ip]
     """
 
     mgr = SoftLayer.LoadBalancerManager(env.client)
