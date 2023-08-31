@@ -5,6 +5,8 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -15,8 +17,9 @@ from SoftLayer.CLI import environment
               help="Cancels the service  immediately (instead of on the billing anniversary)")
 @click.option('--reason',
               help="An optional cancellation reason. See cancel-reasons for a list of available options")
+@click.option('--force', default=False, is_flag=True, help="Force cancel ipsec vpn without confirmation")
 @environment.pass_env
-def cli(env, identifier, immediate, reason):
+def cli(env, identifier, immediate, reason, force):
     """Cancel a IPSEC VPN tunnel context."""
 
     manager = SoftLayer.IPSECManager(env.client)
@@ -24,6 +27,11 @@ def cli(env, identifier, immediate, reason):
 
     if 'billingItem' not in context:
         raise SoftLayer.SoftLayerError("Cannot locate billing. May already be cancelled.")
+
+    if not force:
+        if not (env.skip_confirmations or
+                formatting.confirm("This will cancel the Ipsec Vpn and cannot be undone. Continue?")):
+            raise exceptions.CLIAbort('Aborted')
 
     result = manager.cancel_item(context['billingItem']['id'], immediate, reason)
 

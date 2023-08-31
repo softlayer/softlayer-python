@@ -153,12 +153,18 @@ def order_options(env, datacenter):
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
+@click.option('--force', default=False, is_flag=True, help="Force cancel LBaaS Instance without confirmation")
 @environment.pass_env
-def cancel(env, identifier):
+def cancel(env, identifier, force):
     """Cancels a LBaaS instance"""
 
     mgr = SoftLayer.LoadBalancerManager(env.client)
     uuid, _ = mgr.get_lbaas_uuid_id(identifier)
+
+    if not force:
+        if not (env.skip_confirmations or
+                formatting.confirm("This will cancel the LBaaS Instance and cannot be undone. Continue?")):
+            raise exceptions.CLIAbort('Aborted')
 
     try:
         mgr.cancel_lbaas(uuid)
