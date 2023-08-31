@@ -21,7 +21,12 @@ DEFAULT_COLUMNS = storage_utils.REPLICATION_PARTNER_DEFAULT
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, columns, sortby, volume_id):
-    """List existing replicant volumes for a file volume."""
+    """List existing replicant volumes for a file volume.
+
+    Example::
+        slcli file replica-partners 12345678
+        This command lists existing replicant volumes for block volume with ID 12345678.
+    """
     file_storage_manager = SoftLayer.FileStorageManager(env.client)
 
     legal_volumes = file_storage_manager.get_replication_partners(
