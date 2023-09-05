@@ -18,7 +18,12 @@ from SoftLayer.CLI import formatting
                    "of on the billing anniversary")
 @environment.pass_env
 def cli(env, volume_id, reason, immediate):
-    """Cancel an existing file storage volume."""
+    """Cancel an existing file storage volume.
+    
+    EXAMPLE::
+        slcli file volume-cancel 12345678 --immediate -f
+        This command cancels volume with ID 12345678 immediately and without asking for confirmation.
+    """
 
     file_storage_manager = SoftLayer.FileStorageManager(env.client)
 
