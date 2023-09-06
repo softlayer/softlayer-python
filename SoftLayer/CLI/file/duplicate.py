@@ -62,7 +62,12 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 def cli(env, origin_volume_id, origin_snapshot_id, duplicate_size,
         duplicate_iops, duplicate_tier, duplicate_snapshot_size, billing,
         dependent_duplicate):
-    """Order a duplicate file storage volume."""
+    """Order a duplicate file storage volume.
+    
+    EXAMPLE::
+        slcli file volume-duplicate 12345678
+        This command shows order a new volume by duplicating the volume with ID 12345678.
+    """
     file_manager = SoftLayer.FileStorageManager(env.client)
 
     hourly_billing_flag = False
