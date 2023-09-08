@@ -16,10 +16,11 @@ from SoftLayer.CLI import formatting
               is_flag=True,
               help="Cancels the file storage volume immediately instead "
                    "of on the billing anniversary")
+@click.option('--force', default=False, is_flag=True, help="Force modify")
 @environment.pass_env
-def cli(env, volume_id, reason, immediate):
+def cli(env, volume_id, reason, immediate, force):
     """Cancel an existing file storage volume.
-    
+
     EXAMPLE::
         slcli file volume-cancel 12345678 --immediate -f
         This command cancels volume with ID 12345678 immediately and without asking for confirmation.
@@ -27,8 +28,9 @@ def cli(env, volume_id, reason, immediate):
 
     file_storage_manager = SoftLayer.FileStorageManager(env.client)
 
-    if not (env.skip_confirmations or formatting.no_going_back(volume_id)):
-        raise exceptions.CLIAbort('Aborted')
+    if not force:
+        if not (env.skip_confirmations or formatting.no_going_back(volume_id)):
+            raise exceptions.CLIAbort('Aborted.')
 
     cancelled = file_storage_manager.cancel_file_volume(volume_id,
                                                         reason, immediate)

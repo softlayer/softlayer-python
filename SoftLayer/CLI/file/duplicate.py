@@ -5,6 +5,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 
 
 CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
@@ -58,12 +59,13 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
               show_default=True,
               help='Whether or not this duplicate will be a dependent duplicate'
                    'of the origin volume.')
+@click.option('--force', default=False, is_flag=True, help="Force modify")
 @environment.pass_env
 def cli(env, origin_volume_id, origin_snapshot_id, duplicate_size,
         duplicate_iops, duplicate_tier, duplicate_snapshot_size, billing,
-        dependent_duplicate):
+        dependent_duplicate, force):
     """Order a duplicate file storage volume.
-    
+
     EXAMPLE::
         slcli file volume-duplicate 12345678
         This command shows order a new volume by duplicating the volume with ID 12345678.
@@ -76,6 +78,11 @@ def cli(env, origin_volume_id, origin_snapshot_id, duplicate_size,
 
     if duplicate_tier is not None:
         duplicate_tier = float(duplicate_tier)
+
+    if not force:
+        if not (env.skip_confirmations or formatting.confirm("This action will incur charges on your account."
+                                                             "Continue?")):
+            raise exceptions.CLIAbort('Aborted.')
 
     try:
         order = file_manager.order_duplicate_volume(
