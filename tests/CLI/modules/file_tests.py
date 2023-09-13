@@ -850,3 +850,17 @@ class FileTests(testing.TestCase):
         result = self.run_command(['file', 'snapshot-cancel', '4917309'])
         self.assertEqual(2, result.exit_code)
         self.assertEqual('Aborted.', result.exception.message)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_file_volume_cancel_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['file', 'volume-cancel', '1234'])
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Aborted.', result.exception.message)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_file_volume_duplicate_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['file', 'volume-duplicate', '100'])
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Aborted.', result.exception.message)
