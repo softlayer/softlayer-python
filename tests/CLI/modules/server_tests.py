@@ -321,6 +321,20 @@ class ServerCLITests(testing.TestCase):
         self.assert_called_with('SoftLayer_Hardware_Server', 'powerOn',
                                 identifier=12345)
 
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_harware_power_on_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hardware', 'power-on', '12345'])
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Aborted.', result.exception.message)
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_harware_power_off_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hardware', 'power-off', '12345'])
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Aborted.', result.exception.message)
+
     def test_server_power_cycle(self):
         result = self.run_command(['--really', 'server', 'power-cycle',
                                    '12345'])
