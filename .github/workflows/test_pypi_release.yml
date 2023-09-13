@@ -38,6 +38,3 @@ jobs:
         .
     - name: Publish 📦 to Test PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.CGALLO_TEST_PYPI }}
-        repository-url: https://test.pypi.org/legacy/
