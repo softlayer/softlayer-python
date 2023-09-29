@@ -1,9 +1,6 @@
 ﻿NetworkManager
 =================================
 
-NetworkManager
-SoftLayer.managers.NetworkManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: NetworkManager

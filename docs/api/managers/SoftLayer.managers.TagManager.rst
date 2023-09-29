@@ -1,9 +1,6 @@
 ﻿TagManager
 =============================
 
-TagManager
-SoftLayer.managers.TagManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: TagManager

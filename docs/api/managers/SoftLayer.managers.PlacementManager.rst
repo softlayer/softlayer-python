@@ -1,9 +1,6 @@
 ﻿PlacementManager
 ===================================
 
-PlacementManager
-SoftLayer.managers.PlacementManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: PlacementManager

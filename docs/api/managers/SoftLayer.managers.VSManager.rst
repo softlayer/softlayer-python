@@ -1,9 +1,6 @@
 ﻿VSManager
 ============================
 
-VSManager
-SoftLayer.managers.VSManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: VSManager

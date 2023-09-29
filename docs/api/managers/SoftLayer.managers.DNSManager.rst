@@ -1,9 +1,6 @@
 ﻿DNSManager
 =============================
 
-DNSManager
-SoftLayer.managers.DNSManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: DNSManager

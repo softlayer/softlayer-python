@@ -1,9 +1,6 @@
 ﻿FirewallManager
 ==================================
 
-FirewallManager
-SoftLayer.managers.FirewallManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: FirewallManager

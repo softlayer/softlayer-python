@@ -1,9 +1,6 @@
 ﻿BandwidthManager
 ===================================
 
-BandwidthManager
-SoftLayer.managers.BandwidthManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: BandwidthManager

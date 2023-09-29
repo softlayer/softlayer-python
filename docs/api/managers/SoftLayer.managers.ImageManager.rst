@@ -1,9 +1,6 @@
 ﻿ImageManager
 ===============================
 
-ImageManager
-SoftLayer.managers.ImageManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: ImageManager

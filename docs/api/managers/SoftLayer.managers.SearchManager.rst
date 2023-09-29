@@ -1,9 +1,6 @@
 ﻿SearchManager
 ================================
 
-SearchManager
-SoftLayer.managers.SearchManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: SearchManager

@@ -1,9 +1,6 @@
 ﻿HardwareManager
 ==================================
 
-HardwareManager
-SoftLayer.managers.HardwareManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: HardwareManager

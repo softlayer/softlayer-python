@@ -1,9 +1,6 @@
 ﻿UserManager
 ==============================
 
-UserManager
-SoftLayer.managers.UserManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: UserManager

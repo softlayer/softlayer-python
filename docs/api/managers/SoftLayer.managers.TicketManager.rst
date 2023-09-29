@@ -1,9 +1,6 @@
 ﻿TicketManager
 ================================
 
-TicketManager
-SoftLayer.managers.TicketManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: TicketManager

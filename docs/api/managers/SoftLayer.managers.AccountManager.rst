@@ -1,9 +1,6 @@
 ﻿AccountManager
 =================================
 
-AccountManager
-SoftLayer.managers.AccountManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: AccountManager

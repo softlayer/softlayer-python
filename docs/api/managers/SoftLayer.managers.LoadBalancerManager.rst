@@ -1,9 +1,6 @@
 ﻿LoadBalancerManager
 ======================================
 
-LoadBalancerManager
-SoftLayer.managers.LoadBalancerManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: LoadBalancerManager

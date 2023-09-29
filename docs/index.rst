@@ -10,8 +10,8 @@ SoftLayer API Python Client |version|
 
 
 This is the documentation to SoftLayer's Python API Bindings. These bindings
-use SoftLayer's `XML-RPC interface <https://softlayer.github.io/article/xml-rpc/>`_
-in order to manage SoftLayer services.
+use SoftLayer's `XML-RPC interface <https://sldn.softlayer.com/article/xml-rpc/>`_
+in order to manage SoftLayer services. Also support REST.
 
 .. toctree::
    :maxdepth: 1

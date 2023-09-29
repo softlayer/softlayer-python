@@ -1,9 +1,6 @@
 ﻿CapacityManager
 ==================================
 
-CapacityManager
-SoftLayer.managers.CapacityManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: CapacityManager

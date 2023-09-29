@@ -1,9 +1,6 @@
 ﻿EventLogManager
 ==================================
 
-EventLogManager
-SoftLayer.managers.EventLogManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: EventLogManager

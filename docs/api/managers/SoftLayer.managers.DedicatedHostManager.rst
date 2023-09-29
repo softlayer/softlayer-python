@@ -1,9 +1,6 @@
 ﻿DedicatedHostManager
 =======================================
 
-DedicatedHostManager
-SoftLayer.managers.DedicatedHostManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: DedicatedHostManager

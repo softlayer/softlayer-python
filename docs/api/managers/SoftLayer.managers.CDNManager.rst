@@ -1,9 +1,6 @@
 ﻿CDNManager
 =============================
 
-CDNManager
-SoftLayer.managers.CDNManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: CDNManager

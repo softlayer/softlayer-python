@@ -1,9 +1,6 @@
 ﻿LicensesManager
 ==================================
 
-LicensesManager
-SoftLayer.managers.LicensesManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: LicensesManager

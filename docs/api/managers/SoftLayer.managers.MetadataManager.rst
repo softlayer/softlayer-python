@@ -1,9 +1,6 @@
 ﻿MetadataManager
 ==================================
 
-MetadataManager
-SoftLayer.managers.MetadataManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: MetadataManager

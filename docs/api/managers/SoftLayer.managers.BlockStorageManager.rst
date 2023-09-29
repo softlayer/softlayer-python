@@ -1,9 +1,6 @@
 ﻿BlockStorageManager
 ======================================
 
-BlockStorageManager
-SoftLayer.managers.BlockStorageManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: BlockStorageManager

@@ -1,9 +1,6 @@
 ﻿ObjectStorageManager
 =======================================
 
-ObjectStorageManager
-SoftLayer.managers.ObjectStorageManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: ObjectStorageManager

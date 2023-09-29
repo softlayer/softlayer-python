@@ -1,9 +1,6 @@
 ﻿SSLManager
 =============================
 
-SSLManager
-SoftLayer.managers.SSLManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: SSLManager

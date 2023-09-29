@@ -1,9 +1,6 @@
 ﻿SshKeyManager
 ================================
 
-SshKeyManager
-SoftLayer.managers.SshKeyManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: SshKeyManager

@@ -1,9 +1,6 @@
 ﻿IPSECManager
 ===============================
 
-IPSECManager
-SoftLayer.managers.IPSECManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: IPSECManager

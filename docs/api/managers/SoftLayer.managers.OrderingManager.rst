@@ -1,9 +1,6 @@
 ﻿OrderingManager
 ==================================
 
-OrderingManager
-SoftLayer.managers.OrderingManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: OrderingManager

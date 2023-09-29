@@ -1,9 +1,6 @@
 ﻿FileStorageManager
 =====================================
 
-FileStorageManager
-SoftLayer.managers.FileStorageManager
-
 .. currentmodule:: SoftLayer.managers
 
 .. autoclass:: FileStorageManager
