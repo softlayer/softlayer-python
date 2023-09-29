@@ -42,6 +42,12 @@ Docs are generated with [Sphinx](https://docs.readthedocs.io/en/latest/intro/get
 
 `make html` in the softlayer-python/docs directory, which should generate the HTML in `softlayer-python/docs/_build/html` for testing.
 
+For windows, use:
+```
+cd docs
+sphinx-build  -b html -d _build/doctrees . _build/html
+```
+
 
 ## Unit Tests
 
