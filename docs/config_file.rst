@@ -8,7 +8,7 @@ locations.
 
 * Input directly into SoftLayer.create_client_from_env(...)
 * Enviorment variables (`SL_USERNAME`, `SL_API_KEY`)
-* Config file locations (`~/.softlayer`, `/etc/softlayer.conf`)
+* Config file locations (`~/.softlayer`, `/etc/softlayer.conf`, `%USERPROFILE%\AppData\Roaming\softlayer`)
 * Or argument (`-C/path/to/config` or `--config=/path/to/config`)
 
 The configuration file is INI-based and requires the `softlayer` section to be

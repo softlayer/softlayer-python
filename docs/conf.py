@@ -14,6 +14,7 @@
 
 import sys
 import os
+import datetime
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -28,10 +29,16 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.coverage',
-              'sphinx.ext.viewcode',
-              'sphinx_click.ext']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.coverage',
+    'sphinx.ext.viewcode',
+    'sphinx_click.ext',
+    "sphinx.ext.duration",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.autosummary"
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -49,7 +56,8 @@ master_doc = 'index'
 project = u'SoftLayer API Python Client'
 # Hack to avoid the "Redefining built-in 'copyright'" error from static
 # analysis tools
-globals()['copyright'] = u'2019, SoftLayer Technologies, Inc.'
+today_date = datetime.date.today()
+copyright  = f'{today_date.year}, SoftLayer Technologies, Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -100,12 +108,15 @@ pygments_style = 'friendly'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if on_rtd:
-    html_theme = 'default'
-else:
-    html_theme = 'nature'
-    html_style = "style.css"
+# on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+# if on_rtd:
+#     html_theme = 'default'
+# else:
+#     html_theme = 'nature'
+#     html_style = "style.css"
+
+# html_theme = 'default'
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -265,3 +276,5 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 # texinfo_show_urls = 'footnote'
+
+autosummary_ignore_module_all = False

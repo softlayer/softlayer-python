@@ -1,7 +1,7 @@
 .. _cli_hardware:
 
-Interacting with Hardware
-==============================
+Hardware Commands
+=================
 
 
 .. click:: SoftLayer.CLI.hardware.bandwidth:cli

@@ -1,6 +1,6 @@
 """
     SoftLayer.storage_utils
-    ~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~
     Utility functions used by File and Block Storage Managers
 
     :license: MIT, see LICENSE for more details.

@@ -1,7 +1,7 @@
 .. _vs_user_docs:
 
-Working with Virtual Servers
-============================
+Virtual Servers
+===============
 Using the SoftLayer portal to order virtual servers is fine, but for a number
 of reasons it's often more convenient to use the command line. For this, you
 can use SoftLayer's command-line client to make administrative tasks quicker

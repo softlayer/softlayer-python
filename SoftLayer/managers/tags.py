@@ -1,6 +1,6 @@
 """
     SoftLayer.tags
-    ~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~
     Tag Manager
 
     :license: MIT, see LICENSE for more details.
@@ -83,18 +83,20 @@ class TagManager(object):
 
         From  SoftLayer_Tag::getAllTagTypes()
 
-        |Type                             |Service |
-        | -----------------------------   | ------ |
-        |Hardware                         |HARDWARE|
-        |CCI                              |GUEST|
-        |Account Document                 |ACCOUNT_DOCUMENT|
-        |Ticket                           |TICKET|
-        |Vlan Firewall                    |NETWORK_VLAN_FIREWALL|
-        |Contract                         |CONTRACT|
-        |Image Template                   |IMAGE_TEMPLATE|
-        |Application Delivery Controller  |APPLICATION_DELIVERY_CONTROLLER|
-        |Vlan                             |NETWORK_VLAN|
-        |Dedicated Host                   |DEDICATED_HOST|
+        ::
+
+            |Type                             |Service |
+            | -----------------------------   | ------ |
+            |Hardware                         |HARDWARE|
+            |CCI                              |GUEST|
+            |Account Document                 |ACCOUNT_DOCUMENT|
+            |Ticket                           |TICKET|
+            |Vlan Firewall                    |NETWORK_VLAN_FIREWALL|
+            |Contract                         |CONTRACT|
+            |Image Template                   |IMAGE_TEMPLATE|
+            |Application Delivery Controller  |APPLICATION_DELIVERY_CONTROLLER|
+            |Vlan                             |NETWORK_VLAN|
+            |Dedicated Host                   |DEDICATED_HOST|
         """
         service = self.type_to_service(tag_type)
         if service is None:

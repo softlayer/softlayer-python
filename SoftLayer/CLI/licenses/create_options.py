@@ -6,7 +6,7 @@ import click
 from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
-from SoftLayer.managers.licenses import LicensesManager
+from SoftLayer.managers.license import LicensesManager
 from SoftLayer import utils
 
 
