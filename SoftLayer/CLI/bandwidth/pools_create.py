@@ -25,10 +25,11 @@ regions = ['SJC/DAL/WDC/TOR/MON', 'AMS/LON/MAD/PAR', 'SNG/HKG/OSA/TOK', 'SYD', '
 
 
 def check_region_param(ctx, param, value):  # pylint: disable=unused-argument
-    """Check if provided region is region group or part of region"""
+    """Check if provided region is region group or part of region
 
-    # :params string value: Region or Region-Groups
-    # return string Region-Groups
+    :params string value: Region or Region-Groups
+    return string Region-Groups
+    """
 
     region_group = None
     for key in location_groups:
@@ -53,10 +54,11 @@ def cli(env, name, region):
     """Create bandwidth pool.
 
     Region can be the full zone name 'SJC/DAL/WDC/TOR/MON', or just a single datacenter like 'SJC'.
+
     Example::
         slcli bandwidth pool-create --name testPool --region DAL
         slcli bandwidth pool-create --name testPool --region SJC/DAL/WDC/TOR/MON
-        """
+    """
 
     manager = BandwidthManager(env.client)
     locations = manager.get_location_group()

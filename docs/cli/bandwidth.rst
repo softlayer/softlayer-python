@@ -1,7 +1,7 @@
-.. _cli_account:
+.. _cli_bandwidth:
 
-bandwidth Commands
-=================
+Bandwidth Commands
+==================
 
 
 .. click:: SoftLayer.CLI.bandwidth.pools:cli
