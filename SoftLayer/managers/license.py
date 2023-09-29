@@ -13,6 +13,7 @@ from SoftLayer import utils
 
 LICENSE_PACKAGE_ID = 301
 
+
 class LicensesManager(object):
     """Manages account license."""
 

@@ -31,7 +31,7 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
     """Get Event Logs
 
     Example::
-    
+
         slcli event-log get -d 01/01/2019 -D 02/01/2019 -t User -l 10
     """
     columns = ['Event', 'Object', 'Type', 'Date', 'Username']
