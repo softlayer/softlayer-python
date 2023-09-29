@@ -1,14 +1,13 @@
 .. _cli_ipsec:
 
-Interacting with IPSEC Tunnels
-==============================
+IPSEC Tunnels
+=============
 The IPSEC :ref:`cli` commands can be used to configure an existing IPSEC tunnel context. Subnets in the SoftLayer private network can be associated to the tunnel context along with user-defined remote subnets. Address translation entries may also be defined to provide NAT functionality from static subnet IP addresses associated with the tunnel context to user-defined remote subnet IP addresses.
 
 .. note::
 
     Most CLI actions that affect an IPSEC tunnel context do not result in configuration changes to SoftLayer network devices. A separate *configure* command is available to issue a device configuration request.
 
-To see more information about the IPSEC tunnel context module and API internaction, see :doc:`IPSEC Module<../api/managers/ipsec>` documentation.
 
 .. _cli_ipsec_list:
 

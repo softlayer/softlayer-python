@@ -101,6 +101,7 @@ class UserManager(utils.IdentifierMixin, object):
         :returns: True on success
 
         Example::
+
             enable_notifications(['Order Approved','Reload Complete'])
         """
 
@@ -120,6 +121,7 @@ class UserManager(utils.IdentifierMixin, object):
         :returns: True on success
 
         Example::
+
             disable_notifications(['Order Approved','Reload Complete'])
         """
 
@@ -140,6 +142,7 @@ class UserManager(utils.IdentifierMixin, object):
         :returns: True on success, Exception otherwise
 
         Example::
+
             add_permissions(123, ['BANDWIDTH_MANAGE'])
         """
         pretty_permissions = self.format_permission_object(permissions)
@@ -154,6 +157,7 @@ class UserManager(utils.IdentifierMixin, object):
         :returns: True on success, Exception otherwise
 
         Example::
+
             remove_permissions(123, ['BANDWIDTH_MANAGE'])
         """
         pretty_permissions = self.format_permission_object(permissions)
@@ -196,7 +200,9 @@ class UserManager(utils.IdentifierMixin, object):
         :param int id: User id to get
         :param string start_date: "%m/%d/%Y %H:%M:%s" formatted string.
         :returns: list https://softlayer.github.io/reference/datatypes/SoftLayer_User_Customer_Access_Authentication/
+
         Example::
+
             get_logins(123, '04/08/2018 0:0:0')
         """
 
@@ -366,7 +372,6 @@ class UserManager(utils.IdentifierMixin, object):
 
         :param int user_id: User to edit.
         :param bool value: Value for vpn enable flag.
-        or
         :param bool value: Value for vpn disable flag.
         """
         user_object = {'sslVpnAllowedFlag': value}
@@ -426,9 +431,8 @@ class UserManager(utils.IdentifierMixin, object):
     def grant_hardware_access(self, user_id, hardware_id):
         """Grants the user access to a single hardware device.
 
-        :param int user_id:
-        :param int hardware_id
-
+        :param int user_id: User Id
+        :param int hardware_id: Hardware Id
         :returns: true
         """
         return self.user_service.addHardwareAccess(hardware_id, id=user_id)
@@ -436,9 +440,8 @@ class UserManager(utils.IdentifierMixin, object):
     def grant_virtual_access(self, user_id, virtual_id):
         """Grants the user access to a single VS device.
 
-        :param int user_id:
-        :param int virtual_id
-
+        :param int user_id: User Id
+        :param int virtual_id: Hardware Id
         :returns: true
         """
         return self.user_service.addVirtualGuestAccess(virtual_id, id=user_id)
@@ -446,9 +449,8 @@ class UserManager(utils.IdentifierMixin, object):
     def grant_dedicated_access(self, user_id, dedicated_id):
         """Grants the user access to a single dedicated host device.
 
-        :param int user_id:
-        :param int dedicated_id
-
+        :param int user_id: User Id
+        :param int dedicated_id: Dedicatd Host Id
         :returns: true
         """
         return self.user_service.addDedicatedHostAccess(dedicated_id, id=user_id)
@@ -456,9 +458,8 @@ class UserManager(utils.IdentifierMixin, object):
     def remove_hardware_access(self, user_id, hardware_id):
         """Remove hardware from a portal user’s hardware access list.
 
-        :param int user_id:
-        :param int hardware_id
-
+        :param int user_id: User Id
+        :param int hardware_id: Hardware Id
         :returns: true
         """
         return self.user_service.removeHardwareAccess(hardware_id, id=user_id)
@@ -466,9 +467,8 @@ class UserManager(utils.IdentifierMixin, object):
     def remove_virtual_access(self, user_id, virtual_id):
         """Remove hardware from a portal user’s virtual guests access list.
 
-        :param int user_id:
-        :param int hardware_id
-
+        :param int user_id: User Id
+        :param int hardware_id: Hardware Id
         :returns: true
         """
         return self.user_service.removeVirtualGuestAccess(virtual_id, id=user_id)
@@ -476,9 +476,8 @@ class UserManager(utils.IdentifierMixin, object):
     def remove_dedicated_access(self, user_id, dedicated_id):
         """Remove hardware from a portal user’s dedicated host access list.
 
-        :param int user_id:
-        :param int dedicated_id
-
+        :param int user_id: User Id
+        :param int dedicated_id: Dedicated Host Id
         :returns: true
         """
         return self.user_service.removeDedicatedHostAccess(dedicated_id, id=user_id)
@@ -486,7 +485,7 @@ class UserManager(utils.IdentifierMixin, object):
     def get_user_hardware(self, user_id):
         """User Hardware list.
 
-        :param int user_id:
+        :param int user_id: User Id
         :return: List hardware relate to user
         """
         return self.user_service.getHardware(id=user_id)
@@ -494,7 +493,7 @@ class UserManager(utils.IdentifierMixin, object):
     def get_user_dedicated_host(self, user_id):
         """User dedicate host list.
 
-        :param int user_id:
+        :param int user_id: User Id
         :return: List dedicated host relate to user
         """
         return self.user_service.getDedicatedHosts(id=user_id)
@@ -502,7 +501,7 @@ class UserManager(utils.IdentifierMixin, object):
     def get_user_virtuals(self, user_id):
         """User virtual guest list.
 
-        :param int user_id:
+        :param int user_id: User Id
         :return: List virtual guest relate to user
         """
         return self.user_service.getVirtualGuests(id=user_id)
@@ -510,9 +509,8 @@ class UserManager(utils.IdentifierMixin, object):
     def update_vpn_password(self, user_id, password):
         """Update a user's VPN password.
 
-        :param int user_id:
-        :param string password:
-
+        :param int user_id: User Id
+        :param string password: Password
         :returns: true
         """
         return self.user_service.updateVpnPassword(password, id=user_id)

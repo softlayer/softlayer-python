@@ -49,6 +49,21 @@ sphinx-build  -b html -d _build/doctrees . _build/html
 ```
 
 
+### Note
+
+If you get this error, or similar... you might just need to remove the `_build/html/*` directory and try again, that seems to generally work.
+```
+docs\cli\hardware.rst:15: ERROR: Failed to import "cli" from "SoftLayer.CLI.hardware.cancel". The following exception was raised:
+Traceback (most recent call last):
+  File "py311\Lib\site-packages\sphinx_click\ext.py", line 403, in _load_module
+    mod = __import__(module_name, globals(), locals(), [attr_name])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "SoftLayer\CLI\hardware\cancel.py", line 13, in <module>
+    @click.command(cls=SoftLayer.CLI.command.SLCommand, )
+                       ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'SoftLayer.CLI' has no attribute 'command'
+```
+
 ## Unit Tests
 
 All new features should be 100% code covered, and your pull request should at the very least increase total code overage. 

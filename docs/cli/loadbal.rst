@@ -1,7 +1,7 @@
 .. _cli_loadbalancer:
 
 LoadBalancers
-===================================
+=============
 These commands were added in version `5.8.0 <https://github.com/softlayer/softlayer-python/releases/tag/v5.8.0>`_
 
 LBaaS Commands

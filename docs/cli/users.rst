@@ -1,7 +1,7 @@
 .. _cli_user:
 
 Users
-=============
+=====
 Version 5.6.0 introduces the ability to interact with user accounts from the cli. 
 
 .. click:: SoftLayer.CLI.user.list:cli

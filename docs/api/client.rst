@@ -67,11 +67,46 @@ various services. These are higher-level interfaces to the SoftLayer API.
 
 **Available managers**:
 
-.. toctree::
-   :maxdepth: 1
-   :glob:
+.. currentmodule:: SoftLayer.managers
 
-   managers/*
+.. autosummary::
+    :toctree: managers
+    :recursive:
+    :template: manager_template.rst
+
+    AccountManager
+    BandwidthManager
+    BlockStorageManager
+    CapacityManager
+    CDNManager
+    DedicatedHostManager
+    DNSManager
+    EventLogManager
+    FileStorageManager
+    FirewallManager
+    HardwareManager
+    ImageManager
+    IPSECManager
+    LicensesManager
+    LoadBalancerManager
+    MetadataManager
+    NetworkManager
+    ObjectStorageManager
+    OrderingManager
+    PlacementManager
+    SearchManager
+    SshKeyManager
+    SSLManager
+    TagManager
+    TicketManager
+    UserManager
+    VSManager
+
+    
+
+
+
+
 
 If you need more power or functionality than the managers provide, you can
 make direct API calls as well.

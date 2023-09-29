@@ -1,8 +1,7 @@
 .. _cli_tickets:
 
 Support Tickets
-=================
-
+===============
 The SoftLayer ticket API is used to create "classic" or Infrastructure Support cases. These tickets will still show up in your web portal, but for the more unified case management API, see the `Case Management API <https://cloud.ibm.com/apidocs/case-management#introduction>`_
 
 .. note::

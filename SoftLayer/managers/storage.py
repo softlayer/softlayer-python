@@ -1,6 +1,6 @@
 """
     SoftLayer.storage
-    ~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~
     Network Storage Manager
 
     :license: MIT, see LICENSE for more details.

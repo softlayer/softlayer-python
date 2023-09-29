@@ -1,6 +1,6 @@
 """
     SoftLayer.license
-    ~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~
     License Manager
 
     :license: MIT, see LICENSE for more details.
@@ -11,6 +11,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.managers import ordering
 from SoftLayer import utils
 
+LICENSE_PACKAGE_ID = 301
 
 class LicensesManager(object):
     """Manages account license."""
@@ -63,3 +64,7 @@ class LicensesManager(object):
                                             item_keynames=item_package,
                                             complex_type=complex_type,
                                             hourly=False)
+
+    def get_create_options(self):
+        """Returns valid options for ordering Licenses."""
+        return self.client.call('SoftLayer_Product_Package', 'getItems', id=LICENSE_PACKAGE_ID)

@@ -14,7 +14,7 @@ use SoftLayer's `XML-RPC interface <https://softlayer.github.io/article/xml-rpc/
 in order to manage SoftLayer services.
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    :glob:
 
    install
