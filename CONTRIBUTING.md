@@ -45,7 +45,7 @@ Docs are generated with [Sphinx](https://docs.readthedocs.io/en/latest/intro/get
 For windows, use:
 ```
 cd docs
-sphinx-build  -b html -d _build/doctrees . _build/html
+python -m sphinx -T -E -b dirhtml -d _build/doctrees -D language=en . _build/html
 ```
 
 
