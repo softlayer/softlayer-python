@@ -29,7 +29,7 @@ def cli(env, identifier, passwords, price, components):
     table.align['value'] = 'l'
 
     hardware_id = helpers.resolve_id(hardware.resolve_ids, identifier, 'hardware')
-    result = hardware.get_hardware(hardware_id)
+    result = hardware.get_hardware_fast(hardware_id)
     result = utils.NestedDict(result)
     hard_drives = hardware.get_hard_drives(hardware_id)
 
@@ -72,11 +72,30 @@ def cli(env, identifier, passwords, price, components):
     table.add_row(['last_transaction', last_transaction])
     table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else 'Monthly'])
 
-    vlan_table = formatting.Table(['type', 'number', 'id', 'name', 'netmask'])
+    vlan_table = formatting.Table(['Network', 'Number', 'Id', 'Name', 'Type'])
     for vlan in result['networkVlans']:
-        vlan_table.add_row([vlan['networkSpace'], vlan['vlanNumber'],
-                            vlan['id'], vlan['fullyQualifiedName'],
-                            vlan['primarySubnets'][0]['netmask']])
+        vlan_table.add_row([
+            vlan.get('networkSpace'),
+            vlan.get('vlanNumber'),
+            vlan['id'],
+            vlan['fullyQualifiedName'],
+            'Primary'
+        ])
+
+    # Shows any VLANS trunked/tagged on this server
+    for component in result.get('networkComponents', []):
+        # These are the Primary network components
+        if component.get('primaryIpAddress', False):
+            uplink = component.get('uplinkComponent')
+            for trunk in uplink.get('networkVlanTrunks'):
+                trunk_vlan = trunk.get('networkVlan')
+                vlan_table.add_row([
+                    trunk_vlan.get('networkSpace'),
+                    trunk_vlan.get('vlanNumber'),
+                    trunk_vlan.get('id'),
+                    trunk_vlan.get('fullyQualifiedName'),
+                    'Trunked'
+                ])
 
     table.add_row(['vlans', vlan_table])
 

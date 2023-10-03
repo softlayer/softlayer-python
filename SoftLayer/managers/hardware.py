@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import concurrent.futures as cf
 import datetime
 import logging
 import socket
@@ -275,6 +276,97 @@ class HardwareManager(utils.IdentifierMixin, object):
             )
 
         return self.hardware.getObject(id=hardware_id, **kwargs)
+
+    @retry(logger=LOGGER)
+    def get_hardware_fast(self, hardware_id):
+        """Get details about a hardware device. Similar to get_hardware() but this uses threads
+
+        :param integer id: the hardware ID
+        :returns: A dictionary containing a large amount of information about the specified server.
+        """
+
+        hw_mask = (
+            'id, globalIdentifier, fullyQualifiedDomainName, hostname, domain,'
+            'provisionDate, hardwareStatus, bareMetalInstanceFlag, processorPhysicalCoreAmount,'
+            'memoryCapacity, notes, privateNetworkOnlyFlag, primaryBackendIpAddress,'
+            'primaryIpAddress, networkManagementIpAddress, userData, datacenter, hourlyBillingFlag,'
+            'lastTransaction[transactionGroup], hardwareChassis[id,name]'
+        )
+        server = self.client.call('SoftLayer_Hardware_Server', 'getObject', id=hardware_id, mask=hw_mask)
+        with cf.ThreadPoolExecutor(max_workers=10) as executor:
+            networkComponentsMask = (
+                "id, status, speed, maxSpeed, name, ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,"
+                "port, primarySubnet[id, netmask, broadcastAddress, networkIdentifier, gateway],"
+                "uplinkComponent[networkVlanTrunks[networkVlan[networkSpace]]]"
+            )
+            networkComponents = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getNetworkComponents',
+                id=hardware_id, mask=networkComponentsMask
+            )
+            activeComponentsMask = (
+               'id,hardwareComponentModel[hardwareGenericComponentModel[id,hardwareComponentType[keyName]]]'
+            )
+            activeComponents = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getActiveComponents',
+                id=hardware_id, mask=activeComponentsMask
+            )
+
+            activeTransaction = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getActiveTransaction',
+                id=hardware_id, mask="id, transactionStatus[friendlyName,name]"
+            )
+
+            operatingSystemMask = (
+                'softwareLicense[softwareDescription[manufacturer, name, version, referenceCode]],'
+                'passwords[id,username,password]'
+            )
+            operatingSystem = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getOperatingSystem',
+                id=hardware_id, mask=operatingSystemMask
+            )
+
+            # Intentionally reusing the operatingSystemMask here. They are both softwareComponents
+            softwareComponents = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getSoftwareComponents',
+                id=hardware_id, mask=operatingSystemMask
+            )
+
+            billingItemMask = (
+                'id,nextInvoiceTotalRecurringAmount,'
+                'nextInvoiceChildren[nextInvoiceTotalRecurringAmount],'
+                'orderItem.order.userRecord[username]'
+            )
+            billingItem = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getBillingItem',
+                id=hardware_id, mask=billingItemMask
+            )
+
+            tagReferences = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getTagReferences',
+                id=hardware_id, mask="id,tag[name,id]"
+            )
+
+            networkVlans = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getNetworkVlans',
+                id=hardware_id, mask="id,vlanNumber,networkSpace,fullyQualifiedName,primarySubnets[ipAddresses]"
+            )
+
+            remoteManagementAccounts = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getRemoteManagementAccounts',
+                id=hardware_id, mask="username,password"
+            )
+
+            server['networkComponents'] = networkComponents.result()
+            server['activeComponents'] = activeComponents.result()
+            server['activeTransaction'] = activeTransaction.result()
+            server['operatingSystem'] = operatingSystem.result()
+            server['softwareComponents'] = softwareComponents.result()
+            server['billingItem'] = billingItem.result()
+            server['networkVlans'] = networkVlans.result()
+            server['remoteManagementAccounts'] = remoteManagementAccounts.result()
+            server['tagReferences'] = tagReferences.result()
+
+        return server
 
     def reload(self, hardware_id, post_uri=None, ssh_keys=None, lvm=False):
         """Perform an OS reload of a server with its current configuration.

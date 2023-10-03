@@ -953,6 +953,26 @@ class HardwareTests(testing.TestCase):
         self.hardware.create_credential(template)
         self.assert_called_with('SoftLayer_Software_Component_Password', 'createObject')
 
+    def test_get_hardware_fast(self):
+        result = self.hardware.get_hardware_fast(1234)
+        self.assertIn('networkComponents', result)
+        self.assertIn('activeComponents', result)
+        self.assertIn('activeTransaction', result)
+        self.assertIn('operatingSystem', result)
+        self.assertIn('softwareComponents', result)
+        self.assertIn('billingItem', result)
+        self.assertIn('networkVlans', result)
+        self.assertIn('remoteManagementAccounts', result)
+        self.assertIn('tagReferences', result)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getNetworkComponents')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getActiveComponents')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getOperatingSystem')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getSoftwareComponents')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getBillingItem')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getTagReferences')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getNetworkVlans')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getRemoteManagementAccounts')
+
 
 class HardwareHelperTests(testing.TestCase):
 
@@ -1052,11 +1072,3 @@ class HardwareHelperTests(testing.TestCase):
         item_public = {'attributes': [{'attributeTypeKeyName': 'NOT_PRIVATE_NETWORK_ONLY'}]}
         self.assertTrue(managers.hardware._is_private_port_speed_item(item_private))
         self.assertFalse(managers.hardware._is_private_port_speed_item(item_public))
-
-    @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_hardware_cancel_no_force(self, confirm_mock):
-        confirm_mock.return_value = False
-        result = self.run_command(['hardware', 'cancel', '102'])
-
-        self.assertEqual(2, result.exit_code)
-        self.assertEqual('Aborted', result.exception.message)

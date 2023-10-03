@@ -161,6 +161,7 @@ getFrontendNetworkComponents = [
         }
     }
 ]
+getNetworkComponents = getFrontendNetworkComponents
 
 getBandwidthAllotmentDetail = {
     'allocationId': 25465663,
@@ -410,4 +411,64 @@ getComponents = [{
             {
                 "createDate": "2019-10-14T16:51:12-06:00",
                 "version": "5.10"
-            }]}}]
+            }
+        ]
+    }
+}]
+getActiveComponents = getComponents
+getActiveTransaction = getObject['activeTransaction']
+getOperatingSystem = getObject['operatingSystem']
+getSoftwareComponents = [
+    {
+        "hardwareId": 1907356,
+        "id": 59003868,
+        "manufacturerLicenseInstance": "",
+        "softwareLicense": {
+            "id": 20658,
+            "softwareDescriptionId": 2888,
+            "softwareDescription": {
+                "controlPanel": 0,
+                "id": 2888,
+                "licenseTermValue": 0,
+                "longDescription": "Juniper vSRX 1G 19.4R2-S3 Standard 19.4.2.3",
+                "manufacturer": "Juniper",
+                "name": "vSRX 1G 19.4R2-S3 Standard",
+                "operatingSystem": 1,
+                "referenceCode": "UBUNTU_18_64",
+                "upgradeSoftwareDescriptionId": None,
+                "upgradeSwDescId": None,
+                "version": "19.4.2.3",
+                "virtualLicense": 0,
+                "virtualizationPlatform": 0,
+                "requiredUser": "root"
+            }
+        }
+    },
+    {
+        "hardwareId": 1907356,
+        "id": 59003870,
+        "manufacturerLicenseInstance": "",
+        "softwareLicense": {
+            "id": 147,
+            "softwareDescriptionId": 148,
+            "softwareDescription": {
+                "controlPanel": 0,
+                "id": 148,
+                "licenseTermValue": None,
+                "longDescription": "Passmark Suite Latest",
+                "manufacturer": "Passmark",
+                "name": "Passmark Suite",
+                "operatingSystem": 0,
+                "upgradeSoftwareDescriptionId": None,
+                "upgradeSwDescId": None,
+                "version": "Latest",
+                "virtualLicense": 0,
+                "virtualizationPlatform": 0
+            }
+        }
+    }
+]
+getBillingItem = getObject['billingItem']
+getTagReferences = getObject['tagReferences']
+getNetworkVlans = getObject['networkVlans']
+getRemoteManagementAccounts = getObject['remoteManagementAccounts']
