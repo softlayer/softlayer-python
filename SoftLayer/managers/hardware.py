@@ -1164,21 +1164,41 @@ class HardwareManager(utils.IdentifierMixin, object):
                         "createDate": {
                             "operation": "orderBy",
                             "options": [
-                                {
-                                    "name": "sort",
-                                    "value": [
-                                        "DESC"
-                                    ]
-                                },
-                                {
-                                    "name": "sortOrder",
-                                    "value": [
-                                        1
-                                    ]}]}
-                    }}}}
+                                {"name": "sort", "value": ["DESC"]},
+                                {"name": "sortOrder", "value": [1]}
+                            ]
+                        }
+                    }
+                }}}
 
         return self.client.call('Hardware_Server', 'getComponents',
                                 mask=mask, filter=filter_component, id=hardware_id)
+
+    def get_network_components(self, hardware_id, mask=None, space=None):
+        """Calls SoftLayer_Hardware_Server::getNetworkComponents()
+
+        :param int hardware_id: SoftLayer_Hardware_Server id
+        :param string mask: The object mask to use if you do not want the default
+        :param string space: 'public', 'private', or None for both.
+        :returns: https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_Component/
+        """
+
+        if mask is None:
+            mask = "mask[uplinkComponent, router, redundancyEnabledFlag, redundancyCapableFlag]"
+        method = "getNetworkComponents"
+        if space == "public":
+            method = "getFrontendNetworkComponents"
+        elif space == "private":
+            method = "getBackendNetworkComponents"
+        return self.client.call("SoftLayer_Hardware_Server", method, id=hardware_id, mask=mask)
+
+    def trunk_vlan(self, component_id, vlans):
+        """Calls SoftLayer_Network_Component::addNetworkVlanTrunks()
+
+        :param int component_id: SoftLayer_Network_Component id
+        :param list vlans: list of SoftLayer_Network_Vlan objects to add. Each object needs at least id or vlanNumber
+        """
+        return self.client.call('SoftLayer_Network_Component', 'addNetworkVlanTrunks', vlans, id=component_id)
 
     def get_sensors(self, hardware_id):
         """Returns Hardware sensor data"""

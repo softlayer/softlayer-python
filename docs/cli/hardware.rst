@@ -147,3 +147,11 @@ This function updates the firmware of a server. If already at the latest version
 .. click:: SoftLayer.CLI.hardware.create_credential:cli
    :prog: hardware create-credential
    :show-nested:
+
+.. click:: SoftLayer.CLI.hardware.vlan_add:cli
+   :prog: hardware vlan_add
+   :show-nested:
+
+.. click:: SoftLayer.CLI.hardware.vlan_list:cli
+   :prog: hardware vlan_list
+   :show-nested:
