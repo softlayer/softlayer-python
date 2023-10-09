@@ -134,7 +134,7 @@ class VSManager(utils.IdentifierMixin, object):
         if tags:
             _filter['virtualGuests']['tagReferences']['tag']['name'] = {
                 'operation': 'in',
-                'options': [{'name': 'data', 'value': tags}],
+                'options': [{'name': 'data', 'value': list(tags)}],
             }
 
         if cpus:

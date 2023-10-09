@@ -43,4 +43,4 @@ class SearchTests(testing.TestCase):
                                 args=(f"{expected} datacenter.longName: *dal13*",))
         self.search.search_instances(search_string, tags=["thisTag"])
         self.assert_called_with('SoftLayer_Search', 'advancedSearch',
-                                args=(f"{expected} internalTagReferences.tag.name: thisTag",))
+                                args=(f"{expected} tagReferences.tag.name: \"thisTag\"",))

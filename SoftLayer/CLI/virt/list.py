@@ -19,18 +19,11 @@ COLUMNS = [
     column_helper.Column('backend_ip', ('primaryBackendIpAddress',)),
     column_helper.Column('datacenter', ('datacenter', 'name')),
     column_helper.Column('action', lambda guest: formatting.active_txn(guest),
-                         mask='''
-                         activeTransaction[
-                            id,transactionStatus[name,friendlyName]
-                         ]'''),
+                         mask='activeTransaction[id,transactionStatus[name,friendlyName]]'),
     column_helper.Column('power_state', ('powerState', 'name')),
-    column_helper.Column(
-        'created_by',
-        ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
-    column_helper.Column(
-        'tags',
-        lambda server: formatting.tags(server.get('tagReferences')),
-        mask="tagReferences.tag.name"),
+    column_helper.Column('created_by', ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
+    column_helper.Column('tags', lambda server: formatting.tags(server.get('tagReferences')),
+                         mask="tagReferences.tag.name"),
     column_helper.Column(
         'createDate',
         lambda guest: utils.clean_time(guest.get('createDate'),
@@ -59,7 +52,7 @@ DEFAULT_COLUMNS = [
 @click.option('--network', '-n', help='Network port speed in Mbps')
 @click.option('--hourly', is_flag=True, help='Show only hourly instances')
 @click.option('--monthly', is_flag=True, help='Show only monthly instances')
-@click.option('--tag', '-t', help='list of tags')
+@click.option('--tag', '-t', help='list of tags', multiple=True)
 @click.option('--transient', help='Filter by transient instances', type=click.BOOL)
 @click.option('--search', is_flag=False, flag_value="", default=None,
               help="Use the more flexible Search API to list instances. See `slcli search --types` for list " +
