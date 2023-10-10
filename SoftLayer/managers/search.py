@@ -47,8 +47,8 @@ class SearchManager(object):
         if kwargs.get('datacenter'):
             search_string = f"{search_string} datacenter.longName: *{kwargs.get('datacenter')}*"
         if kwargs.get('tags'):
-            tags = " ".join(kwargs.get("tags", []))
-            search_string = f"{search_string} internalTagReferences.tag.name: {tags}"
+            tags = " ".join(f"tagReferences.tag.name: \"{t}\"" for t in kwargs.get("tags", []))
+            search_string = f"{search_string} {tags}"
         result = self.search_manager.advancedSearch(search_string, mask=mask)
         guests = []
         for resource in result:
