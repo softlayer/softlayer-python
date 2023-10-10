@@ -32,7 +32,7 @@ def cli(env, volume_id, new_size, new_iops, new_tier, force):
     """Modify an existing file storage volume.
 
     Valid size and iops options can be found here:
-        https://cloud.ibm.com/docs/BlockStorage/index.html#provisioning-considerations
+        https://cloud.ibm.com/docs/FileStorage/index.html#provisioning-considerations
         https://cloud.ibm.com/docs/FileStorage?topic=FileStorage-orderingFileStorage&interface=cli
 
     Example::
