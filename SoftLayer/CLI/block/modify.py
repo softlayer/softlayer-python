@@ -20,22 +20,21 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 @click.option('--new-iops', '-i',
               type=int,
               help='Performance Storage IOPS, between 100 and 6000 in multiples of 100 [only for performance volumes] '
-                   '***If no IOPS value is specified, the original IOPS value of the volume will be used.***\n'
-                   'Requirements: [If original IOPS/GB for the volume is less than 0.3, new IOPS/GB must also be '
-                   'less than 0.3. If original IOPS/GB for the volume is greater than or equal to 0.3, new IOPS/GB '
-                   'for the volume must also be greater than or equal to 0.3.]')
+                   '***If no IOPS value is specified, the original IOPS value of the volume will be used.***')
 @click.option('--new-tier', '-t',
-              help='Endurance Storage Tier (IOPS per GB) [only for endurance volumes] '
-                   '***If no tier is specified, the original tier of the volume will be used.***\n'
-                   'Requirements: [If original IOPS/GB for the volume is 0.25, new IOPS/GB for the volume must also '
-                   'be 0.25. If original IOPS/GB for the volume is greater than 0.25, new IOPS/GB for the volume '
-                   'must also be greater than 0.25.]',
+              help='Endurance Storage Tier (IOPS per GB) [only for endurance volumes] Classic Choices: '
+                   '***If no tier is specified, the original tier of the volume will be used.***',
               type=click.Choice(['0.25', '2', '4', '10']))
 @environment.pass_env
 def cli(env, volume_id, new_size, new_iops, new_tier):
-    """Modify an existing block storage volume.
+    """Modify an existing block storage volume. Choices.
+
+    Valid size and iops options can be found here:
+        https://cloud.ibm.com/docs/BlockStorage/index.html#provisioning-considerations
+        https://cloud.ibm.com/docs/BlockStorage?topic=BlockStorage-orderingBlockStorage&interface=cli
 
     Example::
+
         slcli block volume-modify 12345678 --new-size 1000 --new-iops 4000
         This command modify a volume 12345678 with size is 1000GB, IOPS is 4000.
 
