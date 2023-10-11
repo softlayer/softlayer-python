@@ -1200,6 +1200,34 @@ class HardwareManager(utils.IdentifierMixin, object):
         """
         return self.client.call('SoftLayer_Network_Component', 'addNetworkVlanTrunks', vlans, id=component_id)
 
+    def remove_vlan(self, component_id, vlans):
+        """Calls SoftLayer_Network_Component::removeNetworkVlanTrunks()
+
+        :param int component_id: SoftLayer_Network_Component id
+        :param list vlans: list of SoftLayer_Network_Vlan objects to remove. Each object needs at least id or vlanNumber
+        """
+        return self.client.call('SoftLayer_Network_Component', 'removeNetworkVlanTrunks', vlans, id=component_id)
+    def clear_vlan(self, hardware_id):
+        """Clears all vlan trunks from a hardware_id
+
+        :param int hardware_id: server to clear vlans from
+        """
+        component_mask = (
+            "mask[id, "
+            "backendNetworkComponents[id,networkVlanTrunks[networkVlanId]], "
+            "frontendNetworkComponents[id,networkVlanTrunks[networkVlanId]]"
+            "]"
+        )
+        components = self.client.call('SoftLayer_Hardware_Server', 'getObject', id=hardware_id, mask=component_mask)
+        back_component_id = utils.lookup(components, 'backendNetworkComponent', 'id')
+        front_component_id = utils.lookup(components, 'frontendNetworkComponent', 'id')
+        for c in components.get('backendNetworkComponent', []):
+            if len(c.get('networkVlanTrunks')):
+                self.client.call('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', id=c.get('id'))
+        for c in components.get('frontendNetworkComponent', []):
+            if len(c.get('networkVlanTrunks')):
+                self.client.call('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', id=c.get('id'))            
+
     def get_sensors(self, hardware_id):
         """Returns Hardware sensor data"""
         return self.client.call('Hardware', 'getSensorData', id=hardware_id)

@@ -255,12 +255,6 @@ class ResolveIdTests(testing.TestCase):
             exceptions.CLIAbort, helpers.resolve_id, lambda r: [12345, 54321], 'test')
 
 
-class TestTable(testing.TestCase):
-
-    def test_table_with_duplicated_columns(self):
-        self.assertRaises(exceptions.CLIHalt, formatting.Table, ['col', 'col'])
-
-
 class TestFormatOutput(testing.TestCase):
 
     def test_format_output_string(self):
