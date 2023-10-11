@@ -8,7 +8,7 @@ from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 
-from pprint import pprint as pp
+
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('hardware')
 @environment.pass_env

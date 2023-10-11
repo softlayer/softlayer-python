@@ -4,21 +4,11 @@
 
     :license: MIT, see LICENSE for more details.
 """
-import json
-import os
-import sys
-import tempfile
 
-import click
-from rich.table import Table
-from unittest import mock as mock
-
-from SoftLayer.CLI import core
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
-from SoftLayer.CLI import helpers
-from SoftLayer.CLI import template
 from SoftLayer import testing
+
 
 class TestTable(testing.TestCase):
 

@@ -21,7 +21,7 @@ from SoftLayer import utils
 LOGGER = logging.getLogger(__name__)
 
 # Invalid names are ignored due to long method names and short argument names
-# pylint: disable=invalid-name, too-many-lines
+# pylint: disable=invalid-name, too-many-lines, too-many-public-methods
 
 EXTRA_CATEGORIES = ['pri_ipv6_addresses',
                     'static_ipv6_addresses',
@@ -1207,6 +1207,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param list vlans: list of SoftLayer_Network_Vlan objects to remove. Each object needs at least id or vlanNumber
         """
         return self.client.call('SoftLayer_Network_Component', 'removeNetworkVlanTrunks', vlans, id=component_id)
+
     def clear_vlan(self, hardware_id):
         """Clears all vlan trunks from a hardware_id
 
@@ -1219,14 +1220,14 @@ class HardwareManager(utils.IdentifierMixin, object):
             "]"
         )
         components = self.client.call('SoftLayer_Hardware_Server', 'getObject', id=hardware_id, mask=component_mask)
-        back_component_id = utils.lookup(components, 'backendNetworkComponent', 'id')
-        front_component_id = utils.lookup(components, 'frontendNetworkComponent', 'id')
+        # We only want to call this API on components with actual trunks.
+        # Calling this on the primary and redundant components might cause exceptions.
         for c in components.get('backendNetworkComponent', []):
             if len(c.get('networkVlanTrunks')):
                 self.client.call('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', id=c.get('id'))
         for c in components.get('frontendNetworkComponent', []):
             if len(c.get('networkVlanTrunks')):
-                self.client.call('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', id=c.get('id'))            
+                self.client.call('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', id=c.get('id'))
 
     def get_sensors(self, hardware_id):
         """Returns Hardware sensor data"""

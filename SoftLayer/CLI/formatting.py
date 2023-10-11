@@ -335,7 +335,6 @@ class Table(object):
         """
         self.empty_message = message
 
-
     def add_row(self, row):
         """Add a row to the table.
 
