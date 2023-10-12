@@ -173,8 +173,8 @@ getNetworkComponents = [
     }
 ]
 # This splits out the network components into 2 sections so they are different enough for tests
-getFrontendNetworkComponents = getNetworkComponents[0::1]
-getBackendNetworkComponents = getNetworkComponents[2::3]
+getFrontendNetworkComponents = getNetworkComponents[:2]
+getBackendNetworkComponents = getNetworkComponents[3:]
 
 getBandwidthAllotmentDetail = {
     'allocationId': 25465663,

@@ -1223,10 +1223,10 @@ class HardwareManager(utils.IdentifierMixin, object):
         # We only want to call this API on components with actual trunks.
         # Calling this on the primary and redundant components might cause exceptions.
         for c in components.get('backendNetworkComponent', []):
-            if len(c.get('networkVlanTrunks')):
+            if len(c.get('networkVlanTrunks', [])):
                 self.client.call('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', id=c.get('id'))
         for c in components.get('frontendNetworkComponent', []):
-            if len(c.get('networkVlanTrunks')):
+            if len(c.get('networkVlanTrunks', [])):
                 self.client.call('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', id=c.get('id'))
 
     def get_sensors(self, hardware_id):
