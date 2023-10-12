@@ -86,8 +86,8 @@ def cli(env, identifier, passwords, price, components):
     for component in result.get('networkComponents', []):
         # These are the Primary network components
         if component.get('primaryIpAddress', False):
-            uplink = component.get('uplinkComponent')
-            for trunk in uplink.get('networkVlanTrunks'):
+            uplink = component.get('uplinkComponent', {})
+            for trunk in uplink.get('networkVlanTrunks', []):
                 trunk_vlan = trunk.get('networkVlan')
                 vlan_table.add_row([
                     trunk_vlan.get('networkSpace'),

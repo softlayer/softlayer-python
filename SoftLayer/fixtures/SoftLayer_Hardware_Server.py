@@ -130,38 +130,51 @@ reloadOperatingSystem = 'OK'
 getReverseDomainRecords = [
     {'resourceRecords': [{'data': '2.0.1.10.in-addr.arpa'}]}]
 bootToRescueLayer = True
-getFrontendNetworkComponents = [
+
+getNetworkComponents = [
     {'maxSpeed': 100},
     {
         'maxSpeed': 1000,
         'networkComponentGroup': {
             'groupTypeId': 2,
             'networkComponents': [{'maxSpeed': 1000}, {'maxSpeed': 1000}]
-        }
+        },
+        'primaryIpAddress': '192.168.1.1',
+        'id': 998877,
+        'uplinkComponent': {}
     },
     {
         'maxSpeed': 1000,
         'networkComponentGroup': {
             'groupTypeId': 2,
             'networkComponents': [{'maxSpeed': 1000}, {'maxSpeed': 1000}]
-        }
+        },
+        'id': 665544,
+        'uplinkComponent': {}
     },
     {
         'maxSpeed': 1000,
         'networkComponentGroup': {
             'groupTypeId': 2,
             'networkComponents': [{'maxSpeed': 1000}, {'maxSpeed': 1000}]
-        }
+        },
+        'id': 112233,
+        'uplinkComponent': {}
     },
     {
         'maxSpeed': 1000,
         'networkComponentGroup': {
             'groupTypeId': 2,
             'networkComponents': [{'maxSpeed': 1000}, {'maxSpeed': 1000}]
-        }
+        },
+        'primaryIpAddress': '10.0.0.1',
+        'id': 123456,
+        'uplinkComponent': {}
     }
 ]
-getNetworkComponents = getFrontendNetworkComponents
+# This splits out the network components into 2 sections so they are different enough for tests
+getFrontendNetworkComponents = getNetworkComponents[0::1]
+getBackendNetworkComponents = getNetworkComponents[2::3]
 
 getBandwidthAllotmentDetail = {
     'allocationId': 25465663,

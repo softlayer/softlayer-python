@@ -15,6 +15,7 @@ from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer.fixtures import SoftLayer_Product_Order
+from SoftLayer.fixtures import SoftLayer_Search
 from SoftLayer import SoftLayerError
 from SoftLayer import testing
 from SoftLayer import utils
@@ -1030,3 +1031,15 @@ class ServerCLITests(testing.TestCase):
 
         self.assertEqual(2, result.exit_code)
         self.assertEqual('Aborted', result.exception.message)
+
+    def test_hardware_vlan_add(self):
+        mock = self.set_mock('SoftLayer_Search', 'advancedSearch')
+        mock.return_value = SoftLayer_Search.advancedSearchVlan
+        result = self.run_command(['hardware', 'vlan-add', '12345', '5555'])
+        self.assert_no_fail(result)
+        search_args = '_objectType:SoftLayer_Network_Vlan "5555"'
+        self.assert_called_with('SoftLayer_Search', 'advancedSearch', args=(search_args,))
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getFrontendNetworkComponents', identifier=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getBackendNetworkComponents', identifier=12345)
+        self.assert_called_with('SoftLayer_Network_Component', 'addNetworkVlanTrunks', identifier=998877)
+        self.assert_called_with('SoftLayer_Network_Component', 'addNetworkVlanTrunks', identifier=123456)
