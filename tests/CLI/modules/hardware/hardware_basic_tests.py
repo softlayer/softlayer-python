@@ -15,7 +15,6 @@ from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
 from SoftLayer.fixtures import SoftLayer_Product_Order
-from SoftLayer.fixtures import SoftLayer_Search
 from SoftLayer import SoftLayerError
 from SoftLayer import testing
 from SoftLayer import utils
@@ -1031,4 +1030,3 @@ class HardwareCLITests(testing.TestCase):
 
         self.assertEqual(2, result.exit_code)
         self.assertEqual('Aborted', result.exception.message)
-

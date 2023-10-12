@@ -8,16 +8,10 @@
 """
 
 import json
-import sys
-import tempfile
-from unittest import mock as mock
 
-from SoftLayer.CLI import exceptions
 from SoftLayer.fixtures import SoftLayer_Hardware_Server
 from SoftLayer.fixtures import SoftLayer_Search
-from SoftLayer import SoftLayerError
 from SoftLayer import testing
-from SoftLayer import utils
 
 
 class HardwareVlanCLITests(testing.TestCase):
@@ -36,7 +30,7 @@ class HardwareVlanCLITests(testing.TestCase):
             {
                 'maxSpeed': 1000,
                 'networkVlansTrunkable': [{
-                    'id':5555,
+                    'id': 5555,
                     'fullyQualifiedName': 'test01.ibm99.1234',
                     'name': 'IBMTEst',
                     'networkSpace': 'PUBLIC'
@@ -67,7 +61,6 @@ class HardwareVlanCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assertEqual([], output)
 
-
     # slcli hardware vlan-remove
     def test_hardware_vlan_remove(self):
         mock = self.set_mock('SoftLayer_Search', 'advancedSearch')
@@ -97,7 +90,6 @@ class HardwareVlanCLITests(testing.TestCase):
         self.assertEqual("Argument Error: Error: Missing argument 'VLANS'.", result.exception.message)
 
     def test_hardware_vlan_remove_all_vlans(self):
-        from pprint import pprint as pp
         mock = self.set_mock('SoftLayer_Search', 'advancedSearch')
         mock.return_value = SoftLayer_Search.advancedSearchVlan
         hardware_mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')

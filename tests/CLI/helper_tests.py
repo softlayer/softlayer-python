@@ -448,6 +448,3 @@ class TestExportToTemplate(testing.TestCase):
                 self.assertEqual(len(data.splitlines()), 2)
                 self.assertIn('datacenter=ams01\n', data)
                 self.assertIn('disk=disk1,disk2\n', data)
-
-
-
