@@ -93,13 +93,7 @@ class HardwareVlanCLITests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Search', 'advancedSearch')
         mock.return_value = SoftLayer_Search.advancedSearchVlan
         hardware_mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        hardware_return = {
-            'backendNetworkComponent': SoftLayer_Hardware_Server.getBackendNetworkComponents,
-            'frontendNetworkComponent': SoftLayer_Hardware_Server.getFrontendNetworkComponents
-        }
-        hardware_return['backendNetworkComponent'][1]['networkVlanTrunks'] = [{'id': 99}]
-        hardware_return['frontendNetworkComponent'][1]['networkVlanTrunks'] = [{'id': 11}]
-        hardware_mock.return_value = hardware_return
+        hardware_mock.return_value = SoftLayer_Hardware_Server.getObjectVlanClear
         result = self.run_command(['hardware', 'vlan-remove', '12345', '--all'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', identifier=998877)

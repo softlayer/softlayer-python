@@ -112,6 +112,7 @@ getObject = {
         }
     ]
 }
+
 editObject = True
 setTags = True
 setPrivateNetworkInterfaceSpeed = True
@@ -485,3 +486,12 @@ getBillingItem = getObject['billingItem']
 getTagReferences = getObject['tagReferences']
 getNetworkVlans = getObject['networkVlans']
 getRemoteManagementAccounts = getObject['remoteManagementAccounts']
+
+
+# Setup for hardwareManager.clear_vlan related tests
+getObjectVlanClear = {
+    'backendNetworkComponent': getBackendNetworkComponents,
+    'frontendNetworkComponent': getFrontendNetworkComponents
+}
+getObjectVlanClear['backendNetworkComponent'][1]['networkVlanTrunks'] = [{'id': 99}]
+getObjectVlanClear['frontendNetworkComponent'][1]['networkVlanTrunks'] = [{'id': 11}]
