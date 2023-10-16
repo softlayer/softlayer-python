@@ -19,8 +19,7 @@ class FunctionalTest(testing.TestCase):
                                     'variables not set')
 
         return {
-            'endpoint': (os.environ.get('SL_API_ENDPOINT') or
-                         SoftLayer.API_PUBLIC_ENDPOINT),
+            'endpoint': (SoftLayer.API_PUBLIC_ENDPOINT),
             'username': os.environ['SL_USERNAME'],
             'api_key': os.environ['SL_API_KEY']
         }
@@ -30,7 +29,7 @@ class UnauthedUser(FunctionalTest):
 
     def test_failed_auth(self):
         client = SoftLayer.Client(
-            username='doesnotexist', api_key='issurelywrong', timeout=20)
+            username='doesnotexist', api_key='issurelywrong', timeout=20, endpoint_url=SoftLayer.API_PUBLIC_ENDPOINT)
         self.assertRaises(
             SoftLayer.SoftLayerAPIError,
             client['SoftLayer_User_Customer'].getPortalLoginToken)
