@@ -20,7 +20,7 @@ from SoftLayer import testing
 from SoftLayer import utils
 
 
-class ServerCLITests(testing.TestCase):
+class HardwareCLITests(testing.TestCase):
 
     def test_server_cancel_reasons(self):
         result = self.run_command(['server', 'cancel-reasons'])
@@ -105,10 +105,7 @@ class ServerCLITests(testing.TestCase):
 
         result = self.run_command(['hardware', 'credentials', '12345'])
 
-        self.assertEqual(
-            'None',
-            str(result.exception)
-        )
+        self.assertEqual('None', str(result.exception))
 
     def test_server_details(self):
         result = self.run_command(['server', 'detail', '1234', '--passwords', '--price'])
@@ -119,28 +116,17 @@ class ServerCLITests(testing.TestCase):
         self.assertEqual(output['prices'][0]['Recurring Price'], 16.08)
         self.assertEqual(output['remote users'][0]['password'], 'abc123')
         self.assertEqual(output['users'][0]['username'], 'root')
-        self.assertEqual(output['vlans'][0]['number'], 1800)
+        self.assertEqual(output['vlans'][0]['Number'], 1800)
         self.assertEqual(output['owner'], 'chechu')
         self.assertEqual(output['Bandwidth'][0]['Allotment'], '250')
 
     def test_detail_vs_empty_tag(self):
-        mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        mock.return_value = {
-            'id': 100,
-            'processorPhysicalCoreAmount': 2,
-            'memoryCapacity': 2,
-            'tagReferences': [
-                {'tag': {'name': 'example-tag'}},
-                {},
-            ],
-        }
+        mock = self.set_mock('SoftLayer_Hardware_Server', 'getTagReferences')
+        mock.return_value = [{'tag': {'name': 'example-tag'}}, {}]
         result = self.run_command(['server', 'detail', '100'])
 
         self.assert_no_fail(result)
-        self.assertEqual(
-            json.loads(result.output)['tags'],
-            ['example-tag'],
-        )
+        self.assertEqual(json.loads(result.output)['tags'], ['example-tag'])
 
     def test_detail_empty_allotment(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getBandwidthAllotmentDetail')
@@ -148,10 +134,7 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['server', 'detail', '100'])
 
         self.assert_no_fail(result)
-        self.assertEqual(
-            json.loads(result.output)['Bandwidth'][0]['Allotment'],
-            '-',
-        )
+        self.assertEqual(json.loads(result.output)['Bandwidth'][0]['Allotment'], '-')
 
     def test_detail_drives(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getHardDrives')
@@ -255,15 +238,13 @@ class ServerCLITests(testing.TestCase):
         ngb_mock.return_value = False
 
         # Check the positive case
-        result = self.run_command(['--really', 'server', 'cancel', '12345',
-                                   '--reason=Test', '--comment=Test'])
+        result = self.run_command(['--really', 'server', 'cancel', '12345', '--reason=Test', '--comment=Test'])
 
         self.assert_no_fail(result)
         cancel_mock.assert_called_with(12345, "Test", "Test", False)
 
         # Test
-        result = self.run_command(['server', 'cancel', '12345',
-                                   '--reason=Test', '--comment=Test'])
+        result = self.run_command(['server', 'cancel', '12345', '--reason=Test', '--comment=Test'])
 
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
@@ -273,8 +254,7 @@ class ServerCLITests(testing.TestCase):
         # Check the positive case
         result = self.run_command(['--really', 'server', 'power-off', '12345'])
 
-        self.assert_called_with('SoftLayer_Hardware_Server', 'powerOff',
-                                identifier=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'powerOff', identifier=12345)
 
         # Now check to make sure we properly call CLIAbort in the negative case
         confirm_mock.return_value = False
@@ -287,24 +267,19 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['--really', 'server', 'reboot', '12345'])
 
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Hardware_Server', 'rebootDefault',
-                                identifier=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'rebootDefault', identifier=12345)
 
     def test_server_reboot_soft(self):
-        result = self.run_command(['--really', 'server', 'reboot', '12345',
-                                   '--soft'])
+        result = self.run_command(['--really', 'server', 'reboot', '12345', '--soft'])
 
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Hardware_Server', 'rebootSoft',
-                                identifier=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'rebootSoft', identifier=12345)
 
     def test_server_reboot_hard(self):
-        result = self.run_command(['--really', 'server', 'reboot', '12345',
-                                   '--hard'])
+        result = self.run_command(['--really', 'server', 'reboot', '12345', '--hard'])
 
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Hardware_Server', 'rebootHard',
-                                identifier=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'rebootHard',  identifier=12345)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_server_reboot_negative(self, confirm_mock):
@@ -318,8 +293,7 @@ class ServerCLITests(testing.TestCase):
         result = self.run_command(['--really', 'server', 'power-on', '12345'])
 
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Hardware_Server', 'powerOn',
-                                identifier=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'powerOn', identifier=12345)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_harware_power_on_force(self, confirm_mock):
@@ -336,12 +310,10 @@ class ServerCLITests(testing.TestCase):
         self.assertEqual('Aborted.', result.exception.message)
 
     def test_server_power_cycle(self):
-        result = self.run_command(['--really', 'server', 'power-cycle',
-                                   '12345'])
+        result = self.run_command(['--really', 'server', 'power-cycle', '12345'])
 
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Hardware_Server', 'powerCycle',
-                                identifier=12345)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'powerCycle', identifier=12345)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_server_power_cycle_negative(self, confirm_mock):
@@ -498,8 +470,7 @@ class ServerCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assertEqual(result.output, "")
         self.assert_called_with('SoftLayer_Hardware_Server', 'editObject',
-                                args=({'domain': 'test.sftlyr.ws',
-                                       'hostname': 'hardware-test1'},),
+                                args=({'domain': 'test.sftlyr.ws', 'hostname': 'hardware-test1'},),
                                 identifier=1000)
 
     @mock.patch('SoftLayer.HardwareManager.edit')
@@ -512,10 +483,7 @@ class ServerCLITests(testing.TestCase):
 
         self.assertEqual(result.exit_code, 2)
         self.assertEqual(result.output, "")
-        edit_mock.assert_called_with(1000,
-                                     userdata='My data',
-                                     domain='test.sftlyr.ws',
-                                     hostname='hardware-test1')
+        edit_mock.assert_called_with(1000, userdata='My data', domain='test.sftlyr.ws', hostname='hardware-test1')
 
     def test_edit_server_userfile(self):
         if (sys.platform.startswith("win")):
@@ -523,15 +491,12 @@ class ServerCLITests(testing.TestCase):
         with tempfile.NamedTemporaryFile() as userfile:
             userfile.write(b"some data")
             userfile.flush()
-            result = self.run_command(['server', 'edit', '1000',
-                                       '--userfile=%s' % userfile.name])
+            result = self.run_command(['server', 'edit', '1000', '--userfile=%s' % userfile.name])
 
             self.assert_no_fail(result)
             self.assertEqual(result.output, "")
-            self.assert_called_with('SoftLayer_Hardware_Server',
-                                    'setUserMetadata',
-                                    args=(['some data'],),
-                                    identifier=1000)
+            self.assert_called_with('SoftLayer_Hardware_Server', 'setUserMetadata',
+                                    args=(['some data'],), identifier=1000)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_update_firmware(self, confirm_mock):
@@ -540,8 +505,7 @@ class ServerCLITests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(result.output, "")
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'createFirmwareUpdateTransaction',
+        self.assert_called_with('SoftLayer_Hardware_Server', 'createFirmwareUpdateTransaction',
                                 args=((1, 1, 1, 1)), identifier=1000)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
@@ -551,8 +515,7 @@ class ServerCLITests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assertEqual(result.output, 'Successfully device firmware reflashed\n')
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'createFirmwareReflashTransaction',
+        self.assert_called_with('SoftLayer_Hardware_Server', 'createFirmwareReflashTransaction',
                                 args=((1, 1, 1)), identifier=1000)
 
     def test_edit(self):
@@ -715,8 +678,7 @@ class ServerCLITests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_both(self, confirm_mock):
         confirm_mock.return_value = True
-        getReverseDomainRecords = self.set_mock('SoftLayer_Hardware_Server',
-                                                'getReverseDomainRecords')
+        getReverseDomainRecords = self.set_mock('SoftLayer_Hardware_Server', 'getReverseDomainRecords')
         getReverseDomainRecords.return_value = [{
             'networkAddress': '172.16.1.100',
             'name': '2.240.16.172.in-addr.arpa',
@@ -727,8 +689,7 @@ class ServerCLITests(testing.TestCase):
             'serial': 1234665663,
             'id': 123456,
         }]
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
-                                           'getResourceRecords')
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 'getResourceRecords')
         getResourceRecords.return_value = []
         createAargs = ({
                            'type': 'a',
@@ -749,20 +710,14 @@ class ServerCLITests(testing.TestCase):
 
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Dns_Domain', 'getResourceRecords')
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'getReverseDomainRecords')
-        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
-                                'createObject',
-                                args=createAargs)
-        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
-                                'createObject',
-                                args=createPTRargs)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getReverseDomainRecords')
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord', 'createObject', args=createAargs)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord', 'createObject', args=createPTRargs)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_v6(self, confirm_mock):
         confirm_mock.return_value = True
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
-                                           'getResourceRecords')
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 'getResourceRecords')
         getResourceRecords.return_value = []
         server = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
         test_server = {
@@ -795,9 +750,7 @@ class ServerCLITests(testing.TestCase):
         server.return_value = test_server
         result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
-                                'createObject',
-                                args=createV6args)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord', 'createObject', args=createV6args)
 
         v6Record = {
             'id': 1,
@@ -807,18 +760,14 @@ class ServerCLITests(testing.TestCase):
             'type': 'aaaa'
         }
 
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
-                                           'getResourceRecords')
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 'getResourceRecords')
         getResourceRecords.return_value = [v6Record]
         editArgs = (v6Record,)
         result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
-                                'editObject',
-                                args=editArgs)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord', 'editObject', args=editArgs)
 
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
-                                           'getResourceRecords')
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 'getResourceRecords')
         getResourceRecords.return_value = [v6Record, v6Record]
         result = self.run_command(['hw', 'dns-sync', '--aaaa-record', '1000'])
         self.assertEqual(result.exit_code, 1)
@@ -827,8 +776,7 @@ class ServerCLITests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_edit_a(self, confirm_mock):
         confirm_mock.return_value = True
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
-                                           'getResourceRecords')
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 'getResourceRecords')
         getResourceRecords.return_value = [
             {'id': 1, 'ttl': 7200, 'data': '1.1.1.1',
              'host': 'hardware-test1', 'type': 'a'}
@@ -839,12 +787,9 @@ class ServerCLITests(testing.TestCase):
         )
         result = self.run_command(['hw', 'dns-sync', '-a', '1000'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
-                                'editObject',
-                                args=editArgs)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord', 'editObject', args=editArgs)
 
-        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain',
-                                           'getResourceRecords')
+        getResourceRecords = self.set_mock('SoftLayer_Dns_Domain', 'getResourceRecords')
         getResourceRecords.return_value = [
             {'id': 1, 'ttl': 7200, 'data': '1.1.1.1',
              'host': 'hardware-test1', 'type': 'a'},
@@ -858,8 +803,7 @@ class ServerCLITests(testing.TestCase):
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_edit_ptr(self, confirm_mock):
         confirm_mock.return_value = True
-        getReverseDomainRecords = self.set_mock('SoftLayer_Hardware_Server',
-                                                'getReverseDomainRecords')
+        getReverseDomainRecords = self.set_mock('SoftLayer_Hardware_Server', 'getReverseDomainRecords')
         getReverseDomainRecords.return_value = [{
             'networkAddress': '172.16.1.100',
             'name': '100.1.16.172.in-addr.arpa',
@@ -870,13 +814,10 @@ class ServerCLITests(testing.TestCase):
             'serial': 1234665663,
             'id': 123456,
         }]
-        editArgs = ({'host': '100', 'data': 'hardware-test1.test.sftlyr.ws',
-                     'id': 123, 'ttl': 7200},)
+        editArgs = ({'host': '100', 'data': 'hardware-test1.test.sftlyr.ws', 'id': 123, 'ttl': 7200},)
         result = self.run_command(['hw', 'dns-sync', '--ptr', '1000'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord',
-                                'editObject',
-                                args=editArgs)
+        self.assert_called_with('SoftLayer_Dns_Domain_ResourceRecord', 'editObject', args=editArgs)
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_dns_sync_misc_exception(self, confirm_mock):
@@ -900,9 +841,7 @@ class ServerCLITests(testing.TestCase):
         self.assertIsInstance(result.exception, exceptions.CLIAbort)
 
     def test_hardware_storage(self):
-        result = self.run_command(
-            ['hw', 'storage', '100'])
-
+        result = self.run_command(['hw', 'storage', '100'])
         self.assert_no_fail(result)
 
     def test_billing(self):
@@ -1083,3 +1022,11 @@ class ServerCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Search', 'advancedSearch',
                                 args=('_objectType:SoftLayer_Hardware  domain: *test*',))
+
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
+    def test_hardware_cancel_no_force(self, confirm_mock):
+        confirm_mock.return_value = False
+        result = self.run_command(['hardware', 'cancel', '102'])
+
+        self.assertEqual(2, result.exit_code)
+        self.assertEqual('Aborted', result.exception.message)

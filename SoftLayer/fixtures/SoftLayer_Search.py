@@ -49,3 +49,37 @@ getObjectTypes = [{"name": "SoftLayer_Event_Log",
                            "type": "string"
                        }]
                    }]
+
+
+advancedSearchVlan = [
+    {
+        "matchedTerms": [
+            "name:|IBMPrivate|",
+            "name.sort:|IBMPrivate|"
+        ],
+        "relevanceScore": "9.05",
+        "resource": {
+            "fullyQualifiedName": "dal10.bcr03.0000",
+            "id": 11111,
+            "name": "IBMPrivate",
+            "vlanNumber": 0000,
+            "networkSpace": "PRIVATE"
+        },
+        "resourceType": "SoftLayer_Network_Vlan"
+    },
+    {
+        "matchedTerms": [
+            "name:|IBMPublic|",
+            "name.sort:|IBMPublic|"
+        ],
+        "relevanceScore": "9.01",
+        "resource": {
+            "fullyQualifiedName": "dal10.bcr03.11111",
+            "id": 999999,
+            "name": "IBMPublic",
+            "vlanNumber": 11111,
+            "networkSpace": "PUBLIC"
+        },
+        "resourceType": "SoftLayer_Network_Vlan"
+    }
+]

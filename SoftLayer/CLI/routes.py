@@ -315,6 +315,9 @@ ALL_ROUTES = [
     ('hardware:notification-add', 'SoftLayer.CLI.hardware.notification_add:cli'),
     ('hardware:notification-delete', 'SoftLayer.CLI.hardware.notification_delete:cli'),
     ('hardware:create-credential', 'SoftLayer.CLI.hardware.create_credential:cli'),
+    ('hardware:vlan-trunkable', 'SoftLayer.CLI.hardware.vlan_trunkable:cli'),
+    ('hardware:vlan-add', 'SoftLayer.CLI.hardware.vlan_add:cli'),
+    ('hardware:vlan-remove', 'SoftLayer.CLI.hardware.vlan_remove:cli'),
 
     ('securitygroup', 'SoftLayer.CLI.securitygroup'),
     ('securitygroup:list', 'SoftLayer.CLI.securitygroup.list:cli'),

@@ -81,6 +81,7 @@ class NetworkManager(object):
         self.subnet = client['Network_Subnet']
         self.network_storage = self.client['Network_Storage']
         self.security_group = self.client['Network_SecurityGroup']
+        self.resolvers = [self.search_for_vlan]
 
     def add_global_ip(self, version=4, test_order=False):
         """Adds a global IP address to the account.
@@ -887,3 +888,17 @@ class NetworkManager(object):
         returns  true or false.
         """
         return self.client.call('SoftLayer_Network_Subnet', 'clearRoute', id=identifier)
+
+    def search_for_vlan(self, vlan):
+        """Returns a list of matching VLAN objects.
+
+        :param string vlan: Could be either vlan name, number, id, or fully qualified name
+        :return list: List of SoftLayer_Network_Vlan objects
+        """
+
+        query = f"_objectType:SoftLayer_Network_Vlan {vlan}"
+        mask = "mask[resource(SoftLayer_Network_Vlan)[id,name,vlanNumber,fullyQualifiedName,networkSpace]]"
+
+        results = self.client.call('SoftLayer_Search', 'advancedSearch', query, mask=mask)
+        # This returns JUST the Network_Vlan information, none of the search information.
+        return [result.get('resource') for result in results]

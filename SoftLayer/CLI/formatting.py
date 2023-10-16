@@ -318,6 +318,22 @@ class Table(object):
         self.align = align or {}
         self.sortby = None
         self.title = title
+        # Used to print a message if the table is empty
+        self.empty_message = None
+
+    def __bool__(self):
+        """Useful for seeing if the table has any rows"""
+        return len(self.rows) > 0
+
+    def set_empty_message(self, message):
+        """Sets the empty message for this table for env.fout
+
+        Set this message if you want to print a message instead of a table to the user
+        but still want the json output to print an empty list `[]`
+
+        :param message str: Message to print if the table has no rows
+        """
+        self.empty_message = message
 
     def add_row(self, row):
         """Add a row to the table.
@@ -337,6 +353,10 @@ class Table(object):
 
     def prettytable(self, fmt='table', theme=None):
         """Returns a RICH table instance."""
+
+        # Used to print a message instead of a bad looking empty table
+        if not self and self.empty_message:
+            return self.empty_message
         box_style = box.SQUARE
         if fmt == 'raw':
             box_style = None

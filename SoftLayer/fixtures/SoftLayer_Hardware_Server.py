@@ -112,6 +112,7 @@ getObject = {
         }
     ]
 }
+
 editObject = True
 setTags = True
 setPrivateNetworkInterfaceSpeed = True
@@ -130,37 +131,51 @@ reloadOperatingSystem = 'OK'
 getReverseDomainRecords = [
     {'resourceRecords': [{'data': '2.0.1.10.in-addr.arpa'}]}]
 bootToRescueLayer = True
-getFrontendNetworkComponents = [
+
+getNetworkComponents = [
     {'maxSpeed': 100},
     {
         'maxSpeed': 1000,
         'networkComponentGroup': {
             'groupTypeId': 2,
             'networkComponents': [{'maxSpeed': 1000}, {'maxSpeed': 1000}]
-        }
+        },
+        'primaryIpAddress': '192.168.1.1',
+        'id': 998877,
+        'uplinkComponent': {}
     },
     {
         'maxSpeed': 1000,
         'networkComponentGroup': {
             'groupTypeId': 2,
             'networkComponents': [{'maxSpeed': 1000}, {'maxSpeed': 1000}]
-        }
+        },
+        'id': 665544,
+        'uplinkComponent': {}
     },
     {
         'maxSpeed': 1000,
         'networkComponentGroup': {
             'groupTypeId': 2,
             'networkComponents': [{'maxSpeed': 1000}, {'maxSpeed': 1000}]
-        }
+        },
+        'id': 112233,
+        'uplinkComponent': {}
     },
     {
         'maxSpeed': 1000,
         'networkComponentGroup': {
             'groupTypeId': 2,
             'networkComponents': [{'maxSpeed': 1000}, {'maxSpeed': 1000}]
-        }
+        },
+        'primaryIpAddress': '10.0.0.1',
+        'id': 123456,
+        'uplinkComponent': {}
     }
 ]
+# This splits out the network components into 2 sections so they are different enough for tests
+getFrontendNetworkComponents = getNetworkComponents[:2]
+getBackendNetworkComponents = getNetworkComponents[3:]
 
 getBandwidthAllotmentDetail = {
     'allocationId': 25465663,
@@ -410,4 +425,73 @@ getComponents = [{
             {
                 "createDate": "2019-10-14T16:51:12-06:00",
                 "version": "5.10"
-            }]}}]
+            }
+        ]
+    }
+}]
+getActiveComponents = getComponents
+getActiveTransaction = getObject['activeTransaction']
+getOperatingSystem = getObject['operatingSystem']
+getSoftwareComponents = [
+    {
+        "hardwareId": 1907356,
+        "id": 59003868,
+        "manufacturerLicenseInstance": "",
+        "softwareLicense": {
+            "id": 20658,
+            "softwareDescriptionId": 2888,
+            "softwareDescription": {
+                "controlPanel": 0,
+                "id": 2888,
+                "licenseTermValue": 0,
+                "longDescription": "Juniper vSRX 1G 19.4R2-S3 Standard 19.4.2.3",
+                "manufacturer": "Juniper",
+                "name": "vSRX 1G 19.4R2-S3 Standard",
+                "operatingSystem": 1,
+                "referenceCode": "UBUNTU_18_64",
+                "upgradeSoftwareDescriptionId": None,
+                "upgradeSwDescId": None,
+                "version": "19.4.2.3",
+                "virtualLicense": 0,
+                "virtualizationPlatform": 0,
+                "requiredUser": "root"
+            }
+        }
+    },
+    {
+        "hardwareId": 1907356,
+        "id": 59003870,
+        "manufacturerLicenseInstance": "",
+        "softwareLicense": {
+            "id": 147,
+            "softwareDescriptionId": 148,
+            "softwareDescription": {
+                "controlPanel": 0,
+                "id": 148,
+                "licenseTermValue": None,
+                "longDescription": "Passmark Suite Latest",
+                "manufacturer": "Passmark",
+                "name": "Passmark Suite",
+                "operatingSystem": 0,
+                "upgradeSoftwareDescriptionId": None,
+                "upgradeSwDescId": None,
+                "version": "Latest",
+                "virtualLicense": 0,
+                "virtualizationPlatform": 0
+            }
+        }
+    }
+]
+getBillingItem = getObject['billingItem']
+getTagReferences = getObject['tagReferences']
+getNetworkVlans = getObject['networkVlans']
+getRemoteManagementAccounts = getObject['remoteManagementAccounts']
+
+
+# Setup for hardwareManager.clear_vlan related tests
+getObjectVlanClear = {
+    'backendNetworkComponent': getBackendNetworkComponents,
+    'frontendNetworkComponent': getFrontendNetworkComponents
+}
+getObjectVlanClear['backendNetworkComponent'][1]['networkVlanTrunks'] = [{'id': 99}]
+getObjectVlanClear['frontendNetworkComponent'][1]['networkVlanTrunks'] = [{'id': 11}]

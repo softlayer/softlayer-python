@@ -275,10 +275,7 @@ class HardwareTests(testing.TestCase):
                             "longName": "Montreal 1",
                             "name": "mon01",
                             "regions": [
-                                {
-                                    "description": "MON01 - Montreal",
-                                    "keyname": "MONTREAL",
-                                }
+                                {"description": "MON01 - Montreal",  "keyname": "MONTREAL"}
                             ]
                         }
                     ]
@@ -303,8 +300,7 @@ class HardwareTests(testing.TestCase):
         packages_copy[0]['regions'] = []
         packages.return_value = packages_copy
 
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               self.hardware._generate_create_dict,
+        ex = self.assertRaises(SoftLayer.SoftLayerError, self.hardware._generate_create_dict,
                                **MINIMAL_TEST_CREATE_ARGS)
         self.assertIn("Could not find valid location for: 'wdc01'", str(ex))
 
@@ -372,16 +368,8 @@ class HardwareTests(testing.TestCase):
             'hardware': [{
                 'domain': 'giggles.woo',
                 'hostname': 'unicorn',
-                'primaryNetworkComponent': {
-                    "router": {
-                        "id": 1111
-                    }
-                },
-                'primaryBackendNetworkComponent': {
-                    "router": {
-                        "id": 1234
-                    }
-                }
+                'primaryNetworkComponent': {"router": {"id": 1111}},
+                'primaryBackendNetworkComponent': {"router": {"id": 1234}}
             }]
         }
 
@@ -429,8 +417,7 @@ class HardwareTests(testing.TestCase):
 
     def test_cancel_hardware_without_reason(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        mock.return_value = {'id': 987, 'billingItem': {'id': 1234},
-                             'openCancellationTicket': {'id': 1234}}
+        mock.return_value = {'id': 987, 'billingItem': {'id': 1234}, 'openCancellationTicket': {'id': 1234}}
 
         result = self.hardware.cancel_hardware(987)
 
@@ -441,8 +428,7 @@ class HardwareTests(testing.TestCase):
 
     def test_cancel_hardware_with_reason_and_comment(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
-        mock.return_value = {'id': 987, 'billingItem': {'id': 1234},
-                             'openCancellationTicket': {'id': 1234}}
+        mock.return_value = {'id': 987, 'billingItem': {'id': 1234}, 'openCancellationTicket': {'id': 1234}}
 
         result = self.hardware.cancel_hardware(6327, reason='sales', comment='Test Comment')
 
@@ -465,18 +451,14 @@ class HardwareTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
         mock.return_value = {'id': 987, 'openCancellationTicket': {'id': 1234}}
 
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               self.hardware.cancel_hardware,
-                               6327)
+        ex = self.assertRaises(SoftLayer.SoftLayerError, self.hardware.cancel_hardware, 6327)
         self.assertEqual("Ticket #1234 already exists for this server", str(ex))
 
     def test_cancel_hardwareno_billing_item_or_ticket(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
         mock.return_value = {'id': 987}
 
-        ex = self.assertRaises(SoftLayer.SoftLayerError,
-                               self.hardware.cancel_hardware,
-                               6327)
+        ex = self.assertRaises(SoftLayer.SoftLayerError, self.hardware.cancel_hardware, 6327)
         self.assertEqual("Cannot locate billing for the server. The server may already be cancelled.", str(ex))
 
     def test_cancel_hardware_monthly_now(self):
@@ -513,34 +495,25 @@ class HardwareTests(testing.TestCase):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
         mock.return_value = {'id': 987, 'billingItem': {'id': 6327},
                              'activeTransaction': {'id': 4567}}
-        self.assertRaises(SoftLayer.SoftLayerError,
-                          self.hardware.cancel_hardware,
-                          12345)
+        self.assertRaises(SoftLayer.SoftLayerError, self.hardware.cancel_hardware, 12345)
 
     def test_change_port_speed_public(self):
         self.hardware.change_port_speed(2, True, 100, 'degraded')
 
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'setPublicNetworkInterfaceSpeed',
-                                identifier=2,
-                                args=([100, 'degraded'],))
+        self.assert_called_with('SoftLayer_Hardware_Server', 'setPublicNetworkInterfaceSpeed',
+                                identifier=2, args=([100, 'degraded'],))
 
     def test_change_port_speed_private(self):
         self.hardware.change_port_speed(2, False, 10, 'redundant')
 
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'setPrivateNetworkInterfaceSpeed',
-                                identifier=2,
-                                args=([10, 'redundant'],))
+        self.assert_called_with('SoftLayer_Hardware_Server', 'setPrivateNetworkInterfaceSpeed',
+                                identifier=2, args=([10, 'redundant'],))
 
     def test_edit_meta(self):
         # Test editing user data
         self.hardware.edit(100, userdata='my data')
 
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'setUserMetadata',
-                                args=(['my data'],),
-                                identifier=100)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'setUserMetadata', args=(['my data'],), identifier=100)
 
     def test_edit_blank(self):
         # Now test a blank edit
@@ -549,13 +522,9 @@ class HardwareTests(testing.TestCase):
 
     def test_edit(self):
         # Finally, test a full edit
-        self.hardware.edit(100,
-                           hostname='new-host',
-                           domain='new.sftlyr.ws',
-                           notes='random notes')
+        self.hardware.edit(100, hostname='new-host', domain='new.sftlyr.ws', notes='random notes')
 
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'editObject',
+        self.assert_called_with('SoftLayer_Hardware_Server', 'editObject',
                                 args=({
                                           'hostname': 'new-host',
                                           'domain': 'new.sftlyr.ws',
@@ -567,44 +536,34 @@ class HardwareTests(testing.TestCase):
         result = self.hardware.rescue(1234)
 
         self.assertEqual(result, True)
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'bootToRescueLayer',
-                                identifier=1234)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'bootToRescueLayer', identifier=1234)
 
     def test_update_firmware(self):
         result = self.hardware.update_firmware(100)
 
         self.assertEqual(result, True)
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'createFirmwareUpdateTransaction',
+        self.assert_called_with('SoftLayer_Hardware_Server', 'createFirmwareUpdateTransaction',
                                 identifier=100, args=(1, 1, 1, 1))
 
     def test_update_firmware_selective(self):
-        result = self.hardware.update_firmware(100,
-                                               ipmi=False,
-                                               hard_drive=False)
+        result = self.hardware.update_firmware(100, ipmi=False, hard_drive=False)
 
         self.assertEqual(result, True)
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'createFirmwareUpdateTransaction',
+        self.assert_called_with('SoftLayer_Hardware_Server', 'createFirmwareUpdateTransaction',
                                 identifier=100, args=(0, 1, 1, 0))
 
     def test_reflash_firmware(self):
         result = self.hardware.reflash_firmware(100)
 
         self.assertEqual(result, True)
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'createFirmwareReflashTransaction',
+        self.assert_called_with('SoftLayer_Hardware_Server', 'createFirmwareReflashTransaction',
                                 identifier=100, args=(1, 1, 1))
 
     def test_reflash_firmware_selective(self):
-        result = self.hardware.reflash_firmware(100,
-                                                raid_controller=False,
-                                                bios=False)
+        result = self.hardware.reflash_firmware(100, raid_controller=False, bios=False)
 
         self.assertEqual(result, True)
-        self.assert_called_with('SoftLayer_Hardware_Server',
-                                'createFirmwareReflashTransaction',
+        self.assert_called_with('SoftLayer_Hardware_Server', 'createFirmwareReflashTransaction',
                                 identifier=100, args=(1, 0, 0))
 
     def test_get_tracking_id(self):
@@ -614,10 +573,8 @@ class HardwareTests(testing.TestCase):
 
     def test_get_bandwidth_data(self):
         result = self.hardware.get_bandwidth_data(1234, '2019-01-01', '2019-02-01', 'public', 1000)
-        self.assert_called_with('SoftLayer_Metric_Tracking_Object',
-                                'getBandwidthData',
-                                args=('2019-01-01', '2019-02-01', 'public', 1000),
-                                identifier=1000)
+        self.assert_called_with('SoftLayer_Metric_Tracking_Object', 'getBandwidthData',
+                                args=('2019-01-01', '2019-02-01', 'public', 1000), identifier=1000)
         self.assertEqual(result[0]['type'], 'cpu0')
 
     def test_get_bandwidth_allocation(self):
@@ -681,7 +638,7 @@ class HardwareTests(testing.TestCase):
 
     def test_get_storage_nas_details(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getAttachedNetworkStorages')
-        mock.return_value = [
+        getAttachedNetworkStorages = [
             {
                 "accountId": 11111,
                 "capacityGb": 12000,
@@ -691,15 +648,9 @@ class HardwareTests(testing.TestCase):
             }
         ]
 
+        mock.return_value = getAttachedNetworkStorages
         result = self.hardware.get_storage_details(1234, 'NAS')
-
-        self.assertEqual([{
-            "accountId": 11111,
-            "capacityGb": 12000,
-            "id": 3777111,
-            "nasType": "NAS",
-            "username": "SL02SEL32222-9",
-        }], result)
+        self.assertEqual(getAttachedNetworkStorages, result)
 
     def test_get_storage_nas_empty_details(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getAttachedNetworkStorages')
@@ -711,7 +662,7 @@ class HardwareTests(testing.TestCase):
 
     def test_get_storage_credentials(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getAllowedHost')
-        mock.return_value = {
+        getAllowedHost = {
             "accountId": 11111,
             "id": 33333,
             "name": "iqn.2020-03.com.ibm:sl02su11111-v62941551",
@@ -723,33 +674,19 @@ class HardwareTests(testing.TestCase):
                 "username": "SL02SU11111-V62941551"
             }
         }
-
+        mock.return_value = getAllowedHost
         result = self.hardware.get_storage_credentials(1234)
-
-        self.assertEqual({
-            "accountId": 11111,
-            "id": 33333,
-            "name": "iqn.2020-03.com.ibm:sl02su11111-v62941551",
-            "resourceTableName": "HARDWARE",
-            "credential": {
-                "accountId": "11111",
-                "id": 44444,
-                "password": "SjFDCpHrjskfj",
-                "username": "SL02SU11111-V62941551"
-            }
-        }, result)
+        self.assertEqual(getAllowedHost, result)
 
     def test_get_none_storage_credentials(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getAllowedHost')
         mock.return_value = None
-
         result = self.hardware.get_storage_credentials(1234)
-
         self.assertEqual(None, result)
 
     def test_get_hard_drives(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getHardDrives')
-        mock.return_value = [
+        hd_return = [
             {
                 "id": 11111,
                 "serialNumber": "z1w4sdf",
@@ -773,33 +710,9 @@ class HardwareTests(testing.TestCase):
                 }
             }
         ]
-
+        mock.return_value = hd_return
         result = self.hardware.get_hard_drives(1234)
-
-        self.assertEqual([
-            {
-                "id": 11111,
-                "serialNumber": "z1w4sdf",
-                "serviceProviderId": 1,
-                "hardwareComponentModel": {
-                    "capacity": "1000",
-                    "description": "SATAIII:2000:8300:Constellation",
-                    "id": 111,
-                    "manufacturer": "Seagate",
-                    "name": "Constellation ES",
-                    "hardwareGenericComponentModel": {
-                        "capacity": "1000",
-                        "units": "GB",
-                        "hardwareComponentType": {
-                            "id": 1,
-                            "keyName": "HARD_DRIVE",
-                            "type": "Hard Drive",
-                            "typeParentId": 5
-                        }
-                    }
-                }
-            }
-        ], result)
+        self.assertEqual(hd_return, result)
 
     def test_get_hard_drive_empty(self):
         mock = self.set_mock('SoftLayer_Hardware_Server', 'getHardDrives')
@@ -817,9 +730,7 @@ class HardwareTests(testing.TestCase):
     def test_authorize_storage_empty(self):
         mock = self.set_mock('SoftLayer_Account', 'getNetworkStorage')
         mock.return_value = []
-        self.assertRaises(SoftLayer.exceptions.SoftLayerError,
-                          self.hardware.authorize_storage,
-                          1234, "#")
+        self.assertRaises(SoftLayer.exceptions.SoftLayerError, self.hardware.authorize_storage, 1234, "#")
 
     def test_get_price_id_memory_capacity(self):
         upgrade_prices = [
@@ -945,13 +856,55 @@ class HardwareTests(testing.TestCase):
             "software": {
                 "hardwareId": 123456,
                 "softwareLicense": {
-                    "softwareDescription": {
-                        "name": 'system'
-                    }
+                    "softwareDescription": {"name": 'system'}
                 }
-            }}
+            }
+        }
         self.hardware.create_credential(template)
         self.assert_called_with('SoftLayer_Software_Component_Password', 'createObject')
+
+    def test_get_hardware_fast(self):
+        result = self.hardware.get_hardware_fast(1234)
+        self.assertIn('networkComponents', result)
+        self.assertIn('activeComponents', result)
+        self.assertIn('activeTransaction', result)
+        self.assertIn('operatingSystem', result)
+        self.assertIn('softwareComponents', result)
+        self.assertIn('billingItem', result)
+        self.assertIn('networkVlans', result)
+        self.assertIn('remoteManagementAccounts', result)
+        self.assertIn('tagReferences', result)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getNetworkComponents')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getActiveComponents')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getOperatingSystem')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getSoftwareComponents')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getBillingItem')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getTagReferences')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getNetworkVlans')
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getRemoteManagementAccounts')
+
+    def test_trunk_vlan(self):
+        vlans = [{'id': 9999}]
+        vlan_id = 1234
+        self.hardware.trunk_vlan(vlan_id, vlans)
+        self.assert_called_with('SoftLayer_Network_Component', 'addNetworkVlanTrunks',
+                                identifier=vlan_id, args=(vlans,))
+
+    def test_remove_vlan(self):
+        vlans = [{'id': 9999}]
+        vlan_id = 1234
+        self.hardware.remove_vlan(vlan_id, vlans)
+        self.assert_called_with('SoftLayer_Network_Component', 'removeNetworkVlanTrunks',
+                                identifier=vlan_id, args=(vlans,))
+
+    def test_clear_vlan(self):
+        hardware_mock = self.set_mock('SoftLayer_Hardware_Server', 'getObject')
+        hardware_mock.return_value = fixtures.SoftLayer_Hardware_Server.getObjectVlanClear
+        server_id = 1234
+        self.hardware.clear_vlan(server_id)
+        self.assert_called_with('SoftLayer_Hardware_Server', 'getObject', identifier=server_id)
+        self.assert_called_with('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', identifier=998877)
+        self.assert_called_with('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', identifier=123456)
 
 
 class HardwareHelperTests(testing.TestCase):
@@ -1052,11 +1005,3 @@ class HardwareHelperTests(testing.TestCase):
         item_public = {'attributes': [{'attributeTypeKeyName': 'NOT_PRIVATE_NETWORK_ONLY'}]}
         self.assertTrue(managers.hardware._is_private_port_speed_item(item_private))
         self.assertFalse(managers.hardware._is_private_port_speed_item(item_public))
-
-    @mock.patch('SoftLayer.CLI.formatting.confirm')
-    def test_hardware_cancel_no_force(self, confirm_mock):
-        confirm_mock.return_value = False
-        result = self.run_command(['hardware', 'cancel', '102'])
-
-        self.assertEqual(2, result.exit_code)
-        self.assertEqual('Aborted', result.exception.message)
