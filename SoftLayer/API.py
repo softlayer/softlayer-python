@@ -6,12 +6,13 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=invalid-name
-import time
-import warnings
-
+import concurrent.futures as cf
 import json
 import logging
+import math
 import requests
+import time
+import warnings
 
 
 from SoftLayer import auth as slauth
@@ -289,13 +290,6 @@ class BaseClient(object):
             request.verify = kwargs.get('verify')
 
         if self.auth:
-            extra_headers = self.auth.get_headers()
-            if extra_headers:
-                warnings.warn("auth.get_headers() is deprecated and will be "
-                              "removed in the next major version",
-                              DeprecationWarning)
-                request.headers.update(extra_headers)
-
             request = self.auth.get_request(request)
 
         request.headers.update(kwargs.get('headers', {}))
@@ -351,6 +345,45 @@ class BaseClient(object):
                 keep_looping = False
 
             offset += limit
+
+    def cf_call(self, service, method, *args, **kwargs):
+        """Uses threads to iterate through API calls.
+
+        :param service: the name of the SoftLayer API service
+        :param method: the method to call on the service
+        :param integer limit: result size for each API call (defaults to 100)
+        :param \\*args: same optional arguments that ``Service.call`` takes
+        :param \\*\\*kwargs: same optional keyword arguments that ``Service.call`` takes
+        """
+        limit = kwargs.pop('limit', 100)
+        offset = kwargs.pop('offset', 0)
+
+        if limit <= 0:
+            raise AttributeError("Limit size should be greater than zero.")
+        # This initial API call is to determine how many API calls we need to make after this first one.
+        first_call = self.call(service, method, offset=offset, limit=limit, *args, **kwargs)
+
+        # This was not a list result, just return it.
+        if not isinstance(first_call, transports.SoftLayerListResult):
+            return first_call
+        # How many more API calls we have to make
+        api_calls = math.ceil((first_call.total_count - limit) / limit)
+
+
+        def this_api(offset):
+            """Used to easily call executor.map() on this fuction"""
+            return self.call(service, method, offset=offset, limit=limit, *args, **kwargs)
+
+        with cf.ThreadPoolExecutor(max_workers=10) as executor:
+            future_results = {}
+            offset_map = [x * limit for x in range(1, api_calls)]
+            future_results = list(executor.map(this_api, offset_map))
+        # Append the results in the order they were called
+        for call_result in future_results:
+            first_call = first_call + call_result
+        return first_call
+
+
 
     def __repr__(self):
         return "Client(transport=%r, auth=%r)" % (self.transport, self.auth)

@@ -25,17 +25,13 @@ COLUMNS = ['Id',
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
-@click.option('--sortby',
-              help='Column to sort by',
-              type=click.Choice(COLUMNS))
+@click.option('--sortby', help='Column to sort by', type=click.Choice(COLUMNS))
 @click.option('--datacenter', '-d',
               help='Filter by datacenter shortname (sng01, dal05, ...)')
 @click.option('--number', '-n', help='Filter by VLAN number')
 @click.option('--name', help='Filter by VLAN name')
-@click.option('--limit', '-l',
-              help='How many results to get in one api call, default is 100',
-              default=100,
-              show_default=True)
+@click.option('--limit', '-l', default=100, show_default=True,
+              help='How many results to get in one api call, default is 100')
 @environment.pass_env
 def cli(env, sortby, datacenter, number, name, limit):
     """List VLANs.

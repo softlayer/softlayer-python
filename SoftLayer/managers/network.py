@@ -515,46 +515,37 @@ class NetworkManager(object):
         kwargs['iter'] = True
         return self.client.call('Account', 'getSubnets', **kwargs)
 
-    def list_vlans(self, datacenter=None, vlan_number=None, name=None, limit=100, **kwargs):
+    def list_vlans(self, datacenter=None, vlan_number=None, name=None, limit=100, mask=None, _filter={}):
         """Display a list of all VLANs on the account.
 
         This provides a quick overview of all VLANs including information about
         data center residence and the number of devices attached.
 
-        :param string datacenter: If specified, the list will only contain
-                                    VLANs in the specified data center.
-        :param int vlan_number: If specified, the list will only contain the
-                                  VLAN matching this VLAN number.
-        :param int name: If specified, the list will only contain the
-                                  VLAN matching this VLAN name.
+        :param string datacenter: If specified, the list will only contain  VLANs in the specified data center.
+        :param int vlan_number: If specified, the list will only contain the VLAN matching this VLAN number.
+        :param int name: If specified, the list will only contain the VLAN matching this VLAN name.
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
 
         """
-        _filter = utils.NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict(_filter)
 
         _filter['networkVlans']['id'] = utils.query_filter_orderby()
 
         if vlan_number:
-            _filter['networkVlans']['vlanNumber'] = (
-                utils.query_filter(vlan_number))
+            _filter['networkVlans']['vlanNumber'] = (utils.query_filter(vlan_number))
 
         if name:
             _filter['networkVlans']['name'] = utils.query_filter(name)
 
         if datacenter:
-            _filter['networkVlans']['primaryRouter']['datacenter']['name'] = (
-                utils.query_filter(datacenter))
+            _filter['networkVlans']['primaryRouter']['datacenter']['name'] = (utils.query_filter(datacenter))
 
-        kwargs['filter'] = _filter.to_dict()
+        if mask is None:
+            mask = DEFAULT_VLAN_MASK
 
-        if 'mask' not in kwargs:
-            kwargs['mask'] = DEFAULT_VLAN_MASK
-
-        kwargs['iter'] = True
-        if limit > 0:
-            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), limit=limit, iter=True)
-        else:
-            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), iter=True)
+        # cf_call uses threads to get all results.
+        return self.client.cf_call('SoftLayer_Account', 'getNetworkVlans',
+                                    mask=mask, filter=_filter.to_dict(), limit=limit)
 
     def list_securitygroups(self, **kwargs):
         """List security groups."""
