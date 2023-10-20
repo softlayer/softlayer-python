@@ -515,7 +515,7 @@ class NetworkManager(object):
         kwargs['iter'] = True
         return self.client.call('Account', 'getSubnets', **kwargs)
 
-    def list_vlans(self, datacenter=None, vlan_number=None, name=None, limit=100, mask=None, _filter={}):
+    def list_vlans(self, datacenter=None, vlan_number=None, name=None, limit=100, mask=None, _filter=None):
         """Display a list of all VLANs on the account.
 
         This provides a quick overview of all VLANs including information about
@@ -527,25 +527,25 @@ class NetworkManager(object):
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
 
         """
-        _filter = utils.NestedDict(_filter)
+        _filter = utils.NestedDict(_filter or {})
 
         _filter['networkVlans']['id'] = utils.query_filter_orderby()
 
         if vlan_number:
-            _filter['networkVlans']['vlanNumber'] = (utils.query_filter(vlan_number))
+            _filter['networkVlans']['vlanNumber'] = utils.query_filter(vlan_number)
 
         if name:
             _filter['networkVlans']['name'] = utils.query_filter(name)
 
         if datacenter:
-            _filter['networkVlans']['primaryRouter']['datacenter']['name'] = (utils.query_filter(datacenter))
+            _filter['networkVlans']['primaryRouter']['datacenter']['name'] = utils.query_filter(datacenter)
 
         if mask is None:
             mask = DEFAULT_VLAN_MASK
 
         # cf_call uses threads to get all results.
         return self.client.cf_call('SoftLayer_Account', 'getNetworkVlans',
-                                    mask=mask, filter=_filter.to_dict(), limit=limit)
+                                   mask=mask, filter=_filter.to_dict(), limit=limit)
 
     def list_securitygroups(self, **kwargs):
         """List security groups."""

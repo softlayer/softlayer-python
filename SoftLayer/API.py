@@ -6,14 +6,14 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=invalid-name
+import time
+import warnings
+
 import concurrent.futures as cf
 import json
 import logging
 import math
 import requests
-import time
-import warnings
-
 
 from SoftLayer import auth as slauth
 from SoftLayer import config
@@ -369,7 +369,6 @@ class BaseClient(object):
         # How many more API calls we have to make
         api_calls = math.ceil((first_call.total_count - limit) / limit)
 
-
         def this_api(offset):
             """Used to easily call executor.map() on this fuction"""
             return self.call(service, method, offset=offset, limit=limit, *args, **kwargs)
@@ -382,8 +381,6 @@ class BaseClient(object):
         for call_result in future_results:
             first_call = first_call + call_result
         return first_call
-
-
 
     def __repr__(self):
         return "Client(transport=%r, auth=%r)" % (self.transport, self.auth)
