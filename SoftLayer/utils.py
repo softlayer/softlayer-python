@@ -273,7 +273,7 @@ def resolve_ids(identifier, resolvers):
     """
 
     # Before doing anything, let's see if this is an integer
-    if type(identifier) == int:
+    if isinstance(identifier, int):
         return [int(identifier)]
     # It was worth a shot
 
