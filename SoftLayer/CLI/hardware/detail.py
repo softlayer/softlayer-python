@@ -36,7 +36,7 @@ def cli(env, identifier, passwords, price, components):
     operating_system = utils.lookup(result, 'operatingSystem', 'softwareLicense', 'softwareDescription') or {}
     memory = formatting.gb(result.get('memoryCapacity', 0))
     owner = None
-    if utils.lookup(result, 'billingItem') != []:
+    if utils.lookup(result, 'billingItem'):
         owner = utils.lookup(result, 'billingItem', 'orderItem', 'order', 'userRecord', 'username')
 
     table_hard_drives = formatting.Table(['Name', 'Capacity', 'Serial #'])
