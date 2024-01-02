@@ -3,7 +3,6 @@ import codecs
 import os
 
 from setuptools import setup, find_packages
-
 # pylint: disable=inconsistent-return-statements
 
 DESCRIPTION = "A library for SoftLayer's API"
@@ -16,7 +15,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='6.1.9',
+    version='v6.1.11',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/x-rst',
@@ -40,7 +39,7 @@ setup(
         'prompt_toolkit >= 2',
         'pygments >= 2.0.0',
         'urllib3 >= 1.24',
-        'rich == 13.6.0'
+        'rich == 13.7.0'
     ],
     keywords=['softlayer', 'cloud', 'slcli'],
     classifiers=[

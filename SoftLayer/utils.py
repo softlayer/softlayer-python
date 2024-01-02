@@ -273,7 +273,7 @@ def resolve_ids(identifier, resolvers):
     """
 
     # Before doing anything, let's see if this is an integer
-    if type(identifier) == int:
+    if isinstance(identifier, int):
         return [int(identifier)]
     # It was worth a shot
 
@@ -474,7 +474,7 @@ def decode_stacked(document, pos=0, decoder=JSONDecoder()):
 
 
 def console_color_themes(theme):
-    """Colors in https://rich.readthedocs.io/en/stable/appendix/colors.html?highlight=light_pink1#standard-colors"""
+    """Colors in https://rich.readthedocs.io/en/stable/appendix/colors.html#standard-colors"""
 
     if theme == 'light':
         return Console(theme=Theme(
@@ -490,7 +490,7 @@ def console_color_themes(theme):
                 "switch": "bold green4",
                 "default_option": "light_coral",
                 "option_keyword": "bold dark_cyan",
-                "args_keyword": "bold green4",
+                "args_keyword": "underline orange4",
                 "option_choices": "gold3",
                 "example_block": "underline deep_pink3",
                 "url": "underline blue",
@@ -509,7 +509,7 @@ def console_color_themes(theme):
             "switch": "bold green",
             "default_option": "light_pink1",
             "option_keyword": "bold cyan",
-            "args_keyword": "bold green",
+            "args_keyword": "underline yellow",
             "option_choices": "gold3",
             "example_block": "underline light_coral",
             "url": "underline blue",

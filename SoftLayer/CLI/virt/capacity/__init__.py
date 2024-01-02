@@ -5,12 +5,14 @@ import importlib
 import os
 
 import click
+from SoftLayer.CLI.command import CommandLoader
+from SoftLayer.CLI.command import OptionHighlighter
 
 CONTEXT = {'help_option_names': ['-h', '--help'],
            'max_content_width': 999}
 
 
-class CapacityCommands(click.MultiCommand):
+class CapacityCommands(CommandLoader):
     """Loads module for capacity related commands.
 
     Will automatically replace _ with - where appropriate.
@@ -19,8 +21,11 @@ class CapacityCommands(click.MultiCommand):
     """
 
     def __init__(self, **attrs):
-        click.MultiCommand.__init__(self, **attrs)
+        CommandLoader.__init__(self, **attrs)
         self.path = os.path.dirname(__file__)
+        self.highlighter = OptionHighlighter()
+        self.env = None
+        self.console = None
 
     def list_commands(self, ctx):
         """List all sub-commands."""

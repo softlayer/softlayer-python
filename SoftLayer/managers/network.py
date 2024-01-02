@@ -81,6 +81,7 @@ class NetworkManager(object):
         self.subnet = client['Network_Subnet']
         self.network_storage = self.client['Network_Storage']
         self.security_group = self.client['Network_SecurityGroup']
+        self.resolvers = [self.search_for_vlan]
 
     def add_global_ip(self, version=4, test_order=False):
         """Adds a global IP address to the account.
@@ -514,46 +515,37 @@ class NetworkManager(object):
         kwargs['iter'] = True
         return self.client.call('Account', 'getSubnets', **kwargs)
 
-    def list_vlans(self, datacenter=None, vlan_number=None, name=None, limit=100, **kwargs):
+    def list_vlans(self, datacenter=None, vlan_number=None, name=None, limit=100, mask=None, _filter=None):
         """Display a list of all VLANs on the account.
 
         This provides a quick overview of all VLANs including information about
         data center residence and the number of devices attached.
 
-        :param string datacenter: If specified, the list will only contain
-                                    VLANs in the specified data center.
-        :param int vlan_number: If specified, the list will only contain the
-                                  VLAN matching this VLAN number.
-        :param int name: If specified, the list will only contain the
-                                  VLAN matching this VLAN name.
+        :param string datacenter: If specified, the list will only contain  VLANs in the specified data center.
+        :param int vlan_number: If specified, the list will only contain the VLAN matching this VLAN number.
+        :param int name: If specified, the list will only contain the VLAN matching this VLAN name.
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
 
         """
-        _filter = utils.NestedDict(kwargs.get('filter') or {})
+        _filter = utils.NestedDict(_filter or {})
 
         _filter['networkVlans']['id'] = utils.query_filter_orderby()
 
         if vlan_number:
-            _filter['networkVlans']['vlanNumber'] = (
-                utils.query_filter(vlan_number))
+            _filter['networkVlans']['vlanNumber'] = utils.query_filter(vlan_number)
 
         if name:
             _filter['networkVlans']['name'] = utils.query_filter(name)
 
         if datacenter:
-            _filter['networkVlans']['primaryRouter']['datacenter']['name'] = (
-                utils.query_filter(datacenter))
+            _filter['networkVlans']['primaryRouter']['datacenter']['name'] = utils.query_filter(datacenter)
 
-        kwargs['filter'] = _filter.to_dict()
+        if mask is None:
+            mask = DEFAULT_VLAN_MASK
 
-        if 'mask' not in kwargs:
-            kwargs['mask'] = DEFAULT_VLAN_MASK
-
-        kwargs['iter'] = True
-        if limit > 0:
-            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), limit=limit, iter=True)
-        else:
-            return self.account.getNetworkVlans(mask=kwargs['mask'], filter=_filter.to_dict(), iter=True)
+        # cf_call uses threads to get all results.
+        return self.client.cf_call('SoftLayer_Account', 'getNetworkVlans',
+                                   mask=mask, filter=_filter.to_dict(), limit=limit)
 
     def list_securitygroups(self, **kwargs):
         """List security groups."""
@@ -887,3 +879,17 @@ class NetworkManager(object):
         returns  true or false.
         """
         return self.client.call('SoftLayer_Network_Subnet', 'clearRoute', id=identifier)
+
+    def search_for_vlan(self, vlan):
+        """Returns a list of matching VLAN objects.
+
+        :param string vlan: Could be either vlan name, number, id, or fully qualified name
+        :return list: List of SoftLayer_Network_Vlan objects
+        """
+
+        query = f"_objectType:SoftLayer_Network_Vlan {vlan}"
+        mask = "mask[resource(SoftLayer_Network_Vlan)[id,name,vlanNumber,fullyQualifiedName,networkSpace]]"
+
+        results = self.client.call('SoftLayer_Search', 'advancedSearch', query, mask=mask)
+        # This returns JUST the Network_Vlan information, none of the search information.
+        return [result.get('resource') for result in results]

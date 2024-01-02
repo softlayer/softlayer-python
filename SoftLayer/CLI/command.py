@@ -30,6 +30,7 @@ class OptionHighlighter(RegexHighlighter):
         r"(?P<option_choices>Choices: )",
         r"(?P<example_block>Example::)",
         r"(?P<url>(file|https|http|ws|wss)://[-0-9a-zA-Z$_+!`(),.?/;:&=%#~]*)"
+        r"(?P<args_keyword>^[A-Z]+$)",
     ]
 
 
@@ -179,6 +180,8 @@ class SLCommand(click.Command):
                 pieces[index] = "[options][OPTIONS][/]"
             elif piece == "COMMAND [ARGS]...":
                 pieces[index] = "[command]COMMAND[/] [args][ARGS][/] ..."
+            else:
+                pieces[index] = f"[args_keyword]{piece}[/]"
 
         self.console.print(f"Usage: [path]{ctx.command_path}[/] {' '.join(pieces)}")
 
@@ -205,16 +208,23 @@ class SLCommand(click.Command):
     def format_options(self, ctx, formatter):
         """Prints out the options in a table format"""
 
-        # NEXT support binary options --yes/--no
-        # NEXT SUPPORT color for IDENTIFIER and such
         options_table = Table(highlight=True, box=box.SQUARE, show_header=False)
 
         for param in self.get_params(ctx):
+            # useful for showing whats in a param
+            # print(param.to_info_dict())
+
+            # Set Arguments to all uppercase
+            if param.param_type_name == 'argument':
+                param.opts[0] = param.opts[0].upper()
+
+            # This option has a short (-v) and long (--verbose) options
             if len(param.opts) == 2:
                 opt1 = self.highlighter(param.opts[1])
                 opt2 = self.highlighter(param.opts[0])
             else:
                 opt2 = self.highlighter(param.opts[0])
+                # Needs to be the Text() type because rich.Text doesn't mesh with string
                 opt1 = Text("")
 
             # Ensures the short option is always in opt1.
@@ -224,19 +234,20 @@ class SLCommand(click.Command):
             if param.metavar:
                 opt2 += Text(f" {param.metavar}", style="bold yellow")
 
-            options = Text(" ".join(reversed(param.opts)))
+            # secondary_opts are usually for flags --enable/--disable
+            if len(param.secondary_opts) == 1:
+                opt2 += Text("|") + self.highlighter(param.secondary_opts[0])
+
             help_record = param.get_help_record(ctx)
             help_message = ""
             if help_record:
-                help_message = param.get_help_record(ctx)[-1]
+                help_message = Text(param.get_help_record(ctx)[-1])
 
             # Add Click choices to help message
             if isinstance(param.type, click.Choice):
                 choices = ", ".join(param.type.choices)
                 help_message += f" Choices: {choices}"
 
-            if param.metavar:
-                options += f" {param.metavar}"
             options_table.add_row(opt1, opt2, self.highlighter(help_message))
 
         self.console.print(options_table)

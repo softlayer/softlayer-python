@@ -147,9 +147,15 @@ class VlanTests(testing.TestCase):
         ngb_mock.return_value = True
         vlan_mock = self.set_mock('SoftLayer_Account', 'getNetworkVlans')
         gpods_mock = self.set_mock('SoftLayer_Network_Pod', 'getAllObjects')
-        vlan_mock.return_value = {'primaryRouter': {'fullyQualifiedDomainName': 'bcr01a.fra02.softlayer.com',
-                                                    'id': 462912},
-                                  'tagReferences': ''}
+        vlan_mock.return_value = [
+            {
+                "primaryRouter": {
+                    "fullyQualifiedDomainName": "bcr01a.fra02.softlayer.com",
+                    "id": 462912
+                },
+                "tagReferences": ""
+            }
+        ]
         gpods_mock.return_value = [{'backendRouterId': 462912,
                                     'backendRouterName': 'bcr01a.fra02',
                                     'datacenterId': 449506,
@@ -166,9 +172,15 @@ class VlanTests(testing.TestCase):
         ngb_mock.return_value = True
         vlan_mock = self.set_mock('SoftLayer_Account', 'getNetworkVlans')
         gpods_mock = self.set_mock('SoftLayer_Network_Pod', 'getAllObjects')
-        vlan_mock.return_value = {'primaryRouter': {'fullyQualifiedDomainName': 'bcr01a.fra02.softlayer.com',
-                                                    'id': 462912},
-                                  'tagReferences': ''}
+        vlan_mock.return_value = [
+            {
+                "primaryRouter": {
+                    "fullyQualifiedDomainName": "bcr01a.fra02.softlayer.com",
+                    "id": 462912
+                },
+                "tagReferences": ""
+            }
+        ]
         gpods_mock.return_value = [{'backendRouterId': 462912,
                                     'backendRouterName': 'bcr01a.fra02',
                                     'datacenterId': 449506,
