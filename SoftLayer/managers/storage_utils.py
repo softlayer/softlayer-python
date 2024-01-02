@@ -419,8 +419,7 @@ def find_snapshot_schedule_id(volume, snapshot_schedule_keyname):
             if schedule['type']['keyname'] == snapshot_schedule_keyname:
                 return schedule['id']
 
-    raise ValueError("The given snapshot schedule ID was not found for "
-                     "the given storage volume")
+    raise ValueError("The given snapshot schedule ID was not found for the given storage volume")
 
 
 def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade, iops):
@@ -436,8 +435,7 @@ def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade, iops
     """
     # Ensure the storage volume has not been cancelled
     if 'billingItem' not in volume:
-        raise exceptions.SoftLayerError(
-            'This volume has been cancelled; unable to order snapshot space')
+        raise exceptions.SoftLayerError('This volume has been cancelled; unable to order snapshot space')
 
     # Determine and validate the storage volume's billing item category
     billing_item_category_code = volume['billingItem']['categoryCode']

@@ -313,11 +313,7 @@ class StorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
-    def order_modified_volume(self,
-                              volume_id,
-                              new_size=None,
-                              new_iops=None,
-                              new_tier_level=None):
+    def order_modified_volume(self, volume_id, new_size=None, new_iops=None, new_tier_level=None):
         """Places an order for modifying an existing block volume.
 
         :param volume_id: The ID of the volume to be modified
