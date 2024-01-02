@@ -8,16 +8,10 @@ from SoftLayer.CLI import environment
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
-@click.option('--crt',
-              type=click.Path(exists=True),
-              help="Certificate file")
-@click.option('--csr',
-              type=click.Path(exists=True),
-              help="Certificate Signing Request file")
-@click.option('--icc',
-              type=click.Path(exists=True),
-              help="Intermediate Certificate file")
-@click.option('--key', type=click.Path(exists=True), help="Private Key file")
+@click.option('--crt', required=True, type=click.Path(exists=True), help="Certificate file")
+@click.option('--key', type=click.Path(exists=True), required=True, help="Private Key file")
+@click.option('--csr', type=click.Path(exists=True), help="Certificate Signing Request file")
+@click.option('--icc', type=click.Path(exists=True), help="Intermediate Certificate file")
 @click.option('--notes', help="Additional notes")
 @environment.pass_env
 def cli(env, crt, csr, icc, key, notes):
@@ -32,13 +26,13 @@ def cli(env, crt, csr, icc, key, notes):
         template['certificate'] = file_crt.read()
     with open(key, encoding="utf-8") as file_key:
         template['privateKey'] = file_key.read()
-    with open(csr, encoding="utf-8") as file_csr:
-        if csr:
+    if csr:
+        with open(csr, encoding="utf-8") as file_csr:
             body = file_csr.read()
             template['certificateSigningRequest'] = body
 
-    with open(icc, encoding="utf-8") as file_icc:
-        if icc:
+    if icc:
+        with open(icc, encoding="utf-8") as file_icc:
             body = file_icc.read()
             template['intermediateCertificate'] = body
 
