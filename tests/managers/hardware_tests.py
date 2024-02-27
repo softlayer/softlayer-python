@@ -543,14 +543,14 @@ class HardwareTests(testing.TestCase):
 
         self.assertEqual(result, True)
         self.assert_called_with('SoftLayer_Hardware_Server', 'createFirmwareUpdateTransaction',
-                                identifier=100, args=(1, 1, 1, 1))
+                                identifier=100, args=(1, 1, 1, 1, 1))
 
     def test_update_firmware_selective(self):
         result = self.hardware.update_firmware(100, ipmi=False, hard_drive=False)
 
         self.assertEqual(result, True)
         self.assert_called_with('SoftLayer_Hardware_Server', 'createFirmwareUpdateTransaction',
-                                identifier=100, args=(0, 1, 1, 0))
+                                identifier=100, args=(0, 1, 1, 0, 1))
 
     def test_reflash_firmware(self):
         result = self.hardware.reflash_firmware(100)

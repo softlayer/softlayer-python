@@ -723,22 +723,23 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         return self.hardware.editObject(obj, id=hardware_id)
 
-    def update_firmware(self,
-                        hardware_id,
-                        ipmi=True,
-                        raid_controller=True,
-                        bios=True,
-                        hard_drive=True):
+    def update_firmware(self, hardware_id: int,
+                        ipmi: bool = True,
+                        raid_controller: bool = True,
+                        bios: bool = True,
+                        hard_drive: bool = True,
+                        network: bool = True):
         """Update hardware firmware.
 
         This will cause the server to be unavailable for ~20 minutes.
+        https://sldn.softlayer.com/reference/services/SoftLayer_Hardware_Server/createFirmwareUpdateTransaction/
 
-        :param int hardware_id: The ID of the hardware to have its firmware
-                                updated.
+        :param int hardware_id: The ID of the hardware to have its firmware updated.
         :param bool ipmi: Update the ipmi firmware.
         :param bool raid_controller: Update the raid controller firmware.
         :param bool bios: Update the bios firmware.
         :param bool hard_drive: Update the hard drive firmware.
+        :param bool network: Update the network card firmware
 
         Example::
 
@@ -746,21 +747,22 @@ class HardwareManager(utils.IdentifierMixin, object):
             result = mgr.update_firmware(hardware_id=1234)
         """
 
-        return self.hardware.createFirmwareUpdateTransaction(
-            bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive), id=hardware_id)
+        return self.client.call(
+            'SoftLayer_Hardware_Server', 'createFirmwareUpdateTransaction',
+            bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive), bool(network), id=hardware_id
+        )
 
-    def reflash_firmware(self,
-                         hardware_id,
-                         ipmi=True,
-                         raid_controller=True,
-                         bios=True):
+    def reflash_firmware(self, hardware_id: int,
+                         ipmi: bool = True,
+                         raid_controller: bool = True,
+                         bios: bool = True,):
         """Reflash hardware firmware.
 
         This will cause the server to be unavailable for ~60 minutes.
         The firmware will not be upgraded but rather reflashed to the version installed.
+        https://sldn.softlayer.com/reference/services/SoftLayer_Hardware_Server/createFirmwareReflashTransaction/
 
-        :param int hardware_id: The ID of the hardware to have its firmware
-                                reflashed.
+        :param int hardware_id: The ID of the hardware to have its firmware reflashed.
         :param bool ipmi: Reflash the ipmi firmware.
         :param bool raid_controller: Reflash the raid controller firmware.
         :param bool bios: Reflash the bios firmware.
