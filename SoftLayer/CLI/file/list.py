@@ -63,12 +63,15 @@ DEFAULT_NOTES_SIZE = 20
 @click.option('--sortby', help='Column to sort by', default='username')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. Options: {0}'.format(
-                  ', '.join(column.name for column in COLUMNS)),
+              help=f"Columns to display. Options: {', '.join(column.name for column in COLUMNS)}",
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, sortby, columns, datacenter, username, storage_type, order):
-    """List file storage."""
+    """List file storage.
+
+    Example::
+            slcli file volume-list -d dal10 --storage-type endurance --sortby capacity_gb
+    """
     file_manager = SoftLayer.FileStorageManager(env.client)
     file_volumes = file_manager.list_file_volumes(datacenter=datacenter,
                                                   username=username,

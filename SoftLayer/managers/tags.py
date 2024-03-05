@@ -1,6 +1,6 @@
 """
     SoftLayer.tags
-    ~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~
     Tag Manager
 
     :license: MIT, see LICENSE for more details.
@@ -83,22 +83,24 @@ class TagManager(object):
 
         From  SoftLayer_Tag::getAllTagTypes()
 
-        |Type                             |Service |
-        | -----------------------------   | ------ |
-        |Hardware                         |HARDWARE|
-        |CCI                              |GUEST|
-        |Account Document                 |ACCOUNT_DOCUMENT|
-        |Ticket                           |TICKET|
-        |Vlan Firewall                    |NETWORK_VLAN_FIREWALL|
-        |Contract                         |CONTRACT|
-        |Image Template                   |IMAGE_TEMPLATE|
-        |Application Delivery Controller  |APPLICATION_DELIVERY_CONTROLLER|
-        |Vlan                             |NETWORK_VLAN|
-        |Dedicated Host                   |DEDICATED_HOST|
+        ::
+
+            |Type                             |Service |
+            | -----------------------------   | ------ |
+            |Hardware                         |HARDWARE|
+            |CCI                              |GUEST|
+            |Account Document                 |ACCOUNT_DOCUMENT|
+            |Ticket                           |TICKET|
+            |Vlan Firewall                    |NETWORK_VLAN_FIREWALL|
+            |Contract                         |CONTRACT|
+            |Image Template                   |IMAGE_TEMPLATE|
+            |Application Delivery Controller  |APPLICATION_DELIVERY_CONTROLLER|
+            |Vlan                             |NETWORK_VLAN|
+            |Dedicated Host                   |DEDICATED_HOST|
         """
         service = self.type_to_service(tag_type)
         if service is None:
-            raise SoftLayerAPIError(404, "Unable to lookup {} types".format(tag_type))
+            raise SoftLayerAPIError(404, f"Unable to lookup {tag_type} types")
         return self.client.call(service, 'getObject', id=resource_table_id)
 
     def delete_tag(self, name):
@@ -136,9 +138,9 @@ class TagManager(object):
         :param string tag_type: Key name of a tag type. See SoftLayer_Tag::getAllTagTypes
         """
         service = self.type_to_service(tag_type)
-        search_term = "_objectType:SoftLayer_{}".format(service)
+        search_term = f"_objectType:SoftLayer_{service}"
         if tag_type == 'TICKET':
-            search_term = "{} status.name: open".format(search_term)
+            search_term = f"{search_term} status.name: open"
         elif tag_type == 'IMAGE_TEMPLATE':
             mask = "mask[id,accountId,name,globalIdentifier,parentId,publicFlag,flexImageFlag,imageType]"
             resources = self.client.call('SoftLayer_Account', 'getPrivateBlockDeviceTemplateGroups',
@@ -191,7 +193,7 @@ class TagManager(object):
         if tag_type == 'NETWORK_VLAN_FIREWALL':
             return resource.get('primaryIpAddress')
         elif tag_type == 'NETWORK_VLAN':
-            return "{} ({})".format(resource.get('vlanNumber'), resource.get('name'))
+            return f"{resource.get('vlanNumber')} ({resource.get('name')})"
         elif tag_type == 'IMAGE_TEMPLATE' or tag_type == 'APPLICATION_DELIVERY_CONTROLLER':
             return resource.get('name')
         elif tag_type == 'TICKET':

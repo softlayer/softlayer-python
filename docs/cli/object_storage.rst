@@ -28,3 +28,7 @@ Object Storage Commands
 .. click:: SoftLayer.CLI.object_storage.credential.create:cli
     :prog: object-storage credential create
     :show-nested:
+
+.. click:: SoftLayer.CLI.object_storage.cancel:cli
+    :prog: object-storage cancel
+    :show-nested:

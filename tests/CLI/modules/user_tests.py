@@ -8,9 +8,9 @@ import json
 import sys
 import unittest
 
-from unittest import mock as mock
-
+from SoftLayer.fixtures import SoftLayer_User_Customer
 from SoftLayer import testing
+from unittest import mock as mock
 
 
 class UserCLITests(testing.TestCase):
@@ -113,7 +113,7 @@ class UserCLITests(testing.TestCase):
     def test_permissions_list(self):
         result = self.run_command(['user', 'permissions', '11100'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_User_Customer_CustomerPermission_Permission', 'getAllObjects')
+        self.assert_called_with('SoftLayer_User_Permission_Action', 'getAllObjects')
         self.assert_called_with(
             'SoftLayer_User_Customer', 'getObject', identifier=11100,
             mask='mask[id, permissions, isMasterUserFlag, roles]'
@@ -378,3 +378,64 @@ class UserCLITests(testing.TestCase):
         result = self.run_command(['user', 'remove-access', '123456'])
         self.assertEqual(2, result.exit_code)
         self.assertIn('A device option is required.', result.exception.message)
+
+    def test_update_vpn_password(self):
+        result = self.run_command(['user', 'vpn-password', '123456', '--password', 'Mypassword1.'])
+        self.assert_no_fail(result)
+
+    def test_remove_without_password(self):
+        result = self.run_command(['user', 'vpn-password', '123456'])
+        self.assertEqual(2, result.exit_code)
+        self.assertIn("Missing option '--password'", result.output)
+
+    def test_api_key_without_option(self):
+        result = self.run_command(['user', 'apikey', '123456'])
+        self.assertEqual(2, result.exit_code)
+        self.assertIn('At least one option is required', result.exception.message)
+
+    def test_api_key_with_all_option(self):
+        result = self.run_command(['user', 'apikey', '123456', '--add', '--remove', '--refresh'])
+        self.assertEqual(2, result.exit_code)
+        self.assertIn('Can only specify one option', result.exception.message)
+
+    def test_remove_api_authentication_key_without_api_key(self):
+        mock = self.set_mock('SoftLayer_User_Customer', 'getApiAuthenticationKeys')
+        mock.return_value = SoftLayer_User_Customer.getEmptyApiAuthenticationKeys
+        result = self.run_command(['user', 'apikey', '123456', '--remove'])
+        self.assert_no_fail(result)
+
+    def test_add_api_authentication_key(self):
+        result = self.run_command(['user', 'apikey', '123456', '--add'])
+        self.assert_no_fail(result)
+
+    def test_remove_api_authentication_key(self):
+        result = self.run_command(['user', 'apikey', '123456', '--remove'])
+        self.assert_no_fail(result)
+
+    def test_refresh_api_authentication_key(self):
+        result = self.run_command(['user', 'apikey', '123456', '--refresh'])
+        self.assert_no_fail(result)
+
+    def test_vpn_disable(self):
+        result = self.run_command(['user', 'vpn-disable', '8344458'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=8344458)
+
+        result = self.run_command(['user', 'vpn-disable', '8344458'])
+        permission_m = self.set_mock('SoftLayer_User_Customer', 'editObject')
+        permission_m.return_value = {'sslVpnAllowedFlag': False}
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=8344458)
+        self.assertEqual('8344458 vpn is successfully disabled\n', result.output)
+
+    def test_vpn_enable(self):
+        result = self.run_command(['user', 'vpn-enable', '8344458'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=8344458)
+
+        result = self.run_command(['user', 'vpn-enable', '8344458'])
+        permission_m = self.set_mock('SoftLayer_User_Customer', 'editObject')
+        permission_m.return_value = {'sslVpnAllowedFlag': True}
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_User_Customer', 'editObject', identifier=8344458)
+        self.assertEqual('8344458 vpn is successfully enabled\n', result.output)

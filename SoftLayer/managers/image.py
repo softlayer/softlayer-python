@@ -46,7 +46,7 @@ class ImageManager(utils.IdentifierMixin, object):
         """
         self.vgbdtg.deleteObject(id=image_id)
 
-    def list_private_images(self, guid=None, name=None, **kwargs):
+    def list_private_images(self, guid=None, name=None, limit=100, **kwargs):
         """List all private images.
 
         :param string guid: filter based on GUID
@@ -67,10 +67,10 @@ class ImageManager(utils.IdentifierMixin, object):
 
         kwargs['filter'] = _filter.to_dict()
 
-        account = self.client['Account']
-        return account.getPrivateBlockDeviceTemplateGroups(**kwargs)
+        return self.client.iter_call('SoftLayer_Account', 'getPrivateBlockDeviceTemplateGroups',
+                                     filter=kwargs['filter'], mask=kwargs['mask'], limit=limit)
 
-    def list_public_images(self, guid=None, name=None, **kwargs):
+    def list_public_images(self, guid=None, name=None, limit=100, **kwargs):
         """List all public images.
 
         :param string guid: filter based on GUID
@@ -89,7 +89,8 @@ class ImageManager(utils.IdentifierMixin, object):
 
         kwargs['filter'] = _filter.to_dict()
 
-        return self.vgbdtg.getPublicImages(**kwargs)
+        return self.client.iter_call('SoftLayer_Virtual_Guest_Block_Device_Template_Group', 'getPublicImages',
+                                     filter=kwargs['filter'], mask=kwargs['mask'], limit=limit)
 
     def _get_ids_from_name_public(self, name):
         """Get public images which match the given name."""
@@ -237,3 +238,21 @@ class ImageManager(utils.IdentifierMixin, object):
             locations_ids.append(matching_location)
 
         return locations_ids
+
+    def share_image(self, image_id, account_id):
+        """Permit sharing image template with another account.
+
+        :param int image_id: The ID of the image.
+        :param int account_id: The ID of the another account to share the image.
+        """
+
+        return self.vgbdtg.permitSharingAccess(account_id, id=image_id)
+
+    def deny_share_image(self, image_id, account_id):
+        """Deny sharing image template with another account.
+
+        :param int image_id: The ID of the image.
+        :param int account_id: The ID of the another account to deny share the image.
+        """
+
+        return self.vgbdtg.denySharingAccess(account_id, id=image_id)

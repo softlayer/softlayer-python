@@ -52,7 +52,7 @@ def cli(env, **args):
 
 
 def _build_receipt(result, test=False):
-    title = "OrderId: %s" % (result.get('orderId', 'No order placed'))
+    title = f"OrderId: {result.get('orderId', 'No order placed')}"
     table = formatting.Table(['Item Id', 'Description'], title=title)
     table.align['Description'] = 'l'
 

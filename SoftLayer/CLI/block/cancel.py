@@ -16,14 +16,22 @@ from SoftLayer.CLI import formatting
               is_flag=True,
               help="Cancels the block storage volume immediately instead "
                    "of on the billing anniversary")
+@click.option('--force', default=False, is_flag=True, help="Force cancel block volume without confirmation")
 @environment.pass_env
-def cli(env, volume_id, reason, immediate):
-    """Cancel an existing block storage volume."""
+def cli(env, volume_id, reason, immediate, force):
+    """Cancel an existing block storage volume.
+
+    Example::
+        slcli block volume-cancel 12345678 --immediate -f
+        This command cancels volume with ID 12345678 immediately and without asking for confirmation.
+"""
 
     block_storage_manager = SoftLayer.BlockStorageManager(env.client)
 
-    if not (env.skip_confirmations or formatting.no_going_back(volume_id)):
-        raise exceptions.CLIAbort('Aborted')
+    if not force:
+        if not (env.skip_confirmations or
+                formatting.confirm(f"This will cancel the block volume: {volume_id} and cannot be undone. Continue?")):
+            raise exceptions.CLIAbort('Aborted')
 
     cancelled = block_storage_manager.cancel_block_volume(volume_id,
                                                           reason, immediate)

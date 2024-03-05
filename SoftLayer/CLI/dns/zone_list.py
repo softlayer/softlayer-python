@@ -12,7 +12,12 @@ from SoftLayer.utils import clean_time
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @environment.pass_env
 def cli(env):
-    """List all zones."""
+    """List all zones.
+
+    Example::
+        slcli dns zone-list
+        This command lists all zones under current account.
+"""
 
     manager = SoftLayer.DNSManager(env.client)
     object_mask = "mask[id,name,serial,updateDate,resourceRecordCount]"
@@ -24,7 +29,7 @@ def cli(env):
         zone_date = zone.get('updateDate', None)
         if zone_date is None:
             # The serial is just YYYYMMDD##, and since there is no createDate, just format it like it was one.
-            zone_date = "{}-{}-{}T00:00:00-06:00".format(zone_serial[0:4], zone_serial[4:6], zone_serial[6:8])
+            zone_date = f"{zone_serial[0:4]}-{zone_serial[4:6]}-{zone_serial[6:8]}T00:00:00-06:00"
         table.add_row([
             zone['id'],
             zone['name'],

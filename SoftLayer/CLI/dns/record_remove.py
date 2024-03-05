@@ -13,7 +13,12 @@ from SoftLayer.CLI import formatting
 @click.argument('record_id')
 @environment.pass_env
 def cli(env, record_id):
-    """Remove resource record."""
+    """Remove resource record.
+
+    Example::
+        slcli dns record-remove 12345678
+        This command removes resource record with ID 12345678.
+"""
 
     manager = SoftLayer.DNSManager(env.client)
 

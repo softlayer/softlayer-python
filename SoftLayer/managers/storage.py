@@ -1,6 +1,6 @@
 """
     SoftLayer.storage
-    ~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~
     Network Storage Manager
 
     :license: MIT, see LICENSE for more details.
@@ -313,11 +313,7 @@ class StorageManager(utils.IdentifierMixin, object):
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
-    def order_modified_volume(self,
-                              volume_id,
-                              new_size=None,
-                              new_iops=None,
-                              new_tier_level=None):
+    def order_modified_volume(self, volume_id, new_size=None, new_iops=None, new_tier_level=None):
         """Places an order for modifying an existing block volume.
 
         :param volume_id: The ID of the volume to be modified
@@ -381,7 +377,7 @@ class StorageManager(utils.IdentifierMixin, object):
                                 **kwargs)
 
     def order_snapshot_space(self, volume_id, capacity, tier, upgrade,
-                             **kwargs):
+                             iops=None, **kwargs):
         """Orders snapshot space for the given block volume.
 
         :param integer volume_id: The id of the volume
@@ -395,8 +391,11 @@ class StorageManager(utils.IdentifierMixin, object):
                       'staasVersion,hasEncryptionAtRest'
         volume = self.get_volume_details(volume_id, mask=object_mask, **kwargs)
 
+        if iops is None:
+            iops = int(volume['provisionedIops'])
+
         order = storage_utils.prepare_snapshot_order_object(
-            self, volume, capacity, tier, upgrade)
+            self, volume, capacity, tier, upgrade, iops)
 
         return self.client.call('Product_Order', 'placeOrder', order)
 
@@ -563,15 +562,17 @@ class StorageManager(utils.IdentifierMixin, object):
                                 reason,
                                 id=billing_item_id)
 
-    def refresh_dupe(self, volume_id, snapshot_id):
+    def refresh_dupe(self, volume_id, snapshot_id, force_refresh=False):
         """"Refresh a duplicate volume with a snapshot from its parent.
 
         :param integer volume_id: The id of the volume
         :param integer snapshot_id: The id of the snapshot
+        :param boolean force_refresh: Force refreshing the volume if True
         """
         return self.client.call('Network_Storage',
                                 'refreshDuplicate',
                                 snapshot_id,
+                                force_refresh,
                                 id=volume_id)
 
     def convert_dep_dupe(self, volume_id):

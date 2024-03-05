@@ -29,7 +29,7 @@ def cli(env, identifier):
                            True,
                            'Cancel by cli command',
                            'Cancel by cli command'):
-            env.fout("VLAN {} was cancelled.".format(identifier))
+            env.fout(f"VLAN {identifier} was cancelled.")
     else:
         raise exceptions.CLIAbort(
             "VLAN is an automatically assigned and free of charge VLAN,"

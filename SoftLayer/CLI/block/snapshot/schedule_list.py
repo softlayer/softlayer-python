@@ -11,7 +11,7 @@ from SoftLayer.CLI import formatting
 @click.argument('volume_id')
 @environment.pass_env
 def cli(env, volume_id):
-    """Lists snapshot schedules for a given volume"""
+    """Lists snapshot schedules for a given volume."""
 
     block_manager = SoftLayer.BlockStorageManager(env.client)
 

@@ -66,15 +66,30 @@ class CdnTests(testing.TestCase):
 
         self.assert_no_fail(result)
 
+    def test_add_origin_server_dynamic(self):
+        result = self.run_command(
+            ['cdn', 'origin-add', '-t', 'server', '-H=test.example.com', '-s', 81, '-o', 'dynamic', '-c=include-all',
+             '-P', 'HTTPS', '-d', 'abc.html', '-g', True, '-i', True, '1234', '10.10.10.1', '/example/videos2', ])
+
+        self.assert_no_fail(result)
+
     def test_add_origin_storage(self):
         result = self.run_command(['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-H=test.example.com',
                                    '-p', 80, '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
 
         self.assert_no_fail(result)
 
+    def test_add_origin_storage_dynamic(self):
+        result = self.run_command(['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-H=test.example.com',
+                                   '-s', 81, '-o', 'dynamic', '-c=include-all', '1234', '10.10.10.1',
+                                   '/example/videos2', '-g', True, '-i', True])
+
+        self.assert_no_fail(result)
+
     def test_add_origin_without_storage(self):
         result = self.run_command(['cdn', 'origin-add', '-t', 'storage', '-H=test.example.com', '-p', 80,
-                                   '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
+                                   '-P', 'HTTPS', '-o', 'web', '-c=include-all',
+                                   '1234', '10.10.10.1', '/example/videos2'])
 
         self.assertEqual(result.exit_code, 2)
         self.assertIsInstance(result.exception, exceptions.ArgumentError)
@@ -83,6 +98,15 @@ class CdnTests(testing.TestCase):
         result = self.run_command(
             ['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-e', 'jpg', '-H=test.example.com', '-p', 80,
              '-o', 'web', '-c=include-all', '1234', '10.10.10.1', '/example/videos2'])
+
+        self.assert_no_fail(result)
+
+    def test_add_origin_storage_with_file_extensions_dynamic(self):
+        result = self.run_command(
+            ['cdn', 'origin-add', '-t', 'storage', '-b=test-bucket', '-e', 'jpg', '-H=test.example.com', '-s', 81,
+             '-P', 'HTTPS', '-o', 'dynamic', '-d', 'abc.html', '-g', True, '-i', True,
+             '-c=include-all', '1234', '10.10.10.1', '/example/videos2',
+             ])
 
         self.assert_no_fail(result)
 
@@ -123,3 +147,40 @@ class CdnTests(testing.TestCase):
         self.assert_no_fail(result)
         header_result = json.loads(result.output)
         self.assertEqual('include: test', header_result['Cache key optimization'])
+
+    def test_delete_cdn(self):
+        result = self.run_command(['cdn', 'delete', '123456'])
+        self.assert_no_fail(result)
+        self.assertIn("Cdn with uniqueId: 123456 was deleted.", result.output)
+
+    def test_create_cdn(self):
+        result = self.run_command(['cdn', 'create', '--hostname', 'www.example.com',
+                                  '--origin', '123.123.123.123', '--http', '80'])
+        self.assert_no_fail(result)
+        self.assertIn("CDN Unique ID", result.output)
+        self.assertIn("354034879028850", result.output)
+        self.assertIn("Hostname", result.output)
+        self.assertIn("test.com", result.output)
+        self.assertIn("header", result.output)
+        self.assertIn("header.test.com", result.output)
+        self.assertIn("Http Port", result.output)
+        self.assertIn("80", result.output)
+        self.assertIn("Path", result.output)
+        self.assertIn("/*", result.output)
+
+    def test_create_cdn_without_hostname(self):
+        result = self.run_command(['cdn', 'create'])
+        self.assertEqual(2, result.exit_code)
+        print(result.output)
+        self.assertIn("Error: Missing option '--hostname'.", result.output)
+
+    def test_create_cdn_without_origin(self):
+        result = self.run_command(['cdn', 'create', '--hostname', 'www.example.com'])
+        self.assertEqual(2, result.exit_code)
+        print(result.output)
+        self.assertIn("Error: Missing option '--origin'.", result.output)
+
+    def test_create_cdn_without_http_or_https(self):
+        result = self.run_command(['cdn', 'create', '--hostname', 'www.example.com', '--origin', '123.123.123.123'])
+        self.assertEqual(2, result.exit_code)
+        self.assertIn("Is needed http or https options", result.exception.message)

@@ -9,6 +9,7 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
 from SoftLayer import utils
 
+
 # pylint: disable=R0915
 
 
@@ -28,14 +29,14 @@ def cli(env, identifier, passwords, price, components):
     table.align['value'] = 'l'
 
     hardware_id = helpers.resolve_id(hardware.resolve_ids, identifier, 'hardware')
-    result = hardware.get_hardware(hardware_id)
+    result = hardware.get_hardware_fast(hardware_id)
     result = utils.NestedDict(result)
     hard_drives = hardware.get_hard_drives(hardware_id)
 
     operating_system = utils.lookup(result, 'operatingSystem', 'softwareLicense', 'softwareDescription') or {}
     memory = formatting.gb(result.get('memoryCapacity', 0))
     owner = None
-    if utils.lookup(result, 'billingItem') != []:
+    if utils.lookup(result, 'billingItem'):
         owner = utils.lookup(result, 'billingItem', 'orderItem', 'order', 'userRecord', 'username')
 
     table_hard_drives = formatting.Table(['Name', 'Capacity', 'Serial #'])
@@ -65,15 +66,36 @@ def cli(env, identifier, passwords, price, components):
     table.add_row(['created', result['provisionDate'] or formatting.blank()])
     table.add_row(['owner', owner or formatting.blank()])
 
-    last_transaction = "{} ({})".format(utils.lookup(result, 'lastTransaction', 'transactionGroup', 'name'),
-                                        utils.clean_time(utils.lookup(result, 'lastTransaction', 'modifyDate')))
+    last_transaction = f"{utils.lookup(result, 'lastTransaction', 'transactionGroup', 'name')} \
+        ({utils.clean_time(utils.lookup(result, 'lastTransaction', 'modifyDate'))})"
 
     table.add_row(['last_transaction', last_transaction])
     table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else 'Monthly'])
 
-    vlan_table = formatting.Table(['type', 'number', 'id'])
+    vlan_table = formatting.Table(['Network', 'Number', 'Id', 'Name', 'Type'])
     for vlan in result['networkVlans']:
-        vlan_table.add_row([vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
+        vlan_table.add_row([
+            vlan.get('networkSpace'),
+            vlan.get('vlanNumber'),
+            vlan['id'],
+            vlan['fullyQualifiedName'],
+            'Primary'
+        ])
+
+    # Shows any VLANS trunked/tagged on this server
+    for component in result.get('networkComponents', []):
+        # These are the Primary network components
+        if component.get('primaryIpAddress', False):
+            uplink = component.get('uplinkComponent', {})
+            for trunk in uplink.get('networkVlanTrunks', []):
+                trunk_vlan = trunk.get('networkVlan')
+                vlan_table.add_row([
+                    trunk_vlan.get('networkSpace'),
+                    trunk_vlan.get('vlanNumber'),
+                    trunk_vlan.get('id'),
+                    trunk_vlan.get('fullyQualifiedName'),
+                    'Trunked'
+                ])
 
     table.add_row(['vlans', vlan_table])
 

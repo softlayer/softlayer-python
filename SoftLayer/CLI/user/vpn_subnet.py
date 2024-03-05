@@ -25,6 +25,6 @@ def cli(env, user, add, subnet):
         result = mgr.vpn_subnet_remove(user_id, subnet)
 
     if result:
-        click.secho("%s updated successfully" % (user), fg='green')
+        click.secho(f"{user} updated successfully", fg='green')
     else:
-        click.secho("Failed to update %s" % (user), fg='red')
+        click.secho(f"Failed to update {user}", fg='red')

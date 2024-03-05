@@ -1,7 +1,7 @@
 .. _vs_user_docs:
 
-Working with Virtual Servers
-============================
+Virtual Servers
+===============
 Using the SoftLayer portal to order virtual servers is fine, but for a number
 of reasons it's often more convenient to use the command line. For this, you
 can use SoftLayer's command-line client to make administrative tasks quicker
@@ -291,10 +291,16 @@ If no timezone is specified, IMS local time (CST) will be assumed, which might n
    :prog: virtual notification-delete
    :show-nested:
 
-.. click:: SoftLayer.CLI.virt.host_list:cli
-    This command is an alias for `slcli dedicatedhost list`
-    :prog: virtual host-list
-    :show-nested:
+.. click:: SoftLayer.CLI.dedicatedhost.list:cli 
+   :prog: virtual host-list
+   :show-nested:
+
+.. click:: SoftLayer.CLI.dedicatedhost.create:cli
+   :prog: virtual host-create
+
+.. click:: SoftLayer.CLI.virt.os_available:cli
+   :prog: virtual os-available
+   :show-nested:
 
 Manages the migration of virutal guests. Supports migrating virtual guests on Dedicated Hosts as well.
 

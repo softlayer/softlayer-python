@@ -11,15 +11,11 @@ from SoftLayer.CLI import formatting
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('target')
-@click.option('--firewall-type',
-              type=click.Choice(['vs', 'vlan', 'server']),
-              help='Firewall type',
-              required=True)
-@click.option('-ha', '--high-availability',
-              is_flag=True,
-              help='High available firewall option')
+@click.option('--firewall-type', type=click.Choice(['vs', 'vlan', 'server']), help='Firewall type', required=True)
+@click.option("-h", '--high-availability', is_flag=True, help='High available firewall option')
+@click.option('-f', '--force',  default=False, is_flag=True, help="Force addition of firewall to the server")
 @environment.pass_env
-def cli(env, target, firewall_type, high_availability):
+def cli(env, target, firewall_type, high_availability, force):
     """Create new firewall.
 
     TARGET: Id of the server the firewall will protect
@@ -43,8 +39,9 @@ def cli(env, target, firewall_type, high_availability):
         click.echo("Price: $%s monthly" % pkg[0]['prices'][0]['recurringFee'])
         click.echo("******************")
 
-        if not formatting.confirm("This action will incur charges on your account. Continue?"):
-            raise exceptions.CLIAbort('Aborted.')
+        if not force:
+            if not formatting.confirm("This action will incur charges on your account. Continue?"):
+                raise exceptions.CLIAbort('Aborted.')
 
     if firewall_type == 'vlan':
         mgr.add_vlan_firewall(target, ha_enabled=high_availability)

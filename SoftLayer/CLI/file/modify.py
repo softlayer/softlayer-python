@@ -5,6 +5,7 @@ import click
 import SoftLayer
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import exceptions
+from SoftLayer.CLI import formatting
 
 
 CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
@@ -20,20 +21,29 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 @click.option('--new-iops', '-i',
               type=int,
               help='Performance Storage IOPS, between 100 and 6000 in multiples of 100 [only for performance volumes] '
-                   '***If no IOPS value is specified, the original IOPS value of the volume will be used.***\n'
-                   'Requirements: [If original IOPS/GB for the volume is less than 0.3, new IOPS/GB must also be '
-                   'less than 0.3. If original IOPS/GB for the volume is greater than or equal to 0.3, new IOPS/GB '
-                   'for the volume must also be greater than or equal to 0.3.]')
+                   '***If no IOPS value is specified, the original IOPS value of the volume will be used.***')
 @click.option('--new-tier', '-t',
               help='Endurance Storage Tier (IOPS per GB) [only for endurance volumes] '
-                   '***If no tier is specified, the original tier of the volume will be used.***\n'
-                   'Requirements: [If original IOPS/GB for the volume is 0.25, new IOPS/GB for the volume must also '
-                   'be 0.25. If original IOPS/GB for the volume is greater than 0.25, new IOPS/GB for the volume '
-                   'must also be greater than 0.25.]',
+                   '***If no tier is specified, the original tier of the volume will be used.***',
               type=click.Choice(['0.25', '2', '4', '10']))
+@click.option('--force',  default=False, is_flag=True, help="Force modify")
 @environment.pass_env
-def cli(env, volume_id, new_size, new_iops, new_tier):
-    """Modify an existing file storage volume."""
+def cli(env, volume_id, new_size, new_iops, new_tier, force):
+    """Modify an existing file storage volume.
+
+    Valid size and iops options can be found here:
+        https://cloud.ibm.com/docs/FileStorage/index.html#provisioning-considerations
+        https://cloud.ibm.com/docs/FileStorage?topic=FileStorage-orderingFileStorage&interface=cli
+
+    Example::
+
+            slcli file volume-modify 12345678 --new-size 1000 --new-iops 400
+    """
+    if not force:
+        if not (env.skip_confirmations or
+                formatting.confirm("This action will incur charges on your account. Continue?")):
+            raise exceptions.CLIAbort('Aborted')
+
     file_manager = SoftLayer.FileStorageManager(env.client)
 
     if new_tier is not None:
@@ -50,7 +60,7 @@ def cli(env, volume_id, new_size, new_iops, new_tier):
         raise exceptions.ArgumentError(str(ex))
 
     if 'placedOrder' in order.keys():
-        click.echo("Order #{0} placed successfully!".format(order['placedOrder']['id']))
+        click.echo(f"Order #{order['placedOrder']['id']} placed successfully!")
         for item in order['placedOrder']['items']:
             click.echo(" > %s" % item['description'])
     else:

@@ -10,6 +10,8 @@ from re import match
 
 from SoftLayer import exceptions
 
+from SoftLayer import utils
+
 CATEGORY_MASK = '''id, isRequired, itemCategory[id, name, categoryCode]'''
 
 ITEM_MASK = '''id, keyName, description, itemCategory, categories, prices'''
@@ -19,6 +21,7 @@ PACKAGE_MASK = '''id, name, keyName, isActive, type'''
 PRESET_MASK = '''id, name, keyName, description, prices[id, hourlyRecurringFee, recurringFee], locations'''
 
 
+# pylint: disable=R0904
 class OrderingManager(object):
     """Manager to help ordering via the SoftLayer API.
 
@@ -31,6 +34,8 @@ class OrderingManager(object):
         self.order_svc = client['Product_Order']
         self.billing_svc = client['Billing_Order']
         self.package_preset = client['Product_Package_Preset']
+        self.package_mask = 'id, description, capacity, itemCategory, keyName, prices[categories], ' \
+            'softwareDescription[id,referenceCode,longDescription]'
 
     def get_packages_of_type(self, package_types, mask=None):
         """Get packages that match a certain type.
@@ -265,7 +270,7 @@ class OrderingManager(object):
 
         packages = self.package_svc.getAllObjects(mask=mask, filter=_filter)
         if len(packages) == 0:
-            raise exceptions.SoftLayerError("Package {} does not exist".format(package_keyname))
+            raise exceptions.SoftLayerError(f"Package {package_keyname} does not exist")
 
         return packages.pop()
 
@@ -351,8 +356,7 @@ class OrderingManager(object):
 
         if len(presets) == 0:
             raise exceptions.SoftLayerError(
-                "Preset {} does not exist in package {}".format(preset_keyname,
-                                                                package_keyname))
+                f"Preset {preset_keyname} does not exist in package {package_keyname}")
 
         return presets[0]
 
@@ -370,7 +374,8 @@ class OrderingManager(object):
                   keynames in the given package
 
         """
-        mask = 'id, description, capacity, itemCategory, keyName, prices[categories]'
+        mask = 'id, description, capacity, itemCategory, keyName, prices[categories], ' \
+            'softwareDescription[id,referenceCode,longDescription]'
         items = self.list_items(package_keyname, mask=mask)
         item_capacity = self.get_item_capacity(items, item_keynames)
 
@@ -378,15 +383,18 @@ class OrderingManager(object):
         category_dict = {"gpu0": -1, "pcie_slot0": -1}
 
         for item_keyname in item_keynames:
-            try:
-                # Need to find the item in the package that has a matching
-                # keyName with the current item we are searching for
-                matching_item = [i for i in items
-                                 if i['keyName'] == item_keyname][0]
-            except IndexError as ex:
-                message = "Item {} does not exist for package {}".format(item_keyname,
-                                                                         package_keyname)
-                raise exceptions.SoftLayerError(message) from ex
+            matching_item = []
+            # Need to find the item in the package that has a matching
+            # keyName with the current item we are searching for
+            for i in items:
+                reference_code = utils.lookup(i, 'softwareDescription', 'referenceCode')
+                if i['keyName'] == item_keyname or reference_code == item_keyname:
+                    matching_item.append(i)
+
+            if len(matching_item) == 0:
+                message = f"Item {item_keyname} does not exist for package {package_keyname}"
+                raise exceptions.SoftLayerError(message)
+            matching_item = matching_item[0]
 
             # we want to get the price ID that has no location attached to it,
             # because that is the most generic price. verifyOrder/placeOrder
@@ -703,7 +711,7 @@ class OrderingManager(object):
 
         default_region_keyname = 'unknown'
         if not location_key or location_key == default_region_keyname:
-            raise exceptions.SoftLayerError("Invalid location {}".format(location_key))
+            raise exceptions.SoftLayerError(f"Invalid location {location_key}")
 
         default_regions = [{'keyname': default_region_keyname}]
         index_first = 0
@@ -715,9 +723,9 @@ class OrderingManager(object):
                 return location_key
             if location.get('regions', default_regions)[index_first].get('keyname') == location_key:
                 return location_name
-        raise exceptions.SoftLayerError("Location {} does not exist".format(location_key))
+        raise exceptions.SoftLayerError(f"Location {location_key} does not exist")
 
-    def get_items(self, package_id, storage_filter=None):
+    def get_items(self, package_id, storage_filter=None, mask=None):
         """"Returns the items .
 
 
@@ -726,7 +734,7 @@ class OrderingManager(object):
         """
 
         return self.client.call('SoftLayer_Product_Package', 'getItems', filter=storage_filter,
-                                id=package_id)
+                                id=package_id, mask=mask)
 
     def get_regions(self, package_id, location=None):
         """returns the all regions.
@@ -737,3 +745,20 @@ class OrderingManager(object):
         if location:
             _filter = {"regions": {"location": {"location": {"name": {"operation": location}}}}}
         return self.client.call('SoftLayer_Product_Package', 'getRegions', id=package_id, filter=_filter)
+
+    def delete_quote(self, quote_id):
+        """Delete the quote of an order.
+
+        :param quote_id: ID number of target quote
+        """
+
+        return self.client['SoftLayer_Billing_Order_Quote'].deleteQuote(id=quote_id)
+
+    def get_all_cancelation(self, limit=50):
+        """returns the all cancelations, completed orders"""
+
+        mask = 'mask[id,itemCount,modifyDate,createDate,ticketId,' \
+               'ticket[assignedUserId,id,' \
+               'serviceProviderResourceId],status[name,id],user[id,firstName,lastName]]'
+        return self.client.call('SoftLayer_Billing_Item_Cancellation_Request', 'getAllCancellationRequests',
+                                mask=mask, limit=limit)

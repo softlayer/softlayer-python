@@ -23,7 +23,12 @@ RECORD_FMT = "type={type}, record={record}, data={data}, ttl={ttl}"
 @click.option('--dry-run', is_flag=True, help="Don't actually create records")
 @environment.pass_env
 def cli(env, zonefile, dry_run):
-    """Import zone based off a BIND zone file."""
+    """Import zone based off a BIND zone file.
+
+    Example::
+        slcli dns import ~/ibm.com.txt
+        This command imports zone and its resource records from file: ~/ibm.com.txt
+"""
 
     manager = SoftLayer.DNSManager(env.client)
     with open(zonefile, encoding="utf-8") as zone_f:

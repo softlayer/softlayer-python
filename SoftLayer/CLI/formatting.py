@@ -111,6 +111,74 @@ def gb(gigabytes):  # pylint: disable=C0103
     return FormattedItem(int(float(gigabytes)) * 1024, "%dG" % int(float(gigabytes)))
 
 
+def convert_sizes(value, unit='GB', round_result=False):
+    """Converts a data storage value to an appropriate unit.
+
+    :param str value: The value to convert.
+    :param str unit: The unit of the value ('B', 'KB', 'MB', 'GB', 'TB').
+    :param bool round_result: rounded result
+    :return: The converted value and its unit.
+    """
+
+    if not value:
+        return '0.00 MB'
+
+    value = float(value)
+
+    if value == 0:
+        return "0.00 MB"
+
+    units = ['B', 'KB', 'MB', 'GB', 'TB']
+    if unit not in units:
+        return "Invalid unit. Must be one of 'B', 'KB', 'MB', 'GB', 'TB'"
+
+    unit_index = units.index(unit)
+
+    while value > 999 and unit_index < len(units) - 1:
+        value /= 1024
+        unit_index += 1
+
+    while value < 1 and unit_index > 0:
+        value *= 1024
+        unit_index -= 1
+
+    if round_result:
+        value = round(value / 5) * 5
+    return f"{value:.2f} {units[unit_index]}"
+
+
+def sum_sizes(size1, size2):
+    """Sums two data storage values.
+
+    :param str size1: The first value and its unit.
+    :param str size2: The second value and its unit.
+    :return: The sum of the values and its unit.
+    """
+    if size1 == '0.00 MB':
+        return size2
+    if size2 == '0.00 MB':
+        return size1
+
+    value1, unit1 = float(size1.split()[0]), size1.split()[1]
+    value2, unit2 = float(size2.split()[0]), size2.split()[1]
+
+    units = ['B', 'KB', 'MB', 'GB', 'TB']
+    if unit1 not in units or unit2 not in units:
+        return "Invalid unit in one of the sizes. Unit must be one of 'B', 'KB', 'MB', 'GB', 'TB'"
+
+    value1 *= (1024 ** units.index(unit1))
+    value2 *= (1024 ** units.index(unit2))
+
+    total_value = value1 + value2
+
+    total_unit = 'B'
+    while total_value > 999 and total_unit != 'TB':
+        total_value /= 1024
+        total_unit = units[units.index(total_unit) + 1]
+
+    return f"{total_value:.2f} {total_unit}"
+
+
 def blank():
     """Returns a blank FormattedItem."""
     return FormattedItem(None, '-')
@@ -191,8 +259,7 @@ def no_going_back(confirmation):
     if not confirmation:
         confirmation = 'yes'
 
-    prompt = ('This action cannot be undone! Type "%s" or press Enter '
-              'to abort' % confirmation)
+    prompt = f"This action cannot be undone! Type '{confirmation}' or press Enter to abort"
 
     ans = click.prompt(prompt, default='', show_default=False)
     if ans.lower() == str(confirmation):
@@ -250,6 +317,22 @@ class Table(object):
         self.align = align or {}
         self.sortby = None
         self.title = title
+        # Used to print a message if the table is empty
+        self.empty_message = None
+
+    def __bool__(self):
+        """Useful for seeing if the table has any rows"""
+        return len(self.rows) > 0
+
+    def set_empty_message(self, message):
+        """Sets the empty message for this table for env.fout
+
+        Set this message if you want to print a message instead of a table to the user
+        but still want the json output to print an empty list `[]`
+
+        :param message str: Message to print if the table has no rows
+        """
+        self.empty_message = message
 
     def add_row(self, row):
         """Add a row to the table.
@@ -269,6 +352,10 @@ class Table(object):
 
     def prettytable(self, fmt='table', theme=None):
         """Returns a RICH table instance."""
+
+        # Used to print a message instead of a bad looking empty table
+        if not self and self.empty_message:
+            return self.empty_message
         box_style = box.SQUARE
         if fmt == 'raw':
             box_style = None
@@ -467,7 +554,7 @@ def clean_table(data, delimiter):
 
             if str(type(value)) == "<class 'SoftLayer.CLI.formatting.Table'>":
                 string_io = io.StringIO()
-                write_csv_format(string_io, value, delimiter)
+                write_csv_format(string_io, value, delimiter, quoting=csv.QUOTE_MINIMAL)
 
                 nested_table_converted = string_io.getvalue()
                 nested_table_converted = nested_table_converted.replace('\r', '').split('\n')
@@ -488,8 +575,8 @@ def clean_table(data, delimiter):
     return data
 
 
-def write_csv_format(support_output, data, delimiter):
+def write_csv_format(support_output, data, delimiter, quoting=csv.QUOTE_NONNUMERIC):
     """Write csv format to supported output"""
-    writer = csv.writer(support_output, delimiter=delimiter)
+    writer = csv.writer(support_output, delimiter=delimiter, quoting=quoting)
     writer.writerow(data.columns)
     writer.writerows(data.rows)

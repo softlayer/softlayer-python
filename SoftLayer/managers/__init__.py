@@ -8,6 +8,7 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.managers.account import AccountManager
+from SoftLayer.managers.bandwidth import BandwidthManager
 from SoftLayer.managers.block import BlockStorageManager
 from SoftLayer.managers.cdn import CDNManager
 from SoftLayer.managers.dedicated_host import DedicatedHostManager
@@ -24,6 +25,7 @@ from SoftLayer.managers.metadata import MetadataManager
 from SoftLayer.managers.network import NetworkManager
 from SoftLayer.managers.object_storage import ObjectStorageManager
 from SoftLayer.managers.ordering import OrderingManager
+from SoftLayer.managers.search import SearchManager
 from SoftLayer.managers.sshkey import SshKeyManager
 from SoftLayer.managers.ssl import SSLManager
 from SoftLayer.managers.tags import TagManager
@@ -35,6 +37,7 @@ from SoftLayer.managers.vs_placement import PlacementManager
 
 __all__ = [
     'AccountManager',
+    'BandwidthManager',
     'BlockStorageManager',
     'CapacityManager',
     'CDNManager',
@@ -53,6 +56,7 @@ __all__ = [
     'ObjectStorageManager',
     'OrderingManager',
     'PlacementManager',
+    'SearchManager',
     'SshKeyManager',
     'SSLManager',
     'TagManager',

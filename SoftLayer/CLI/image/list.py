@@ -14,26 +14,39 @@ from SoftLayer import utils
 @click.option('--name', default=None, help='Filter on image name')
 @click.option('--public/--private', is_flag=True, default=None,
               help='Display only public or private images')
+@click.option('--limit', '-l',
+              help='How many results to get in one api call',
+              default=100,
+              show_default=True)
 @environment.pass_env
-def cli(env, name, public):
+def cli(env, name, public, limit):
     """List images."""
 
     image_mgr = SoftLayer.ImageManager(env.client)
 
     images = []
     if public in [False, None]:
-        for image in image_mgr.list_private_images(name=name, mask=image_mod.MASK):
+        for image in image_mgr.list_private_images(name=name, limit=limit, mask=image_mod.MASK):
             images.append(image)
 
     if public in [True, None]:
-        for image in image_mgr.list_public_images(name=name, mask=image_mod.MASK):
+        for image in image_mgr.list_public_images(name=name, limit=limit, mask=image_mod.MASK):
             images.append(image)
 
-    table = formatting.Table(['id', 'name', 'type', 'visibility', 'account'])
+    table = formatting.Table(['Id', 'Name', 'Type', 'Visibility', 'Account', 'OS', 'Created', 'Notes'])
+    table.align['OS'] = 'l'
+    table.align['Notes'] = 'l'
 
     images = [image for image in images if not image['parentId']]
     for image in images:
-
+        operative_system = '-'
+        if image.get('children') and len(image.get('children')) != 0:
+            if image.get('children')[0].get('blockDevices') and len(image.get('children')[0].get('blockDevices')) != 0:
+                for block_device in image.get('children')[0].get('blockDevices'):
+                    if block_device.get('diskImage').get('softwareReferences') and \
+                            len(block_device.get('diskImage').get('softwareReferences')) != 0:
+                        operative_system = block_device.get('diskImage').get('softwareReferences')[0].\
+                            get('softwareDescription').get('longDescription')
         visibility = (image_mod.PUBLIC_TYPE if image['publicFlag'] else image_mod.PRIVATE_TYPE)
         table.add_row([
             image.get('id', formatting.blank()),
@@ -43,6 +56,9 @@ def cli(env, name, public):
                 utils.lookup(image, 'imageType', 'name')),
             visibility,
             image.get('accountId', formatting.blank()),
+            operative_system,
+            utils.clean_time(image.get('createDate', formatting.blank())),
+            image.get('note', formatting.blank()),
         ])
 
     env.fout(table)

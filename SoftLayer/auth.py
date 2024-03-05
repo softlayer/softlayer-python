@@ -132,12 +132,12 @@ class BearerAuthentication(AuthenticationBase):
 
     def get_request(self, request):
         """Sets token-based auth headers."""
-        request.transport_headers['Authorization'] = 'Bearer {}'.format(self.api_key)
+        request.transport_headers['Authorization'] = f'Bearer {self.api_key}'
         request.transport_user = self.username
         return request
 
     def __repr__(self):
-        return "BearerAuthentication(username={}, token={})".format(self.username, self.api_key)
+        return f"BearerAuthentication(username={self.username}, token={self.api_key})"
 
 class EmployeeAuthentication(AuthenticationBase):
     """Token-based authentication class.

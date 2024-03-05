@@ -82,7 +82,6 @@ def get_local_storage_table(local_disks):
                 get_local_type(disk),
                 disk['mountType'],
                 disk['device'],
-                "{capacity} {unit}".format(capacity=disk['diskImage']['capacity'],
-                                           unit=disk['diskImage']['units'])
+                f"{disk['diskImage']['capacity']} {disk['diskImage']['units']}"
             ])
     return table_local_disks

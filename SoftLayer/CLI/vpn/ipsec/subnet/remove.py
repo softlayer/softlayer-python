@@ -45,7 +45,6 @@ def cli(env, context_id, subnet_id, subnet_type):
         succeeded = manager.remove_service_subnet(context_id, subnet_id)
 
     if succeeded:
-        env.out('Removed {} subnet #{}'.format(subnet_type, subnet_id))
+        env.out(f'Removed {subnet_type} subnet #{subnet_id}')
     else:
-        raise CLIHalt('Failed to remove {} subnet #{}'
-                      .format(subnet_type, subnet_id))
+        raise CLIHalt(f'Failed to remove {subnet_type} subnet #{subnet_id}')

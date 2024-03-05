@@ -73,7 +73,7 @@ class UserManagerTests(testing.TestCase):
 
     def test_get_all_permissions(self):
         self.manager.get_all_permissions()
-        self.assert_called_with('SoftLayer_User_Customer_CustomerPermission_Permission', 'getAllObjects')
+        self.assert_called_with('SoftLayer_User_Permission_Action', 'getAllObjects')
 
     def test_add_permissions(self):
         self.manager.add_permissions(1234, ['TEST'])
@@ -168,7 +168,7 @@ class UserManagerTests(testing.TestCase):
 
     def test_format_permission_object(self):
         result = self.manager.format_permission_object(['TEST'])
-        self.assert_called_with('SoftLayer_User_Customer_CustomerPermission_Permission', 'getAllObjects')
+        self.assert_called_with('SoftLayer_User_Permission_Action', 'getAllObjects')
         self.assertEqual([{'keyName': 'TEST'}], result)
 
     def test_format_permission_object_all(self):
@@ -176,12 +176,30 @@ class UserManagerTests(testing.TestCase):
             {'key': 'T_2', 'keyName': 'TEST', 'name': 'A Testing Permission'},
             {'key': 'T_1', 'keyName': 'TICKET_VIEW', 'name': 'View Tickets'}
         ]
-        service_name = 'SoftLayer_User_Customer_CustomerPermission_Permission'
+        service_name = 'SoftLayer_User_Permission_Action'
         permission_mock = self.set_mock(service_name, 'getAllObjects')
         permission_mock.return_value = expected
         result = self.manager.format_permission_object(['ALL'])
         self.assert_called_with(service_name, 'getAllObjects')
         self.assertEqual(expected, result)
+
+    def test_hide_permissions(self):
+        result = self.manager.get_all_permissions()
+        hide_permissions = [
+            {'keyName': 'ACCOUNT_SUMMARY_VIEW'},
+            {'keyName': 'REQUEST_COMPLIANCE_REPORT'},
+            {'keyName': 'COMPANY_EDIT'},
+            {'keyName': 'ONE_TIME_PAYMENTS'},
+            {'keyName': 'UPDATE_PAYMENT_DETAILS'},
+            {'keyName': 'EU_LIMITED_PROCESSING_MANAGE'},
+            {'keyName': 'TICKET_ADD'},
+            {'keyName': 'TICKET_EDIT'},
+            {'keyName': 'TICKET_SEARCH'},
+            {'keyName': 'TICKET_VIEW'},
+            {'keyName': 'TICKET_VIEW_ALL'}
+        ]
+        self.assert_called_with('SoftLayer_User_Permission_Action', 'getAllObjects')
+        self.assertNotEqual(hide_permissions, result)
 
     def test_get_current_user(self):
         result = self.manager.get_current_user()
@@ -330,3 +348,19 @@ class UserManagerTests(testing.TestCase):
     def test_remove_dedicated(self):
         self.manager.remove_dedicated_access(123456, 369852)
         self.assert_called_with('SoftLayer_User_Customer', 'removeDedicatedHostAccess')
+
+    def test_update_vpn_password(self):
+        self.manager.update_vpn_password(123456, "Mypassword1.")
+        self.assert_called_with('SoftLayer_User_Customer', 'updateVpnPassword')
+
+    def test_add_api_authentication_key(self):
+        self.manager.add_api_authentication_key(123456)
+        self.assert_called_with('SoftLayer_User_Customer', 'addApiAuthenticationKey')
+
+    def test_get_api_authentication_keys(self):
+        self.manager.get_api_authentication_keys(123456)
+        self.assert_called_with('SoftLayer_User_Customer', 'getApiAuthenticationKeys')
+
+    def test_remove_api_authentication_key(self):
+        self.manager.remove_api_authentication_key(123456)
+        self.assert_called_with('SoftLayer_User_Customer', 'removeApiAuthenticationKey')

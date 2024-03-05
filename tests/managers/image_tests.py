@@ -33,45 +33,41 @@ class ImageTests(testing.TestCase):
         self.assert_called_with(IMAGE_SERVICE, 'deleteObject', identifier=100)
 
     def test_list_private_images(self):
-        results = self.image.list_private_images()
-
+        # Casting to list() to force the iter_call generator to run
+        results = list(self.image.list_private_images())
         self.assertEqual(len(results), 2)
-        self.assert_called_with('SoftLayer_Account',
-                                'getPrivateBlockDeviceTemplateGroups')
+        self.assert_called_with('SoftLayer_Account', 'getPrivateBlockDeviceTemplateGroups')
 
     def test_list_private_images_with_filters(self):
-        results = self.image.list_private_images(
-            guid='0FA9ECBD-CF7E-4A1F-1E36F8D27C2B', name='name')
+        # Casting to list() to force the iter_call generator to run
+        results = list(self.image.list_private_images(guid='0FA9ECBD-CF7E-4A1F-1E36F8D27C2B', name='name'))
 
-        self.assertEqual(len(results), 2)
         _filter = {
             'privateBlockDeviceTemplateGroups': {
                 'globalIdentifier': {
                     'operation': '_= 0FA9ECBD-CF7E-4A1F-1E36F8D27C2B'},
                 'name': {'operation': '_= name'}}
         }
-        self.assert_called_with('SoftLayer_Account',
-                                'getPrivateBlockDeviceTemplateGroups',
-                                filter=_filter)
+        self.assertEqual(len(results), 2)
+        self.assert_called_with('SoftLayer_Account', 'getPrivateBlockDeviceTemplateGroups', filter=_filter)
 
     def test_list_public_images(self):
-        results = self.image.list_public_images()
-
+        # Casting to list() to force the iter_call generator to run
+        results = list(self.image.list_public_images())
         self.assertEqual(len(results), 2)
         self.assert_called_with(IMAGE_SERVICE, 'getPublicImages')
 
     def test_list_public_images_with_filters(self):
-        results = self.image.list_public_images(
-            guid='0FA9ECBD-CF7E-4A1F-1E36F8D27C2B', name='name')
-
+        # Casting to list() to force the iter_call generator to run
+        results = list(self.image.list_public_images(guid='0FA9ECBD-CF7E-4A1F-1E36F8D27C2B', name='name'))
+        self.assertEqual(len(results), 2)
         _filter = {
             'globalIdentifier': {
                 'operation': '_= 0FA9ECBD-CF7E-4A1F-1E36F8D27C2B'},
             'name': {'operation': '_= name'}
         }
-        self.assertEqual(len(results), 2)
-        self.assert_called_with(IMAGE_SERVICE, 'getPublicImages',
-                                filter=_filter)
+
+        self.assert_called_with(IMAGE_SERVICE, 'getPublicImages', filter=_filter)
 
     def test_resolve_ids_guid(self):
         result = self.image.resolve_ids('3C1F3C68-0B67-4F5E-8907-D0FC84BF3F12')
@@ -223,3 +219,15 @@ class ImageTests(testing.TestCase):
             100,
             locations
         )
+
+    def test_share_image(self):
+        result = self.image.share_image(image_id=123456, account_id=654321)
+
+        self.assert_called_with(IMAGE_SERVICE, 'permitSharingAccess', identifier=123456, args=(654321,))
+        self.assertEqual(True, result)
+
+    def test_deny_share_image(self):
+        result = self.image.deny_share_image(image_id=123456, account_id=654321)
+
+        self.assert_called_with(IMAGE_SERVICE, 'denySharingAccess', identifier=123456, args=(654321,))
+        self.assertEqual(True, result)

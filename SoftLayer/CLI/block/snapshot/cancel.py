@@ -11,19 +11,25 @@ from SoftLayer.CLI import formatting
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume-id')
-@click.option('--reason', help="An optional reason for cancellation")
+@click.option('--reason', help="An optional reason for cancellation.")
 @click.option('--immediate',
               is_flag=True,
               help="Cancels the snapshot space immediately instead "
-                   "of on the billing anniversary")
+                   "of on the billing anniversary.")
+@click.option('--force',  default=False, is_flag=True, help="Force modify")
 @environment.pass_env
-def cli(env, volume_id, reason, immediate):
+def cli(env, volume_id, reason, immediate, force):
     """Cancel existing snapshot space for a given volume."""
 
     block_storage_manager = SoftLayer.BlockStorageManager(env.client)
 
     if not (env.skip_confirmations or formatting.no_going_back(volume_id)):
         raise exceptions.CLIAbort('Aborted')
+
+    if not force:
+        if not (env.skip_confirmations or
+                formatting.confirm("This action will incur charges on your account. Continue?")):
+            raise exceptions.CLIAbort('Aborted')
 
     cancelled = block_storage_manager.cancel_snapshot_space(
         volume_id, reason, immediate)

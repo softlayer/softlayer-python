@@ -24,8 +24,7 @@ DEFAULT_COLUMNS = [
 @click.argument('volume-id')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. Options: {0}'.format(
-                  ', '.join(column.name for column in COLUMNS)),
+              help=f"Columns to display. Options: {', '.join(column.name for column in COLUMNS)}",
               default=','.join(DEFAULT_COLUMNS))
 @click.option('--sortby', help='Column to sort by', default='Long Name')
 @environment.pass_env

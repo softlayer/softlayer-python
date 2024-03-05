@@ -69,28 +69,28 @@ class VirtCreateTests(testing.TestCase):
         self.assertIn('"guid": "1a2b3c-1701"', result.output)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         args = ({
-            'startCpus': 2,
-            'maxMemory': 1024,
-            'hostname': 'host',
-            'domain': 'example.com',
-            'localDiskFlag': True,
-            'hourlyBillingFlag': True,
-            'supplementalCreateObjectOptions': {'bootMode': None},
-            'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-            'datacenter': {'name': 'dal05'},
-            'primaryBackendNetworkComponent': {
-                'networkVlan': {
-                    'id': 577940,
-                    'primarySubnet': {'id': 478700}
-                }
-            },
-            'primaryNetworkComponent': {
-                'networkVlan': {
-                    'id': 1639255,
-                    'primarySubnet': {'id': 297614}
-                }
-            }
-        },)
+                    'startCpus': 2,
+                    'maxMemory': 1024,
+                    'hostname': 'host',
+                    'domain': 'example.com',
+                    'localDiskFlag': True,
+                    'hourlyBillingFlag': True,
+                    'supplementalCreateObjectOptions': {'bootMode': None},
+                    'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+                    'datacenter': {'name': 'dal05'},
+                    'primaryBackendNetworkComponent': {
+                        'networkVlan': {
+                            'id': 577940,
+                            'primarySubnet': {'id': 478700}
+                        }
+                    },
+                    'primaryNetworkComponent': {
+                        'networkVlan': {
+                            'id': 1639255,
+                            'primarySubnet': {'id': 297614}
+                        }
+                    }
+                },)
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
 
@@ -114,26 +114,26 @@ class VirtCreateTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         args = ({
-            'startCpus': 2,
-            'maxMemory': 1024,
-            'hostname': 'host',
-            'domain': 'example.com',
-            'localDiskFlag': True,
-            'hourlyBillingFlag': True,
-            'supplementalCreateObjectOptions': {'bootMode': None},
-            'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-            'datacenter': {'name': 'dal05'},
-            'primaryBackendNetworkComponent': {
+                    'startCpus': 2,
+                    'maxMemory': 1024,
+                    'hostname': 'host',
+                    'domain': 'example.com',
+                    'localDiskFlag': True,
+                    'hourlyBillingFlag': True,
+                    'supplementalCreateObjectOptions': {'bootMode': None},
+                    'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+                    'datacenter': {'name': 'dal05'},
+                    'primaryBackendNetworkComponent': {
                         'router': {
                             'id': 577940
                         }
-            },
-            'primaryNetworkComponent': {
-                'router': {
-                    'id': 1639255
-                }
-            }
-        },)
+                    },
+                    'primaryNetworkComponent': {
+                        'router': {
+                            'id': 1639255
+                        }
+                    }
+                },)
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
 
@@ -216,17 +216,17 @@ class VirtCreateTests(testing.TestCase):
         self.assert_no_fail(result)
         self.assertIn('"guid": "1a2b3c-1701"', result.output)
         args = ({
-            'startCpus': 2,
-            'maxMemory': 1024,
-            'hostname': 'host',
-            'domain': 'example.com',
-            'localDiskFlag': True,
-            'hourlyBillingFlag': True,
-            'supplementalCreateObjectOptions': {'bootMode': None},
-            'blockDeviceTemplateGroup': {'globalIdentifier': 'aaaa1111bbbb2222'},
-            'datacenter': {'name': 'dal05'},
-            'networkComponents': [{'maxSpeed': 100}]
-        },)
+                    'startCpus': 2,
+                    'maxMemory': 1024,
+                    'hostname': 'host',
+                    'domain': 'example.com',
+                    'localDiskFlag': True,
+                    'hourlyBillingFlag': True,
+                    'supplementalCreateObjectOptions': {'bootMode': None},
+                    'blockDeviceTemplateGroup': {'globalIdentifier': 'aaaa1111bbbb2222'},
+                    'datacenter': {'name': 'dal05'},
+                    'networkComponents': [{'maxSpeed': 100}]
+                },)
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
@@ -345,18 +345,18 @@ class VirtCreateTests(testing.TestCase):
 
         self.assert_called_with('SoftLayer_Product_Order', 'placeOrder')
         template_args = ({
-            'startCpus': 2,
-            'maxMemory': 1024,
-            'hostname': 'host',
-            'domain': 'example.com',
-            'localDiskFlag': True,
-            'hourlyBillingFlag': True,
-            'supplementalCreateObjectOptions': {'bootMode': None},
-            'dedicatedHost': {'id': 123},
-            'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-            'datacenter': {'name': 'dal05'},
-            'networkComponents': [{'maxSpeed': 100}]
-        },)
+                             'startCpus': 2,
+                             'maxMemory': 1024,
+                             'hostname': 'host',
+                             'domain': 'example.com',
+                             'localDiskFlag': True,
+                             'hourlyBillingFlag': True,
+                             'supplementalCreateObjectOptions': {'bootMode': None},
+                             'dedicatedHost': {'id': 123},
+                             'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+                             'datacenter': {'name': 'dal05'},
+                             'networkComponents': [{'maxSpeed': 100}]
+                         },)
 
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=template_args)
 
@@ -633,22 +633,21 @@ class VirtCreateTests(testing.TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assert_called_with('SoftLayer_Product_Order', 'verifyOrder')
         args = ({
-            'startCpus': None,
-            'maxMemory': None,
-            'hostname': 'TEST',
-            'domain': 'TESTING',
-            'localDiskFlag': None,
-            'hourlyBillingFlag': True,
-            'supplementalCreateObjectOptions': {
-                'bootMode': None,
-                'flavorKeyName': 'B1_2X8X25'
-            },
-            'operatingSystemReferenceCode': 'UBUNTU_LATEST',
-            'datacenter': {
-                'name': 'TEST00'
-            }
-        },
-        )
+                    'startCpus': None,
+                    'maxMemory': None,
+                    'hostname': 'TEST',
+                    'domain': 'TESTING',
+                    'localDiskFlag': None,
+                    'hourlyBillingFlag': True,
+                    'supplementalCreateObjectOptions': {
+                        'bootMode': None,
+                        'flavorKeyName': 'B1_2X8X25'
+                    },
+                    'operatingSystemReferenceCode': 'UBUNTU_LATEST',
+                    'datacenter': {
+                        'name': 'TEST00'
+                    }
+                },)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'generateOrderTemplate', args=args)
         self.assertEqual([], self.calls('SoftLayer_Virtual_Guest', 'setTags'))
 
@@ -693,7 +692,7 @@ class VirtCreateTests(testing.TestCase):
         self.assertEqual(result.exit_code, 2)
 
     def test_create_vs_export(self):
-        if(sys.platform.startswith("win")):
+        if sys.platform.startswith("win"):
             self.skipTest("Test doesn't work in Windows")
         with tempfile.NamedTemporaryFile() as config_file:
             result = self.run_command(['vs', 'create', '--hostname', 'TEST', '--export', config_file.name,

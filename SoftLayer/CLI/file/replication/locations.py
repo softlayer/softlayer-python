@@ -25,12 +25,16 @@ DEFAULT_COLUMNS = [
 @click.option('--sortby', help='Column to sort by', default='Long Name')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. Options: {0}'.format(
-                  ', '.join(column.name for column in COLUMNS)),
+              help=f"Columns to display. Options: {', '.join(column.name for column in COLUMNS)}",
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, columns, sortby, volume_id):
-    """List suitable replication datacenters for the given volume."""
+    """List suitable replication datacenters for the given volume.
+
+    Example::
+        slcl file replica-locations 12345678
+        This command lists suitable replication data centers for block volume with ID 12345678.
+    """
     file_storage_manager = SoftLayer.FileStorageManager(env.client)
 
     legal_centers = file_storage_manager.get_replication_locations(

@@ -53,3 +53,5 @@ getStorageLocations = [
     {'id': 265592, 'longName': 'Amsterdam 1', 'name': 'ams01', 'statusId': 2},
     {'id': 814994, 'longName': 'Amsterdam 3', 'name': 'ams03', 'statusId': 2},
 ]
+permitSharingAccess = True
+denySharingAccess = True

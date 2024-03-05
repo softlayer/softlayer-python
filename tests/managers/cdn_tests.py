@@ -58,42 +58,54 @@ class CDNTests(testing.TestCase):
                                 'listOriginPath')
 
     def test_add_origin(self):
-        self.cdn_client.add_origin("12345", "10.10.10.1", "/example/videos", origin_type="server",
-                                   header="test.example.com", port=80, protocol='http', optimize_for="web",
-                                   cache_query="include all")
+        self.cdn_client.add_origin("12345", "10.10.10.1", "/example/videos", dynamic_path="abc.html",
+                                   origin_type="server", header="test.example.com", https_port=81,
+                                   protocol='https', optimize_for="dynamic", compression=True,
+                                   prefetching=True, cache_query="include all")
 
         args = ({
             'uniqueId': "12345",
             'origin': '10.10.10.1',
             'path': '/example/videos',
-                    'originType': 'HOST_SERVER',
-                    'header': 'test.example.com',
-                    'httpPort': 80,
-                    'protocol': 'HTTP',
-                    'performanceConfiguration': 'General web delivery',
-                    'cacheKeyQueryRule': "include all"
+            'originType': 'HOST_SERVER',
+            'header': 'test.example.com',
+            'httpPort': 80,
+            'httpsPort': 81,
+            'protocol': 'HTTPS',
+            'performanceConfiguration': 'Dynamic content acceleration',
+            'cacheKeyQueryRule': "include all",
+            'dynamicContentAcceleration': {
+                'detectionPath': "/abc.html",
+                'prefetchEnabled': True,
+                'mobileImageCompressionEnabled': True
+            }
         },)
         self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path',
                                 'createOriginPath',
                                 args=args)
 
     def test_add_origin_with_bucket_and_file_extension(self):
-        self.cdn_client.add_origin("12345", "10.10.10.1", "/example/videos", origin_type="storage",
-                                   bucket_name="test-bucket", file_extensions="jpg", header="test.example.com", port=80,
-                                   protocol='http', optimize_for="web", cache_query="include all")
+        self.cdn_client.add_origin("12345", "10.10.10.1", "/example/videos", dynamic_path="abc.html",
+                                   origin_type="server", header="test.example.com", https_port=81,
+                                   protocol='https', optimize_for="dynamic", compression=True,
+                                   prefetching=True, cache_query="include all")
 
         args = ({
             'uniqueId': "12345",
             'origin': '10.10.10.1',
             'path': '/example/videos',
-                    'originType': 'OBJECT_STORAGE',
-                    'header': 'test.example.com',
-                    'httpPort': 80,
-                    'protocol': 'HTTP',
-                    'bucketName': 'test-bucket',
-                    'fileExtension': 'jpg',
-                    'performanceConfiguration': 'General web delivery',
-                    'cacheKeyQueryRule': "include all"
+            'originType': 'HOST_SERVER',
+            'header': 'test.example.com',
+            'httpPort': 80,
+            'httpsPort': 81,
+            'protocol': 'HTTPS',
+            'performanceConfiguration': 'Dynamic content acceleration',
+            'cacheKeyQueryRule': "include all",
+            'dynamicContentAcceleration': {
+                'detectionPath': "/abc.html",
+                'prefetchEnabled': True,
+                'mobileImageCompressionEnabled': True
+            }
         },)
         self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping_Path',
                                 'createOriginPath',
@@ -150,3 +162,26 @@ class CDNTests(testing.TestCase):
         self.assert_called_with(
             'SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
             'listDomainMappings',)
+
+    def test_delete_cdn(self):
+        uniqueId = "123465"
+        self.cdn_client.delete_cdn(uniqueId)
+
+        args = (uniqueId,)
+
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
+                                'deleteDomainMapping',
+                                args=args)
+
+    def test_create_cdn(self):
+        hostname = "test.com"
+        origin = "123.123.123.123"
+        origin_type = "server"
+        http = 80
+        newCdn = ({"domain": hostname, "origin": origin, "originType": "HOST_SERVER",
+                  "vendorName": "akamai", "httpPort": http, "protocol": "HTTP"},)
+        self.cdn_client.create_cdn(hostname, origin, origin_type, http)
+
+        self.assert_called_with('SoftLayer_Network_CdnMarketplace_Configuration_Mapping',
+                                'createDomainMapping',
+                                args=newCdn)

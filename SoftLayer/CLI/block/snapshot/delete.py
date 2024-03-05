@@ -10,7 +10,7 @@ from SoftLayer.CLI import environment
 @click.argument('snapshot_id')
 @environment.pass_env
 def cli(env, snapshot_id):
-    """Deletes a snapshot on a given volume"""
+    """Deletes a snapshot on a given volume."""
     block_manager = SoftLayer.BlockStorageManager(env.client)
     deleted = block_manager.delete_snapshot(snapshot_id)
 

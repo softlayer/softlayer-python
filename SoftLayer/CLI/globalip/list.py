@@ -14,7 +14,11 @@ from SoftLayer.CLI import formatting
               type=click.Choice(['v4', 'v6']))
 @environment.pass_env
 def cli(env, ip_version):
-    """List all global IPs."""
+    """List all global IPs.
+
+    Example::
+        slcli globalip list
+    """
 
     mgr = SoftLayer.NetworkManager(env.client)
 

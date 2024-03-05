@@ -14,7 +14,7 @@ from SoftLayer.CLI import helpers
 @click.command(cls=SoftLayer.CLI.command.SLCommand, short_help="Capture SoftLayer image.")
 @click.argument('identifier')
 @click.option('--name', '-n', required=True, help="Name of the image")
-@click.option('--all', help="Capture all disks belonging to the VS")
+@click.option('--all', is_flag=True, default=False, help="Capture all disks belonging to the VS")
 @click.option('--note', help="Add a note to be associated with the image")
 @environment.pass_env
 def cli(env, identifier, name, all, note):

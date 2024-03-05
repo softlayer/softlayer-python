@@ -134,7 +134,7 @@ class VSManager(utils.IdentifierMixin, object):
         if tags:
             _filter['virtualGuests']['tagReferences']['tag']['name'] = {
                 'operation': 'in',
-                'options': [{'name': 'data', 'value': tags}],
+                'options': [{'name': 'data', 'value': list(tags)}],
             }
 
         if cpus:
@@ -287,7 +287,7 @@ class VSManager(utils.IdentifierMixin, object):
             _mask = "mask[priceGroups]"
             dc_details = self.client.call('SoftLayer_Location', 'getDatacenters', mask=_mask, filter=_filter, limit=1)
             if not dc_details:
-                raise SoftLayerError("Unable to find a datacenter named {}".format(datacenter))
+                raise SoftLayerError(f"Unable to find a datacenter named {datacenter}")
             # A DC will have several price groups, no good way to deal with this other than checking each.
             # An item should only belong to one type of price group.
             for group in dc_details[0].get('priceGroups', []):
@@ -1120,7 +1120,7 @@ class VSManager(utils.IdentifierMixin, object):
         if category_to_request is None:
             return None
 
-        key_name = "*= GUEST_DISK_"+str(capacity)+"_GB_SAN"
+        key_name = "*= GUEST_DISK_" + str(capacity) + "_GB_SAN"
         object_filter = {
             "itemPrices": {
                 "locationGroupId": {"operation": "is null"},
@@ -1440,15 +1440,6 @@ class VSManager(utils.IdentifierMixin, object):
         :param int instance_id: Id of the virtual server
         """
         return self.guest.migrateDedicatedHost(host_id, id=instance_id)
-
-    def get_hardware_guests(self):
-        """Returns all virtualHost capable hardware objects and their guests.
-
-        :return SoftLayer_Hardware[].
-        """
-        object_filter = {"hardware": {"virtualHost": {"id": {"operation": "not null"}}}}
-        mask = "mask[virtualHost[guests[powerState]]]"
-        return self.client.call('SoftLayer_Account', 'getHardware', mask=mask, filter=object_filter)
 
     def authorize_storage(self, vs_id, username_storage):
         """Authorize File or Block Storage to a Virtual Server.

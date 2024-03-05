@@ -19,7 +19,12 @@ If you wish to test failover, please use replica-failover.
 @click.option('--replicant-id', help="ID of the replicant volume")
 @environment.pass_env
 def cli(env, volume_id, replicant_id):
-    """Failover an inaccessible file volume to its available replicant volume."""
+    """Failover an inaccessible file volume to its available replicant volume.
+
+    Example::
+        slcli file disaster-recovery-failover 12345678 87654321
+        This command performs failover operation for volume with ID 12345678 to replica volume with ID 87654321.
+"""
     file_storage_manager = SoftLayer.FileStorageManager(env.client)
 
     click.secho("""WARNING : Failover an inaccessible file volume to its available replicant volume."""

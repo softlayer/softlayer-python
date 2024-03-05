@@ -10,21 +10,24 @@ from SoftLayer import utils
 
 
 @click.command(cls=SLCommand)
+@click.option('--create', '-c', help='The date the billing item was created.')
+@click.option('--ordered', '-o', help='Name that ordered the item')
+@click.option('--category', '-C', help='Category name')
 @environment.pass_env
-def cli(env):
+def cli(env, create, category, ordered):
     """Lists billing items with some other useful information.
 
     Similiar to https://cloud.ibm.com/billing/billing-items
     """
 
     manager = AccountManager(env.client)
-    items = manager.get_account_billing_items()
-    table = item_table(items)
+    items = manager.get_account_billing_items(create, category)
+    table = item_table(items, ordered)
 
     env.fout(table)
 
 
-def item_table(items):
+def item_table(items, ordered=None):
     """Formats a table for billing items"""
     table = formatting.Table([
         "Id",
@@ -39,7 +42,7 @@ def item_table(items):
     table.align['Category Code'] = 'l'
     for item in items:
         description = item.get('description')
-        fqdn = "{}.{}".format(item.get('hostName', ''), item.get('domainName', ''))
+        fqdn = f"{item.get('hostName', '')}.{item.get('domainName', '')}"
         if fqdn != ".":
             description = fqdn
         user = utils.lookup(item, 'orderItem', 'order', 'userRecord')
@@ -48,7 +51,9 @@ def item_table(items):
         if user:
             # ordered_by = "{} ({})".format(user.get('displayName'), utils.lookup(user, 'userStatus', 'name'))
             ordered_by = user.get('displayName')
-
+        if ordered:
+            if ordered != ordered_by:
+                continue
         table.add_row([
             item.get('id'),
             create_date,

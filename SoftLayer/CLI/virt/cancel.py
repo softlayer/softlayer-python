@@ -24,4 +24,4 @@ def cli(env, identifier):
     virtual_server = vsi.cancel_instance(vs_id)
 
     if virtual_server:
-        env.fout("The virtual server instance: {} was cancelled.".format(vs_id))
+        env.fout(f"The virtual server instance: {vs_id} was cancelled.")

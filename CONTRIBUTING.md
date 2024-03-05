@@ -42,6 +42,27 @@ Docs are generated with [Sphinx](https://docs.readthedocs.io/en/latest/intro/get
 
 `make html` in the softlayer-python/docs directory, which should generate the HTML in `softlayer-python/docs/_build/html` for testing.
 
+For windows, use:
+```
+cd docs
+python -m sphinx -T -E -b dirhtml -d _build/doctrees -D language=en . _build/html
+```
+
+
+### Note
+
+If you get this error, or similar... you might just need to remove the `_build/html/*` directory and try again, that seems to generally work.
+```
+docs\cli\hardware.rst:15: ERROR: Failed to import "cli" from "SoftLayer.CLI.hardware.cancel". The following exception was raised:
+Traceback (most recent call last):
+  File "py311\Lib\site-packages\sphinx_click\ext.py", line 403, in _load_module
+    mod = __import__(module_name, globals(), locals(), [attr_name])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "SoftLayer\CLI\hardware\cancel.py", line 13, in <module>
+    @click.command(cls=SoftLayer.CLI.command.SLCommand, )
+                       ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'SoftLayer.CLI' has no attribute 'command'
+```
 
 ## Unit Tests
 
@@ -154,3 +175,27 @@ When doing testing of a code change, indicate this with a comment on the pull re
 
 :heavy_check: `slcli vs list --new-feature` 
 :x: `slcli vs list --broken-feature`
+
+
+### Secret Checking
+This repo uses [IBM Detect-Secrets](https://github.com/IBM/detect-secrets) to prevent secrets from being committed to the codebase. If your commit is rejected because of a secret make sure to remove the secret and try again. If you need to mark the secret as a false positive to the following:
+
+```
+detect-secrets scan --update .secrets.baseline
+git add .secrets.baseline
+```
+
+The first time you commit code, you may need to install detect-secrets, but hopefully that should be taken care of you by the git precommit hook.
+
+```
+$> git commit --message="#1997 adding secret baseline"
+[INFO] Initializing environment for https://github.com/ibm/detect-secrets.
+[INFO] Installing environment for https://github.com/ibm/detect-secrets.
+[INFO] Once installed this environment will be reused.
+[INFO] This may take a few minutes...
+Detect secrets...........................................................Passed
+[issues1997 11d3dcb5] #1997 adding secret baseline
+ 2 files changed, 791 insertions(+)
+ create mode 100644 .pre-commit-config.yaml
+ create mode 100644 .secrets.baseline
+```

@@ -21,7 +21,6 @@ COLUMNS = [
         else '-',
         mask="storageType.keyName"),
     column_helper.Column('capacity_gb', ('capacityGb',), mask="capacityGb"),
-    column_helper.Column('bytes_used', ('bytesUsed',), mask="bytesUsed"),
     column_helper.Column('IOPs', ('provisionedIops',), mask="provisionedIops"),
     column_helper.Column('ip_addr', ('serviceResourceBackendIpAddress',),
                          mask="serviceResourceBackendIpAddress"),
@@ -42,7 +41,6 @@ DEFAULT_COLUMNS = [
     'datacenter',
     'storage_type',
     'capacity_gb',
-    'bytes_used',
     'IOPs',
     'ip_addr',
     'lunId',
@@ -62,12 +60,18 @@ DEFAULT_COLUMNS = [
 @click.option('--sortby', help='Column to sort by', default='username')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. Options: {0}'.format(
-                  ', '.join(column.name for column in COLUMNS)),
+              help=f"Columns to display. Options: {', '.join(column.name for column in COLUMNS)}",
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, sortby, columns, datacenter, username, storage_type, order):
-    """List block storage."""
+    """List block storage.
+
+    Example::
+        slcli block volume-list -d dal09 -t endurance --sortby capacity_gb
+        This command lists all endurance volumes on current account \
+that are located at dal09, and sorts them by capacity.
+"""
+
     block_manager = SoftLayer.BlockStorageManager(env.client)
     block_volumes = block_manager.list_block_volumes(datacenter=datacenter,
                                                      username=username,

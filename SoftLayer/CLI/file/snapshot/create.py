@@ -12,7 +12,13 @@ from SoftLayer.CLI import environment
               help='Notes to set on the new snapshot')
 @environment.pass_env
 def cli(env, volume_id, notes):
-    """Creates a snapshot on a given volume"""
+    """Creates a snapshot on a given volume
+
+    Example::
+
+        slcli file snapshot-create 12345678 --note snapshotforsoftlayer
+        This command creates a snapshot for volume with ID 12345678 and with addition note as snapshotforsoftlayer.
+    """
     file_storage_manager = SoftLayer.FileStorageManager(env.client)
     snapshot = file_storage_manager.create_snapshot(volume_id, notes=notes)
 

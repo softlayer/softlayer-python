@@ -67,11 +67,46 @@ various services. These are higher-level interfaces to the SoftLayer API.
 
 **Available managers**:
 
-.. toctree::
-   :maxdepth: 1
-   :glob:
+.. currentmodule:: SoftLayer.managers
 
-   managers/*
+.. autosummary::
+    :toctree: managers
+    :recursive:
+    :template: manager_template.rst
+
+    AccountManager
+    BandwidthManager
+    BlockStorageManager
+    CapacityManager
+    CDNManager
+    DedicatedHostManager
+    DNSManager
+    EventLogManager
+    FileStorageManager
+    FirewallManager
+    HardwareManager
+    ImageManager
+    IPSECManager
+    LicensesManager
+    LoadBalancerManager
+    MetadataManager
+    NetworkManager
+    ObjectStorageManager
+    OrderingManager
+    PlacementManager
+    SearchManager
+    SshKeyManager
+    SSLManager
+    TagManager
+    TicketManager
+    UserManager
+    VSManager
+
+    
+
+
+
+
 
 If you need more power or functionality than the managers provide, you can
 make direct API calls as well.
@@ -220,7 +255,7 @@ For example.
     print("Id, hostname")
     for item in result:
         # will throw a KeyError: 'hostName' exception on certain billing items that do not have a hostName
-        print("{}, {}".format(item['id'], item['hostName']))
+        print(f"{item['id']}, {item['hostName']}")
 
 The Solution
 ^^^^^^^^^^^^
@@ -229,7 +264,7 @@ Using the python dictionary's `.get() <https://docs.python.org/3/library/stdtype
 
 ::
 
-    print("{}, {}".format(item.get('id'), item.get('hostName')))
+    print(f"{item.get('id')}, {item.get('hostName')}")
 
 Otherwise, this SDK provides a util function to do something similar. Each additional argument passed into `utils.lookup` will go one level deeper into the nested dictionary to find the item requested, returning `None` if a KeyError shows up.
 
@@ -237,7 +272,7 @@ Otherwise, this SDK provides a util function to do something similar. Each addit
 
     itemId = SoftLayer.utils.lookup(item, 'id')
     itemHostname = SoftLayer.utils.lookup(item, 'hostName')
-    print("{}, {}".format(itemId, itemHostname))
+    print(f"{itemId}, {itemHostname}")
 
 
 API Reference

@@ -46,12 +46,12 @@ class AccountCLITests(testing.TestCase):
         result = self.run_command(command_params)
 
         json_text_tables = result.stdout.split('\n')
-        print("RESULT: {}".format(result.output))
+        print(f"RESULT: {result.output}")
         # removing an extra item due to an additional Newline at the end of the output
         json_text_tables.pop()
         # each item in the json_text_tables should be a list
         for json_text_table in json_text_tables:
-            print("TESTING THIS: \n{}\n".format(json_text_table))
+            print(f"TESTING THIS: \n{json_text_table}\n")
             json_table = json.loads(json_text_table)
             self.assertIsInstance(json_table, list)
 
@@ -70,10 +70,11 @@ class AccountCLITests(testing.TestCase):
         result = self.run_command(["--format", "csv", 'account', 'invoice-detail', '1234'])
         result_output = result.output.replace('\r', '').split('\n')
         self.assert_no_fail(result)
-        self.assertEqual(result_output[0], 'Item Id,Category,Description,Single,Monthly,Create Date,Location')
-        self.assertEqual(result_output[1], '724951323,Private (only) Secondary VLAN IP Addresses,'
-                                           '64 Portable Private IP Addresses (bleg.beh.com),'
-                                           '$0.00,$0.00,2018-04-04,fra02')
+        self.assertEqual(result_output[0], '"Item Id","Category","Description","Single","Monthly",'
+                         '"Create Date","Location"')
+        self.assertEqual(result_output[1], '724951323,"Private (only) Secondary VLAN IP Addresses",'
+                                           '"64 Portable Private IP Addresses (bleg.beh.com)",'
+                                           '"$0.00","$0.00","2018-04-04","fra02"')
 
     # slcli account invoices
     def test_invoices(self):
@@ -126,6 +127,21 @@ class AccountCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Account', 'getAllTopLevelBillingItems')
 
+    def test_account_billing_items_by_category(self):
+        result = self.run_command(['account', 'billing-items', '--category', 'server'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getAllTopLevelBillingItems')
+
+    def test_account_billing_items_by_ordered(self):
+        result = self.run_command(['account', 'billing-items', '--ordered', 'Test'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getAllTopLevelBillingItems')
+
+    def test_account_billing_items_create(self):
+        result = self.run_command(['account', 'billing-items', '--create', '04-21-2023'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getAllTopLevelBillingItems')
+
     # slcli account item-detail
     def test_account_get_billing_item_detail(self):
         result = self.run_command(['account', 'item-detail', '12345'])
@@ -149,13 +165,42 @@ class AccountCLITests(testing.TestCase):
         self.assert_called_with('SoftLayer_Account', 'getActiveVirtualLicenses')
         self.assert_called_with('SoftLayer_Account', 'getActiveAccountLicenses')
 
-    def test_bandwidth_pools(self):
-        result = self.run_command(['account', 'bandwidth-pools'])
+    def test_acccount_provisioning_hook(self):
+        result = self.run_command(['account', 'hooks'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Account', 'getBandwidthAllotments')
-        self.assert_called_with('SoftLayer_Network_Bandwidth_Version1_Allotment', 'getObject')
+        self.assert_called_with('SoftLayer_Account', 'getPostProvisioningHooks')
 
-    def test_acccount_bandwidth_pool_detail(self):
-        result = self.run_command(['account', 'bandwidth-pools-detail', '123456'])
+    def test_created_provisioning_hook(self):
+        result = self.run_command(['account', 'hook-create', '--name', 'testslcli', '--uri', 'http://slclitest.com'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Network_Bandwidth_Version1_Allotment', 'getObject')
+        self.assert_called_with('SoftLayer_Provisioning_Hook', 'createObject')
+
+    def test_delete_provisioning_hook(self):
+        result = self.run_command(['account', 'hook-delete', '123456'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Provisioning_Hook', 'deleteObject')
+
+    def test_order_upgrade(self):
+        result = self.run_command(['account', 'orders', '--upgrades'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Account', 'getUpgradeRequests')
+
+    def test_account_events(self):
+        result = self.run_command(['account', 'events', '--date-min', '5/9/2023'])
+        self.assert_no_fail(result)
+        self.assert_called_with(self.SLNOE, 'getAllObjects')
+
+    def test_account_planned_events(self):
+        result = self.run_command(['account', 'events', '--planned'])
+        self.assert_no_fail(result)
+        self.assert_called_with(self.SLNOE, 'getAllObjects')
+
+    def test_account_unplanned_events(self):
+        result = self.run_command(['account', 'events', '--unplanned'])
+        self.assert_no_fail(result)
+        self.assert_called_with(self.SLNOE, 'getAllObjects')
+
+    def test_account_announcement_events(self):
+        result = self.run_command(['account', 'events', '--announcement'])
+        self.assert_no_fail(result)
+        self.assert_called_with(self.SLNOE, 'getAllObjects')

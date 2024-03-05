@@ -1,5 +1,6 @@
-sphinx
-sphinx-click
+sphinx==7.2.6
+sphinx_rtd_theme==2.0.0
+sphinx-click==5.1.0
 click
 prettytable
 rich

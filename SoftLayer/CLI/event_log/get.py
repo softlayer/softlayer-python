@@ -5,6 +5,7 @@ import click
 
 import SoftLayer
 from SoftLayer.CLI import environment
+from SoftLayer import exceptions
 from SoftLayer import utils
 
 
@@ -29,7 +30,8 @@ from SoftLayer import utils
 def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metadata, limit):
     """Get Event Logs
 
-    Example:
+    Example::
+
         slcli event-log get -d 01/01/2019 -D 02/01/2019 -t User -l 10
     """
     columns = ['Event', 'Object', 'Type', 'Date', 'Username']
@@ -39,6 +41,7 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
     request_filter = event_mgr.build_filter(date_min, date_max, obj_event, obj_id, obj_type, utc_offset)
     logs = event_mgr.get_event_logs(request_filter)
     log_time = "%Y-%m-%dT%H:%M:%S.%f%z"
+    # A list of IDs that we have looked up user information about.
     user_data = {}
 
     if metadata:
@@ -56,27 +59,25 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
         if user == "CUSTOMER":
             username = user_data.get(log['userId'])
             if username is None:
-                username = user_mgr.get_user(log['userId'], "mask[username]")['username']
-                user_data[log['userId']] = username
+                try:
+                    username = user_mgr.get_user(log['userId'], "mask[username]")['username']
+                # Some users might not be able to access information about this specific userId
+                except exceptions.SoftLayerAPIError:
+                    username = log['userId']
+            # This keeps track of any users we asked the API about, so we can make fewer calls.
+            user_data[log['userId']] = username
             user = username
 
         if metadata:
             metadata_data = log['metaData'].strip("\n\t")
 
-            click.secho("'{0}','{1}','{2}','{3}','{4}','{5}'".format(
-                log['eventName'],
-                label,
-                log['objectName'],
-                utils.clean_time(log['eventCreateDate'], in_format=log_time),
-                user,
-                metadata_data))
+            click.secho(f"'{log['eventName']}','{label}','{log['objectName']}',"
+                        f"'{utils.clean_time(log['eventCreateDate'], in_format=log_time)}',"
+                        f"'{user}','{metadata_data}'")
         else:
-            click.secho("'{0}','{1}','{2}','{3}','{4}'".format(
-                log['eventName'],
-                label,
-                log['objectName'],
-                utils.clean_time(log['eventCreateDate'], in_format=log_time),
-                user))
+            click.secho(f"'{log['eventName']}','{label}','{log['objectName']}',"
+                        f"'{utils.clean_time(log['eventCreateDate'],in_format=log_time)}',"
+                        f"'{user}'")
 
         row_count = row_count + 1
         if row_count >= limit and limit != -1:

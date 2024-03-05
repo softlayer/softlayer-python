@@ -18,17 +18,6 @@ Install via pip:
 
 	$ pip install softlayer
 
-
-Debian/Ubuntu
--------------
-
-For Debian "jessie" (currently testing) and Ubuntu 14.04, official system
-packages are available. **These are typically a couple versions behind so it is recommended to install from pypi if problems are encountered.**
-::
-
-	$ sudo apt-get install python-softlayer
-
-
 .. _install_from_source:
 
 From Source

@@ -64,7 +64,13 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 def cli(env, origin_volume_id, origin_snapshot_id, duplicate_size,
         duplicate_iops, duplicate_tier, duplicate_snapshot_size, billing,
         dependent_duplicate):
-    """Order a duplicate block storage volume."""
+    """Order a duplicate block storage volume.
+
+    Example::
+        slcli block volume-duplicate 12345678
+        This command shows order a new volume by duplicating the volume with ID 12345678.
+"""
+
     block_manager = SoftLayer.BlockStorageManager(env.client)
 
     hourly_billing_flag = False
@@ -89,8 +95,7 @@ def cli(env, origin_volume_id, origin_snapshot_id, duplicate_size,
         raise exceptions.ArgumentError(str(ex))
 
     if 'placedOrder' in order.keys():
-        click.echo("Order #{0} placed successfully!".format(
-            order['placedOrder']['id']))
+        click.echo(f"Order #{order['placedOrder']['id']} placed successfully!")
         for item in order['placedOrder']['items']:
             click.echo(" > %s" % item['description'])
     else:

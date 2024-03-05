@@ -300,7 +300,7 @@ class OrderingTests(testing.TestCase):
                                     self.ordering.get_preset_by_key, 'PACKAGE_KEYNAME', keyname)
 
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', filter=preset_filter, mask=None)
-        self.assertEqual('Preset {} does not exist in package {}'.format(keyname, 'PACKAGE_KEYNAME'), str(exc))
+        self.assertEqual(f"Preset {keyname} does not exist in package PACKAGE_KEYNAME", str(exc))
 
     def test_get_price_id_list(self):
         category1 = {'categoryCode': 'cat1'}
@@ -316,8 +316,7 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
-                                                                  'prices[categories]')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask=self.ordering.package_mask)
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_get_price_id_list_no_core(self):
@@ -335,22 +334,24 @@ class OrderingTests(testing.TestCase):
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], None)
 
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
-                                                                  'prices[categories]')
+                                          'prices[categories], softwareDescription[id,referenceCode,longDescription]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_get_price_id_list_item_not_found(self):
         category1 = {'categoryCode': 'cat1'}
         price1 = {'id': 1234, 'locationGroupId': '', 'categories': [category1]}
-        item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': category1, 'prices': [price1]}
+        softwareDescription1 = {'id': 1234, 'longDescription': 'ABCD 1.2-34', 'referenceCode': 'ABCD_9_32'}
+        item1 = {'id': 1111, 'keyName': 'ITEM1', 'itemCategory': category1,
+                 'prices': [price1], 'softwareDescription': softwareDescription1, }
 
         with mock.patch.object(self.ordering, 'list_items') as list_mock:
             list_mock.return_value = [item1]
 
             exc = self.assertRaises(exceptions.SoftLayerError,
                                     self.ordering.get_price_id_list,
-                                    'PACKAGE_KEYNAME', ['ITEM2'], "8")
+                                    'PACKAGE_KEYNAME', ['ITEM2'], "12")
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
-                                                                  'prices[categories]')
+                                          'prices[categories], softwareDescription[id,referenceCode,longDescription]')
         self.assertEqual("Item ITEM2 does not exist for package PACKAGE_KEYNAME", str(exc))
 
     def test_get_price_id_list_gpu_items_with_two_categories(self):
@@ -365,7 +366,8 @@ class OrderingTests(testing.TestCase):
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM1'], "8")
 
             list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, '
-                                                                      'keyName, ' 'prices[categories]')
+                                              'keyName, prices[categories], '
+                                              'softwareDescription[id,referenceCode,longDescription]')
             self.assertEqual([price2['id'], price1['id']], prices)
 
     def test_generate_no_complex_type(self):
@@ -620,7 +622,7 @@ class OrderingTests(testing.TestCase):
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
         list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
-                                                                  'prices[categories]')
+                                          'prices[categories], softwareDescription[id,referenceCode,longDescription]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_location_groud_id_empty(self):
@@ -637,8 +639,9 @@ class OrderingTests(testing.TestCase):
 
             prices = self.ordering.get_price_id_list('PACKAGE_KEYNAME', ['ITEM1', 'ITEM2'], "8")
 
-        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, keyName, '
-                                                                  'prices[categories]')
+        list_mock.assert_called_once_with('PACKAGE_KEYNAME', mask='id, description, capacity, itemCategory, '
+                                          'keyName, prices[categories], '
+                                          'softwareDescription[id,referenceCode,longDescription]')
         self.assertEqual([price1['id'], price2['id']], prices)
 
     def test_get_item_price_id_without_capacity_restriction(self):
@@ -901,3 +904,11 @@ class OrderingTests(testing.TestCase):
     def test_get_regions(self):
         self.ordering.get_regions(123)
         self.assert_called_with('SoftLayer_Product_Package', 'getRegions')
+
+    def test_delete_quote(self):
+        self.ordering.delete_quote(123)
+        self.assert_called_with('SoftLayer_Billing_Order_Quote', 'deleteQuote')
+
+    def test_get_all_cancelations(self):
+        self.ordering.get_all_cancelation()
+        self.assert_called_with('SoftLayer_Billing_Item_Cancellation_Request', 'getAllCancellationRequests')

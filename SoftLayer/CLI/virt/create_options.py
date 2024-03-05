@@ -42,7 +42,7 @@ def cli(env, vsi_type, prices, location=None):
 
         notes = '-'
         if len(closure) > 0:
-            notes = 'closed soon: %s' % (', '.join(closure))
+            notes = f"closed soon: {', '.join(closure)}"
         dc_table.add_row([location_info['name'], location_info['key'], notes])
     tables.append(dc_table)
 
@@ -108,7 +108,7 @@ def os_prices_table(operating_systems, prices=False):
                 [operating_system['key'],
                  _get_price_data(price, 'hourlyRecurringFee'),
                  _get_price_data(price, 'recurringFee'),
-                 "%s - %s %s" % (cr_min, cr_max, cr_type)])
+                 f"{cr_min} - {cr_max} {cr_type}"])
         os_table.add_row([operating_system['name'], operating_system['key'], operating_system['referenceCode']])
     if prices:
         return os_price_table
@@ -215,7 +215,7 @@ def database_prices_table(database_list, prices=False):
                 [database['key'],
                  _get_price_data(price, 'hourlyRecurringFee'),
                  _get_price_data(price, 'recurringFee'),
-                 "%s - %s %s" % (cr_min, cr_max, cr_type)])
+                 f"{cr_min} - {cr_max} {cr_type}"])
         database_table.add_row([database['name'], database['key']])
     if prices:
         return database_price_table

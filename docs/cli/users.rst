@@ -1,7 +1,7 @@
 .. _cli_user:
 
 Users
-=============
+=====
 Version 5.6.0 introduces the ability to interact with user accounts from the cli. 
 
 .. click:: SoftLayer.CLI.user.list:cli
@@ -60,4 +60,19 @@ Version 5.6.0 introduces the ability to interact with user accounts from the cli
     :prog: user grant-access
     :show-nested:
 
+.. click:: SoftLayer.CLI.user.vpn_password:cli
+    :prog: user vpn-password
+    :show-nested:
+
+.. click:: SoftLayer.CLI.user.vpn_enable_or_disable:vpn_enable
+    :prog: user vpn-enable
+    :show-nested:
+
+.. click:: SoftLayer.CLI.user.vpn_enable_or_disable:vpn_disable
+    :prog: user vpn-disable
+    :show-nested:
+
+.. click:: SoftLayer.CLI.user.apikey:cli
+    :prog: user apikey
+    :show-nested:
 

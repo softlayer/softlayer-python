@@ -19,4 +19,4 @@ def cli(env, key, immediate):
     item = licenses.cancel_item(key, immediate)
 
     if item:
-        env.fout("License key: {} was cancelled.".format(key))
+        env.fout(f"License key: {key} was cancelled.")

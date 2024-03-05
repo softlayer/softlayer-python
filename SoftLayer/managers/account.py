@@ -203,7 +203,7 @@ class AccountManager(utils.IdentifierMixin, object):
             limit=100
         )
 
-    def get_account_billing_items(self, mask=None):
+    def get_account_billing_items(self, create=None, category=None, mask=None):
         """Gets all the topLevelBillingItems currently active on the account
 
         :param string mask: Object Mask
@@ -222,9 +222,24 @@ class AccountManager(utils.IdentifierMixin, object):
                 "cancellationDate": {
                     "operation": "is null"
                 },
-                "createDate": utils.query_filter_orderby()
+                "id": {
+                    "operation": "orderBy",
+                    "options": [
+                        {
+                            "name": "sort",
+                            "value": ["ASC"]
+                        }
+                    ]
+                }
             }
         }
+
+        if category:
+            object_filter = utils.dict_merge(object_filter,
+                                             {"allTopLevelBillingItems": {"categoryCode": {"operation": category}}})
+        if create:
+            object_filter = utils.dict_merge(object_filter,
+                                             {"allTopLevelBillingItems": {"createDate": {"operation": "*=" + create}}})
 
         return self.client.call('Account', 'getAllTopLevelBillingItems',
                                 mask=mask, filter=object_filter, iter=True, limit=100)
@@ -278,7 +293,7 @@ class AccountManager(utils.IdentifierMixin, object):
 
         if note is None:
             user = self.client.call('Account', 'getCurrentUser', mask="mask[id,displayName,email,username]")
-            note = "Cancelled by {} with the SLCLI".format(user.get('username'))
+            note = f"Cancelled by {user.get('username')} with the SLCLI"
 
         return self.client.call('Billing_Item', 'cancelItem', False, True, reason, note, id=identifier)
 
@@ -358,7 +373,8 @@ class AccountManager(utils.IdentifierMixin, object):
 
         if mask is None:
             mask = """mask[totalBandwidthAllocated,locationGroup, id, name, projectedPublicBandwidthUsage,
-                      billingCyclePublicBandwidthUsage[amountOut,amountIn]]
+                      billingCyclePublicBandwidthUsage[amountOut,amountIn],
+                      billingItem[id,nextInvoiceTotalRecurringAmount],outboundPublicBandwidthUsage,serviceProviderId,bandwidthAllotmentTypeId,activeDetailCount,endDate]
                    """
 
         return self.client.call('SoftLayer_Account', 'getBandwidthAllotments', mask=mask, iter=True)
@@ -387,3 +403,36 @@ class AccountManager(utils.IdentifierMixin, object):
         virtualGuests[outboundPublicBandwidthUsage,bandwidthAllotmentDetail[allocation]],
         bareMetalInstances[outboundBandwidthUsage,bandwidthAllotmentDetail[allocation]]"""
         return self.client['SoftLayer_Network_Bandwidth_Version1_Allotment'].getObject(id=identifier, mask=_mask)
+
+    def get_provisioning_scripts(self):
+        """Gets a provisioning hooks.
+
+        :returns: provisioning hook
+        """
+
+        return self.client.call('Account', 'getPostProvisioningHooks')
+
+    def create_provisioning(self, name, uri):
+        """create a provisioning script
+
+        :param name: Name of the hook.
+        :param uri: endpoint that the script will be downloaded
+        """
+        template = {
+            'name': name,
+            'uri': uri
+        }
+        return self.client.call('SoftLayer_Provisioning_Hook', 'createObject', template)
+
+    def delete_provisioning(self, identifier):
+        """Delete a provisioning script
+
+        param: identifier provisioning script identifier
+
+        Returns: boolean
+        """
+        return self.client.call("SoftLayer_Provisioning_Hook", "deleteObject", id=identifier)
+
+    def get_account_upgrade_orders(self, limit=100):
+        """Gets upgrade order list"""
+        return self.client.call('SoftLayer_Account', 'getUpgradeRequests', limit=limit)

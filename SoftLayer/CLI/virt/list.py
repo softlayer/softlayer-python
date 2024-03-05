@@ -19,18 +19,15 @@ COLUMNS = [
     column_helper.Column('backend_ip', ('primaryBackendIpAddress',)),
     column_helper.Column('datacenter', ('datacenter', 'name')),
     column_helper.Column('action', lambda guest: formatting.active_txn(guest),
-                         mask='''
-                         activeTransaction[
-                            id,transactionStatus[name,friendlyName]
-                         ]'''),
+                         mask='activeTransaction[id,transactionStatus[name,friendlyName]]'),
     column_helper.Column('power_state', ('powerState', 'name')),
+    column_helper.Column('created_by', ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
+    column_helper.Column('tags', lambda server: formatting.tags(server.get('tagReferences')),
+                         mask="tagReferences.tag.name"),
     column_helper.Column(
-        'created_by',
-        ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
-    column_helper.Column(
-        'tags',
-        lambda server: formatting.tags(server.get('tagReferences')),
-        mask="tagReferences.tag.name"),
+        'createDate',
+        lambda guest: utils.clean_time(guest.get('createDate'),
+                                       in_format='%Y-%m-%dT%H:%M:%S', out_format='%Y-%m-%d %H:%M'), mask="createDate"),
 ]
 
 DEFAULT_COLUMNS = [
@@ -55,68 +52,42 @@ DEFAULT_COLUMNS = [
 @click.option('--network', '-n', help='Network port speed in Mbps')
 @click.option('--hourly', is_flag=True, help='Show only hourly instances')
 @click.option('--monthly', is_flag=True, help='Show only monthly instances')
+@click.option('--tag', '-t', help='list of tags', multiple=True)
 @click.option('--transient', help='Filter by transient instances', type=click.BOOL)
-@click.option('--hardware', is_flag=True, default=False, help='Show the all VSI related to hardware')
-@click.option('--all-guests', is_flag=True, default=False, help='Show the all VSI and hardware VSIs')
+@click.option('--search', is_flag=False, flag_value="", default=None,
+              help="Use the more flexible Search API to list instances. See `slcli search --types` for list " +
+              "of searchable fields.")
 @helpers.multi_option('--tag', help='Filter by tags')
-@click.option('--sortby',
-              help='Column to sort by',
-              default='hostname',
-              show_default=True)
+@click.option('--sortby', default='hostname', show_default=True, help='Column to sort by')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. [options: %s]'
-              % ', '.join(column.name for column in COLUMNS),
+              help=f"Columns to display. [options: {', '.join(column.name for column in COLUMNS)}]",
               default=','.join(DEFAULT_COLUMNS),
               show_default=True)
-@click.option('--limit', '-l',
-              help='How many results to get in one api call, default is 100',
-              default=100,
-              show_default=True)
+@click.option('--limit', '-l', default=100, show_default=True,
+              help='How many results to get in one api call, default is 100')
 @environment.pass_env
 def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network,
-        hourly, monthly, tag, columns, limit, transient, hardware, all_guests):
+        hourly, monthly, tag, columns, limit, transient, search):
     """List virtual servers."""
 
-    vsi = SoftLayer.VSManager(env.client)
-    guests = vsi.list_instances(hourly=hourly,
-                                monthly=monthly,
-                                hostname=hostname,
-                                domain=domain,
-                                cpus=cpu,
-                                memory=memory,
-                                datacenter=datacenter,
-                                nic_speed=network,
-                                transient=transient,
-                                tags=tag,
-                                mask=columns.mask(),
-                                limit=limit)
+    guests = []
+    if search is not None:
+        object_mask = f"mask[resource(SoftLayer_Virtual_Guest)[{columns.mask()}]]"
+        search_manager = SoftLayer.SearchManager(env.client)
+        guests = search_manager.search_instances(hostname=hostname, domain=domain, datacenter=datacenter,
+                                                 tags=tag, search_string=search, mask=object_mask)
+    else:
+        vsi = SoftLayer.VSManager(env.client)
+        guests = vsi.list_instances(hourly=hourly, monthly=monthly, hostname=hostname, domain=domain,
+                                    cpus=cpu, memory=memory, datacenter=datacenter, nic_speed=network,
+                                    transient=transient, tags=tag, mask=columns.mask(), limit=limit)
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby
-    if not hardware or all_guests:
-        for guest in guests:
-            table.add_row([value or formatting.blank()
-                           for value in columns.row(guest)])
 
-        env.fout(table)
+    for guest in guests:
+        table.add_row([value or formatting.blank()
+                       for value in columns.row(guest)])
 
-    if hardware or all_guests:
-        hardware_guests = vsi.get_hardware_guests()
-        for hd_guest in hardware_guests:
-            if hd_guest['virtualHost']['guests']:
-                title = "Hardware(id = {hardwareId}) guests associated".format(hardwareId=hd_guest['id'])
-                table_hardware_guest = formatting.Table(['id', 'hostname', 'CPU', 'Memory', 'Start Date', 'Status',
-                                                         'powerState'], title=title)
-                table_hardware_guest.sortby = 'hostname'
-                for guest in hd_guest['virtualHost']['guests']:
-                    table_hardware_guest.add_row([
-                        guest['id'],
-                        guest['hostname'],
-                        '%i %s' % (guest['maxCpu'], guest['maxCpuUnits']),
-                        guest['maxMemory'],
-                        utils.clean_time(guest['createDate']),
-                        guest['status']['keyName'],
-                        guest['powerState']['keyName']
-                    ])
-                env.fout(table_hardware_guest)
+    env.fout(table)

@@ -37,7 +37,7 @@ def _parse_create_args(client, args):
         try:
             data['extras'] = args.get('extras')
         except ValueError as err:
-            raise exceptions.CLIAbort("There was an error when parsing the --extras value: {}".format(err))
+            raise exceptions.CLIAbort(f"There was an error when parsing the --extras value: {err}")
     if args.get('image'):
         if args.get('image').isdigit():
             image_mgr = ImageManager(client)

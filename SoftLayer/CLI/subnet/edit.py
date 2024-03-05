@@ -34,6 +34,6 @@ def cli(env, identifier, tags, note):
 def print_result(result, detail):
     """Prints a successfully or Failed message."""
     if result:
-        click.secho("{} successfully".format(detail), fg='green')
+        click.secho(f"{detail} successfully", fg='green')
     else:
-        click.secho("Failed to {}".format(detail.lower()), fg='red')
+        click.secho(f"Failed to {detail.lower()}", fg='red')

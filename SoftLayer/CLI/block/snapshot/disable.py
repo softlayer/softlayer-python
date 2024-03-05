@@ -10,11 +10,11 @@ from SoftLayer.CLI import exceptions
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
 @click.option('--schedule-type',
-              help='Snapshot schedule [INTERVAL|HOURLY|DAILY|WEEKLY]',
+              help='Snapshot schedule [INTERVAL|HOURLY|DAILY|WEEKLY].',
               required=True)
 @environment.pass_env
 def cli(env, volume_id, schedule_type):
-    """Disables snapshots on the specified schedule for a given volume"""
+    """Disables snapshots on the specified schedule for a given volume."""
 
     if (schedule_type not in ['INTERVAL', 'HOURLY', 'DAILY', 'WEEKLY']):
         raise exceptions.CLIAbort(

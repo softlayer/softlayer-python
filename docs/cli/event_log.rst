@@ -1,7 +1,7 @@
 .. _cli_event_log:
 
 Event-Log Commands
-====================
+===================
 
 
 .. click:: SoftLayer.CLI.event_log.get:cli

@@ -145,6 +145,23 @@ class VirtTests(testing.TestCase):
 
         self.assert_no_fail(result)
 
+    def test_list_vs_search_noargs(self):
+        result = self.run_command(['vs', 'list', '--search'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Search', 'advancedSearch', args=('_objectType:SoftLayer_Virtual_Guest ',))
+
+    def test_list_vs_search_noargs_domain(self):
+        result = self.run_command(['vs', 'list', '--search', '-Dtest'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Search', 'advancedSearch',
+                                args=('_objectType:SoftLayer_Virtual_Guest  domain: *test*',))
+
+    def test_list_vs_search_args(self):
+        result = self.run_command(['vs', 'list', '--search=thisTerm'])
+        self.assert_no_fail(result)
+        self.assert_called_with('SoftLayer_Search', 'advancedSearch',
+                                args=('_objectType:SoftLayer_Virtual_Guest *thisTerm*',))
+
     @mock.patch('SoftLayer.utils.lookup')
     def test_detail_vs_empty_billing(self, mock_lookup):
         def mock_lookup_func(dic, key, *keys):
@@ -318,18 +335,18 @@ class VirtTests(testing.TestCase):
         result = self.run_command(["--format", "csv", 'vs', 'detail', '100'])
         result_output = result.output.replace('\r', '').split('\n')
         self.assert_no_fail(result)
-        self.assertEqual(result_output[0], 'name,value')
-        self.assertEqual(result_output[1], 'id,100')
-        self.assertEqual(result_output[16], 'drives,"Type,Name,Drive,Capacity"')
-        self.assertEqual(result_output[17], 'drives,"System,Disk,0,100 GB"')
-        self.assertEqual(result_output[18], 'drives,"Swap,Disk,1,2 GB"')
-        self.assertEqual(result_output[30], 'vlans,"type,number,id"')
-        self.assertEqual(result_output[31], 'vlans,"PUBLIC,23,1"')
-        self.assertEqual(result_output[32], 'Bandwidth,"Type,In GB,Out GB,Allotment"')
-        self.assertEqual(result_output[33], 'Bandwidth,"Public,.448,.52157,250"')
-        self.assertEqual(result_output[34], 'Bandwidth,"Private,.03842,.01822,N/A"')
-        self.assertEqual(result_output[35], 'security_groups,"interface,id,name"')
-        self.assertEqual(result_output[36], 'security_groups,"PRIVATE,128321,allow_all"')
+        self.assertEqual(result_output[0], '"name","value"')
+        self.assertEqual(result_output[1], '"id",100')
+        self.assertEqual(result_output[16], '"drives","Type,Name,Drive,Capacity"')
+        self.assertEqual(result_output[17], '"drives","System,Disk,0,100 GB"')
+        self.assertEqual(result_output[18], '"drives","Swap,Disk,1,2 GB"')
+        self.assertEqual(result_output[30], '"vlans","type,number,id"')
+        self.assertEqual(result_output[31], '"vlans","PUBLIC,23,1"')
+        self.assertEqual(result_output[32], '"Bandwidth","Type,In GB,Out GB,Allotment"')
+        self.assertEqual(result_output[33], '"Bandwidth","Public,.448,.52157,250"')
+        self.assertEqual(result_output[34], '"Bandwidth","Private,.03842,.01822,N/A"')
+        self.assertEqual(result_output[35], '"security_groups","interface,id,name"')
+        self.assertEqual(result_output[36], '"security_groups","PRIVATE,128321,allow_all"')
 
     def test_create_options(self):
         result = self.run_command(['vs', 'create-options', '--vsi-type', 'TRANSIENT_CLOUD_SERVER'])
@@ -919,10 +936,6 @@ class VirtTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Virtual_Guest', 'migrate', identifier=100)
         self.assert_not_called_with('SoftLayer_Virtual_Guest', 'migrateDedicatedHost', args=(999), identifier=100)
 
-    def test_list_vsi(self):
-        result = self.run_command(['vs', 'list', '--hardware'])
-        self.assert_no_fail(result)
-
     def test_credentail(self):
         result = self.run_command(['vs', 'credentials', '100'])
         self.assert_no_fail(result)
@@ -994,4 +1007,10 @@ class VirtTests(testing.TestCase):
 
     def test_notification_delete(self):
         result = self.run_command(['vs', 'notification-delete', '100'])
+        self.assert_no_fail(result)
+
+    def test_os_available(self):
+        _mock = self.set_mock('SoftLayer_Product_Package', 'getItems')
+        _mock.return_value = SoftLayer_Product_Package.getItemsOS
+        result = self.run_command(['vs', 'os-available'])
         self.assert_no_fail(result)

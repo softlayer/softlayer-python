@@ -64,27 +64,35 @@ class CDNManager(utils.IdentifierMixin, object):
 
         return self.cdn_path.listOriginPath(unique_id, **kwargs)
 
-    def add_origin(self, unique_id, origin, path, origin_type="server", header=None,
-                   port=80, protocol='http', bucket_name=None, file_extensions=None,
-                   optimize_for="web", cache_query="include all"):
+    def add_origin(self, unique_id, origin, path, dynamic_path, origin_type="server", header=None,
+                   http_port=80, https_port=None, protocol='http', bucket_name=None, file_extensions=None,
+                   optimize_for="web", compression=None, prefetching=None,
+                   cache_query="include all"):
         """Creates an origin path for an existing CDN.
 
         :param str unique_id: The unique ID associated with the CDN.
         :param str path: relative path to the domain provided, e.g. "/articles/video"
+        :param str dynamic_path: The path that Akamai edge servers periodically fetch the test object from.
+                                example = /detection-test-object.html
         :param str origin: ip address or hostname if origin_type=server, API endpoint for
                            your S3 object storage if origin_type=storage
         :param str origin_type: it can be 'server' or 'storage' types.
         :param str header: the edge server uses the host header to communicate with the origin.
                            It defaults to hostname. (optional)
-        :param int port: the http port number (default: 80)
+        :param int http_port: the http port number (default: 80)
+        :param int https_port: the https port number
         :param str protocol: the protocol of the origin (default: HTTP)
         :param str bucket_name: name of the available resource
         :param str file_extensions: file extensions that can be stored in the CDN, e.g. "jpg,png"
         :param str optimize_for: performance configuration, available options: web, video, and file where:
 
-                                    - 'web' = 'General web delivery'
-                                    - 'video' = 'Video on demand optimization'
-                                    - 'file' = 'Large file optimization'
+                                - 'web' = 'General web delivery'
+                                - 'video' = 'Video on demand optimization'
+                                - 'file' = 'Large file optimization'
+                                - 'dynamic' = 'Dynamic content acceleration'
+        :param bool compression: Enable or disable compression of JPEG images for requests over
+                                certain network conditions.
+        :param bool prefetching: Enable or disable the embedded object prefetching feature.
         :param str cache_query: rules with the following formats: 'include-all', 'ignore-all',
                                'include: space separated query-names',
                                'ignore: space separated query-names'.'
@@ -94,7 +102,8 @@ class CDNManager(utils.IdentifierMixin, object):
         performance_config = {
             'web': 'General web delivery',
             'video': 'Video on demand optimization',
-            'file': 'Large file optimization'
+            'file': 'Large file optimization',
+            "dynamic": "Dynamic content acceleration"
         }
 
         new_origin = {
@@ -102,11 +111,19 @@ class CDNManager(utils.IdentifierMixin, object):
             'path': path,
             'origin': origin,
             'originType': types.get(origin_type),
-            'httpPort': port,
+            'httpPort': http_port,
+            'httpsPort': https_port,
             'protocol': protocol.upper(),
-            'performanceConfiguration': performance_config.get(optimize_for, 'General web delivery'),
-            'cacheKeyQueryRule': cache_query
+            'performanceConfiguration': performance_config.get(optimize_for),
+            'cacheKeyQueryRule': cache_query,
         }
+
+        if optimize_for == 'dynamic':
+            new_origin['dynamicContentAcceleration'] = {
+                'detectionPath': "/" + str(dynamic_path),
+                'prefetchEnabled': bool(prefetching),
+                'mobileImageCompressionEnabled': bool(compression)
+            }
 
         if header:
             new_origin['header'] = header
@@ -140,7 +157,6 @@ class CDNManager(utils.IdentifierMixin, object):
         :param str path: A string of url or path that should be purged.
         :returns: A Container_Network_CdnMarketplace_Configuration_Cache_Purge array object
         """
-
         return self.cdn_purge.createPurge(unique_id, path)
 
     def get_usage_metrics(self, unique_id, history=30, frequency="aggregate"):
@@ -176,7 +192,7 @@ class CDNManager(utils.IdentifierMixin, object):
         return self._end_date
 
     def edit(self, identifier, header=None, http_port=None, https_port=None, origin=None,
-             respect_headers=None, cache=None, performance_configuration=None):
+             respect_headers=None, cache=None, cache_description=None, performance_configuration=None):
         """Edit the cdn object.
 
         :param string identifier: The CDN identifier.
@@ -224,12 +240,12 @@ class CDNManager(utils.IdentifierMixin, object):
         if respect_headers:
             config['respectHeaders'] = respect_headers
 
-        if cache:
+        if cache or cache_description:
             if 'include-specified' in cache['cacheKeyQueryRule']:
-                cache_key_rule = self.get_cache_key_query_rule('include', cache)
+                cache_key_rule = self.get_cache_key_query_rule('include', cache_description)
                 config['cacheKeyQueryRule'] = cache_key_rule
             elif 'ignore-specified' in cache['cacheKeyQueryRule']:
-                cache_key_rule = self.get_cache_key_query_rule('ignore', cache)
+                cache_key_rule = self.get_cache_key_query_rule('ignore', cache_description)
                 config['cacheKeyQueryRule'] = cache_key_rule
             else:
                 config['cacheKeyQueryRule'] = cache['cacheKeyQueryRule']
@@ -255,7 +271,7 @@ class CDNManager(utils.IdentifierMixin, object):
         return result
 
     @staticmethod
-    def get_cache_key_query_rule(cache_type, cache):
+    def get_cache_key_query_rule(cache_type, cache_description):
         """Get the cdn object detail.
 
         :param string cache_type: Cache type.
@@ -263,9 +279,77 @@ class CDNManager(utils.IdentifierMixin, object):
 
         :return: string value.
         """
-        if 'description' not in cache:
+        if cache_description is None:
             raise SoftLayer.SoftLayerError('Please add a description to be able to update the'
                                            ' cache.')
-        cache_result = '%s: %s' % (cache_type, cache['description'])
+        cache_result = '%s: %s' % (cache_type, cache_description)
 
         return cache_result
+
+    def delete_cdn(self, unique_id):
+        """Delete CDN domain mapping for a particular customer.
+
+        :param str unique_id: The unique ID associated with the CDN.
+        :returns: The cdn that is being deleted.
+        """
+
+        return self.cdn_configuration.deleteDomainMapping(unique_id)
+
+    def create_cdn(self, hostname=None, origin=None, origin_type=None, http=None, https=None, bucket_name=None,
+                   cname=None, header=None, path=None, ssl=None):
+        """Create CDN domain mapping for a particular customer.
+
+        :param str hostname: The unique ID associated with the CDN.
+        :param str origin: ip address or hostname if origin_type=server, API endpoint for
+                           your S3 object storage if origin_type=storage
+        :param str origin_type: it can be 'server' or 'storage' types.
+        :param int http: http port
+        :param int https: https port
+        :param str bucket_name: name of the available resource
+        :param str cname: globally unique subdomain
+        :param str header: the edge server uses the host header to communicate with the origin.
+                            It defaults to hostname. (optional)
+        :param str path: relative path to the domain provided, e.g. "/articles/video"
+        :param str ssl: ssl certificate
+        :returns: The cdn that is being created.
+        """
+        types = {'server': 'HOST_SERVER', 'storage': 'OBJECT_STORAGE'}
+        ssl_certificate = {'wilcard': 'WILDCARD_CERT', 'dvSan': 'SHARED_SAN_CERT'}
+
+        new_origin = {
+            'domain': hostname,
+            'origin': origin,
+            'originType': types.get(origin_type),
+            'vendorName': 'akamai',
+        }
+
+        protocol = ''
+        if http:
+            protocol = 'HTTP'
+            new_origin['httpPort'] = http
+        if https:
+            protocol = 'HTTPS'
+            new_origin['httpsPort'] = https
+            new_origin['certificateType'] = ssl_certificate.get(ssl)
+        if http and https:
+            protocol = 'HTTP_AND_HTTPS'
+
+        new_origin['protocol'] = protocol
+
+        if types.get(origin_type) == 'OBJECT_STORAGE':
+            new_origin['bucketName'] = bucket_name
+            new_origin['header'] = header
+
+        if cname:
+            new_origin['cname'] = cname + '.cdn.appdomain.cloud'
+
+        if header:
+            new_origin['header'] = header
+
+        if path:
+            new_origin['path'] = '/' + path
+
+        origin = self.cdn_configuration.createDomainMapping(new_origin)
+
+        # The method createOriginPath() returns an array but there is only 1 object
+        return origin[0]

@@ -45,12 +45,12 @@ class DebugTransport(object):
 
     def pre_transport_log(self, call):
         """Prints a warning before calling the API """
-        output = "Calling: {})".format(call)
+        output = f"Calling: {call}"
         self.logger.warning(output)
 
     def post_transport_log(self, call):
         """Prints the result "Returned Data: \n%s" % (call.result)of an API call"""
-        output = "Returned Data: \n{}".format(json.dumps(call.result))
+        output = f"Returned Data: \n{json.dumps(call.result)}"
         self.logger.debug(output)
 
     def get_last_calls(self):

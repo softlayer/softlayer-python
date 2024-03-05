@@ -127,7 +127,7 @@ class LoadBalancerTests(testing.TestCase):
         lbaas_id = '1111111'
         member_ip_address = '10.0.0.1'
         result = self.run_command(['loadbal', 'member-add', '--private', '-m', member_ip_address, lbaas_id])
-        output = 'Member {} added'.format(member_ip_address)
+        output = f'Member {member_ip_address} added'
         self.assert_no_fail(result)
         click.secho.assert_called_with(output, fg='green')
 
@@ -136,7 +136,7 @@ class LoadBalancerTests(testing.TestCase):
         lbaas_id = '1111111'
         member_ip_address = '10.0.0.1'
         result = self.run_command(['loadbal', 'member-add', '--public', '-m', member_ip_address, lbaas_id])
-        output = 'Member {} added'.format(member_ip_address)
+        output = f'Member {member_ip_address} added'
         self.assert_no_fail(result)
         click.secho.assert_called_with(output, fg='green')
 
@@ -149,7 +149,7 @@ class LoadBalancerTests(testing.TestCase):
         result = self.run_command(['loadbal', 'member-add', '--public', '-m', member_ip_address, lbaas_id])
         self.assertIn('This LB requires a Public IP address for its members and none was supplied',
                       result.output)
-        self.assertIn("ERROR: {}".format(fault_string),
+        self.assertIn(f"ERROR: {fault_string}",
                       result.output)
 
     @mock.patch('SoftLayer.LoadBalancerManager.add_lb_member')
@@ -161,7 +161,7 @@ class LoadBalancerTests(testing.TestCase):
         result = self.run_command(['loadbal', 'member-add', '--private', '-m', member_ip_address, lbaas_id])
         self.assertIn('This LB requires a Private IP address for its members and none was supplied',
                       result.output)
-        self.assertIn("ERROR: {}".format(fault_string),
+        self.assertIn(f"ERROR: {fault_string}",
                       result.output)
 
     @mock.patch('SoftLayer.managers.load_balancer.LoadBalancerManager.delete_lb_member')
@@ -177,7 +177,7 @@ class LoadBalancerTests(testing.TestCase):
         lbaas_id = '1111111'
         lbaas_member_uuid = "x123x123-123x-123x-123x-123a123b123c"
         result = self.run_command(['loadbal', 'member-del', '-m', lbaas_member_uuid, lbaas_id])
-        output = 'Member {} removed'.format(lbaas_member_uuid)
+        output = f'Member {lbaas_member_uuid} removed'
         self.assert_no_fail(result)
         click.secho.assert_called_with(output, fg='green')
 
@@ -198,7 +198,7 @@ class LoadBalancerTests(testing.TestCase):
         result = self.run_command(['loadbal', 'health', lb_id, '--uuid', lb_check_uuid,
                                    '-i', '60', '-r', '10', '-t', '10', '-u', '/'])
         self.assert_no_fail(result)
-        output = 'Health Check {} updated successfully'.format(lb_check_uuid)
+        output = f'Health Check {lb_check_uuid} updated successfully'
         click.secho.assert_called_with(output, fg='green')
 
     def test_lb_health_manage_args_time_fails(self):
@@ -295,7 +295,7 @@ class LoadBalancerTests(testing.TestCase):
         cancel_lbaas.side_effect = exceptions.SoftLayerAPIError(mock.ANY, fault_string)
         result = self.run_command(['loadbal', 'cancel', '11111'])
 
-        self.assertIn("ERROR: {}".format(fault_string),
+        self.assertIn(f"ERROR: {fault_string}",
                       result.output)
 
     def test_ns_list(self):
@@ -313,5 +313,25 @@ class LoadBalancerTests(testing.TestCase):
 
     def test_ns_detail(self):
         result = self.run_command(['loadbal', 'ns-detail', '11111'])
+
+        self.assert_no_fail(result)
+
+    def test_lb_protocol_add(self):
+        result = self.run_command(['lb', 'protocol-add', '1111111', '--backend', 'HTTP:216',
+                                   '--frontend', 'HTTP:217', '--method', 'ROUNDROBIN', '-s', 'SOURCE_IP',
+                                   '--max', '190'])
+        self.assert_no_fail(result)
+
+    def test_lb_protocol_edit(self):
+        result = self.run_command(['lb', 'protocol-edit', '1111111',
+                                   '--uuid', '4d088a44-8c42-4f24-a437-9461ff4c9851', '--backend', 'HTTP:216',
+                                   '--frontend', 'HTTP:217', '--method', 'ROUNDROBIN', '-s', 'SOURCE_IP',
+                                   '--max', '190'])
+
+        self.assert_no_fail(result)
+
+    def test_lb_protocol_delete(self):
+        result = self.run_command(['lb', 'protocol-delete', '1111111',
+                                   '--uuid', '4d088a44-8c42-4f24-a437-9461ff4c9851'])
 
         self.assert_no_fail(result)

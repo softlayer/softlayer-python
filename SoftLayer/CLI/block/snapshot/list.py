@@ -28,12 +28,11 @@ DEFAULT_COLUMNS = [
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
-@click.option('--sortby', help='Column to sort by',
+@click.option('--sortby', help='Column to sort by.',
               default='created')
 @click.option('--columns',
               callback=column_helper.get_formatter(COLUMNS),
-              help='Columns to display. Options: {0}'.format(
-                  ', '.join(column.name for column in COLUMNS)),
+              help=f"Columns to display. Options: {', '.join(column.name for column in COLUMNS)}",
               default=','.join(DEFAULT_COLUMNS))
 @environment.pass_env
 def cli(env, volume_id, sortby, columns):

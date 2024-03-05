@@ -66,6 +66,7 @@ is equivalent to
 
   $ slcli -vvv --format=json -a <account_id> vs list
 
+
 Getting Help
 ------------
 
@@ -77,6 +78,7 @@ Examples
 
 A curated list of examples on how to use this library can be found at `SLDN <https://softlayer.github.io/python/>`_
 
+<<<<<<< HEAD
 
 .. code-block:: python
 
@@ -91,6 +93,13 @@ A curated list of examples on how to use this library can be found at `SLDN <htt
 
 After logging in with `authenticate_with_password` the EmployeeClient will try to automatically refresh the login token when it gets a TokenExpired exception. It will also record the token in the config file for future use in the CLI.
   
+=======
+Development
+-----------
+To get started working with this project please read the `CONTRIBUTING <https://github.com/softlayer/softlayer-python/blob/master/CONTRIBUTING.md>`_ document.
+
+You can quickly test local changes by running the './slcli' file, which will load the local softlayer-python code instead of the system's softlayer-python codebase.
+>>>>>>> dab2c052962cfcfcc6f9d08f988426321a230213
 
 Debugging
 ---------

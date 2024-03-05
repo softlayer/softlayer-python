@@ -9,6 +9,7 @@
 """
 import SoftLayer
 from SoftLayer import exceptions
+from SoftLayer import fixtures
 from SoftLayer.fixtures import SoftLayer_Network_LBaaS_LoadBalancer
 from SoftLayer import testing
 
@@ -209,3 +210,26 @@ class LoadBalancerTests(testing.TestCase):
         load_bal_mock.return_value = []
         name = 'test'
         self.assertRaises(exceptions.SoftLayerError, self.lb_mgr.get_lbaas_by_name, name)
+
+    def test_lbaas_update_protocol(self):
+        uuid = '1a1aa111-4474-4e16-9f02-4de959229b85'
+        protocol_configurations = [
+            {
+                "backendPort": 52,
+                "backendProtocol": 'HTTP',
+                "frontendPort": 216,
+                "frontendProtocol": 'HTTP',
+                "loadBalancingMethod": 'ROUNDROBIN',
+                "sessionType": 'SOURCE_IP',
+                "maxConn": 50
+            }
+        ]
+        result = self.lb_mgr.add_protocols(uuid, protocol_configurations)
+        self.assertEqual(fixtures.SoftLayer_Network_LBaaS_Listener.updateLoadBalancerProtocols, result)
+
+    def test_lbaas_delete_protocol(self):
+        uuid = '1a1aa111-4474-4e16-9f02-4de959229b85'
+        uuid_delete = 'abba-aabb-cc'
+
+        result = self.lb_mgr.delete_protocol(uuid, uuid_delete)
+        self.assertEqual(fixtures.SoftLayer_Network_LBaaS_Listener.deleteLoadBalancerProtocols, result)

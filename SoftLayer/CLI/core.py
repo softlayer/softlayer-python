@@ -46,7 +46,7 @@ def get_latest_version():
     try:
         result = requests.get('https://pypi.org/pypi/SoftLayer/json',  timeout=60)
         json_result = result.json()
-        latest = 'v{}'.format(json_result['info']['version'])
+        latest = f"v{json_result['info']['version']}"
     except Exception:
         latest = "Unable to get version from pypi."
     return latest
@@ -65,8 +65,7 @@ def get_version_message(ctx, param, value):
         return
     current = SoftLayer.consts.VERSION
     latest = get_latest_version()
-    click.secho("Current: {prog} {current}\nLatest:  {prog} {latest}".format(
-        prog=PROG_NAME, current=current, latest=latest))
+    click.secho(f"Current: {PROG_NAME} {current}\nLatest:  {PROG_NAME} {latest}")
     ctx.exit()
 
 
@@ -161,7 +160,7 @@ def output_diagnostics(env, result, verbose=0, **kwargs):
 
     if verbose > 1:
         for call in env.client.transport.get_last_calls():
-            call_table = formatting.Table(['', '{}::{}'.format(call.service, call.method)], align="left")
+            call_table = formatting.Table(['', f'{call.service}::{call.method}'], align="left")
             nice_mask = ''
             if call.mask is not None:
                 nice_mask = call.mask

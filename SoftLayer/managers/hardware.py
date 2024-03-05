@@ -5,6 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import concurrent.futures as cf
 import datetime
 import logging
 import socket
@@ -20,7 +21,7 @@ from SoftLayer import utils
 LOGGER = logging.getLogger(__name__)
 
 # Invalid names are ignored due to long method names and short argument names
-# pylint: disable=invalid-name, too-many-lines
+# pylint: disable=invalid-name, too-many-lines, too-many-public-methods
 
 EXTRA_CATEGORIES = ['pri_ipv6_addresses',
                     'static_ipv6_addresses',
@@ -269,12 +270,103 @@ class HardwareManager(utils.IdentifierMixin, object):
                 'lastTransaction[transactionGroup],'
                 'hourlyBillingFlag,'
                 'tagReferences[id,tag[name,id]],'
-                'networkVlans[id,vlanNumber,networkSpace],'
+                'networkVlans[id,vlanNumber,networkSpace, fullyQualifiedName,primarySubnets[ipAddresses]],'
                 'monitoringServiceComponent,networkMonitors[queryType,lastResult,responseAction],'
                 'remoteManagementAccounts[username,password]'
             )
 
         return self.hardware.getObject(id=hardware_id, **kwargs)
+
+    @retry(logger=LOGGER)
+    def get_hardware_fast(self, hardware_id):
+        """Get details about a hardware device. Similar to get_hardware() but this uses threads
+
+        :param integer id: the hardware ID
+        :returns: A dictionary containing a large amount of information about the specified server.
+        """
+
+        hw_mask = (
+            'id, globalIdentifier, fullyQualifiedDomainName, hostname, domain,'
+            'provisionDate, hardwareStatus, bareMetalInstanceFlag, processorPhysicalCoreAmount,'
+            'memoryCapacity, notes, privateNetworkOnlyFlag, primaryBackendIpAddress,'
+            'primaryIpAddress, networkManagementIpAddress, userData, datacenter, hourlyBillingFlag,'
+            'lastTransaction[transactionGroup], hardwareChassis[id,name]'
+        )
+        server = self.client.call('SoftLayer_Hardware_Server', 'getObject', id=hardware_id, mask=hw_mask)
+        with cf.ThreadPoolExecutor(max_workers=10) as executor:
+            networkComponentsMask = (
+                "id, status, speed, maxSpeed, name, ipmiMacAddress, ipmiIpAddress, macAddress, primaryIpAddress,"
+                "port, primarySubnet[id, netmask, broadcastAddress, networkIdentifier, gateway],"
+                "uplinkComponent[networkVlanTrunks[networkVlan[networkSpace]]]"
+            )
+            networkComponents = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getNetworkComponents',
+                id=hardware_id, mask=networkComponentsMask
+            )
+            activeComponentsMask = (
+               'id,hardwareComponentModel[hardwareGenericComponentModel[id,hardwareComponentType[keyName]]]'
+            )
+            activeComponents = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getActiveComponents',
+                id=hardware_id, mask=activeComponentsMask
+            )
+
+            activeTransaction = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getActiveTransaction',
+                id=hardware_id, mask="id, transactionStatus[friendlyName,name]"
+            )
+
+            operatingSystemMask = (
+                'softwareLicense[softwareDescription[manufacturer, name, version, referenceCode]],'
+                'passwords[id,username,password]'
+            )
+            operatingSystem = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getOperatingSystem',
+                id=hardware_id, mask=operatingSystemMask
+            )
+
+            # Intentionally reusing the operatingSystemMask here. They are both softwareComponents
+            softwareComponents = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getSoftwareComponents',
+                id=hardware_id, mask=operatingSystemMask
+            )
+
+            billingItemMask = (
+                'id,nextInvoiceTotalRecurringAmount,'
+                'nextInvoiceChildren[nextInvoiceTotalRecurringAmount],'
+                'orderItem.order.userRecord[username]'
+            )
+            billingItem = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getBillingItem',
+                id=hardware_id, mask=billingItemMask
+            )
+
+            tagReferences = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getTagReferences',
+                id=hardware_id, mask="id,tag[name,id]"
+            )
+
+            networkVlans = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getNetworkVlans',
+                id=hardware_id, mask="id,vlanNumber,networkSpace,fullyQualifiedName,primarySubnets[ipAddresses]"
+            )
+
+            remoteManagementAccounts = executor.submit(
+                self.client.call, 'SoftLayer_Hardware_Server', 'getRemoteManagementAccounts',
+                id=hardware_id, mask="username,password"
+            )
+
+            server['networkComponents'] = networkComponents.result()
+            server['activeComponents'] = activeComponents.result()
+            server['activeTransaction'] = activeTransaction.result()
+            server['operatingSystem'] = operatingSystem.result()
+            server['softwareComponents'] = softwareComponents.result()
+            server['billingItem'] = billingItem.result()
+            server['networkVlans'] = networkVlans.result()
+            server['remoteManagementAccounts'] = remoteManagementAccounts.result()
+            server['tagReferences'] = tagReferences.result()
+
+        return server
 
     def reload(self, hardware_id, post_uri=None, ssh_keys=None, lvm=False):
         """Perform an OS reload of a server with its current configuration.
@@ -400,7 +492,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             _mask = "mask[priceGroups]"
             dc_details = self.client.call('SoftLayer_Location', 'getDatacenters', mask=_mask, filter=_filter, limit=1)
             if not dc_details:
-                raise SoftLayerError("Unable to find a datacenter named {}".format(datacenter))
+                raise SoftLayerError(f"Unable to find a datacenter named {datacenter}")
             # A DC will have several price groups, no good way to deal with this other than checking each.
             # An item should only belong to one type of price group.
             for group in dc_details[0].get('priceGroups', []):
@@ -631,22 +723,23 @@ class HardwareManager(utils.IdentifierMixin, object):
 
         return self.hardware.editObject(obj, id=hardware_id)
 
-    def update_firmware(self,
-                        hardware_id,
-                        ipmi=True,
-                        raid_controller=True,
-                        bios=True,
-                        hard_drive=True):
+    def update_firmware(self, hardware_id: int,
+                        ipmi: bool = True,
+                        raid_controller: bool = True,
+                        bios: bool = True,
+                        hard_drive: bool = True,
+                        network: bool = True):
         """Update hardware firmware.
 
         This will cause the server to be unavailable for ~20 minutes.
+        https://sldn.softlayer.com/reference/services/SoftLayer_Hardware_Server/createFirmwareUpdateTransaction/
 
-        :param int hardware_id: The ID of the hardware to have its firmware
-                                updated.
+        :param int hardware_id: The ID of the hardware to have its firmware updated.
         :param bool ipmi: Update the ipmi firmware.
         :param bool raid_controller: Update the raid controller firmware.
         :param bool bios: Update the bios firmware.
         :param bool hard_drive: Update the hard drive firmware.
+        :param bool network: Update the network card firmware
 
         Example::
 
@@ -654,21 +747,22 @@ class HardwareManager(utils.IdentifierMixin, object):
             result = mgr.update_firmware(hardware_id=1234)
         """
 
-        return self.hardware.createFirmwareUpdateTransaction(
-            bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive), id=hardware_id)
+        return self.client.call(
+            'SoftLayer_Hardware_Server', 'createFirmwareUpdateTransaction',
+            bool(ipmi), bool(raid_controller), bool(bios), bool(hard_drive), bool(network), id=hardware_id
+        )
 
-    def reflash_firmware(self,
-                         hardware_id,
-                         ipmi=True,
-                         raid_controller=True,
-                         bios=True):
+    def reflash_firmware(self, hardware_id: int,
+                         ipmi: bool = True,
+                         raid_controller: bool = True,
+                         bios: bool = True,):
         """Reflash hardware firmware.
 
         This will cause the server to be unavailable for ~60 minutes.
         The firmware will not be upgraded but rather reflashed to the version installed.
+        https://sldn.softlayer.com/reference/services/SoftLayer_Hardware_Server/createFirmwareReflashTransaction/
 
-        :param int hardware_id: The ID of the hardware to have its firmware
-                                reflashed.
+        :param int hardware_id: The ID of the hardware to have its firmware reflashed.
         :param bool ipmi: Reflash the ipmi firmware.
         :param bool raid_controller: Reflash the raid controller firmware.
         :param bool bios: Reflash the bios firmware.
@@ -1072,21 +1166,70 @@ class HardwareManager(utils.IdentifierMixin, object):
                         "createDate": {
                             "operation": "orderBy",
                             "options": [
-                                {
-                                    "name": "sort",
-                                    "value": [
-                                        "DESC"
-                                    ]
-                                },
-                                {
-                                    "name": "sortOrder",
-                                    "value": [
-                                        1
-                                    ]}]}
-                    }}}}
+                                {"name": "sort", "value": ["DESC"]},
+                                {"name": "sortOrder", "value": [1]}
+                            ]
+                        }
+                    }
+                }}}
 
         return self.client.call('Hardware_Server', 'getComponents',
                                 mask=mask, filter=filter_component, id=hardware_id)
+
+    def get_network_components(self, hardware_id, mask=None, space=None):
+        """Calls SoftLayer_Hardware_Server::getNetworkComponents()
+
+        :param int hardware_id: SoftLayer_Hardware_Server id
+        :param string mask: The object mask to use if you do not want the default
+        :param string space: 'public', 'private', or None for both.
+        :returns: https://sldn.softlayer.com/reference/datatypes/SoftLayer_Network_Component/
+        """
+
+        if mask is None:
+            mask = "mask[uplinkComponent, router, redundancyEnabledFlag, redundancyCapableFlag]"
+        method = "getNetworkComponents"
+        if space == "public":
+            method = "getFrontendNetworkComponents"
+        elif space == "private":
+            method = "getBackendNetworkComponents"
+        return self.client.call("SoftLayer_Hardware_Server", method, id=hardware_id, mask=mask)
+
+    def trunk_vlan(self, component_id, vlans):
+        """Calls SoftLayer_Network_Component::addNetworkVlanTrunks()
+
+        :param int component_id: SoftLayer_Network_Component id
+        :param list vlans: list of SoftLayer_Network_Vlan objects to add. Each object needs at least id or vlanNumber
+        """
+        return self.client.call('SoftLayer_Network_Component', 'addNetworkVlanTrunks', vlans, id=component_id)
+
+    def remove_vlan(self, component_id, vlans):
+        """Calls SoftLayer_Network_Component::removeNetworkVlanTrunks()
+
+        :param int component_id: SoftLayer_Network_Component id
+        :param list vlans: list of SoftLayer_Network_Vlan objects to remove. Each object needs at least id or vlanNumber
+        """
+        return self.client.call('SoftLayer_Network_Component', 'removeNetworkVlanTrunks', vlans, id=component_id)
+
+    def clear_vlan(self, hardware_id):
+        """Clears all vlan trunks from a hardware_id
+
+        :param int hardware_id: server to clear vlans from
+        """
+        component_mask = (
+            "mask[id, "
+            "backendNetworkComponents[id,networkVlanTrunks[networkVlanId]], "
+            "frontendNetworkComponents[id,networkVlanTrunks[networkVlanId]]"
+            "]"
+        )
+        components = self.client.call('SoftLayer_Hardware_Server', 'getObject', id=hardware_id, mask=component_mask)
+        # We only want to call this API on components with actual trunks.
+        # Calling this on the primary and redundant components might cause exceptions.
+        for c in components.get('backendNetworkComponent', []):
+            if len(c.get('networkVlanTrunks', [])):
+                self.client.call('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', id=c.get('id'))
+        for c in components.get('frontendNetworkComponent', []):
+            if len(c.get('networkVlanTrunks', [])):
+                self.client.call('SoftLayer_Network_Component', 'clearNetworkVlanTrunks', id=c.get('id'))
 
     def get_sensors(self, hardware_id):
         """Returns Hardware sensor data"""

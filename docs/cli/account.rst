@@ -44,10 +44,22 @@ Account Commands
     :prog: account licenses
     :show-nested:
 
-.. click:: SoftLayer.CLI.account.bandwidth_pools:cli
+.. click:: SoftLayer.CLI.bandwidth.pools:cli
     :prog: account bandwidth-pools
     :show-nested:
 
-.. click:: SoftLayer.CLI.account.bandwidth_pools_detail:cli
+.. click:: SoftLayer.CLI.bandwidth.pools_detail:cli
     :prog: account bandwidth-pools-detail
+    :show-nested:
+
+.. click:: SoftLayer.CLI.account.hooks:cli
+    :prog: account hooks
+    :show-nested:
+
+.. click:: SoftLayer.CLI.account.hook_create:cli
+    :prog: account hook-create
+    :show-nested:
+
+.. click:: SoftLayer.CLI.account.hook_delete:cli
+    :prog: account hook-delete
     :show-nested:

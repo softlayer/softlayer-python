@@ -1,6 +1,6 @@
 """
     SoftLayer.storage_utils
-    ~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~
     Utility functions used by File and Block Storage Managers
 
     :license: MIT, see LICENSE for more details.
@@ -239,7 +239,7 @@ def find_saas_endurance_space_price(package, size, tier_level):
     """
     if tier_level != 0.25:
         tier_level = int(tier_level)
-    key_name = 'STORAGE_SPACE_FOR_{0}_IOPS_PER_GB'.format(tier_level)
+    key_name = f'STORAGE_SPACE_FOR_{tier_level}_IOPS_PER_GB'
     key_name = key_name.replace(".", "_")
     for item in package['items']:
         if key_name not in item['keyName']:
@@ -307,7 +307,7 @@ def find_saas_perform_space_price(package, size):
         if size < capacity_minimum or size > capacity_maximum:
             continue
 
-        key_name = '{0}_{1}_GBS'.format(capacity_minimum, capacity_maximum)
+        key_name = f'{capacity_minimum}_{capacity_maximum}_GBS'
         if item['keyName'] != key_name:
             continue
         price_id = _find_price_id(item['prices'], 'performance_storage_space')
@@ -419,11 +419,10 @@ def find_snapshot_schedule_id(volume, snapshot_schedule_keyname):
             if schedule['type']['keyname'] == snapshot_schedule_keyname:
                 return schedule['id']
 
-    raise ValueError("The given snapshot schedule ID was not found for "
-                     "the given storage volume")
+    raise ValueError("The given snapshot schedule ID was not found for the given storage volume")
 
 
-def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
+def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade, iops):
     """Prepare the snapshot space order object for the placeOrder() method
 
     :param manager: The File or Block manager calling this function
@@ -436,8 +435,7 @@ def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
     """
     # Ensure the storage volume has not been cancelled
     if 'billingItem' not in volume:
-        raise exceptions.SoftLayerError(
-            'This volume has been cancelled; unable to order snapshot space')
+        raise exceptions.SoftLayerError('This volume has been cancelled; unable to order snapshot space')
 
     # Determine and validate the storage volume's billing item category
     billing_item_category_code = volume['billingItem']['categoryCode']
@@ -466,7 +464,7 @@ def prepare_snapshot_order_object(manager, volume, capacity, tier, upgrade):
                 raise exceptions.SoftLayerError(
                     "Snapshot space cannot be ordered for this performance "
                     "volume since it does not support Encryption at Rest.")
-            iops = int(volume['provisionedIops'])
+
             prices = [find_saas_snapshot_space_price(
                 package, capacity, iops=iops)]
         else:

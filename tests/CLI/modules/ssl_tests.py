@@ -1,7 +1,6 @@
 """
     SoftLayer.tests.CLI.modules.ssl_tests
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer import testing

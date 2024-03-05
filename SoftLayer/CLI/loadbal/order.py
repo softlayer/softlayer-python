@@ -15,7 +15,7 @@ def parse_proto(ctx, param, value):
     proto = {'protocol': 'HTTP', 'port': 80}
     splitout = value.split(':')
     if len(splitout) != 2:
-        raise exceptions.ArgumentError("{}={} is not properly formatted.".format(param, value))
+        raise exceptions.ArgumentError(f"{param}={value} is not properly formatted.")
     proto['protocol'] = splitout[0]
     proto['port'] = int(splitout[1])
     return proto
@@ -47,7 +47,7 @@ def order(env, **args):
     if datacenter:
         location = {'id': datacenter[0]['id']}
     else:
-        raise exceptions.CLIHalt('Datacenter {} was not found'.format(datacenter))
+        raise exceptions.CLIHalt(f'Datacenter {datacenter} was not found')
 
     name = args.get('name')
     description = args.get('label', None)
@@ -74,7 +74,7 @@ def order(env, **args):
 
 def parse_receipt(receipt):
     """Takes an order receipt and nicely formats it for cli output"""
-    table = formatting.KeyValueTable(['Item', 'Cost'], title="Order: {}".format(receipt.get('orderId', 'Quote')))
+    table = formatting.KeyValueTable(['Item', 'Cost'], title=f"Order: {receipt.get('orderId', 'Quote')}")
     if receipt.get('prices'):
         for price in receipt.get('prices'):
             table.add_row([price['item']['description'], price['hourlyRecurringFee']])
@@ -143,8 +143,8 @@ def order_options(env, datacenter):
                 if subnet.get('subnetType') != 'PRIMARY' and \
                         subnet.get('subnetType') != 'ADDITIONAL_PRIMARY':
                     continue
-                space = "{}/{}".format(subnet.get('networkIdentifier'), subnet.get('cidr'))
-                vlan = "{}.{}".format(subnet['podName'], subnet['networkVlan']['vlanNumber'])
+                space = f"{subnet.get('networkIdentifier')}/{subnet.get('cidr')}"
+                vlan = f"{subnet['podName']}.{subnet['networkVlan']['vlanNumber']}"
                 subnet_table.add_row([subnet.get('id'), space, vlan])
 
             env.fout(price_table)
@@ -153,15 +153,21 @@ def order_options(env, datacenter):
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
+@click.option('--force', default=False, is_flag=True, help="Force cancel LBaaS Instance without confirmation")
 @environment.pass_env
-def cancel(env, identifier):
+def cancel(env, identifier, force):
     """Cancels a LBaaS instance"""
 
     mgr = SoftLayer.LoadBalancerManager(env.client)
     uuid, _ = mgr.get_lbaas_uuid_id(identifier)
 
+    if not force:
+        if not (env.skip_confirmations or
+                formatting.confirm("This will cancel the LBaaS Instance and cannot be undone. Continue?")):
+            raise exceptions.CLIAbort('Aborted')
+
     try:
         mgr.cancel_lbaas(uuid)
-        click.secho("LB {} canceled succesfully.".format(identifier), fg='green')
+        click.secho(f"LB {identifier} canceled succesfully.", fg='green')
     except SoftLayerAPIError as exception:
-        click.secho("ERROR: {}".format(exception.faultString), fg='red')
+        click.secho(f"ERROR: {exception.faultString}", fg='red')

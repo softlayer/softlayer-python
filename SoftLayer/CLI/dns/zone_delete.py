@@ -14,7 +14,12 @@ from SoftLayer.CLI import helpers
 @click.argument('zone')
 @environment.pass_env
 def cli(env, zone):
-    """Delete zone."""
+    """Delete zone.
+
+    Example::
+        slcli dns zone-delete ibm.com
+        This command deletes a zone that is named ibm.com
+"""
 
     manager = SoftLayer.DNSManager(env.client)
     zone_id = helpers.resolve_id(manager.resolve_ids, zone, name='zone')

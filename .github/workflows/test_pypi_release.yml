@@ -1,21 +1,27 @@
 # https://packaging.python.org/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+# Trusted Publisher stuff: https://docs.pypi.org/trusted-publishers/adding-a-publisher/
 
-name: Publish 📦 to TestPyPI
+name: TEST Publish 📦 to TestPyPI
 
 on:
   push:
-    branches: [test-pypi ]
+    branches: [test-pypi]
 
 jobs:
   build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+    name: TEST Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
     runs-on: ubuntu-latest
+    environment:
+      name: pypi-test
+      url: https://test.pypi.org/project/SoftLayer/
+    permissions:
+      id-token: write
     steps:
     - uses: actions/checkout@master
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.11
     - name: Install pypa/build
       run: >-
         python -m
@@ -31,7 +37,6 @@ jobs:
         --outdir dist/
         .
     - name: Publish 📦 to Test PyPI
-      uses: pypa/gh-action-pypi-publish@master
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        password: ${{ secrets.CGALLO_TEST_PYPI }}
-        repository_url: https://test.pypi.org/legacy/
+        repository-url: https://test.pypi.org/legacy/

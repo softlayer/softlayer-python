@@ -61,7 +61,7 @@ def cli(env, username, email, password, from_user, template):
             for key in template_object:
                 user_template[key] = template_object[key]
         except ValueError as ex:
-            raise exceptions.ArgumentError("Unable to parse --template. %s" % ex)
+            raise exceptions.ArgumentError(f"Unable to parse --template. {ex}")
 
     user_template['username'] = username
     if password == 'generate':

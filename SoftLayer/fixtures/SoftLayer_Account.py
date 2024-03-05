@@ -456,7 +456,8 @@ getClosedTickets = [ticket for ticket in getTickets
                     if ticket['statusId'] == 1002]
 
 getCurrentUser = {'id': 12345, 'username': 'testAccount',
-                  'apiAuthenticationKeys': [{'authenticationKey': 'A' * 64}]}
+                  'apiAuthenticationKeys': [{'authenticationKey': 'A' * 64}],
+                  'accountId': 123456789}
 
 getCdnAccounts = [
     {
@@ -1419,6 +1420,7 @@ getBandwidthAllotments = [{
         'amountIn': '6.94517',
         'amountOut': '6.8859'
     },
+    "endDate": "2023-07-03T22:59:59-06:00",
     'id': 309961,
     'locationGroup': {
         'description': 'All Datacenters in Mexico',
@@ -1469,3 +1471,35 @@ getNetworkGateways = [{
         'keyName': 'ACTIVE'
     }
 }]
+
+getPostProvisioningHooks = [{
+    "id": 147258369,
+    "name": "testProv",
+    "uri": "http://test.com"
+},
+    {
+        "id": 123654,
+        "name": "GettestProv12345",
+        "uri": "http://test.com"
+    }]
+
+getUpgradeRequests = [{
+    "createDate": "2023-03-01T19:39:51-06:00",
+    "id": 3237486,
+    "maintenanceStartTimeUtc": "2023-03-01T19:39:51-06:00",
+    "modifyDate": "2023-03-01T19:39:53-06:00",
+    "orderId": 103127604,
+    "statusId": 3,
+    "ticketId": 152510472,
+    "userId": 167758
+},
+    {
+        "createDate": "2023-02-27T19:41:26-06:00",
+        "id": 3229998,
+        "maintenanceStartTimeUtc": "2023-02-27T19:41:26-06:00",
+        "modifyDate": "2023-02-27T19:41:29-06:00",
+        "orderId": 103029352,
+        "statusId": 3,
+        "ticketId": 152452042,
+        "userId": 167758
+    }]

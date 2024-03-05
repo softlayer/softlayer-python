@@ -76,7 +76,7 @@ def cli(env, auth):
 
     elif auth == 'cloud_key':
         username = 'apikey'
-        secret = env.getpass('Classic Infrastructue API Key', default=defaults['api_key'])
+        secret = env.getpass('Classic Infrastructure API Key', default=defaults['api_key'])
         new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
         api_key = get_api_key(new_client, username, secret)
 
@@ -84,8 +84,8 @@ def cli(env, auth):
         username, api_key = sso_login(env)
 
     else:
-        username = env.input('Classic Infrastructue Username', default=defaults['username'])
-        secret = env.getpass('Classic Infrastructue API Key', default=defaults['api_key'])
+        username = env.input('Classic Infrastructure Username', default=defaults['username'])
+        secret = env.getpass('Classic Infrastructure API Key', default=defaults['api_key'])
         new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
         api_key = get_api_key(new_client, username, secret)
 
@@ -171,7 +171,7 @@ def ibmid_login(env):
     user = client.call('SoftLayer_Account', 'getCurrentUser', mask="mask[id,username,apiAuthenticationKeys]")
 
     if len(user.get('apiAuthenticationKeys', [])) == 0:
-        env.fout("Creating a Classic Infrastrucutre API key for {}".format(user['username']))
+        env.fout(f"Creating a Classic Infrastrucutre API key for {user['username']}")
         api_key = client.call('User_Customer', 'addApiAuthenticationKey', id=user['id'])
     else:
         api_key = user['apiAuthenticationKeys'][0]['authenticationKey']
@@ -188,7 +188,7 @@ def get_accounts(env, a_token):
         'User-Agent': USER_AGENT,
         'Accept': 'application/json'
     }
-    headers['Authorization'] = 'Bearer {}'.format(a_token)
+    headers['Authorization'] = f'Bearer {a_token}'
     response = iam_client.request(
         'GET',
         'https://accounts.cloud.ibm.com/v1/accounts',
@@ -212,7 +212,7 @@ def get_accounts(env, a_token):
                     ims_id = link.get('id')
             if ims_id is None:
                 ims_id = "Unlinked"
-            env.fout("{}: {} ({})".format(counter, utils.lookup(selected, 'entity', 'name'), ims_id))
+            env.fout(f"{counter}: {utils.lookup(selected, 'entity', 'name')} ({ims_id})")
             counter = counter + 1
         ims_id = None  # Reset ims_id to avoid any mix-match or something.
         choice = click.prompt('Enter a number', type=int)
@@ -225,7 +225,7 @@ def get_accounts(env, a_token):
         if link.get('origin') == "IMS":
             ims_id = link.get('id')
 
-    print("Using account {}".format(utils.lookup(selected, 'entity', 'name')))
+    print(f"Using account {utils.lookup(selected, 'entity', 'name')}")
     return {"account_id": account_id, "ims_id": ims_id}
 
 
@@ -253,7 +253,7 @@ def get_sso_url():
 def sso_login(env):
     """Uses a SSO token to get a SL apikey"""
     passcode_url = get_sso_url()
-    env.fout("Get a one-time code from {} to proceed.".format(passcode_url))
+    env.fout(f"Get a one-time code from {passcode_url} to proceed.")
     open_browser = env.input("Open the URL in the default browser? [Y/n]", default='Y')
     if open_browser.lower() == 'y':
         webbrowser.open(passcode_url)
@@ -274,7 +274,7 @@ def sso_login(env):
     user = client.call('SoftLayer_Account', 'getCurrentUser', mask="mask[id,username,apiAuthenticationKeys]")
 
     if len(user.get('apiAuthenticationKeys', [])) == 0:
-        env.fout("Creating a Classic Infrastrucutre API key for {}".format(user['username']))
+        env.fout(f"Creating a Classic Infrastrucutre API key for {user['username']}")
         api_key = client.call('User_Customer', 'addApiAuthenticationKey', id=user['id'])
     else:
         api_key = user['apiAuthenticationKeys'][0]['authenticationKey']

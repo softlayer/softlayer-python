@@ -12,15 +12,22 @@ from SoftLayer.CLI import storage_utils
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume_id')
-@click.option('--sortby', help='Column to sort by', default='name')
 @click.option('--columns',
               callback=column_helper.get_formatter(storage_utils.COLUMNS),
-              help='Columns to display. Options: {0}'.format(
-                  ', '.join(column.name for column in storage_utils.COLUMNS)),
+              help=f"Columns to display. Options are: {', '.join(column.name for column in storage_utils.COLUMNS)}.",
               default=','.join(storage_utils.DEFAULT_COLUMNS))
+@click.option('--sortby',
+              help=f"Column to sort by. Options are: {', '.join(column.name for column in storage_utils.COLUMNS)}.",
+              default='name')
 @environment.pass_env
 def cli(env, columns, sortby, volume_id):
-    """List ACLs."""
+    """List hosts that are authorized to access the volume.
+
+    EXAMPLE::
+
+            slcli block access-list 12345678 --sortby id
+            This command lists all hosts that are authorized to access volume with ID 12345678 and sorts them by ID.
+    """
     block_manager = SoftLayer.BlockStorageManager(env.client)
     resolved_id = helpers.resolve_id(block_manager.resolve_ids, volume_id, 'Volume Id')
     access_list = block_manager.get_block_volume_access_list(

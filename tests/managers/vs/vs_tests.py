@@ -1278,38 +1278,6 @@ class VSTests(testing.TestCase):
         self.assertTrue(result)
         self.assert_called_with('SoftLayer_Virtual_Guest', 'migrateDedicatedHost', args=(5555,), identifier=1234)
 
-    def test_get_hardware_guests(self):
-        mock = self.set_mock('SoftLayer_Account', 'getHardware')
-        mock.return_value = [{
-            "accountId": 11111,
-            "domain": "vmware.chechu.com",
-            "hostname": "host14",
-            "id": 22222,
-            "virtualHost": {
-                "accountId": 11111,
-                "id": 33333,
-                "name": "host14.vmware.chechu.com",
-                "guests": [
-                    {
-                        "accountId": 11111,
-                        "hostname": "NSX-T Manager",
-                        "id": 44444,
-                        "maxCpu": 16,
-                        "maxCpuUnits": "CORE",
-                        "maxMemory": 49152,
-                        "powerState": {
-                            "keyName": "RUNNING",
-                            "name": "Running"
-                        },
-                        "status": {
-                            "keyName": "ACTIVE",
-                            "name": "Active"
-                        }
-                    }]}}]
-
-        result = self.vs.get_hardware_guests()
-        self.assertEqual("NSX-T Manager", result[0]['virtualHost']['guests'][0]['hostname'])
-
     def test_authorize_storage(self):
         options = self.vs.authorize_storage(1234, "SL01SEL301234-11")
 

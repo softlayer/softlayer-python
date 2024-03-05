@@ -14,7 +14,13 @@ from SoftLayer.CLI import exceptions
               required=True)
 @environment.pass_env
 def cli(env, volume_id, schedule_type):
-    """Disables snapshots on the specified schedule for a given volume"""
+    """Disables snapshots on the specified schedule for a given volume
+
+    Example::
+
+        slcli file snapshot-disable 12345678 -s DAILY
+        This command disables daily snapshot for volume with ID 12345678.
+    """
 
     if (schedule_type not in ['INTERVAL', 'HOURLY', 'DAILY', 'WEEKLY']):
         raise exceptions.CLIAbort(

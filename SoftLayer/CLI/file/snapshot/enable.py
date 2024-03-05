@@ -27,7 +27,14 @@ from SoftLayer.CLI import exceptions
 @environment.pass_env
 def cli(env, volume_id, schedule_type, retention_count,
         minute, hour, day_of_week):
-    """Enables snapshots for a given volume on the specified schedule"""
+    """Enables snapshots for a given volume on the specified schedule
+
+    Example::
+
+        slcli file snapshot-enable 12345678 -s WEEKLY -c 5 -m 0 --hour 2 -d 0
+        This command enables snapshot for volume with ID 12345678, snapshot is
+        taken weekly on every Sunday at 2:00, and up to 5 snapshots are retained.
+    """
     file_manager = SoftLayer.FileStorageManager(env.client)
 
     valid_schedule_types = {'INTERVAL', 'HOURLY', 'DAILY', 'WEEKLY'}
