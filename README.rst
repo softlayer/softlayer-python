@@ -2,19 +2,12 @@ SoftLayer API Python Client
 ===========================
 .. image:: https://github.com/softlayer/softlayer-python/workflows/Tests/badge.svg
     :target: https://github.com/softlayer/softlayer-python/actions?query=workflow%3ATests
-
 .. image:: https://github.com/softlayer/softlayer-python/workflows/documentation/badge.svg
     :target: https://github.com/softlayer/softlayer-python/actions?query=workflow%3Adocumentation
-
-.. image:: https://landscape.io/github/softlayer/softlayer-python/master/landscape.svg
-    :target: https://landscape.io/github/softlayer/softlayer-python/master
-
 .. image:: https://badge.fury.io/py/SoftLayer.svg
     :target: http://badge.fury.io/py/SoftLayer
-
 .. image:: https://coveralls.io/repos/github/softlayer/softlayer-python/badge.svg?branch=master
     :target: https://coveralls.io/github/softlayer/softlayer-python?branch=master
-
 .. image:: https://snapcraft.io//slcli/badge.svg
     :target: https://snapcraft.io/slcli
 
