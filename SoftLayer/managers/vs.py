@@ -1048,25 +1048,20 @@ class VSManager(utils.IdentifierMixin, object):
             vsi_disk = self.get_instance(instance_id)
             for item in vsi_disk.get('billingItem').get('children'):
                 if 'guest_disk' in item.get('categoryCode'):
-                    if disk_number < int("".join(filter(str.isdigit, item.get('categoryCode')))):
-                        disk_number = int("".join(filter(str.isdigit, item.get('categoryCode'))))
+                    disk_number = max(disk_number, int("".join(filter(str.isdigit, item.get('categoryCode')))))
             for disk_guest in disk:
                 if disk_guest.get('number') > 0:
-                    price_id = self._get_price_id_for_upgrade_option(upgrade_prices, 'disk',
-                                                                     disk_guest.get('capacity'),
-                                                                     public)
                     disk_number = disk_guest.get('number')
-
                 else:
-                    price_id = self._get_price_id_for_upgrade_option(upgrade_prices, 'disk',
-                                                                     disk_guest.get('capacity'),
-                                                                     public)
                     disk_number = disk_number + 1
+                price_id = self._get_price_id_for_upgrade_option(upgrade_prices,
+                                                                 'disk',
+                                                                 disk_guest.get('capacity'),
+                                                                 public)
 
                 if price_id is None:
-                    raise exceptions.SoftLayerAPIError(500,
-                                                       'Unable to find %s option with value %s' % (
-                                                           ('disk', disk_guest.get('capacity'))))
+                    error = f"Unable to find disk option with value {disk_guest.get('capacity')}"
+                    raise exceptions.SoftLayerAPIError(500, error)
 
                 category_id = self.get_disk_category_id_by_disk_number(disk_guest.get('capacity'), disk_number)
                 if category_id is None:
@@ -1083,10 +1078,7 @@ class VSManager(utils.IdentifierMixin, object):
         for option, value in data.items():
             if not value:
                 continue
-            price_id = self._get_price_id_for_upgrade_option(upgrade_prices,
-                                                             option,
-                                                             value,
-                                                             public)
+            price_id = self._get_price_id_for_upgrade_option(upgrade_prices, option, value, public)
             if not price_id:
                 # Every option provided is expected to have a price
                 raise exceptions.SoftLayerError(
