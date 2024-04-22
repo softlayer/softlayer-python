@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -29,7 +29,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.12
     - name: Install dependencies
@@ -43,7 +43,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: 3.12
     - name: Install dependencies
@@ -52,3 +52,19 @@ jobs:
         pip install -r tools/test-requirements.txt
     - name: Tox Analysis
       run: tox -e analysis
+  detectsecrets:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python/@v5
+      with:
+        python-version: 3.11
+    - name: Install Detect Secrets
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade "git+https://github.com/ibm/detect-secrets.git@master#egg=detect-secrets"
+    - name: Detect Secrets
+      run: |
+        detect-secrets scan --update .secrets.baseline
+        detect-secrets audit .secrets.baseline --report --fail-on-unaudited --omit-instructions

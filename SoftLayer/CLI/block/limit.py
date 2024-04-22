@@ -23,7 +23,7 @@ def cli(env, sortby, datacenter):
     Example::
         slcli block volume-limits
         This command lists the storage limits per datacenter for this account.
-"""
+    """
 
     block_manager = SoftLayer.BlockStorageManager(env.client)
     block_volumes = block_manager.list_block_volume_limit()

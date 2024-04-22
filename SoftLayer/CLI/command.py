@@ -28,6 +28,8 @@ class OptionHighlighter(RegexHighlighter):
         r"(?P<option>\-\-[\w\-]+)",  # long options like --verbose
         r"(?P<default_option>\[[^\]]+\])",  # anything between [], usually default options
         r"(?P<option_choices>Choices: )",
+        r"(?P<example_block>Example::)",
+        r"(?P<url>(file|https|http|ws|wss)://[-0-9a-zA-Z$_+!`(),.?/;:&=%#~]*)"
         r"(?P<args_keyword>^[A-Z]+$)",
     ]
 
@@ -91,7 +93,7 @@ class CommandLoader(click.MultiCommand):
 
         if text:
             text = inspect.cleandoc(text).partition("\f")[0]
-        self.console.print(f"\n\t{text}\n")
+        self.console.print(f"\n\t{text}\n", highlight=True)
 
     def format_epilog(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
         """Writes the epilog if it exists, then prints out any sub-commands if they exist."""
@@ -191,9 +193,10 @@ class SLCommand(click.Command):
             text = f"(Deprecated) {text}"
 
         if text:
-            text = inspect.cleandoc(text)
+            text = f"\n\t{inspect.cleandoc(text)}\n"
 
-        self.console.print(f"\n\t{text}\n", highlight=False)
+        # Can't use F-string here because it messes with highlights
+        self.console.print(self.highlighter(text))
 
     def format_epilog(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
         """Writes the epilog if it exists, then prints out any sub-commands if they exist."""
