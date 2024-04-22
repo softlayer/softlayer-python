@@ -17,11 +17,11 @@ from SoftLayer import utils
 # pylint: disable=invalid-name, broad-except, arguments-differ
 
 
-class TestServer(http.server.HTTPServer):
+class TestServer(http.server.ThreadingHTTPServer):
     """Test HTTP server which holds a given transport."""
 
     def __init__(self, transport, *args, **kw):
-        http.server.HTTPServer.__init__(self, *args, **kw)
+        http.server.ThreadingHTTPServer.__init__(self, *args, **kw)
         self.transport = transport
 
 

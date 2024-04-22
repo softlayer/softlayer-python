@@ -268,7 +268,7 @@ class OrderingManager(object):
         """
         _filter = {'keyName': {'operation': package_keyname}}
 
-        packages = self.package_svc.getAllObjects(mask=mask, filter=_filter)
+        packages = self.client.call('SoftLayer_Product_Package', 'getAllObjects', mask=mask, filter=_filter)
         if len(packages) == 0:
             raise exceptions.SoftLayerError(f"Package {package_keyname} does not exist")
 
