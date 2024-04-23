@@ -59,8 +59,11 @@ class Request(object):
         #: Boolean specifying if the server certificate should be verified.
         self.verify = None
 
-        #: Client certificate file path.
+        #: Client certificate file path. (Used by X509Authentication)
         self.cert = None
+
+        #: CA certificate for softlayer domains (Used by X509Authentication)
+        self.ca_cert = None
 
         #: InitParameter/identifier of an object.
         self.identifier = None

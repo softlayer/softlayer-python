@@ -12,6 +12,7 @@ __all__ = [
     'TokenAuthentication',
     'BasicHTTPAuthentication',
     'AuthenticationBase',
+    'X509Authentication'
 ]
 
 
@@ -137,3 +138,23 @@ class BearerAuthentication(AuthenticationBase):
 
     def __repr__(self):
         return f"BearerAuthentication(username={self.username}, token={self.api_key})"
+
+class X509Authentication(AuthenticationBase):
+    """X509Authentication authentication class.
+
+        :param certificate str:  Path to a users SSL certificate for authentication
+        :param CA Cert str: Path to the CA bundle for softlayer hostnames.
+    """
+
+    def __init__(self, cert, ca_cert):
+        self.cert = cert
+        self.ca_cert = ca_cert
+
+    def get_request(self, request):
+        """Sets token-based auth headers."""
+        request.cert = self.cert
+        request.ca_cert = self.ca_cert
+        return request
+
+    def __repr__(self):
+        return f"X509Authentication(cert={cert}, ca_cert={ca_cert})"
