@@ -59,6 +59,8 @@ def get_client_settings_config_file(**kwargs):  # pylint: disable=inconsistent-r
         'endpoint_url': '',
         'timeout': '0',
         'proxy': '',
+        'userid': '',
+        'access_token': ''
     })
     config.read(config_files)
 
@@ -69,6 +71,8 @@ def get_client_settings_config_file(**kwargs):  # pylint: disable=inconsistent-r
             'proxy': config.get('softlayer', 'proxy'),
             'username': config.get('softlayer', 'username'),
             'api_key': config.get('softlayer', 'api_key'),
+            'userid': config.get('softlayer', 'userid'),
+            'access_token': config.get('softlayer', 'access_token'),
         }
 
 
@@ -109,6 +113,8 @@ def get_config(config_file=None):
         config['softlayer']['endpoint_url'] = ''
         config['softlayer']['api_key'] = ''
         config['softlayer']['timeout'] = '0'
+        config['softlayer']['userid'] = ''
+        config['softlayer']['access_tokne'] = ''
 
     return config
 

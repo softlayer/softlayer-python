@@ -4,12 +4,17 @@
 
     :license: MIT, see LICENSE for more details.
 """
+import io
+import os
 from unittest import mock as mock
+import requests
 
 import SoftLayer
 import SoftLayer.API
 from SoftLayer import testing
 from SoftLayer import transports
+from SoftLayer import exceptions
+from SoftLayer import auth as slauth
 
 
 class Initialization(testing.TestCase):
@@ -310,3 +315,97 @@ class UnauthenticatedAPIClient(testing.TestCase):
         self.assertIsNotNone(self.client.auth)
         self.assertEqual(self.client.auth.user_id, 12345)
         self.assertEqual(self.client.auth.auth_token, 'TOKEN')
+
+
+class EmployeeClientTests(testing.TestCase):
+
+
+    @staticmethod
+    def setup_response(filename, status_code=200, total_items=1):
+        basepath = os.path.dirname(__file__)
+        body = b''
+        with open(f"{basepath}/../SoftLayer/fixtures/xmlrpc/{filename}.xml", 'rb') as fixture:
+            body = fixture.read()
+        response = requests.Response()
+        list_body = body
+        response.raw = io.BytesIO(list_body)
+        response.headers['SoftLayer-Total-Items'] = total_items
+        response.status_code = status_code
+        return response
+
+
+    def set_up(self):
+        self.client = SoftLayer.API.EmployeeClient(config_file='./tests/testconfig')
+
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
+    def test_auth_with_pass_failure(self, api_response):
+        api_response.return_value = self.setup_response('invalidLogin')
+        exception = self.assertRaises(
+            exceptions.SoftLayerAPIError,
+            self.client.authenticate_with_password, 'testUser', 'testPassword', '123456')
+        self.assertEqual(exception.faultCode, "SoftLayer_Exception_Public")
+
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
+    def test_auth_with_pass_success(self, api_response):
+        api_response.return_value = self.setup_response('successLogin')
+        result = self.client.authenticate_with_password('testUser', 'testPassword', '123456')
+        print(result)
+        self.assertEqual(result['userId'], 1234)
+        self.assertEqual(self.client.settings['softlayer']['userid'], '1234')
+        self.assertIn('x'*200, self.client.settings['softlayer']['access_token'])
+
+    def test_auth_with_hash(self):
+        self.client.auth = None
+        self.client.authenticate_with_hash(5555, 'abcdefg')
+        self.assertEqual(self.client.auth.user_id, 5555)
+        self.assertEqual(self.client.auth.hash, 'abcdefg')
+
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
+    def test_refresh_token(self, api_response):
+        api_response.return_value = self.setup_response('refreshSuccess')
+        result = self.client.refresh_token(9999, 'qweasdzxcqweasdzxcqweasdzxc')
+        self.assertEqual(self.client.auth.user_id, 9999)
+        self.assertIn('REFRESHEDTOKENaaaa', self.client.auth.hash)
+    
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
+    def test_expired_token_is_refreshed(self, api_response):
+        api_response.side_effect = [
+            self.setup_response('expiredToken'),
+            self.setup_response('refreshSuccess'),
+            self.setup_response('Employee_getObject')
+        ]
+        self.client.auth = slauth.EmployeeAuthentication(5555, 'aabbccee')
+        self.client.settings['softlayer']['userid'] = '5555'
+        result = self.client.call('SoftLayer_User_Employee', 'getObject', id=5555)
+        self.assertIn('REFRESHEDTOKENaaaa', self.client.auth.hash)
+        self.assertEqual('testUser', result['username'])
+        
+    @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
+    def test_expired_token_is_really_expored(self, api_response):
+        api_response.side_effect = [
+            self.setup_response('expiredToken'),
+            self.setup_response('expiredToken')
+        ]
+        self.client.auth = slauth.EmployeeAuthentication(5555, 'aabbccee')
+        self.client.settings['softlayer']['userid'] = '5555'
+        exception = self.assertRaises(
+            exceptions.SoftLayerAPIError,
+            self.client.call, 'SoftLayer_User_Employee', 'getObject', id=5555)
+        self.assertEqual(None, self.client.auth)
+        self.assertEqual(exception.faultCode, "SoftLayer_Exception_EncryptedToken_Expired")
+
+    @mock.patch('SoftLayer.API.BaseClient.call')
+    def test_account_check(self, _call):
+        self.client.transport = self.mocks
+        exception = self.assertRaises(
+            exceptions.SoftLayerError,
+            self.client.call, "SoftLayer_Account", "getObject")
+        self.assertEqual(str(exception), "SoftLayer_Account service requires an ID")
+        self.client.account_id = 1234
+        self.client.call("SoftLayer_Account", "getObject")
+        self.client.call("SoftLayer_Account", "getObject1", id=9999)
+
+        _call.assert_has_calls([
+            mock.call(self.client, 'SoftLayer_Account', 'getObject', id=1234),
+            mock.call(self.client, 'SoftLayer_Account', 'getObject1', id=9999),
+        ])
