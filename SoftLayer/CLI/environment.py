@@ -12,7 +12,7 @@ import importlib
 from json.decoder import JSONDecodeError
 
 import click
-import pkg_resources
+
 from rich.console import Console
 from rich.syntax import Syntax
 
@@ -22,9 +22,6 @@ from SoftLayer.CLI import routes
 from SoftLayer import utils
 
 # pylint: disable=too-many-instance-attributes, invalid-name
-
-# Calling pkg_resources.iter_entry_points shows a false-positive
-# pylint: disable=no-member
 
 
 class Environment(object):
@@ -165,8 +162,6 @@ class Environment(object):
 
         self.load_modules_from_python(routes.ALL_ROUTES)
         self.aliases.update(routes.ALL_ALIASES)
-        self._load_modules_from_entry_points('softlayer.cli')
-
         self._modules_loaded = True
 
     def load_modules_from_python(self, route_list):
@@ -177,20 +172,6 @@ class Environment(object):
             else:
                 path, attr = modpath, None
             self.commands[name] = ModuleLoader(path, attr=attr)
-
-    def _load_modules_from_entry_points(self, entry_point_group):
-        """Load modules from the entry_points (slower).
-
-        Entry points can be used to add new commands to the CLI.
-
-        Usage:
-
-            entry_points={'softlayer.cli': ['new-cmd = mymodule.new_cmd.cli']}
-
-        """
-        for obj in pkg_resources.iter_entry_points(group=entry_point_group,
-                                                   name=None):
-            self.commands[obj.name] = obj
 
     def ensure_client(self, config_file=None, is_demo=False, proxy=None):
         """Create a new SLAPI client to the environment.
