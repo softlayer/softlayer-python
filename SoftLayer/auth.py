@@ -143,7 +143,7 @@ class X509Authentication(AuthenticationBase):
     """X509Authentication authentication class.
 
         :param certificate str:  Path to a users SSL certificate for authentication
-        :param CA Cert str: Path to the CA bundle for softlayer hostnames.
+        :param CA Cert str: Path to the Servers signed certificate.
     """
 
     def __init__(self, cert, ca_cert):
@@ -157,4 +157,4 @@ class X509Authentication(AuthenticationBase):
         return request
 
     def __repr__(self):
-        return f"X509Authentication(cert={cert}, ca_cert={ca_cert})"
+        return f"X509Authentication(cert={self.cert}, ca_cert={self.ca_cert})"
