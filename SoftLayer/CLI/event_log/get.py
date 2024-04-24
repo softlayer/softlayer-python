@@ -76,7 +76,7 @@ def cli(env, date_min, date_max, obj_event, obj_id, obj_type, utc_offset, metada
                         f"'{user}','{metadata_data}'")
         else:
             click.secho(f"'{log['eventName']}','{label}','{log['objectName']}',"
-                        f"'{utils.clean_time(log['eventCreateDate'],in_format=log_time)}',"
+                        f"'{utils.clean_time(log['eventCreateDate'], in_format=log_time)}',"
                         f"'{user}'")
 
         row_count = row_count + 1
