@@ -139,6 +139,7 @@ class BearerAuthentication(AuthenticationBase):
     def __repr__(self):
         return f"BearerAuthentication(username={self.username}, token={self.api_key})"
 
+
 class X509Authentication(AuthenticationBase):
     """X509Authentication authentication class.
 
