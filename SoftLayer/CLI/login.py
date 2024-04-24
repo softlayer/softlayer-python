@@ -12,10 +12,6 @@ from SoftLayer import consts
 from SoftLayer.CLI import environment
 
 
-# def get_username(env):
-#     """Gets the username from config or env"""
-#     settings = 
-
 def censor_password(value):
     if value:
         value = '*' * len(value)

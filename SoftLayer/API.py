@@ -180,16 +180,7 @@ def employee_client(username=None,
     :param bool verify: decide to verify the server's SSL/TLS cert. DO NOT SET
                         TO FALSE WITHOUT UNDERSTANDING THE IMPLICATIONS.
 
-    Usage:
-
-        >>> import SoftLayer
-        >>> client = SoftLayer.create_client_from_env()
-        >>> resp = client.call('Account', 'getObject')
-        >>> resp['companyName']
-        'Your Company'
-
     """
-    # SSL verification is OFF because internal api uses a self signed cert
     settings = config.get_client_settings(username=username,
                                           api_key=None,
                                           endpoint_url=endpoint_url,
@@ -198,14 +189,12 @@ def employee_client(username=None,
                                           verify=verify,
                                           config_file=config_file)
 
-    url = settings.get('endpoint_url') or consts.API_EMPLOYEE_ENDPOINT
+    url = settings.get('endpoint_url')
 
     if 'internal' not in url:
-        raise exceptions.SoftLayerError("{} does not look like an Internal Employee url. Try {}".format(
-                                         url, consts.API_EMPLOYEE_ENDPOINT))
+        raise exceptions.SoftLayerError(f"{url} does not look like an Internal Employee url.")
 
     if transport is None:
-        
         if url is not None and '/rest' in url:
             # If this looks like a rest endpoint, use the rest transport
             transport = transports.RestTransport(
@@ -241,7 +230,6 @@ def employee_client(username=None,
         return EmployeeClient(auth=None, transport=transport)
 
 
-
 def Client(**kwargs):
     """Get a SoftLayer API Client using environmental settings."""
     return create_client_from_env(**kwargs)
@@ -251,8 +239,7 @@ class BaseClient(object):
     """Base SoftLayer API client.
 
     :param auth: auth driver that looks like SoftLayer.auth.AuthenticationBase
-    :param transport: An object that's callable with this signature:
-                      transport(SoftLayer.transports.Request)
+    :param transport: An object that's callable with this signature: transport(SoftLayer.transports.Request)
     """
 
     _prefix = "SoftLayer_"
@@ -288,9 +275,7 @@ class BaseClient(object):
 
         self.transport = transport
 
-    def authenticate_with_password(self, username, password,
-                                   security_question_id=None,
-                                   security_question_answer=None):
+    def authenticate_with_password(self, username, password, security_question_id=None, security_question_answer=None):
         """Performs Username/Password Authentication
 
         :param string username: your SoftLayer username
@@ -353,8 +338,7 @@ class BaseClient(object):
 
         invalid_kwargs = set(kwargs.keys()) - VALID_CALL_ARGS
         if invalid_kwargs:
-            raise TypeError(
-                'Invalid keyword arguments: %s' % ','.join(invalid_kwargs))
+            raise TypeError('Invalid keyword arguments: %s' % ','.join(invalid_kwargs))
 
         prefixes = (self._prefix, 'BluePages_Search', 'IntegratedOfferingTeam_Region')
         if self._prefix and not service.startswith(prefixes):
