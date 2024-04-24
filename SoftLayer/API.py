@@ -33,6 +33,7 @@ __all__ = [
     'API_PUBLIC_ENDPOINT',
     'API_PRIVATE_ENDPOINT',
     'IAMClient',
+    'CertificateClient'
 ]
 
 VALID_CALL_ARGS = set((
@@ -144,12 +145,7 @@ def create_client_from_env(username=None,
 
 
 def Client(**kwargs):
-    """Get a SoftLayer API Client using environmental settings.
-
-    Deprecated in favor of create_client_from_env()
-    """
-    warnings.warn("use SoftLayer.create_client_from_env() instead",
-                  DeprecationWarning)
+    """Get a SoftLayer API Client using environmental settings."""
     return create_client_from_env(**kwargs)
 
 
@@ -390,6 +386,52 @@ class BaseClient(object):
     def __len__(self):
         return 0
 
+class CertificateClient(BaseClient):
+    """Client that works with a X509 Certificate for authentication.
+
+    Will read the certificate file from the config file (~/.softlayer usually).
+    > auth_cert = /path/to/authentication/cert.pm
+    > server_cert = /path/to/CAcert.pem
+    Set auth to a SoftLayer.auth.Authentication class to manually set authentication
+    """
+
+    def __init__(self, auth=None, transport=None, config_file=None):
+        if config_file is None:
+            config_file = CONFIG_FILE
+        self.config_file = config_file
+        self.settings = config.get_config(self.config_file)
+
+        if auth is None:
+            auth_cert = self.settings['softlayer'].get('auth_cert')
+            serv_cert = self.settings['softlayer'].get('server_cert', None)
+            auth = slauth.X509Authentication(auth_cert, serv_cert)
+        self.auth = auth        
+        
+        
+
+        if transport is None:
+            url = self.settings['softlayer'].get('endpoint_url')
+            if url is not None and '/rest' in url:
+                # If this looks like a rest endpoint, use the rest transport
+                transport = transports.RestTransport(
+                    endpoint_url=url,
+                    proxy=self.settings['softlayer'].get('proxy'),
+                    # prevents an exception incase timeout is a float number.
+                    timeout=int(self.settings['softlayer'].getfloat('timeout', 0)),
+                    user_agent=consts.USER_AGENT,
+                    verify=self.settings['softlayer'].getboolean('verify'),
+                )
+            else:
+                # Default the transport to use XMLRPC
+                transport = transports.XmlRpcTransport(
+                    endpoint_url=url,
+                    proxy=self.settings['softlayer'].get('proxy'),
+                    timeout=int(self.settings['softlayer'].getfloat('timeout', 0)),
+                    user_agent=consts.USER_AGENT,
+                    verify=self.settings['softlayer'].getboolean('verify'),
+                )
+
+        self.transport = transport
 
 class IAMClient(BaseClient):
     """IBM ID Client for using IAM authentication
