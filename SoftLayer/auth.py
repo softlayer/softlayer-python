@@ -153,7 +153,7 @@ class X509Authentication(AuthenticationBase):
     def get_request(self, request):
         """Sets token-based auth headers."""
         request.cert = self.cert
-        request.ca_cert = self.ca_cert
+        request.verify = self.ca_cert
         return request
 
     def __repr__(self):
