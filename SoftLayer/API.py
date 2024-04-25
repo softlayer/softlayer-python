@@ -6,9 +6,7 @@
     :license: MIT, see LICENSE for more details.
 """
 # pylint: disable=invalid-name
-import os
 import time
-import warnings
 
 import concurrent.futures as cf
 import json
@@ -148,7 +146,6 @@ def create_client_from_env(username=None,
 
 def employee_client(username=None,
                     access_token=None,
-                    password=None,
                     endpoint_url=None,
                     timeout=None,
                     auth=None,
@@ -159,27 +156,22 @@ def employee_client(username=None,
                     verify=False):
     """Creates an INTERNAL SoftLayer API client using your environment.
 
-    Settings are loaded via keyword arguments, environemtal variables and
-    config file.
+    Settings are loaded via keyword arguments, environemtal variables and config file.
 
     :param username: your user ID
-    :param access_token: hash from SoftLayer_User_Employee::performExternalAuthentication(username, password, 2fa_string)
+    :param access_token: hash from SoftLayer_User_Employee::performExternalAuthentication(username, password, token)
     :param password: password to use for employee authentication
     :param endpoint_url: the API endpoint base URL you wish to connect to.
-        Set this to API_PRIVATE_ENDPOINT to connect via SoftLayer's private
-        network.
+        Set this to API_PRIVATE_ENDPOINT to connect via SoftLayer's private network.
     :param proxy: proxy to be used to make API calls
     :param integer timeout: timeout for API requests
-    :param auth: an object which responds to get_headers() to be inserted into
-        the xml-rpc headers. Example: `BasicAuthentication`
+    :param auth: an object which responds to get_headers() to be inserted into the xml-rpc headers.
+        Example: `BasicAuthentication`
     :param config_file: A path to a configuration file used to load settings
     :param user_agent: an optional User Agent to report when making API
         calls if you wish to bypass the packages built in User Agent string
-    :param transport: An object that's callable with this signature:
-                      transport(SoftLayer.transports.Request)
-    :param bool verify: decide to verify the server's SSL/TLS cert. DO NOT SET
-                        TO FALSE WITHOUT UNDERSTANDING THE IMPLICATIONS.
-
+    :param transport: An object that's callable with this signature: transport(SoftLayer.transports.Request)
+    :param bool verify: decide to verify the server's SSL/TLS cert.
     """
     settings = config.get_client_settings(username=username,
                                           api_key=None,
@@ -214,7 +206,6 @@ def employee_client(username=None,
                 verify=verify,
             )
 
-
     if access_token is None:
         access_token = settings.get('access_token')
 
@@ -241,16 +232,23 @@ class BaseClient(object):
     :param auth: auth driver that looks like SoftLayer.auth.AuthenticationBase
     :param transport: An object that's callable with this signature: transport(SoftLayer.transports.Request)
     """
-
     _prefix = "SoftLayer_"
+    auth: slauth.AuthenticationBase
 
     def __init__(self, auth=None, transport=None, config_file=None):
         if config_file is None:
             config_file = CONFIG_FILE
-        self.auth = auth
         self.config_file = config_file
         self.settings = config.get_config(self.config_file)
+        self.__setAuth(auth)
+        self.__setTransport(transport)
 
+    def __setAuth(self, auth=None):
+        """Prepares the authentication property"""
+        self.auth = auth
+
+    def __setTransport(self, transport=None):
+        """Prepares the transport property"""
         if transport is None:
             url = self.settings['softlayer'].get('endpoint_url')
             if url is not None and '/rest' in url:
@@ -469,6 +467,7 @@ class BaseClient(object):
     def __len__(self):
         return 0
 
+
 class CertificateClient(BaseClient):
     """Client that works with a X509 Certificate for authentication.
 
@@ -479,42 +478,20 @@ class CertificateClient(BaseClient):
     """
 
     def __init__(self, auth=None, transport=None, config_file=None):
-        if config_file is None:
-            config_file = CONFIG_FILE
-        self.config_file = config_file
-        self.settings = config.get_config(self.config_file)
+        BaseClient.__init__(self, auth, transport, config_file)
+        self.__setAuth(auth)
 
+    def __setAuth(self, auth=None):
+        """Prepares the authentication property"""
         if auth is None:
             auth_cert = self.settings['softlayer'].get('auth_cert')
             serv_cert = self.settings['softlayer'].get('server_cert', None)
             auth = slauth.X509Authentication(auth_cert, serv_cert)
-        self.auth = auth        
-        
-        
+        self.auth = auth
 
-        if transport is None:
-            url = self.settings['softlayer'].get('endpoint_url')
-            if url is not None and '/rest' in url:
-                # If this looks like a rest endpoint, use the rest transport
-                transport = transports.RestTransport(
-                    endpoint_url=url,
-                    proxy=self.settings['softlayer'].get('proxy'),
-                    # prevents an exception incase timeout is a float number.
-                    timeout=int(self.settings['softlayer'].getfloat('timeout', 0)),
-                    user_agent=consts.USER_AGENT,
-                    verify=self.settings['softlayer'].getboolean('verify'),
-                )
-            else:
-                # Default the transport to use XMLRPC
-                transport = transports.XmlRpcTransport(
-                    endpoint_url=url,
-                    proxy=self.settings['softlayer'].get('proxy'),
-                    timeout=int(self.settings['softlayer'].getfloat('timeout', 0)),
-                    user_agent=consts.USER_AGENT,
-                    verify=self.settings['softlayer'].getboolean('verify'),
-                )
+    def __repr__(self):
+        return "CertificateClient(transport=%r, auth=%r)" % (self.transport, self.auth)
 
-        self.transport = transport
 
 class IAMClient(BaseClient):
     """IBM ID Client for using IAM authentication
@@ -711,9 +688,8 @@ class EmployeeClient(BaseClient):
         BaseClient.__init__(self, auth, transport, config_file)
         self.account_id = account_id
 
-
-    def authenticate_with_password(self, username, password, security_token=None):
-        """Performs IBM IAM Username/Password Authentication
+    def authenticate_with_internal(self, username, password, security_token=None):
+        """Performs internal authentication
 
         :param string username: your softlayer username
         :param string password: your softlayer password
@@ -724,11 +700,10 @@ class EmployeeClient(BaseClient):
         if security_token is None:
             security_token = input("Enter your 2FA Token now: ")
             if len(security_token) != 6:
-                raise Exception("Invalid security token: {}".format(security_token))
+                raise exceptions.SoftLayerAPIError("Invalid security token: {}".format(security_token))
 
         auth_result = self.call('SoftLayer_User_Employee', 'performExternalAuthentication',
                                 username, password, security_token)
-
 
         self.settings['softlayer']['access_token'] = auth_result['hash']
         self.settings['softlayer']['userid'] = str(auth_result['userId'])
@@ -738,8 +713,6 @@ class EmployeeClient(BaseClient):
         self.auth = slauth.EmployeeAuthentication(auth_result['userId'], auth_result['hash'])
 
         return auth_result
-
-
 
     def authenticate_with_hash(self, userId, access_token):
         """Authenticates to the Internal SL API with an employee userid + token
@@ -790,6 +763,7 @@ class EmployeeClient(BaseClient):
 
     def __repr__(self):
         return "EmployeeClient(transport=%r, auth=%r)" % (self.transport, self.auth)
+
 
 class Service(object):
     """A SoftLayer Service.
