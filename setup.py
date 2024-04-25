@@ -5,7 +5,7 @@ import os
 from setuptools import setup, find_packages
 # pylint: disable=inconsistent-return-statements
 
-DESCRIPTION = "A library for SoftLayer's IMS API"
+DESCRIPTION = "A library for SoftLayer's API"
 
 if os.path.exists('README.rst'):
     with codecs.open('README.rst', 'r', 'utf-8') as readme_file:
@@ -14,7 +14,7 @@ else:
     LONG_DESCRIPTION = DESCRIPTION
 
 setup(
-    name='SoftLayer-Internal',
+    name='SoftLayer',
     version='v6.1.11',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
@@ -24,7 +24,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     license='MIT',
     zip_safe=False,
-    url='https://github.ibm.com/SoftLayer/internal-softlayer-cli',
+    url='https://github.com/SoftLayer/softlayer-python',
     entry_points={
         'console_scripts': [
             'islcli = SoftLayer.CLI.core:main',
