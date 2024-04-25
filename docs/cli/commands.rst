@@ -45,3 +45,13 @@ Can be called with an un-authenticated API call.
 .. click:: SoftLayer.CLI.search:cli
     :prog: search
     :show-nested:
+
+
+Employee Login
+==============
+
+Allows employees to use their login information to make API calls.
+
+.. click:: SoftLayer.CLI.login:cli
+    :prog: emplogin
+    :show-nested:
