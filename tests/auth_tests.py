@@ -83,3 +83,22 @@ class TestBasicHTTPAuthentication(testing.TestCase):
         s = repr(self.auth)
         self.assertIn('BasicHTTPAuthentication', s)
         self.assertIn('USERNAME', s)
+
+
+class TestX509AUthentication(testing.TestCase):
+    def set_up(self):
+        self.auth = auth.X509Authentication('authcert.pm', 'servercert.pm')
+
+    def test_attribs(self):
+        self.assertEqual(self.auth.cert, 'authcert.pm')
+        self.assertEqual(self.auth.ca_cert, 'servercert.pm')
+
+    def test_get_request(self):
+        req = transports.Request()
+        authed_req = self.auth.get_request(req)
+        self.assertEqual(authed_req.cert, 'authcert.pm')
+        self.assertEqual(authed_req.verify, 'servercert.pm')
+
+    def test_repr(self):
+        s = repr(self.auth)
+        self.assertEqual(s, "X509Authentication(cert=authcert.pm, ca_cert=servercert.pm)")

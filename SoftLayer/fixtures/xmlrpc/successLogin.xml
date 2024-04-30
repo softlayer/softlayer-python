@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<params>
+    <param>
+        <value>
+            <struct>
+                <member>
+                    <name>hash</name>
+                    <value>
+                        <string>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</string>
+                    </value>
+                </member>
+                <member>
+                    <name>userId</name>
+                    <value>
+                        <int>1234</int>
+                    </value>
+                </member>
+            </struct>
+        </value>
+    </param>
+</params>

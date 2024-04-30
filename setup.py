@@ -24,11 +24,10 @@ setup(
     packages=find_packages(exclude=['tests']),
     license='MIT',
     zip_safe=False,
-    url='http://github.com/softlayer/softlayer-python',
+    url='https://github.com/SoftLayer/softlayer-python',
     entry_points={
         'console_scripts': [
             'slcli = SoftLayer.CLI.core:main',
-            'sl = SoftLayer.CLI.deprecated:main',
         ],
     },
     python_requires='>=3.7',
@@ -41,7 +40,7 @@ setup(
         'urllib3 >= 1.24',
         'rich == 13.7.1'
     ],
-    keywords=['softlayer', 'cloud', 'slcli'],
+    keywords=['softlayer', 'cloud', 'slcli', 'ibmcloud'],
     classifiers=[
         'Environment :: Console',
         'Environment :: Web Environment',
@@ -50,7 +49,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',

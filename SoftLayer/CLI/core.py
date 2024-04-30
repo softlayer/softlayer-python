@@ -74,34 +74,28 @@ def get_version_message(ctx, param, value):
 The easiest way to do that is to use: 'slcli setup'""",
              cls=CommandLoader,
              context_settings=CONTEXT_SETTINGS)
-@click.option('--format',
-              default=DEFAULT_FORMAT,
-              show_default=True,
+@click.option('--format', default=DEFAULT_FORMAT, show_default=True,
               help="Output format",
               type=click.Choice(VALID_FORMATS))
-@click.option('-C', '--config',
-              required=False,
+@click.option('-C', '--config', required=False, show_default=True,
               default=click.get_app_dir('softlayer', force_posix=True),
-              show_default=True,
               help="Config file location",
               type=click.Path(resolve_path=True))
 @click.option('--verbose', '-v',
               help="Sets the debug noise level, specify multiple times for more verbosity.",
               type=click.IntRange(0, 3, clamp=True),
               count=True)
-@click.option('--proxy',
-              required=False,
+@click.option('--proxy', required=False,
               help="HTTPS or HTTP proxy to be use to make API calls")
-@click.option('--really / --not-really', '-y',
-              is_flag=True,
-              required=False,
+@click.option('--really / --not-really', '-y', is_flag=True, required=False,
               help="Confirm all prompt actions")
-@click.option('--demo / --no-demo',
-              is_flag=True,
-              required=False,
+@click.option('--demo / --no-demo', is_flag=True, required=False,
               help="Use demo data instead of actually making API calls")
 @click.option('--version', is_flag=True, expose_value=False, is_eager=True, callback=get_version_message,
               help="Show version information.",  allow_from_autoenv=False,)
+@click.option('--account', '-a', help="Account Id, only needed for some API calls.")
+@click.option('--internal', '-i', is_flag=True, required=False,
+              help="Use the Employee Client instead of the Customer Client.")
 @environment.pass_env
 def cli(env,
         format='table',
@@ -110,6 +104,8 @@ def cli(env,
         proxy=None,
         really=False,
         demo=False,
+        account=None,
+        internal=False,
         **kwargs):
     """Main click CLI entry-point."""
 
@@ -118,7 +114,10 @@ def cli(env,
     env.config_file = config
     env.format = format
     env.set_env_theme(config_file=config)
-    env.ensure_client(config_file=config, is_demo=demo, proxy=proxy)
+    if internal:
+        env.ensure_emp_client(config_file=config, is_demo=demo, proxy=proxy)
+    else:
+        env.ensure_client(config_file=config, is_demo=demo, proxy=proxy)
     env.vars['_start'] = time.time()
     logger = logging.getLogger()
 
@@ -133,6 +132,7 @@ def cli(env,
     env.vars['_timings'] = SoftLayer.DebugTransport(env.client.transport)
     env.vars['verbose'] = verbose
     env.client.transport = env.vars['_timings']
+    env.client.account_id = account
 
 
 @cli.result_callback()

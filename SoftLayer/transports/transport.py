@@ -56,10 +56,12 @@ class Request(object):
         #: Transport headers.
         self.transport_headers = {}
 
-        #: Boolean specifying if the server certificate should be verified.
+        #: False -> Don't verify the SSL certificate
+        #: True -> Verify the SSL certificate
+        #: Path String -> Verify the SSL certificate with the .pem file at path
         self.verify = None
 
-        #: Client certificate file path.
+        #: Client certificate file path. (Used by X509Authentication)
         self.cert = None
 
         #: InitParameter/identifier of an object.
@@ -99,9 +101,12 @@ class Request(object):
         """Prints out what this call is all about"""
         pretty_mask = utils.clean_string(self.mask)
         pretty_filter = self.filter
-        param_string = "id={id}, mask='{mask}', filter='{filter}', args={args}, limit={limit}, offset={offset}".format(
-            id=self.identifier, mask=pretty_mask, filter=pretty_filter,
-            args=self.args, limit=self.limit, offset=self.offset)
+        clean_args = self.args
+        # Passwords can show up here, so censor them before logging.
+        if self.method in ["performExternalAuthentication", "refreshEncryptedToken", "getPortalLoginToken"]:
+            clean_args = "*************"
+        param_string = (f"id={self.identifier}, mask='{pretty_mask}', filter='{pretty_filter}', args={clean_args}, "
+                        f"limit={self.limit}, offset={self.offset}")
         return "{service}::{method}({params})".format(
             service=self.service, method=self.method, params=param_string)
 

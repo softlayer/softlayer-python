@@ -8,6 +8,7 @@
 
 ALL_ROUTES = [
     ('shell', 'SoftLayer.shell.core:cli'),
+    ('emplogin', 'SoftLayer.CLI.login:cli'),
 
     ('call-api', 'SoftLayer.CLI.call_api:cli'),
 
