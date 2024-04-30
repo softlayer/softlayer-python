@@ -69,8 +69,9 @@ def get_version_message(ctx, param, value):
     ctx.exit()
 
 
-@click.group(help="SoftLayer Employee Command-line Client",
-             epilog="""Run 'islcli login' to authenticate""",
+@click.group(help="SoftLayer Command-line Client",
+             epilog="""To use most commands your SoftLayer username and api_key need to be configured.
+The easiest way to do that is to use: 'slcli setup'""",
              cls=CommandLoader,
              context_settings=CONTEXT_SETTINGS)
 @click.option('--format', default=DEFAULT_FORMAT, show_default=True,
