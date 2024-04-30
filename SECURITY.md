@@ -7,7 +7,7 @@ Version 5.7.2 is the last version that supports python2.7.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.9.x   | :white_check_mark: |
+| 6.2.x   | :white_check_mark: |
 | 5.7.2   | :white_check_mark: |
 | < 5.7.2 | :x:                |
 
