@@ -27,7 +27,7 @@ setup(
     url='https://github.com/SoftLayer/softlayer-python',
     entry_points={
         'console_scripts': [
-            'islcli = SoftLayer.CLI.core:main',
+            'slcli = SoftLayer.CLI.core:main',
         ],
     },
     python_requires='>=3.7',
@@ -40,7 +40,7 @@ setup(
         'urllib3 >= 1.24',
         'rich == 13.7.1'
     ],
-    keywords=['islcli'],
+    keywords=['softlayer', 'cloud', 'slcli', 'ibmcloud'],
     classifiers=[
         'Environment :: Console',
         'Environment :: Web Environment',
