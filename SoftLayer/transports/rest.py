@@ -108,7 +108,6 @@ class RestTransport(object):
         request.url = '%s.%s' % ('/'.join(url_parts), 'json')
 
         # Prefer the request setting, if it's not None
-
         if request.verify is None:
             request.verify = self.verify
 

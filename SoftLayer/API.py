@@ -153,7 +153,7 @@ def employee_client(username=None,
                     proxy=None,
                     user_agent=None,
                     transport=None,
-                    verify=False):
+                    verify=True):
     """Creates an INTERNAL SoftLayer API client using your environment.
 
     Settings are loaded via keyword arguments, environemtal variables and config file.
@@ -178,10 +178,11 @@ def employee_client(username=None,
                                           endpoint_url=endpoint_url,
                                           timeout=timeout,
                                           proxy=proxy,
-                                          verify=verify,
+                                          verify=None,
                                           config_file=config_file)
 
     url = settings.get('endpoint_url')
+    verify = settings.get('verify', True)
 
     if 'internal' not in url:
         raise exceptions.SoftLayerError(f"{url} does not look like an Internal Employee url.")

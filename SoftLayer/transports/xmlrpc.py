@@ -84,8 +84,7 @@ class XmlRpcTransport(object):
                                               encoding="iso-8859-1")
 
         # Prefer the request setting, if it's not None
-        verify = request.verify
-        if verify is None:
+        if request.verify is None:
             request.verify = self.verify
 
         try:

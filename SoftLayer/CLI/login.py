@@ -4,6 +4,7 @@ import os
 
 import click
 
+from SoftLayer.API import employee_client
 from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer import config
@@ -30,7 +31,7 @@ def cli(env):
     username = settings.get('username') or os.environ.get('SLCLI_USER', None)
     password = os.environ.get('SLCLI_PASSWORD', '')
     yubi = None
-    client = env.client
+    client = employee_client()
 
     # Might already be logged in, try and refresh token
     if settings.get('access_token') and settings.get('userid'):

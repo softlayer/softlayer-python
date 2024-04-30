@@ -56,7 +56,9 @@ class Request(object):
         #: Transport headers.
         self.transport_headers = {}
 
-        #: Boolean specifying if the server certificate should be verified.
+        #: False -> Don't verify the SSL certificate
+        #: True -> Verify the SSL certificate
+        #: Path String -> Verify the SSL certificate with the .pem file at path
         self.verify = None
 
         #: Client certificate file path. (Used by X509Authentication)

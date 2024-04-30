@@ -60,7 +60,8 @@ def get_client_settings_config_file(**kwargs):  # pylint: disable=inconsistent-r
         'timeout': '0',
         'proxy': '',
         'userid': '',
-        'access_token': ''
+        'access_token': '',
+        'verify': True
     })
     config.read(config_files)
 
@@ -73,6 +74,7 @@ def get_client_settings_config_file(**kwargs):  # pylint: disable=inconsistent-r
             'api_key': config.get('softlayer', 'api_key'),
             'userid': config.get('softlayer', 'userid'),
             'access_token': config.get('softlayer', 'access_token'),
+            'verify':   config.get('softlayer', 'verify')
         }
 
 
