@@ -1,5 +1,6 @@
 # Set the default behavior, in case people don't have core.autocrlf set.
 * text=auto
+*.* text eol=lf
 
 # Language aware diff headers
 # https://tekin.co.uk/2020/10/better-git-diff-output-for-ruby-python-elixir-and-more
