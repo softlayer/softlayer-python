@@ -12,10 +12,8 @@ from SoftLayer.CLI import formatting
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('volume-id')
 @click.option('--reason', help="An optional reason for cancellation")
-@click.option('--immediate',
-              is_flag=True,
-              help="Cancels the file storage volume immediately instead "
-                   "of on the billing anniversary")
+@click.option('--immediate', is_flag=True,
+              help="Cancels the file storage volume immediately instead of on the billing anniversary")
 @click.option('--force', default=False, is_flag=True, help="Force modify")
 @environment.pass_env
 def cli(env, volume_id, reason, immediate, force):
@@ -32,15 +30,12 @@ def cli(env, volume_id, reason, immediate, force):
         if not (env.skip_confirmations or formatting.no_going_back(volume_id)):
             raise exceptions.CLIAbort('Aborted.')
 
-    cancelled = file_storage_manager.cancel_file_volume(volume_id,
-                                                        reason, immediate)
+    cancelled = file_storage_manager.cancel_file_volume(volume_id, reason, immediate)
 
     if cancelled:
         if immediate:
-            click.echo('File volume with id %s has been marked'
-                       ' for immediate cancellation' % volume_id)
+            click.echo(f'File volume with id {volume_id} has been marked for immediate cancellation')
         else:
-            click.echo('File volume with id %s has been marked'
-                       ' for cancellation' % volume_id)
+            click.echo(f'File volume with id {volume_id} has been marked for cancellation')
     else:
-        click.echo('Unable to cancle file volume %s' % volume_id)
+        click.echo(f'Unable to cancle file volume {volume_id}')
