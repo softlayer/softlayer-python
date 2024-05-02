@@ -29,14 +29,11 @@ class CLIJSONEncoderTest(testing.TestCase):
         }, cls=formatting.CLIJSONEncoder)
         self.assertEqual(out, '{"formattedItem": "normal"}')
 
-        out = json.dumps({'normal': 'string'},
-                         cls=formatting.CLIJSONEncoder)
+        out = json.dumps({'normal': 'string'}, cls=formatting.CLIJSONEncoder)
         self.assertEqual(out, '{"normal": "string"}')
 
     def test_fail(self):
-        self.assertRaises(
-            TypeError,
-            json.dumps, {'test': object()}, cls=formatting.CLIJSONEncoder)
+        self.assertRaises(TypeError, json.dumps, {'test': object()}, cls=formatting.CLIJSONEncoder)
 
 
 class PromptTests(testing.TestCase):
@@ -59,6 +56,12 @@ class PromptTests(testing.TestCase):
         result = formatting.no_going_back(confirmed)
         self.assertFalse(result)
 
+        # Make sure mixed cases can be checked against
+        confirmed = "ThisStringHasMixedCase"
+        prompt_mock.return_value = "thisStringHASMIXEDcase"
+        result = formatting.no_going_back(confirmed)
+        self.assertTrue(result)
+
     @mock.patch('click.prompt')
     def test_confirmation(self, prompt_mock):
         prompt_mock.return_value = 'Y'
@@ -72,16 +75,12 @@ class PromptTests(testing.TestCase):
         prompt_mock.return_value = 'Y'
         res = formatting.confirm('Confirm?', default=True)
         self.assertTrue(res)
-        prompt_mock.assert_called_with('Confirm? [Y/n]',
-                                       default='y',
-                                       show_default=False)
+        prompt_mock.assert_called_with('Confirm? [Y/n]', default='y', show_default=False)
 
         prompt_mock.return_value = 'N'
         res = formatting.confirm('Confirm?', default=False)
         self.assertFalse(res)
-        prompt_mock.assert_called_with('Confirm? [y/N]',
-                                       default='n',
-                                       show_default=False)
+        prompt_mock.assert_called_with('Confirm? [y/N]', default='n', show_default=False)
 
 
 class FormattedItemTests(testing.TestCase):
@@ -148,9 +147,7 @@ class FormattedItemTests(testing.TestCase):
     def test_sort(self):
         items = [10, formatting.FormattedItem(20), formatting.FormattedItem(5)]
         sorted_items = sorted(items)
-        self.assertEqual(sorted_items, [formatting.FormattedItem(5),
-                                        10,
-                                        formatting.FormattedItem(20)])
+        self.assertEqual(sorted_items, [formatting.FormattedItem(5), 10, formatting.FormattedItem(20)])
 
 
 class FormattedListTests(testing.TestCase):
