@@ -215,11 +215,11 @@ def employee_client(username=None,
     # Assume access_token is valid for now, user has logged in before at least.
     if access_token and user_id:
         auth = slauth.EmployeeAuthentication(user_id, access_token)
-        return EmployeeClient(auth=auth, transport=transport)
+        return EmployeeClient(auth=auth, transport=transport, config_file=config_file)
     else:
         # This is for logging in mostly.
         LOGGER.info("No access_token or userid found in settings, creating a No Auth client for now.")
-        return EmployeeClient(auth=None, transport=transport)
+        return EmployeeClient(auth=None, transport=transport, config_file=config_file)
 
 
 def Client(**kwargs):
