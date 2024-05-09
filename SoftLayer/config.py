@@ -66,7 +66,7 @@ def get_client_settings_config_file(**kwargs):  # pylint: disable=inconsistent-r
     config.read(config_files)
 
     if config.has_section('softlayer'):
-        return {
+        r_config = {
             'endpoint_url': config.get('softlayer', 'endpoint_url'),
             'timeout': config.getfloat('softlayer', 'timeout'),
             'proxy': config.get('softlayer', 'proxy'),
@@ -76,6 +76,13 @@ def get_client_settings_config_file(**kwargs):  # pylint: disable=inconsistent-r
             'access_token': config.get('softlayer', 'access_token'),
             'verify':   config.get('softlayer', 'verify')
         }
+        if r_config["verify"].lower() == "true":
+            r_config["verify"] = True
+        elif r_config["verify"].lower() == "false":
+            r_config["verify"] = False
+        else:
+            os.environ['SSL_CERT_FILE'] = r_config["verify"]
+        return r_config
 
 
 SETTING_RESOLVERS = [get_client_settings_args,

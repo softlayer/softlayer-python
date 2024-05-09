@@ -191,7 +191,7 @@ def employee_client(username=None,
         if url is not None and '/rest' in url:
             # If this looks like a rest endpoint, use the rest transport
             transport = transports.RestTransport(
-                endpoint_url=settings.get('endpoint_url'),
+                endpoint_url=url,
                 proxy=settings.get('proxy'),
                 timeout=settings.get('timeout'),
                 user_agent=user_agent,
@@ -200,7 +200,7 @@ def employee_client(username=None,
         else:
             # Default the transport to use XMLRPC
             transport = transports.XmlRpcTransport(
-                endpoint_url=settings.get('endpoint_url'),
+                endpoint_url=url,
                 proxy=settings.get('proxy'),
                 timeout=settings.get('timeout'),
                 user_agent=user_agent,
@@ -250,6 +250,11 @@ class BaseClient(object):
 
     def __setTransport(self, transport=None):
         """Prepares the transport property"""
+        verify = self.settings['softlayer'].get('verify')
+        if verify == "False":
+            verify = False
+        elif verify == "True":
+            verify = True
         if transport is None:
             url = self.settings['softlayer'].get('endpoint_url')
             if url is not None and '/rest' in url:
@@ -260,7 +265,7 @@ class BaseClient(object):
                     # prevents an exception incase timeout is a float number.
                     timeout=int(self.settings['softlayer'].getfloat('timeout', 0)),
                     user_agent=consts.USER_AGENT,
-                    verify=self.settings['softlayer'].getboolean('verify'),
+                    verify=verify,
                 )
             else:
                 # Default the transport to use XMLRPC
@@ -269,7 +274,7 @@ class BaseClient(object):
                     proxy=self.settings['softlayer'].get('proxy'),
                     timeout=int(self.settings['softlayer'].getfloat('timeout', 0)),
                     user_agent=consts.USER_AGENT,
-                    verify=self.settings['softlayer'].getboolean('verify'),
+                    verify=verify,
                 )
 
         self.transport = transport
