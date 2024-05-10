@@ -80,7 +80,7 @@ def get_client_settings_config_file(**kwargs):  # pylint: disable=inconsistent-r
             r_config["verify"] = True
         elif r_config["verify"].lower() == "false":
             r_config["verify"] = False
-        elif r_config["verify"]:
+        elif isinstance(r_config["verify"], str):
             os.environ['SSL_CERT_FILE'] = r_config["verify"]
         return r_config
 

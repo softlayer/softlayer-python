@@ -8,7 +8,6 @@ from SoftLayer.API import employee_client
 from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer import config
-from SoftLayer import consts
 
 
 def censor_password(value):
