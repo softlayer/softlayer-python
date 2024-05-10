@@ -8,7 +8,6 @@ from SoftLayer.API import employee_client
 from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer import config
-from SoftLayer import consts
 
 
 def censor_password(value):
@@ -31,7 +30,7 @@ def cli(env):
     username = settings.get('username') or os.environ.get('SLCLI_USER', None)
     password = os.environ.get('SLCLI_PASSWORD', '')
     yubi = None
-    client = employee_client()
+    client = employee_client(config_file=env.config_file)
 
     # Might already be logged in, try and refresh token
     if settings.get('access_token') and settings.get('userid'):
@@ -49,7 +48,7 @@ def cli(env):
         except Exception as ex:
             print("Error with Hash Authentication, try with password: {}".format(ex))
 
-    url = settings.get('endpoint_url') or consts.API_EMPLOYEE_ENDPOINT
+    url = settings.get('endpoint_url')
     click.echo("URL: {}".format(url))
     if username is None:
         username = input("Username: ")
