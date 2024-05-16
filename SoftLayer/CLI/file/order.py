@@ -12,26 +12,18 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, context_settings=CONTEXT_SETTINGS)
-@click.option('--storage-type',
-              help='Type of file storage volume',
-              type=click.Choice(['performance', 'endurance']),
-              required=True)
-@click.option('--size',
-              type=int,
-              help='Size of file storage volume in GB',
-              required=True)
-@click.option('--iops',
-              type=int,
+@click.option('--storage-type', required=True, type=click.Choice(['performance', 'endurance']),
+              help='Type of file storage volume')
+@click.option('--size', type=int, required=True,
+              help='Size of file storage volume in GB')
+@click.option('--iops', type=int,
               help="""Performance Storage IOPs. Options vary based on storage size.
 [required for storage-type performance]""")
-@click.option('--tier',
-              help='Endurance Storage Tier (IOP per GB) [required for storage-type endurance]',
-              type=click.Choice(['0.25', '2', '4', '10']))
-@click.option('-l', '--location',
-              help='Datacenter short name (e.g.: dal09)',
-              required=True)
-@click.option('--snapshot-size',
-              type=int,
+@click.option('--tier', type=click.Choice(['0.25', '2', '4', '10']),
+              help='Endurance Storage Tier (IOP per GB) [required for storage-type endurance]')
+@click.option('-l', '--location', required=True,
+              help='Datacenter short name (e.g.: dal09)')
+@click.option('--snapshot-size', type=int,
               help='Optional parameter for ordering snapshot '
               'space along with endurance file storage; specifies '
               'the size (in GB) of snapshot space to order')
@@ -43,9 +35,7 @@ CONTEXT_SETTINGS = {'token_normalize_func': lambda x: x.upper()}
                   'storage_as_a_service',
                   'enterprise',
                   'performance']))
-@click.option('--billing',
-              type=click.Choice(['hourly', 'monthly']),
-              default='monthly',
+@click.option('--billing', type=click.Choice(['hourly', 'monthly']), default='monthly',
               help="Optional parameter for Billing rate (default to monthly)")
 @click.option('--force', default=False, is_flag=True, help="Force order file storage volume without confirmation")
 @environment.pass_env
@@ -83,6 +73,7 @@ located at dal09 with an additional snapshot space size of 500GB
                 'Hourly billing is only available for the storage_as_a_service service offering'
             )
 
+    order = {}
     if storage_type == 'performance':
         if iops is None:
             raise exceptions.CLIAbort('Option --iops required with Performance')

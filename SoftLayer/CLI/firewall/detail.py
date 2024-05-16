@@ -82,7 +82,6 @@ def cli(env, identifier, password):
     else:
         click.secho('Invalid firewall type %s: firewall type should be either vlan, multiVlan, vs or server.'
                     % firewall_type, fg='red')
-        return
 
 
 def get_rules_table(rules):

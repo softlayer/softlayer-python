@@ -1123,6 +1123,7 @@ class HardwareManager(utils.IdentifierMixin, object):
         :param String disk_type: Disk type.
 
         """
+        disk_price = {}
         if disk_data.get('description') == disk_type:
             if "add" in disk_type:
                 raise SoftLayerError("Unable to add the disk because this already exists.")
