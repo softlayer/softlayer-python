@@ -23,7 +23,7 @@ def get_session(user_agent):
         'Content-Type': 'application/json',
         'User-Agent': user_agent,
     })
-    retry = Retry(connect=3, backoff_factor=3)
+    retry = Retry(total=3, connect=1, backoff_factor=1)
     adapter = HTTPAdapter(max_retries=retry)
     client.mount('https://', adapter)
     return client
