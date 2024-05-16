@@ -78,6 +78,7 @@ def cli(env, storage_type, size, iops, tier, os_type,
                 'Hourly billing is only available for the storage_as_a_service service offering'
             )
 
+    order = {}
     if storage_type == 'performance':
         if iops is None:
             raise exceptions.CLIAbort('Option --iops required with Performance')

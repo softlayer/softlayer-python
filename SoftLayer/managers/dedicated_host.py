@@ -431,7 +431,9 @@ class DedicatedHostManager(utils.IdentifierMixin, object):
             hostname
         '''
         cpu_count = item['capacity']
-
+        mem_capacity = {}
+        disk_capacity = {}
+        gpuComponents = {}
         for capacity in item['bundleItems']:
             for category in capacity['categories']:
                 if category['categoryCode'] == 'dedicated_host_ram':

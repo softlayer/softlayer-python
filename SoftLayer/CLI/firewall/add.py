@@ -22,7 +22,7 @@ def cli(env, target, firewall_type, high_availability, force):
     """
 
     mgr = SoftLayer.FirewallManager(env.client)
-
+    pkg = {}
     if not env.skip_confirmations:
         if firewall_type == 'vlan':
             pkg = mgr.get_dedicated_package(ha_enabled=high_availability)
