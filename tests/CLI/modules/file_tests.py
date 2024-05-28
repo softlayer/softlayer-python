@@ -5,6 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 from SoftLayer.CLI import exceptions
+from SoftLayer.fixtures import SoftLayer_Network_Storage
 from SoftLayer import SoftLayerError
 from SoftLayer import testing
 
@@ -219,6 +220,13 @@ class FileTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Account', 'getNasNetworkStorage', filter=expected_filter)
         self.assert_called_with('SoftLayer_Network_Storage', 'getObject', identifier=1)
         self.assert_no_fail(result)
+
+    def test_volume_detail_issues2154(self):
+        lun_mock = self.set_mock('SoftLayer_Network_Storage', 'getObject')
+        lun_mock.return_value = SoftLayer_Network_Storage.FILE_DETAIL_ISSUE2154
+        result = self.run_command(['--format=table', 'file', 'volume-detail', '1234'])
+        self.assert_no_fail(result)
+        self.assertIn("SL02SV1414935_187", result.output)
 
     def test_volume_order_performance_iops_not_given(self):
         result = self.run_command(['file', 'volume-order',

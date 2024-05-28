@@ -334,4 +334,107 @@ BLOCK_LIST_ISSUES_1732 = {
     'storageType': {
         'keyName': 'ENDURANCE_BLOCK_STORAGE'
     }
+}
+
+
+FILE_DETAIL_ISSUE2154 = {
+    "capacityGb": 150,
+    "id": 609491933,
+    "username": "SL02SV1414935_187",
+    "activeTransactionCount": 0,
+    "replicationPartnerCount": 1,
+    "fileNetworkMountAddress": "fsf-natestdal0505-fcb-fz.service.softlayer.com:/SL02SV1414935_187/data01",
+    "originalVolumeSize": "20",
+    "provisionedIops": "2000",
+    "replicationStatus": "FAILOVER_COMPLETED",
+    "serviceResourceBackendIpAddress": "fsf-natestdal0505-fcb-fz.service.softlayer.com",
+    "snapshotCapacityGb": "5",
+    "activeTransactions": [
+        {
+            "createDate": "",
+            "elapsedSeconds": 111763,
+            "guestId": "",
+            "hardwareId": "",
+            "id": "",
+            "modifyDate": "",
+            "statusChangeDate": "",
+            "transactionGroup": {
+                "name": "Volume Modification"
+            },
+            "transactionStatus": {
+                "friendlyName": "In Progress"
+            }
+        }
+    ],
+    "parentVolume": {
+        "accountId": 1414935,
+        "capacityGb": 120,
+        "createDate": "2024-05-16T02:28:02-05:00",
+        "guestId": "",
+        "hardwareId": "",
+        "hostId": "",
+        "id": 609491967,
+        "nasType": "SNAPSHOT",
+        "notes": "vol_duplicate_snapshot_2024-05-16_0228",
+        "serviceProviderId": 1,
+        "storageTypeId": "16",
+        "upgradableFlag": True,
+        "username": "SL02SV1414935_187",
+        "serviceResourceBackendIpAddress": "fsf-natestdal0505-fcb-fz.service.softlayer.com",
+        "serviceResourceName": "Storage Type 02 Aggregate natestdal0505-fc-d",
+        "snapshotSizeBytes": "0"
+    },
+    "replicationPartners": [
+        {
+            "id": 609491945,
+            "username": "SL02SV1414935_187_REP_1",
+            "serviceResourceBackendIpAddress": "fsf-natestdal0505-ffb-fz.service.softlayer.com",
+            "replicationSchedule": {
+                "active": 1,
+                "createDate": "2024-05-16T01:20:19-05:00",
+                "id": 666339,
+                "modifyDate": "",
+                "name": "SL02SV1414935_187_HOURLY_REP",
+                "partnershipId": "",
+                "typeId": 32,
+                "volumeId": 609491933,
+                "type": {
+                    "keyname": "REPLICATION_HOURLY"
+                }
+            },
+            "serviceResource": {
+                "backendIpAddress": "fsf-natestdal0505-ffb-fz.service.softlayer.com",
+                "id": 57365,
+                "name": "Storage Type 02 Aggregate natestdal0505-ff-d",
+                "datacenter": {
+                    "name": "dal10"
+                },
+                "type": {
+                    "type": "NETAPP_STOR_AGGR"
+                }
+            }
+        }
+    ],
+    "serviceResource": {
+        "backendIpAddress": "fsf-natestdal0505-fcb-fz.service.softlayer.com",
+        "id": 52292,
+        "name": "Storage Type 02 Aggregate natestdal0505-fc-d",
+        "attributes": [
+            {
+                "value": "2",
+                "attributeType": {
+                    "keyname": "STAAS_VERSION"
+                }
+            }
+        ],
+        "datacenter": {
+            "name": "lon02"
+        },
+        "type": {
+            "type": "NETAPP_STOR_AGGR"
+        }
+    },
+    "storageType": {
+        "keyName": "PERFORMANCE_FILE_STORAGE"
     }
+}

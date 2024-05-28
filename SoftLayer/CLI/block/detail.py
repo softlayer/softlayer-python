@@ -83,25 +83,21 @@ def cli(env, volume_id):
             table.add_row(['Replication Status', "%s"
                            % block_volume['replicationStatus']])
 
+        replicant_table = formatting.KeyValueTable(['Name', 'Value'])
+        replicant_table.align['Name'] = 'r'
+        replicant_table.align['Value'] = 'l'
         for replicant in block_volume['replicationPartners']:
-            replicant_table = formatting.Table(['Name',
-                                                'Value'])
-            replicant_table.add_row(['Replicant Id', replicant['id']])
             replicant_table.add_row([
-                'Volume Name',
-                utils.lookup(replicant, 'username')])
+                'Replicant Id', replicant['id']])
             replicant_table.add_row([
-                'Target IP',
-                utils.lookup(replicant, 'serviceResourceBackendIpAddress')])
+                'Volume Name', utils.lookup(replicant, 'username')])
             replicant_table.add_row([
-                'Data Center',
-                utils.lookup(replicant,
-                             'serviceResource', 'datacenter', 'name')])
+                'Target IP',  utils.lookup(replicant, 'serviceResourceBackendIpAddress')])
             replicant_table.add_row([
-                'Schedule',
-                utils.lookup(replicant,
-                             'replicationSchedule', 'type', 'keyname')])
-            table.add_row(['Replicant Volumes', replicant_table])
+                'Data Center', utils.lookup(replicant, 'serviceResource', 'datacenter', 'name')])
+            replicant_table.add_row([
+                'Schedule', utils.lookup(replicant, 'replicationSchedule', 'type', 'keyname')])
+        table.add_row(['Replicant Volumes', replicant_table])
 
     if block_volume.get('originalVolumeSize'):
         original_volume_info = formatting.Table(['Property', 'Value'])
