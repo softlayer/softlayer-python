@@ -111,6 +111,7 @@ class TestCase(unittest.TestCase):
         self.env = environment.Environment()
         self.env.client = self.client
         self.set_up()
+        self.maxDiff = None
 
     def tearDown(self):  # NOQA
         super().tearDown()

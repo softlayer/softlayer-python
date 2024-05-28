@@ -16,9 +16,8 @@ class CLIHalt(SystemExit):
         self.code = code
 
     def __str__(self):
-        return "<CLIHalt code=%s msg=%s>" % (self.code,
-                                             getattr(self, 'message'))
-
+        message = getattr(self, 'message')
+        return f"<CLIHalt code={self.code} msg={message}>"
     __repr__ = __str__
 
 
@@ -29,6 +28,11 @@ class CLIAbort(CLIHalt):
         super().__init__(code=2, *args)
         self.message = msg
 
+    def __str__(self):
+        message = getattr(self, 'message')
+        return f"<CLIAbort code={self.code} msg={message}>"
+    __repr__ = __str__
+
 
 class ArgumentError(CLIAbort):
     """Halt the execution of the command because of invalid arguments."""
@@ -36,3 +40,8 @@ class ArgumentError(CLIAbort):
     def __init__(self, msg, *args):
         super().__init__(msg, *args)
         self.message = "Argument Error: %s" % msg
+
+    def __str__(self):
+        message = getattr(self, 'message')
+        return f"<ArgumentError code={self.code} msg={message}>"
+    __repr__ = __str__

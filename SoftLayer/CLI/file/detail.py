@@ -41,7 +41,7 @@ def cli(env, volume_id):
     table.add_row(['Used Space', used_space])
 
     if file_volume.get('provisionedIops'):
-        table.add_row(['IOPs', float(file_volume['provisionedIops'])])
+        table.add_row(['IOPs', file_volume['provisionedIops']])
 
     if file_volume.get('storageTierLevel'):
         table.add_row(['Endurance Tier', file_volume['storageTierLevel']])
@@ -75,20 +75,17 @@ def cli(env, volume_id):
         else:
             table.add_row(['Replication Status', file_volume['replicationStatus']])
 
-        replicant_table = formatting.KeyValueTable(['Name', 'Value'])
+        replicant_table = formatting.Table(['Id', 'Username', 'Target', 'Location', 'Schedule'])
         replicant_table.align['Name'] = 'r'
         replicant_table.align['Value'] = 'l'
         for replicant in file_volume['replicationPartners']:
             replicant_table.add_row([
-                'Volume ID', replicant.get('id')])
-            replicant_table.add_row([
-                'Volume Name', utils.lookup(replicant, 'username')])
-            replicant_table.add_row([
-                'Target IP', utils.lookup(replicant, 'serviceResourceBackendIpAddress')])
-            replicant_table.add_row([
-                'Data Center', utils.lookup(replicant, 'serviceResource', 'datacenter', 'name')])
-            replicant_table.add_row([
-                'Schedule', utils.lookup(replicant, 'replicationSchedule', 'type', 'keyname')])
+                replicant.get('id'),
+                utils.lookup(replicant, 'username'),
+                utils.lookup(replicant, 'serviceResourceBackendIpAddress'),
+                utils.lookup(replicant, 'serviceResource', 'datacenter', 'name'),
+                utils.lookup(replicant, 'replicationSchedule', 'type', 'keyname')
+            ])
         table.add_row(['Replicant Volumes', replicant_table])
 
     if file_volume.get('originalVolumeSize'):
