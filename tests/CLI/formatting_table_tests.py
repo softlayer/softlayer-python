@@ -4,6 +4,8 @@
 
     :license: MIT, see LICENSE for more details.
 """
+from rich.console import Console
+
 
 from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
@@ -20,6 +22,48 @@ class TestTable(testing.TestCase):
         self.assertFalse(table)
         table.add_row(["entry1"])
         self.assertTrue(table)
+
+    def test_key_value_table(self):
+        expected = """┌───────────┬─────────────────────────┐
+│    Key    │          Value          │
+├───────────┼─────────────────────────┤
+│   First   │           One           │
+│ Sub Table │ ┌─────────┬───────────┐ │
+│           │ │ Sub Key │ Sub Value │ │
+│           │ ├─────────┼───────────┤ │
+│           │ │ Second  │    Two    │ │
+│           │ └─────────┴───────────┘ │
+└───────────┴─────────────────────────┘
+"""
+        table = formatting.KeyValueTable(["Key", "Value"])
+        table.add_row(["First", "One"])
+        sub_table = formatting.KeyValueTable(["Sub Key", "Sub Value"])
+        sub_table.add_row(["Second", "Two"])
+        table.add_row(["Sub Table", sub_table])
+        console = Console()
+
+        with console.capture() as capture:
+            to_print = formatting.format_output(table)
+            console.print(to_print)
+        result = capture.get()
+        self.assertEqual(expected, result)
+
+    def test_unrenderable_recovery_table(self):
+        expected = """│ Sub Table │ [<rich.table.Table object at"""
+        table = formatting.KeyValueTable(["Key", "Value"])
+        table.add_row(["First", "One"])
+        sub_table = formatting.KeyValueTable(["Sub Key", "Sub Value"])
+        sub_table.add_row(["Second", "Two"])
+        # You can't have a list of tables, that isn't handled very well.
+        listable = [sub_table]
+        table.add_row(["Sub Table", listable])
+        console = Console()
+        with console.capture() as capture:
+            to_print = formatting.format_output(table)
+            console.print(to_print)
+        result = capture.get()
+        print(result)
+        self.assertIn(expected, result)
 
 
 class IterToTableTests(testing.TestCase):

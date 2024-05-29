@@ -65,10 +65,9 @@ class BlockTests(testing.TestCase):
         self.assert_called_with('SoftLayer_Network_Storage', 'getObject', identifier=1234)
         self.assertEqual({
             'Username': 'username',
-            'LUN Id': '2',
-            'Notes': "{'status': 'available'}",
             'Endurance Tier': 'READHEAVY_TIER',
-            'IOPs': 1000.0,
+            'IOPs': "1000",
+            'LUN Id': 2,
             'Snapshot Capacity (GB)': '10',
             'Snapshot Used (Bytes)': 1024,
             'Capacity (GB)': '20GB',
@@ -76,24 +75,31 @@ class BlockTests(testing.TestCase):
             'Data Center': 'dal05',
             'Type': 'ENDURANCE',
             'ID': 100,
-            '# of Active Transactions': '1',
+            'Notes': "{'status': 'available'}",
+            '# of Active Transactions': 1,
             'Ongoing Transaction': 'This is a buffer time in which the customer may cancel the server',
-            'Replicant Count': '1',
-            'Replication Status': 'Replicant Volume Provisioning '
-                                  'has completed.',
-            'Replicant Volumes': [
-                {'Name': 'Replicant Id', 'Value': 1785},
-                {'Name': 'Volume Name', 'Value': 'TEST_REP_2'},
-                {'Name': 'Target IP', 'Value': '10.3.177.84'},
-                {'Name': 'Data Center', 'Value': 'dal01'},
-                {'Name': 'Schedule', 'Value': 'REPLICATION_DAILY'}],
+            'Replicant Count': 1,
+            'Replication Status': 'Replicant Volume Provisioning has completed.',
+            "Replicant Volumes": [
+                {
+                    "Id": 1784,
+                    "Username": "TEST_REP_1",
+                    "Target": "10.3.174.79",
+                    "Location": "wdc01",
+                    "Schedule": "REPLICATION_HOURLY"
+                },
+                {
+                    "Id": 1785,
+                    "Username": "TEST_REP_2",
+                    "Target": "10.3.177.84",
+                    "Location": "dal01",
+                    "Schedule": "REPLICATION_DAILY"
+                }
+            ],
             'Original Volume Properties': [
-                {'Property': 'Original Volume Size',
-                 'Value': '20'},
-                {'Property': 'Original Volume Name',
-                 'Value': 'test-original-volume-name'},
-                {'Property': 'Original Snapshot Name',
-                 'Value': 'test-original-snapshot-name'}
+                {'Property': 'Original Volume Size', 'Value': '20'},
+                {'Property': 'Original Volume Name', 'Value': 'test-original-volume-name'},
+                {'Property': 'Original Snapshot Name', 'Value': 'test-original-snapshot-name'}
             ]
         }, json.loads(result.output))
 
@@ -102,10 +108,10 @@ class BlockTests(testing.TestCase):
         lun_mock.return_value = SoftLayer_Network_Storage.BLOCK_LIST_ISSUES_1732
         result = self.run_command(['--format=table',  'block', 'volume-detail', '1234'])
         self.assert_no_fail(result)
-        self.assertIn('│                 Username │ SL02SEL307608-60                          │', result.output)
-        self.assertIn('│            Capacity (GB) │ 16000GB                                   │', result.output)
-        self.assertIn('│       Replication Status │ FAILBACK_COMPLETED                        │', result.output)
-        self.assertIn('│                    Notes │ test                                      │', result.output)
+        self.assertIn('Username │ SL02SEL307608-60', result.output)
+        self.assertIn('Capacity (GB) │ 16000GB', result.output)
+        self.assertIn('Replication Status │ FAILBACK_COMPLETED', result.output)
+        self.assertIn('Notes │ test', result.output)
 
     def test_volume_detail_name_identifier(self):
         result = self.run_command(['block', 'volume-detail', 'SL-12345'])

@@ -14,6 +14,7 @@ import sys
 
 import click
 from rich import box
+from rich.errors import NotRenderableError
 from rich.table import Table as rTable
 
 from SoftLayer.CLI import exceptions
@@ -392,7 +393,15 @@ class Table(object):
             table.add_column(col, justify=justify, style=style)
 
         for row in self.rows:
-            table.add_row(*row)
+            try:
+                table.add_row(*row)
+            # Generally you will see this if one of the columns in the row is a list or dict
+            except NotRenderableError:
+                forced_row = []
+                for i in row:
+                    forced_row.append(str(i))
+                table.add_row(*forced_row)
+
         return table
 
 

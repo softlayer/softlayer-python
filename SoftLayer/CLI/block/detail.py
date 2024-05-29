@@ -31,77 +31,52 @@ def cli(env, volume_id):
     table.add_row(['Username', block_volume['username']])
     table.add_row(['Type', storage_type])
     table.add_row(['Capacity (GB)', capacity])
-    table.add_row(['LUN Id', "%s" % block_volume['lunId']])
+    table.add_row(['LUN Id', block_volume['lunId']])
 
     if block_volume.get('provisionedIops'):
-        table.add_row(['IOPs', float(block_volume['provisionedIops'])])
+        table.add_row(['IOPs', block_volume['provisionedIops']])
 
     if block_volume.get('storageTierLevel'):
-        table.add_row([
-            'Endurance Tier',
-            block_volume['storageTierLevel'],
-        ])
+        table.add_row(['Endurance Tier', block_volume['storageTierLevel']])
 
-    table.add_row([
-        'Data Center',
-        block_volume['serviceResource']['datacenter']['name'],
-    ])
-    table.add_row([
-        'Target IP',
-        block_volume['serviceResourceBackendIpAddress'],
-    ])
+    table.add_row(['Data Center', block_volume['serviceResource']['datacenter']['name']])
+    table.add_row(['Target IP', block_volume['serviceResourceBackendIpAddress']])
 
     if block_volume['snapshotCapacityGb']:
-        table.add_row([
-            'Snapshot Capacity (GB)',
-            block_volume['snapshotCapacityGb'],
-        ])
+        table.add_row(['Snapshot Capacity (GB)', block_volume['snapshotCapacityGb']])
         if 'snapshotSizeBytes' in block_volume['parentVolume']:
-            table.add_row([
-                'Snapshot Used (Bytes)',
-                block_volume['parentVolume']['snapshotSizeBytes'],
-            ])
+            table.add_row(['Snapshot Used (Bytes)', block_volume['parentVolume']['snapshotSizeBytes']])
 
-    table.add_row(['# of Active Transactions', "%i"
-                   % block_volume['activeTransactionCount']])
+    table.add_row(['# of Active Transactions', block_volume['activeTransactionCount']])
 
     if block_volume['activeTransactions']:
         for trans in block_volume['activeTransactions']:
             if 'transactionStatus' in trans and 'friendlyName' in trans['transactionStatus']:
                 table.add_row(['Ongoing Transaction', trans['transactionStatus']['friendlyName']])
 
-    table.add_row(['Replicant Count', "%u" % block_volume.get('replicationPartnerCount', 0)])
+    table.add_row(['Replicant Count', block_volume.get('replicationPartnerCount', 0)])
 
     if block_volume['replicationPartnerCount'] > 0:
         # This if/else temporarily handles a bug in which the SL API
         # returns a string or object for 'replicationStatus'; it seems that
         # the type is string for File volumes and object for Block volumes
         if 'message' in block_volume['replicationStatus']:
-            table.add_row(['Replication Status', "%s"
-                           % block_volume['replicationStatus']['message']])
+            table.add_row(['Replication Status', block_volume['replicationStatus']['message']])
         else:
-            table.add_row(['Replication Status', "%s"
-                           % block_volume['replicationStatus']])
+            table.add_row(['Replication Status', block_volume['replicationStatus']])
 
+        replicant_table = formatting.Table(['Id', 'Username', 'Target', 'Location', 'Schedule'])
+        replicant_table.align['Name'] = 'r'
+        replicant_table.align['Value'] = 'l'
         for replicant in block_volume['replicationPartners']:
-            replicant_table = formatting.Table(['Name',
-                                                'Value'])
-            replicant_table.add_row(['Replicant Id', replicant['id']])
             replicant_table.add_row([
-                'Volume Name',
-                utils.lookup(replicant, 'username')])
-            replicant_table.add_row([
-                'Target IP',
-                utils.lookup(replicant, 'serviceResourceBackendIpAddress')])
-            replicant_table.add_row([
-                'Data Center',
-                utils.lookup(replicant,
-                             'serviceResource', 'datacenter', 'name')])
-            replicant_table.add_row([
-                'Schedule',
-                utils.lookup(replicant,
-                             'replicationSchedule', 'type', 'keyname')])
-            table.add_row(['Replicant Volumes', replicant_table])
+                replicant.get('id'),
+                utils.lookup(replicant, 'username'),
+                utils.lookup(replicant, 'serviceResourceBackendIpAddress'),
+                utils.lookup(replicant, 'serviceResource', 'datacenter', 'name'),
+                utils.lookup(replicant, 'replicationSchedule', 'type', 'keyname')
+            ])
+        table.add_row(['Replicant Volumes', replicant_table])
 
     if block_volume.get('originalVolumeSize'):
         original_volume_info = formatting.Table(['Property', 'Value'])
