@@ -364,3 +364,10 @@ class UserManagerTests(testing.TestCase):
     def test_remove_api_authentication_key(self):
         self.manager.remove_api_authentication_key(123456)
         self.assert_called_with('SoftLayer_User_Customer', 'removeApiAuthenticationKey')
+
+    def test_get_permission_departments(self):
+        result = self.manager.get_permission_departments()
+        self.assert_called_with('SoftLayer_User_Permission_Department', 'getAllObjects')
+        # just making sure the lists are sorted.
+        self.assertEqual(result[0]['permissions'][0]['keyName'], 'ACCOUNT_BILLING_SYSTEM')
+        self.assertEqual(result[1]['permissions'][8]['keyName'], 'VIEW_ACH_INFO')
