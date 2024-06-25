@@ -1,4 +1,4 @@
-"""List A users permissions."""
+"""List a users permissions."""
 import click
 
 import SoftLayer
@@ -11,21 +11,31 @@ from SoftLayer.CLI import helpers
 @click.argument('identifier')
 @environment.pass_env
 def cli(env, identifier):
-    """User Permissions."""
+    """User Permissions.
+
+    Some permissions here may also be managed by IBM IAM service.
+    See https://cloud.ibm.com/docs/account?topic=account-migrated_permissions for more details.
+    """
 
     mgr = SoftLayer.UserManager(env.client)
     user_id = helpers.resolve_id(mgr.resolve_ids, identifier, 'username')
     object_mask = "mask[id, permissions, isMasterUserFlag, roles]"
 
     user = mgr.get_user(user_id, object_mask)
-    all_permissions = mgr.get_all_permissions()
-    user_permissions = perms_to_dict(user['permissions'])
+    all_permissions = mgr.get_permission_departments()
 
+    user_permissions = perms_to_dict(user['permissions'])
+    all_table = formatting.KeyValueTable(['Department', 'Permissions'])
     if user['isMasterUserFlag']:
         click.secho('This account is the Master User and has all permissions enabled', fg='green')
 
     env.fout(roles_table(user))
-    env.fout(permission_table(user_permissions, all_permissions))
+    for department in all_permissions:
+        all_table.add_row([
+            department.get('name'),
+            permission_table(user_permissions, department.get('permissions', []))
+        ])
+    env.fout(all_table)
 
 
 def perms_to_dict(perms):
@@ -39,18 +49,13 @@ def perms_to_dict(perms):
 def permission_table(user_permissions, all_permissions):
     """Creates a table of available permissions"""
 
-    table = formatting.Table(['Description', 'KeyName', 'Assigned'])
+    table = formatting.Table(['KeyName', 'Assigned', 'Description'])
     table.align['KeyName'] = 'l'
     table.align['Description'] = 'l'
     table.align['Assigned'] = 'l'
     for perm in all_permissions:
         assigned = user_permissions.get(perm['keyName'], False)
-        hide_permission_list = ['ACCOUNT_SUMMARY_VIEW', 'REQUEST_COMPLIANCE_REPORT',
-                                'COMPANY_EDIT', 'ONE_TIME_PAYMENTS', 'UPDATE_PAYMENT_DETAILS',
-                                'EU_LIMITED_PROCESSING_MANAGE', 'TICKET_ADD', 'TICKET_EDIT',
-                                'TICKET_SEARCH', 'TICKET_VIEW', 'TICKET_VIEW_ALL']
-        if perm['keyName'] not in hide_permission_list:
-            table.add_row([perm['name'], perm['keyName'], assigned])
+        table.add_row([perm['keyName'], assigned, perm['description']])
     return table
 
 

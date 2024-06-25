@@ -15,6 +15,7 @@ from SoftLayer import utils
 LOGGER = logging.getLogger(__name__)
 
 
+# pylint: disable=too-many-public-methods
 class UserManager(utils.IdentifierMixin, object):
     """Manages Users.
 
@@ -76,7 +77,7 @@ class UserManager(utils.IdentifierMixin, object):
         return self.account_service.getCurrentUser(mask=objectmask)
 
     def get_all_permissions(self):
-        """Calls SoftLayer_User_CustomerPermissions_Permission::getAllObjects
+        """Calls User_Permission_Action::getAllObjects
 
         Stores the result in self.all_permissions
         :returns: A list of dictionaries that contains all valid permissions
@@ -85,6 +86,19 @@ class UserManager(utils.IdentifierMixin, object):
             permissions = self.client.call('User_Permission_Action', 'getAllObjects')
             self.all_permissions = sorted(permissions, key=itemgetter('keyName'))
         return self.all_permissions
+
+    def get_permission_departments(self):
+        """Calls SoftLayer_User_Permission_Department::getAllObjects
+
+        Stores the result in self.all_permissions
+        :returns: A list of dictionaries that contains all valid permissions
+        """
+        mask = "mask[permissions[id,keyName,description,name]]"
+        departments = self.client.call('User_Permission_Department', 'getAllObjects', mask=mask)
+        for i, department in enumerate(departments):
+            departments[i]['permissions'] = sorted(department.get('permissions'), key=itemgetter('keyName'))
+
+        return departments
 
     def get_all_notifications(self):
         """Calls SoftLayer_Email_Subscription::getAllObjects

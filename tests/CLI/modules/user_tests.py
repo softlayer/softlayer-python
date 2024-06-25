@@ -113,7 +113,7 @@ class UserCLITests(testing.TestCase):
     def test_permissions_list(self):
         result = self.run_command(['user', 'permissions', '11100'])
         self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_User_Permission_Action', 'getAllObjects')
+        self.assert_called_with('SoftLayer_User_Permission_Department', 'getAllObjects')
         self.assert_called_with(
             'SoftLayer_User_Customer', 'getObject', identifier=11100,
             mask='mask[id, permissions, isMasterUserFlag, roles]'
