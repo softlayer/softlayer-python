@@ -23,8 +23,8 @@ COLUMNS = [
         mask='activeTransaction[id, transactionStatus[name, friendlyName]]'),
     column_helper.Column(
         'created_by',
-         lambda created_by: utils.lookup(created_by, 'billingItem', 'orderItem', 'order', 'userRecord', 'username'),
-         mask='billingItem[id,orderItem[id,order[id,userRecord[username]]]]'),
+        lambda created_by: utils.lookup(created_by, 'billingItem', 'orderItem', 'order', 'userRecord', 'username'),
+        mask='billingItem[id,orderItem[id,order[id,userRecord[username]]]]'),
     column_helper.Column(
         'tags',
         lambda server: formatting.tags(server.get('tagReferences')),
