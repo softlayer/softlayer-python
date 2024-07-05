@@ -8,6 +8,7 @@ from SoftLayer.CLI import columns as column_helper
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer.CLI import helpers
+from SoftLayer import utils
 
 COLUMNS = [
     column_helper.Column('guid', ('globalIdentifier',)),
@@ -18,7 +19,8 @@ COLUMNS = [
     column_helper.Column('backend_ip', ('primaryBackendIpAddress',)),
     column_helper.Column(
         'created_by',
-        ('billingItem', 'orderItem', 'order', 'userRecord', 'username')),
+        lambda created_by: utils.lookup(created_by, 'billingItem', 'orderItem', 'order', 'userRecord', 'username'),
+        mask='billingItem[id,orderItem[id,order[id,userRecord[username]]]]'),
     column_helper.Column('power_state', ('powerState', 'name')),
     column_helper.Column(
         'tags',
