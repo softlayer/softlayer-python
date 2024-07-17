@@ -15,7 +15,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='v6.2.2',
+    version='v6.2.3',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/x-rst',
