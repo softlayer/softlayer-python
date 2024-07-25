@@ -34,7 +34,7 @@ setup(
     install_requires=[
         'prettytable >= 2.5.0',
         'click >= 8.0.4',
-        'requests >= 2.20.0',
+        'requests >= 2.32.2',
         'prompt_toolkit >= 2',
         'pygments >= 2.0.0',
         'urllib3 >= 1.24',
