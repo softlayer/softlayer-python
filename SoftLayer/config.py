@@ -61,7 +61,8 @@ def get_client_settings_config_file(**kwargs):  # pylint: disable=inconsistent-r
         'proxy': '',
         'userid': '',
         'access_token': '',
-        'verify': "True"
+        'verify': "True",
+        'auth_cert': ''
     })
     config.read(config_files)
 
@@ -74,7 +75,8 @@ def get_client_settings_config_file(**kwargs):  # pylint: disable=inconsistent-r
             'api_key': config.get('softlayer', 'api_key'),
             'userid': config.get('softlayer', 'userid'),
             'access_token': config.get('softlayer', 'access_token'),
-            'verify':   config.get('softlayer', 'verify')
+            'verify':   config.get('softlayer', 'verify'),
+            'auth_cert': config.get('softlayer', 'auth_cert')
         }
         if r_config["verify"].lower() == "true":
             r_config["verify"] = True

@@ -211,9 +211,11 @@ def employee_client(username=None,
         access_token = settings.get('access_token')
 
     user_id = settings.get('userid')
-
     # Assume access_token is valid for now, user has logged in before at least.
-    if access_token and user_id:
+    if settings.get('auth_cert', False):
+        auth = slauth.X509Authentication(settings.get('auth_cert'), verify)
+        return EmployeeClient(auth=auth, transport=transport, config_file=config_file)
+    elif access_token and user_id:
         auth = slauth.EmployeeAuthentication(user_id, access_token)
         return EmployeeClient(auth=auth, transport=transport, config_file=config_file)
     else:
