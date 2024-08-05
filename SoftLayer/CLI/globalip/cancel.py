@@ -18,12 +18,12 @@ def cli(env, identifier, force):
     """Cancel global IP.
 
     Example::
+
         slcli globalip cancel 12345
     """
 
     mgr = SoftLayer.NetworkManager(env.client)
-    global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids, identifier,
-                                      name='global ip')
+    global_ip_id = helpers.resolve_id(mgr.resolve_global_ip_ids, identifier, name='global ip')
 
     if not force:
         if not (env.skip_confirmations or
