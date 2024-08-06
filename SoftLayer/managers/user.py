@@ -54,7 +54,7 @@ class UserManager(utils.IdentifierMixin, object):
 
         if objectmask is None:
             objectmask = """mask[id, username, displayName, userStatus[name], hardwareCount, virtualGuestCount,
-                                 email, roles, externalBindingCount,apiAuthenticationKeyCount]"""
+                                 email, roles, externalBindingCount,apiAuthenticationKeyCount, sslVpnAllowedFlag]"""
 
         return self.account_service.getUsers(mask=objectmask, filter=objectfilter)
 
