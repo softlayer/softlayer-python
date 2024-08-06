@@ -20,7 +20,8 @@ COLUMNS = [
     column_helper.Column('hardwareCount', ('hardwareCount',)),
     column_helper.Column('virtualGuestCount', ('virtualGuestCount',)),
     column_helper.Column('2FA', (TWO_FACTO_AUTH,)),
-    column_helper.Column('classicAPIKey', (CLASSIC_API_KEYS,))
+    column_helper.Column('classicAPIKey', (CLASSIC_API_KEYS,)),
+    column_helper.Column('vpn', ('sslVpnAllowedFlag',))
 ]
 
 DEFAULT_COLUMNS = [
@@ -30,6 +31,7 @@ DEFAULT_COLUMNS = [
     'displayName',
     '2FA',
     'classicAPIKey',
+    'vpn'
 ]
 
 
@@ -48,7 +50,7 @@ def cli(env, columns):
 
     table = formatting.Table(columns.columns)
     for user in users:
-        user = _yes_format(user, [TWO_FACTO_AUTH, CLASSIC_API_KEYS])
+        user = _yes_format(user, [TWO_FACTO_AUTH, CLASSIC_API_KEYS, 'sslVpnAllowedFlag'])
         table.add_row([value or formatting.blank()
                        for value in columns.row(user)])
 
