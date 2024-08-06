@@ -841,12 +841,12 @@ class NetworkManager(object):
     def route(self, subnet_id, type_serv, target):
         """Assigns a subnet to a specified target.
 
-        :param int subnet_id: The ID of the global IP being assigned
+        https://sldn.softlayer.com/reference/services/SoftLayer_Network_Subnet/route/
+        :param int subnet_id: The ID of the SoftLayer_Network_Subnet_IpAddress being routed
         :param string type_serv: The type service to assign
         :param string target: The instance to assign
         """
-        return self.client.call('SoftLayer_Network_Subnet', 'route',
-                                type_serv, target, id=subnet_id, )
+        return self.client.call('SoftLayer_Network_Subnet', 'route', type_serv, target, id=subnet_id, )
 
     def get_datacenter(self, _filter=None, datacenter=None):
         """Calls SoftLayer_Location::getDatacenters()

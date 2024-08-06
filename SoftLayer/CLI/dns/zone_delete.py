@@ -17,6 +17,7 @@ def cli(env, zone):
     """Delete zone.
 
     Example::
+
         slcli dns zone-delete ibm.com
         This command deletes a zone that is named ibm.com
 """

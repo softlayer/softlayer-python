@@ -254,8 +254,7 @@ def confirm(prompt_str, default=False):
 def no_going_back(confirmation):
     """Show a confirmation to a user.
 
-    :param confirmation str: the string the user has to enter in order to
-                             confirm their action.
+    :param confirmation str: the string the user has to enter in order to confirm their action.
     """
     if not confirmation:
         confirmation = 'yes'

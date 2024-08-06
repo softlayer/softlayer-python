@@ -12,15 +12,9 @@ from SoftLayer import testing
 import json
 
 
-class DnsTests(testing.TestCase):
+class GlobalIpTests(testing.TestCase):
 
-    def test_ip_assign(self):
-        result = self.run_command(['globalip', 'assign', '1'])
-
-        self.assert_no_fail(result)
-        self.assertEqual(result.output, "")
-
-    @mock.patch('SoftLayer.CLI.formatting.no_going_back')
+    @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_ip_cancel(self, no_going_back_mock):
         # Test using --really flag
         result = self.run_command(['--really', 'globalip', 'cancel', '1'])
@@ -39,7 +33,7 @@ class DnsTests(testing.TestCase):
         no_going_back_mock.return_value = False
         result = self.run_command(['globalip', 'cancel', '1'])
 
-        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(result.exit_code, 2)
 
     def test_ip_list(self):
         result = self.run_command(['globalip', 'list', '--ip-version=v4'])
@@ -84,6 +78,31 @@ class DnsTests(testing.TestCase):
         result = self.run_command(['globalip', 'unassign', '1'])
         self.assert_no_fail(result)
         self.assertEqual(result.output, "")
+        self.assert_called_with('SoftLayer_Network_Subnet', 'clearRoute', identifier=9988)
+
+    def test_ip_assign(self):
+        result = self.run_command(['globalip', 'assign', '1', '999'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, "")
+        service = 'SoftLayer_Network_Subnet_IpAddress'
+        self.assert_called_with('SoftLayer_Network_Subnet', 'route', identifier=9988, args=(service, '999'))
+
+    def test_ip_assign_target(self):
+        result = self.run_command(['globalip', 'assign', '1', '--target-id=8123'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, "")
+        service = 'SoftLayer_Network_Subnet_IpAddress'
+        self.assert_called_with('SoftLayer_Network_Subnet', 'route', identifier=9988, args=(service, '8123'))
+
+    def test_ip_assign_ip(self):
+        mock_api = self.set_mock('SoftLayer_Account', 'getGlobalIpRecords')
+        mock_api.return_value = [{"id": 112233}]
+        result = self.run_command(['globalip', 'assign', '192.168.1.1', '1.2.3.4'])
+        self.assert_no_fail(result)
+        self.assertEqual(result.output, "")
+        service = 'SoftLayer_Network_Subnet_IpAddress'
+        self.assert_called_with(f"{service}_Global", "getObject", identifier=112233)
+        self.assert_called_with('SoftLayer_Network_Subnet', 'route', identifier=9988, args=(service, '1.2.3.4'))
 
     def test_ip_cancel_force(self):
         result = self.run_command(['globalip', 'cancel', '1', '--force'])
