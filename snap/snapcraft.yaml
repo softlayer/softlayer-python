@@ -3,6 +3,7 @@ adopt-info: slcli
 summary: A CLI tool to interact with the SoftLayer API.
 description: |
     A command-line interface is also included and can be used to manage various SoftLayer products and services.
+    SLCLI documentation can be found here: https://softlayer-python.readthedocs.io/en/latest/
 
 license: MIT
 
@@ -10,14 +11,9 @@ base: core22
 grade: stable 
 confinement: strict
 
-assumes:
-  - command-chain
-
 apps:
   slcli:
     command: bin/slcli
-    command-chain: 
-      - bin/homeishome-launch        
     environment: 
       LC_ALL: C.UTF-8
     plugs:
@@ -38,9 +34,4 @@ parts:
       - python3
       
     stage-packages:
-      - python3
-
-  homeishome-launch:
-    plugin: nil
-    stage-snaps:
-      - homeishome-launch     
+      - python3   

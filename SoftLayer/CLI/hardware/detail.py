@@ -173,10 +173,13 @@ def _bw_table(bw_data):
 
 
 def _system_table(system_data):
-    table = formatting.Table(['Type', 'name'])
+    table = formatting.Table(['Type', 'Name'])
+    table.align['Type'] = 'r'
+    table.align['Name'] = 'l'
+    table.sortby = 'Type'
     for system in system_data:
-        table.add_row([utils.lookup(system, 'hardwareComponentModel',
-                                    'hardwareGenericComponentModel',
-                                    'hardwareComponentType', 'keyName'),
-                       utils.lookup(system, 'hardwareComponentModel', 'longDescription')])
+        c_type = utils.lookup(system, 'hardwareComponentModel', 'hardwareGenericComponentModel',
+                              'hardwareComponentType', 'keyName')
+        c_name = utils.lookup(system, 'hardwareComponentModel', 'longDescription')
+        table.add_row([c_type, c_name])
     return table
