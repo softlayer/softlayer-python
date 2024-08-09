@@ -48,6 +48,26 @@ class TestTable(testing.TestCase):
         result = capture.get()
         self.assertEqual(expected, result)
 
+    def test_key_value_table_empty(self):
+
+        expected = """┌────────┬───────┐
+│  name  │ value │
+├────────┼───────┤
+│ table2 │   -   │
+└────────┴───────┘
+"""
+        table1 = formatting.KeyValueTable(["name", "value"])
+        table2 = formatting.Table(["one", "two", "three"])
+        table1.add_row(["table2", table2])
+        result = formatting.format_output(table1, "table")
+        console = Console()
+
+        with console.capture() as capture:
+            to_print = formatting.format_output(table1)
+            console.print(to_print)
+        result = capture.get()
+        self.assertEqual(expected, result)
+
     def test_unrenderable_recovery_table(self):
         expected = """│ Sub Table │ [<rich.table.Table object at"""
         table = formatting.KeyValueTable(["Key", "Value"])
