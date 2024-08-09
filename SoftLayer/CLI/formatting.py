@@ -70,7 +70,6 @@ def format_output(data, fmt='table', theme=None):  # pylint: disable=R0911,R0912
         return output
 
     # fallback, convert this odd object to a string
-    # print(f"Casting this to string {data}")
     return str(data)
 
 
@@ -318,11 +317,15 @@ class Table(object):
         self.sortby = None
         self.title = title
         # Used to print a message if the table is empty
-        self.empty_message = None
+        self.empty_message = "-"
 
     def __bool__(self):
         """Useful for seeing if the table has any rows"""
         return len(self.rows) > 0
+
+    def __str__(self):
+        """A Table should only be cast to a string if its empty"""
+        return self.empty_message
 
     def set_empty_message(self, message):
         """Sets the empty message for this table for env.fout

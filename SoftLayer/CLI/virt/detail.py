@@ -17,8 +17,7 @@ LOGGER = logging.getLogger(__name__)
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
-@click.option('--passwords',
-              is_flag=True,
+@click.option('--passwords', is_flag=True,
               help='Show passwords (check over your shoulder!)')
 @click.option('--price', is_flag=True, help='Show associated prices')
 @environment.pass_env
@@ -53,10 +52,7 @@ def cli(env, identifier, passwords=False, price=False):
     table.add_row(['active_transaction', formatting.active_txn(result)])
     table.add_row(['datacenter', result['datacenter']['name'] or formatting.blank()])
     _cli_helper_dedicated_host(env, result, table)
-    operating_system = utils.lookup(result,
-                                    'operatingSystem',
-                                    'softwareLicense',
-                                    'softwareDescription') or {}
+    operating_system = utils.lookup(result, 'operatingSystem', 'softwareLicense', 'softwareDescription') or {}
     table.add_row(['os', operating_system.get('name', '-')])
     table.add_row(['os_version', operating_system.get('version', '-')])
     table.add_row(['cores', result['maxCpu']])
@@ -76,10 +72,7 @@ def cli(env, identifier, passwords=False, price=False):
 
     table.add_row(['last_transaction', last_transaction])
     table.add_row(['billing', 'Hourly' if result['hourlyBillingFlag'] else 'Monthly'])
-    table.add_row(['preset', utils.lookup(result, 'billingItem',
-                                          'orderItem',
-                                          'preset',
-                                          'keyName') or '-'])
+    table.add_row(['preset', utils.lookup(result, 'billingItem',  'orderItem', 'preset', 'keyName') or '-'])
 
     table.add_row(_get_owner_row(result))
     table.add_row(_get_vlan_table(result))
@@ -94,9 +87,7 @@ def cli(env, identifier, passwords=False, price=False):
     table.add_row(['notes', result.get('notes', '-')])
 
     if price:
-        total_price = utils.lookup(result,
-                                   'billingItem',
-                                   'nextInvoiceTotalRecurringAmount') or 0
+        total_price = utils.lookup(result, 'billingItem', 'nextInvoiceTotalRecurringAmount') or 0
         if total_price != 0:
             table.add_row(['Prices', _price_table(utils.lookup(result, 'billingItem'), total_price)])
             table.add_row(['Price rate', total_price])
@@ -107,10 +98,7 @@ def cli(env, identifier, passwords=False, price=False):
         for component in result['softwareComponents']:
             for item in component['passwords']:
                 pass_table.add_row([
-                    utils.lookup(component,
-                                 'softwareLicense',
-                                 'softwareDescription',
-                                 'name'),
+                    utils.lookup(component,  'softwareLicense', 'softwareDescription', 'name'),
                     item['username'],
                     item['password'],
                 ])
@@ -122,10 +110,7 @@ def cli(env, identifier, passwords=False, price=False):
     # Test to see if this actually has a primary (public) ip address
     try:
         if not result['privateNetworkOnlyFlag']:
-            ptr_domains = env.client.call(
-                'Virtual_Guest', 'getReverseDomainRecords',
-                id=vs_id,
-            )
+            ptr_domains = env.client.call('Virtual_Guest', 'getReverseDomainRecords', id=vs_id)
 
             for ptr_domain in ptr_domains:
                 for ptr in ptr_domain['resourceRecords']:
@@ -196,8 +181,7 @@ def _get_vlan_table(result):
 
     vlan_table = formatting.Table(['type', 'number', 'id'])
     for vlan in result['networkVlans']:
-        vlan_table.add_row([
-            vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
+        vlan_table.add_row([vlan['networkSpace'], vlan['vlanNumber'], vlan['id']])
     return ['vlans', vlan_table]
 
 
