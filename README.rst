@@ -10,7 +10,8 @@ SoftLayer API Python Client
     :target: https://coveralls.io/github/softlayer/softlayer-python?branch=master
 .. image:: https://snapcraft.io//slcli/badge.svg
     :target: https://snapcraft.io/slcli
-
+.. image:: https://https://github.com/softlayer/softlayer-python/workflows/Snap%20Builds/badge.svg
+    :target: https://github.com/softlayer/softlayer-python/actions?query=workflow:"Snap+Builds"
 
 This library provides a simple Python client to interact with `SoftLayer's
 XML-RPC API <https://softlayer.github.io/reference/softlayerapi>`_.
