@@ -37,13 +37,14 @@ def cli(env, query, types, advanced):
         slcli -vvv search _objectType:SoftLayer_Hardware hostname:testibm --advanced
     """
 
-    # Before any Search operation
+    # Checks to make sure we have at least 1 query.
     def check_opt(list_opt=None):
         check = False
         for input_ in list_opt:
-            if input_ is True:
+            if input_:
                 check = True
                 break
+
         return check
 
     list_opt = [query, types, advanced]
