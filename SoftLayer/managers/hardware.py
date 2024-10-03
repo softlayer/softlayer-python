@@ -169,7 +169,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                               % (','.join(hw_items), ','.join(server_items)))
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
-        _filter['id'] = utils.query_filter_orderby()
+        _filter['hardware']['id'] = utils.query_filter_orderby()
         if tags:
             _filter['hardware']['tagReferences']['tag']['name'] = {
                 'operation': 'in',
