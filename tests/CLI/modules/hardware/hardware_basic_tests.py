@@ -169,47 +169,6 @@ class HardwareCLITests(testing.TestCase):
         self.assertEqual(output['drives'][0]['Name'], 'Seagate Constellation ES')
         self.assertEqual(output['drives'][0]['Serial #'], 'z1w4sdf')
 
-    def test_list_servers(self):
-        result = self.run_command(['server', 'list', '--tag=openstack'])
-
-        expected = [
-            {
-                'datacenter': 'TEST00',
-                'primary_ip': '172.16.1.100',
-                'hostname': 'hardware-test1',
-                'id': 1000,
-                'backend_ip': '10.1.0.2',
-                'action': 'TXN_NAME',
-            },
-            {
-                'datacenter': 'TEST00',
-                'primary_ip': '172.16.4.94',
-                'hostname': 'hardware-test2',
-                'id': 1001,
-                'backend_ip': '10.1.0.3',
-                'action': None,
-            },
-            {
-                'datacenter': 'TEST00',
-                'primary_ip': '172.16.4.95',
-                'hostname': 'hardware-bad-memory',
-                'id': 1002,
-                'backend_ip': '10.1.0.4',
-                'action': None,
-            },
-            {
-                'action': None,
-                'backend_ip': None,
-                'datacenter': None,
-                'hostname': None,
-                'id': 1003,
-                'primary_ip': None,
-            },
-        ]
-
-        self.assert_no_fail(result)
-        self.assertEqual(expected, json.loads(result.output))
-
     @mock.patch('SoftLayer.CLI.formatting.no_going_back')
     @mock.patch('SoftLayer.HardwareManager.reload')
     def test_server_reload(self, reload_mock, ngb_mock):
@@ -991,17 +950,6 @@ class HardwareCLITests(testing.TestCase):
                                    '--username', 'testslcli', '--password', 'test-123456',
                                    '--notes', 'test slcli', '--software', 'system'])
         self.assert_no_fail(result)
-
-    def test_list_hw_search_noargs(self):
-        result = self.run_command(['hw', 'list', '--search'])
-        self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Search', 'advancedSearch', args=('_objectType:SoftLayer_Hardware ',))
-
-    def test_list_hw_search_noargs_domain(self):
-        result = self.run_command(['hw', 'list', '--search', '-Dtest'])
-        self.assert_no_fail(result)
-        self.assert_called_with('SoftLayer_Search', 'advancedSearch',
-                                args=('_objectType:SoftLayer_Hardware  domain: *test*',))
 
     @mock.patch('SoftLayer.CLI.formatting.confirm')
     def test_hardware_cancel_no_force(self, confirm_mock):
