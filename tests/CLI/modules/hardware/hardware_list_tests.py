@@ -71,7 +71,7 @@ class HardwareListCLITests(testing.TestCase):
         result = self.run_command(['hw', 'list', '--owner=testUser'])
         self.assert_no_fail(result)
         expectedFilter = utils.NestedDict()
-        expectedFilter['id'] = utils.query_filter_orderby()
+        expectedFilter['hardware']['id'] = utils.query_filter_orderby()
         expectedFilter['hardware']['billingItem']['orderItem']['order']['userRecord']['username'] = (
                 utils.query_filter('testUser'))
         self.assert_called_with('SoftLayer_Account', 'getHardware', filter=expectedFilter)
@@ -80,7 +80,7 @@ class HardwareListCLITests(testing.TestCase):
         result = self.run_command(['hw', 'list', '--primary_ip=1.2.3.4'])
         self.assert_no_fail(result)
         expectedFilter = utils.NestedDict()
-        expectedFilter['id'] = utils.query_filter_orderby()
+        expectedFilter['hardware']['id'] = utils.query_filter_orderby()
         expectedFilter['hardware']['primaryIpAddress'] = utils.query_filter('1.2.3.4')
         self.assert_called_with('SoftLayer_Account', 'getHardware', filter=expectedFilter)
 
@@ -88,6 +88,6 @@ class HardwareListCLITests(testing.TestCase):
         result = self.run_command(['hw', 'list', '--backend_ip=1.2.3.4'])
         self.assert_no_fail(result)
         expectedFilter = utils.NestedDict()
-        expectedFilter['id'] = utils.query_filter_orderby()
+        expectedFilter['hardware']['id'] = utils.query_filter_orderby()
         expectedFilter['hardware']['primaryBackendIpAddress'] = utils.query_filter('1.2.3.4')
         self.assert_called_with('SoftLayer_Account', 'getHardware', filter=expectedFilter)
