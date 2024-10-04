@@ -409,6 +409,7 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertEqual(resp, [])
         self.assertIsInstance(resp, transports.SoftLayerListResult)
         self.assertEqual(resp.total_count, 10)
+        self.assertEqual(resp.get_total_items(), 10)
 
 
 @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
