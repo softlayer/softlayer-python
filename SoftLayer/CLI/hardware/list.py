@@ -22,7 +22,7 @@ COLUMNS = [
         lambda server: formatting.active_txn(server),
         mask='activeTransaction[id, transactionStatus[name, friendlyName]]'),
     column_helper.Column(
-        'created_by',
+        'owner',
         lambda created_by: utils.lookup(created_by, 'billingItem', 'orderItem', 'order', 'userRecord', 'username'),
         mask='billingItem[id,orderItem[id,order[id,userRecord[username]]]]'),
     column_helper.Column(
@@ -38,6 +38,8 @@ DEFAULT_COLUMNS = [
     'backend_ip',
     'datacenter',
     'action',
+    'owner',
+    'tags',
 ]
 
 
@@ -48,6 +50,9 @@ DEFAULT_COLUMNS = [
 @click.option('--hostname', '-H', help='Filter by hostname')
 @click.option('--memory', '-m', help='Filter by memory in gigabytes')
 @click.option('--network', '-n', help='Filter by network port speed in Mbps')
+@click.option('--owner', help='Filter by created_by username')
+@click.option('--primary_ip', help='Filter by Primary Ip Address')
+@click.option('--backend_ip', help='Filter by Backend Ip Address')
 @click.option('--search', is_flag=False, flag_value="", default=None,
               help="Use the more flexible Search API to list instances. See `slcli search --types` for list " +
                    "of searchable fields.")
@@ -63,29 +68,41 @@ DEFAULT_COLUMNS = [
               default=100,
               show_default=True)
 @environment.pass_env
-def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, search, tag, columns, limit):
+def cli(env, sortby, cpu, domain, datacenter, hostname, memory, network, owner, primary_ip, backend_ip,
+        search, tag, columns, limit):
     """List hardware servers."""
 
     if search is not None:
         object_mask = "mask[resource(SoftLayer_Hardware)]"
         search_manager = SoftLayer.SearchManager(env.client)
-        servers = search_manager.search_hadrware_instances(hostname=hostname, domain=domain, datacenter=datacenter,
-                                                           tags=tag, search_string=search, mask=object_mask)
+        servers = search_manager.search_hadrware_instances(
+            hostname=hostname,
+            domain=domain,
+            datacenter=datacenter,
+            tags=tag,
+            search_string=search,
+            mask=object_mask)
 
     else:
         manager = SoftLayer.HardwareManager(env.client)
-        servers = manager.list_hardware(hostname=hostname,
-                                        domain=domain,
-                                        cpus=cpu,
-                                        memory=memory,
-                                        datacenter=datacenter,
-                                        nic_speed=network,
-                                        tags=tag,
-                                        mask="mask(SoftLayer_Hardware_Server)[%s]" % columns.mask(),
-                                        limit=limit)
+        servers = manager.list_hardware(
+            hostname=hostname,
+            domain=domain,
+            cpus=cpu,
+            memory=memory,
+            datacenter=datacenter,
+            nic_speed=network,
+            tags=tag,
+            owner=owner,
+            public_ip=primary_ip,
+            private_ip=backend_ip,
+            mask="mask(SoftLayer_Hardware_Server)[%s]" % columns.mask(),
+            limit=limit)
 
     table = formatting.Table(columns.columns)
     table.sortby = sortby
+    table.align['created_by'] = 'l'
+    table.align['tags'] = 'l'
 
     for server in servers:
         table.add_row([value or formatting.blank()

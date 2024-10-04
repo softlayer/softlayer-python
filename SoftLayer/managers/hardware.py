@@ -121,7 +121,7 @@ class HardwareManager(utils.IdentifierMixin, object):
 
     @retry(logger=LOGGER)
     def list_hardware(self, tags=None, cpus=None, memory=None, hostname=None,
-                      domain=None, datacenter=None, nic_speed=None,
+                      domain=None, datacenter=None, nic_speed=None, owner=None,
                       public_ip=None, private_ip=None, **kwargs):
         """List all hardware (servers and bare metal computing instances).
 
@@ -169,6 +169,7 @@ class HardwareManager(utils.IdentifierMixin, object):
                               % (','.join(hw_items), ','.join(server_items)))
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
+        _filter['hardware']['id'] = utils.query_filter_orderby()
         if tags:
             _filter['hardware']['tagReferences']['tag']['name'] = {
                 'operation': 'in',
@@ -176,8 +177,7 @@ class HardwareManager(utils.IdentifierMixin, object):
             }
 
         if cpus:
-            _filter['hardware']['processorPhysicalCoreAmount'] = (
-                utils.query_filter(cpus))
+            _filter['hardware']['processorPhysicalCoreAmount'] = utils.query_filter(cpus)
 
         if memory:
             _filter['hardware']['memoryCapacity'] = utils.query_filter(memory)
@@ -189,20 +189,20 @@ class HardwareManager(utils.IdentifierMixin, object):
             _filter['hardware']['domain'] = utils.query_filter(domain)
 
         if datacenter:
-            _filter['hardware']['datacenter']['name'] = (
-                utils.query_filter(datacenter))
+            _filter['hardware']['datacenter']['name'] = utils.query_filter(datacenter)
 
         if nic_speed:
-            _filter['hardware']['networkComponents']['maxSpeed'] = (
-                utils.query_filter(nic_speed))
+            _filter['hardware']['networkComponents']['maxSpeed'] = utils.query_filter(nic_speed)
 
         if public_ip:
-            _filter['hardware']['primaryIpAddress'] = (
-                utils.query_filter(public_ip))
+            _filter['hardware']['primaryIpAddress'] = utils.query_filter(public_ip)
 
         if private_ip:
-            _filter['hardware']['primaryBackendIpAddress'] = (
-                utils.query_filter(private_ip))
+            _filter['hardware']['primaryBackendIpAddress'] = utils.query_filter(private_ip)
+
+        if owner:
+            _filter['hardware']['billingItem']['orderItem']['order']['userRecord']['username'] = (
+                utils.query_filter(owner))
 
         kwargs['filter'] = _filter.to_dict()
         kwargs['iter'] = True
