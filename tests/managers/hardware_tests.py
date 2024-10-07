@@ -57,6 +57,7 @@ class HardwareTests(testing.TestCase):
         self.assertEqual(results, fixtures.SoftLayer_Account.getHardware)
         _filter = {
             'hardware': {
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]},
                 'datacenter': {'name': {'operation': '_= dal05'}},
                 'domain': {'operation': '_= example.com'},
                 'tagReferences': {
@@ -73,8 +74,7 @@ class HardwareTests(testing.TestCase):
                 'networkComponents': {'maxSpeed': {'operation': 100}},
                 'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}}
         }
-        self.assert_called_with('SoftLayer_Account', 'getHardware',
-                                filter=_filter)
+        self.assert_called_with('SoftLayer_Account', 'getHardware', filter=_filter)
 
     def test_resolve_ids_ip(self):
         _id = self.hardware._get_ids_from_ip('172.16.1.100')
