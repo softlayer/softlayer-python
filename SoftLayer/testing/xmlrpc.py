@@ -45,18 +45,17 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             req.args = args[1:]
             req.filter = _item_by_key_postfix(headers, 'ObjectFilter') or None
             req.mask = _item_by_key_postfix(headers, 'ObjectMask').get('mask')
-            req.identifier = _item_by_key_postfix(headers,
-                                                  'InitParameters').get('id')
-            req.transport_headers = dict(((k.lower(), v)
-                                          for k, v in self.headers.items()))
+            req.identifier = _item_by_key_postfix(headers, 'InitParameters').get('id')
+            req.transport_headers = dict(((k.lower(), v) for k, v in self.headers.items()))
             req.headers = headers
 
             # Get response
             response = self.server.transport(req)
 
-            response_body = xmlrpc.client.dumps((response,),
-                                                allow_none=True,
-                                                methodresponse=True)
+            # Need to convert BACK to list, so xmlrpc can dump it out properly.
+            if isinstance(response, SoftLayer.transports.transport.SoftLayerListResult):
+                response = list(response)
+            response_body = xmlrpc.client.dumps((response,), allow_none=True, methodresponse=True)
 
             self.send_response(200)
             self.send_header("Content-type", "application/xml; charset=UTF-8")
@@ -70,18 +69,14 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
             response = xmlrpc.client.Fault(404, str(ex))
-            response_body = xmlrpc.client.dumps(response,
-                                                allow_none=True,
-                                                methodresponse=True)
+            response_body = xmlrpc.client.dumps(response, allow_none=True, methodresponse=True)
             self.wfile.write(response_body.encode('utf-8'))
 
         except SoftLayer.SoftLayerAPIError as ex:
             self.send_response(200)
             self.end_headers()
             response = xmlrpc.client.Fault(ex.faultCode, str(ex.reason))
-            response_body = xmlrpc.client.dumps(response,
-                                                allow_none=True,
-                                                methodresponse=True)
+            response_body = xmlrpc.client.dumps(response, allow_none=True, methodresponse=True)
             self.wfile.write(response_body.encode('utf-8'))
         except Exception:
             self.send_response(500)
@@ -103,7 +98,6 @@ def _item_by_key_postfix(dictionary, key_prefix):
 def create_test_server(transport, host='localhost', port=0):
     """Create a test XML-RPC server in a new thread."""
     server = TestServer(transport, (host, port), TestHandler)
-    thread = threading.Thread(target=server.serve_forever,
-                              kwargs={'poll_interval': 0.01})
+    thread = threading.Thread(target=server.serve_forever, kwargs={'poll_interval': 0.01})
     thread.start()
     return server
