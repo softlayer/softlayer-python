@@ -65,6 +65,7 @@ class VSTests(testing.TestCase):
 
         _filter = {
             'virtualGuests': {
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]},
                 'datacenter': {
                     'name': {'operation': '_= dal05'}},
                 'domain': {'operation': '_= example.com'},
@@ -83,8 +84,7 @@ class VSTests(testing.TestCase):
                 'transientGuestFlag': {'operation': False},
             }
         }
-        self.assert_called_with('SoftLayer_Account', 'getVirtualGuests',
-                                filter=_filter)
+        self.assert_called_with('SoftLayer_Account', 'getVirtualGuests', filter=_filter)
 
     def test_resolve_ids_ip(self):
         _id = self.vs._get_ids_from_ip('172.16.240.2')

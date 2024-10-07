@@ -35,7 +35,7 @@ getVirtualGuests = [{
     'globalIdentifier': '1a2b3c-1701',
     'primaryBackendIpAddress': '10.45.19.37',
     'hourlyBillingFlag': False,
-
+    'pendingMigrationFlag': True,
     'billingItem': {
         'id': 6327,
         'recurringFee': 1.54,
@@ -63,6 +63,7 @@ getVirtualGuests = [{
     'globalIdentifier': '05a8ac-6abf0',
     'primaryBackendIpAddress': '10.45.19.35',
     'hourlyBillingFlag': True,
+    'pendingMigrationFlag': True,
     'billingItem': {
         'id': 6327,
         'recurringFee': 1.54,

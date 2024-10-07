@@ -131,6 +131,7 @@ class VSManager(utils.IdentifierMixin, object):
                 call = 'getMonthlyVirtualGuests'
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
+        _filter['virtualGuests']['id'] = utils.query_filter_orderby()
         if tags:
             _filter['virtualGuests']['tagReferences']['tag']['name'] = {
                 'operation': 'in',
