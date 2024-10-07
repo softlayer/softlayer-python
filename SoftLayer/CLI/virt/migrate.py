@@ -31,7 +31,7 @@ def cli(env, guest, migrate_all, host):
         require_table = formatting.Table(['id', 'hostname', 'domain', 'datacenter'], title="Require Migration")
 
         for vsi_object in require_migration:
-            if vsi_object['pendingMigrationFlag']:
+            if vsi_object.get('pendingMigrationFlag', False):
                 require_table.add_row([
                     vsi_object.get('id'),
                     vsi_object.get('hostname'),
@@ -65,7 +65,7 @@ def cli(env, guest, migrate_all, host):
         require_migration = vsi.list_instances(mask="mask[id,pendingMigrationFlag]")
         migrated = 0
         for vsi_object in require_migration:
-            if vsi_object['pendingMigrationFlag']:
+            if vsi_object.get('pendingMigrationFlag', False):
                 migrated = migrated + 1
                 migrate(vsi, vsi_object['id'])
         if migrated == 0:
