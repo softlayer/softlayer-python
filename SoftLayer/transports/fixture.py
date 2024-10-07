@@ -8,6 +8,8 @@
 
 import importlib
 
+from .transport import SoftLayerListResult
+
 
 class FixtureTransport(object):
     """Implements a transport which returns fixtures."""
@@ -21,7 +23,10 @@ class FixtureTransport(object):
             message = f'{call.service} fixture is not implemented'
             raise NotImplementedError(message) from ex
         try:
-            return getattr(module, call.method)
+            result = getattr(module, call.method)
+            if isinstance(result, list):
+                return SoftLayerListResult(result, len(result))
+            return result
         except AttributeError as ex:
             message = f'{call.service}::{call.method} fixture is not implemented'
             raise NotImplementedError(message) from ex

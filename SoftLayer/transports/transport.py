@@ -121,6 +121,10 @@ class SoftLayerListResult(list):
         self.total_count = total_count
         super().__init__(items)
 
+    def get_total_items(self):
+        """A simple getter to totalCount, but its called getTotalItems since that is the header returned"""
+        return self.total_count
+
 
 def _proxies_dict(proxy):
     """Makes a proxy dict appropriate to pass to requests."""

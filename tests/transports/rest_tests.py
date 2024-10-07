@@ -37,6 +37,7 @@ class TestRestAPICall(testing.TestCase):
         self.assertEqual(resp, [])
         self.assertIsInstance(resp, transports.SoftLayerListResult)
         self.assertEqual(resp.total_count, 10)
+        self.assertEqual(resp.get_total_items(), 10)
         request.assert_called_with(
             'GET', 'http://something9999999999999999999999.com/SoftLayer_Service/Resource.json',
             headers=mock.ANY,

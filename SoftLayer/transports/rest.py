@@ -138,8 +138,7 @@ class RestTransport(object):
             request.result = result
 
             if isinstance(result, list):
-                return SoftLayerListResult(
-                    result, int(resp.headers.get('softlayer-total-items', 0)))
+                return SoftLayerListResult(result, int(resp.headers.get('softlayer-total-items', 0)))
             else:
                 return result
         except requests.HTTPError as ex:

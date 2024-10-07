@@ -20,6 +20,13 @@ class TestFixtureTransport(testing.TestCase):
         resp = self.transport(req)
         self.assertEqual(resp['accountId'], 1234)
 
+    def test_total_items(self):
+        req = transports.Request()
+        req.service = 'SoftLayer_Account'
+        req.method = 'getHardware'
+        resp = self.transport(req)
+        self.assertEqual(resp.get_total_items(), 4)
+
     def test_no_module(self):
         req = transports.Request()
         req.service = 'Doesnt_Exist'
