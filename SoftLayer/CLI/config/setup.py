@@ -78,6 +78,8 @@ def cli(env, auth):
         username = 'apikey'
         secret = env.getpass('Classic Infrastructure API Key', default=defaults['api_key'])
         new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
+        env.client = new_client
+        env.client.transport = SoftLayer.DebugTransport(new_client.transport)
         api_key = get_api_key(new_client, username, secret)
 
     elif auth == 'sso':
@@ -87,6 +89,8 @@ def cli(env, auth):
         username = env.input('Classic Infrastructure Username', default=defaults['username'])
         secret = env.getpass('Classic Infrastructure API Key', default=defaults['api_key'])
         new_client = SoftLayer.Client(username=username, api_key=secret, endpoint_url=endpoint_url, timeout=timeout)
+        env.client = new_client
+        env.client.transport = SoftLayer.DebugTransport(new_client.transport)
         api_key = get_api_key(new_client, username, secret)
 
     # Ask for timeout, convert to float, then to int
