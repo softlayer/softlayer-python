@@ -12,7 +12,7 @@ security export -t certs -f pemseq -k /System/Library/Keychains/SystemRootCertif
 sudo cp bundleCA.pem /etc/ssl/certs/bundleCA.pem
 ```
 Then in the `~/.softlayer` config, set `verify = /etc/ssl/certs/bundleCA.pem` and that should work.
-
+You may also need to set `REQUESTS_CA_BUNDLE` -> `export REQUESTS_CA_BUNDLE=/etc/ssl/certs/bundleCA.pem` to force python to load your CA bundle
 
 ## Certificate Example
 
