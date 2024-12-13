@@ -45,7 +45,6 @@ class TestUtils(testing.TestCase):
         """Simple test case"""
         test_dict = {"key1": "value1", "nested": {"key2": "value2", "key3": "value4"}}
         result = utils.has_key_value(test_dict, "key2", "value2")
-        print(result)
         self.assertIsNotNone(result)
         self.assertTrue(result)
 
@@ -53,7 +52,6 @@ class TestUtils(testing.TestCase):
         """Find first orderBy operation in a real-ish object filter"""
 
         result = utils.has_key_value(TEST_FILTER)
-        print(result)
         self.assertIsNotNone(result)
         self.assertTrue(result)
 
@@ -61,7 +59,6 @@ class TestUtils(testing.TestCase):
         """Nothing to be found"""
         test_dict = {"key1": "value1", "nested": {"key2": "value2", "key3": "value4"}}
         result = utils.has_key_value(test_dict, "key23", "value2")
-        print(result)
         self.assertFalse(result)
 
     def test_fix_filter(self):
@@ -81,7 +78,6 @@ class TestUtils(testing.TestCase):
         }
 
         fixed_filter = utils.fix_filter(billing_filter)
-        print(fixed_filter)
         # Make sure we didn't add any more items
         self.assertEqual(len(fixed_filter), 1)
         self.assertEqual(len(fixed_filter.get('allTopLevelBillingItems')), 2)
