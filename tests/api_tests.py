@@ -169,8 +169,8 @@ class APIClient(testing.TestCase):
 
         self.assertEqual(list(range(125)), result)
         _call.assert_has_calls([
-            mock.call('SERVICE', 'METHOD', limit=100, iter=False, offset=0),
-            mock.call('SERVICE', 'METHOD', limit=100, iter=False, offset=100),
+            mock.call('SERVICE', 'METHOD', limit=100, iter=False, offset=0, filter=mock.ANY),
+            mock.call('SERVICE', 'METHOD', limit=100, iter=False, offset=100, filter=mock.ANY),
         ])
         _call.reset_mock()
 
@@ -183,9 +183,9 @@ class APIClient(testing.TestCase):
         result = list(self.client.iter_call('SERVICE', 'METHOD', iter=True))
         self.assertEqual(list(range(200)), result)
         _call.assert_has_calls([
-            mock.call('SERVICE', 'METHOD', limit=100, iter=False, offset=0),
-            mock.call('SERVICE', 'METHOD', limit=100, iter=False, offset=100),
-            mock.call('SERVICE', 'METHOD', limit=100, iter=False, offset=200),
+            mock.call('SERVICE', 'METHOD', limit=100, iter=False, offset=0, filter=mock.ANY),
+            mock.call('SERVICE', 'METHOD', limit=100, iter=False, offset=100, filter=mock.ANY),
+            mock.call('SERVICE', 'METHOD', limit=100, iter=False, offset=200, filter=mock.ANY),
         ])
         _call.reset_mock()
 
@@ -194,12 +194,11 @@ class APIClient(testing.TestCase):
             transports.SoftLayerListResult(range(0, 25), 30),
             transports.SoftLayerListResult(range(25, 30), 30)
         ]
-        result = list(self.client.iter_call(
-            'SERVICE', 'METHOD', iter=True, limit=25))
+        result = list(self.client.iter_call('SERVICE', 'METHOD', iter=True, limit=25))
         self.assertEqual(list(range(30)), result)
         _call.assert_has_calls([
-            mock.call('SERVICE', 'METHOD', iter=False, limit=25, offset=0),
-            mock.call('SERVICE', 'METHOD', iter=False, limit=25, offset=25),
+            mock.call('SERVICE', 'METHOD', iter=False, limit=25, offset=0, filter=mock.ANY),
+            mock.call('SERVICE', 'METHOD', iter=False, limit=25, offset=25, filter=mock.ANY),
         ])
         _call.reset_mock()
 
@@ -208,7 +207,7 @@ class APIClient(testing.TestCase):
         result = list(self.client.iter_call('SERVICE', 'METHOD', iter=True))
         self.assertEqual(["test"], result)
         _call.assert_has_calls([
-            mock.call('SERVICE', 'METHOD', iter=False, limit=100, offset=0),
+            mock.call('SERVICE', 'METHOD', iter=False, limit=100, offset=0, filter=mock.ANY),
         ])
         _call.reset_mock()
 
@@ -216,23 +215,19 @@ class APIClient(testing.TestCase):
             transports.SoftLayerListResult(range(0, 25), 30),
             transports.SoftLayerListResult(range(25, 30), 30)
         ]
-        result = list(self.client.iter_call('SERVICE', 'METHOD', 'ARG',
-                                            iter=True,
-                                            limit=25,
-                                            offset=12))
+        result = list(
+            self.client.iter_call('SERVICE', 'METHOD', 'ARG', iter=True, limit=25, offset=12)
+        )
         self.assertEqual(list(range(30)), result)
         _call.assert_has_calls([
-            mock.call('SERVICE', 'METHOD', 'ARG',
-                      iter=False, limit=25, offset=12),
-            mock.call('SERVICE', 'METHOD', 'ARG',
-                      iter=False, limit=25, offset=37),
+            mock.call('SERVICE', 'METHOD', 'ARG', iter=False, limit=25, offset=12, filter=mock.ANY),
+            mock.call('SERVICE', 'METHOD', 'ARG', iter=False, limit=25, offset=37, filter=mock.ANY),
         ])
 
         # Chunk size of 0 is invalid
         self.assertRaises(
             AttributeError,
-            lambda: list(self.client.iter_call('SERVICE', 'METHOD',
-                                               iter=True, limit=0)))
+            lambda: list(self.client.iter_call('SERVICE', 'METHOD', iter=True, limit=0, filter=mock.ANY)))
 
     def test_call_invalid_arguments(self):
         self.assertRaises(

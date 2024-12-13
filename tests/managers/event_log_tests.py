@@ -39,8 +39,8 @@ class EventLogTests(testing.TestCase):
 
     def test_build_filter_no_args(self):
         result = self.event_log.build_filter(None, None, None, None, None, None)
-
-        self.assertEqual(result, {})
+        expected = {'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}}
+        self.assertDictEqual(result, expected)
 
     def test_build_filter_min_date(self):
         expected = {
@@ -54,7 +54,8 @@ class EventLogTests(testing.TestCase):
                         ]
                     }
                 ]
-            }
+            },
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
         }
 
         result = self.event_log.build_filter('10/30/2017', None, None, None, None, None)
@@ -73,7 +74,8 @@ class EventLogTests(testing.TestCase):
                         ]
                     }
                 ]
-            }
+            },
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
         }
 
         result = self.event_log.build_filter(None, '10/31/2017', None, None, None, None)
@@ -98,7 +100,8 @@ class EventLogTests(testing.TestCase):
                         ]
                     }
                 ]
-            }
+            },
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
         }
 
         result = self.event_log.build_filter('10/30/2017', '10/31/2017', None, None, None, None)
@@ -117,7 +120,8 @@ class EventLogTests(testing.TestCase):
                         ]
                     }
                 ]
-            }
+            },
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
         }
 
         result = self.event_log.build_filter('10/30/2017', None, None, None, None, '+0500')
@@ -136,7 +140,8 @@ class EventLogTests(testing.TestCase):
                         ]
                     }
                 ]
-            }
+            },
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
         }
 
         result = self.event_log.build_filter(None, '10/31/2017', None, None, None, '+0500')
@@ -161,7 +166,8 @@ class EventLogTests(testing.TestCase):
                         ]
                     }
                 ]
-            }
+            },
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
         }
 
         result = self.event_log.build_filter('10/30/2017', '10/31/2017', None, None, None, '+0500')
@@ -180,7 +186,8 @@ class EventLogTests(testing.TestCase):
                         ]
                     }
                 ]
-            }
+            },
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
         }
 
         result = self.event_log.build_filter('10/30/2017', None, None, None, None, '-0300')
@@ -199,7 +206,8 @@ class EventLogTests(testing.TestCase):
                         ]
                     }
                 ]
-            }
+            },
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
         }
 
         result = self.event_log.build_filter(None, '10/31/2017', None, None, None, '-0300')
@@ -224,7 +232,8 @@ class EventLogTests(testing.TestCase):
                         ]
                     }
                 ]
-            }
+            },
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
         }
 
         result = self.event_log.build_filter('10/30/2017', '10/31/2017', None, None, None, '-0300')
@@ -232,21 +241,30 @@ class EventLogTests(testing.TestCase):
         self.assertEqual(expected, result)
 
     def test_build_filter_name(self):
-        expected = {'eventName': {'operation': 'Add Security Group'}}
+        expected = {
+            'eventName': {'operation': 'Add Security Group'},
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
+        }
 
         result = self.event_log.build_filter(None, None, 'Add Security Group', None, None, None)
 
         self.assertEqual(expected, result)
 
     def test_build_filter_id(self):
-        expected = {'objectId': {'operation': 1}}
+        expected = {
+            'objectId': {'operation': 1},
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
+        }
 
         result = self.event_log.build_filter(None, None, None, 1, None, None)
 
         self.assertEqual(expected, result)
 
     def test_build_filter_type(self):
-        expected = {'objectName': {'operation': 'CCI'}}
+        expected = {
+            'objectName': {'operation': 'CCI'},
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
+        }
 
         result = self.event_log.build_filter(None, None, None, None, 'CCI', None)
 

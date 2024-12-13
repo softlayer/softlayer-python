@@ -496,6 +496,7 @@ class NetworkManager(object):
             kwargs['mask'] = DEFAULT_SUBNET_MASK
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
+        _filter['subnets']['id'] = utils.query_filter_orderby()
 
         if identifier:
             _filter['subnets']['networkIdentifier'] = (

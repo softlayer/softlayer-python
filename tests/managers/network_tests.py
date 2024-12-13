@@ -327,6 +327,7 @@ class NetworkTests(testing.TestCase):
                 'version': {'operation': 4},
                 'subnetType': {'operation': '_= PRIMARY'},
                 'networkVlan': {'networkSpace': {'operation': '_= PUBLIC'}},
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
             }
         }
 
@@ -602,7 +603,10 @@ class NetworkTests(testing.TestCase):
         result = self.network._get_security_group_event_logs()
         # Event log now returns a generator, so you have to get a result for it to make an API call
         log = result.__next__()
-        _filter = {'objectName': {'operation': 'Security Group'}}
+        _filter = {
+            'objectName': {'operation': 'Security Group'},
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
+        }
         self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects', filter=_filter)
         self.assertEqual(100, log['accountId'])
 
@@ -611,7 +615,10 @@ class NetworkTests(testing.TestCase):
         result = self.network._get_cci_event_logs()
         # Event log now returns a generator, so you have to get a result for it to make an API call
         log = result.__next__()
-        _filter = {'objectName': {'operation': 'CCI'}}
+        _filter = {
+            'objectName': {'operation': 'CCI'},
+            'traceId': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
+        }
         self.assert_called_with('SoftLayer_Event_Log', 'getAllObjects', filter=_filter)
         self.assertEqual(100, log['accountId'])
 

@@ -31,10 +31,9 @@ class EventLogTests(testing.TestCase):
         mock.return_value = None
 
         result = self.run_command(['event-log', 'get'])
-        expected = 'Event, Object, Type, Date, Username\n' \
-                   'No logs available for filter {}.\n'
+
         self.assert_no_fail(result)
-        self.assertEqual(expected, result.output)
+        self.assertIn("No logs available for filter ", result.output)
 
     def test_get_event_log_over_limit(self):
         result = self.run_command(['event-log', 'get', '-l 1'])

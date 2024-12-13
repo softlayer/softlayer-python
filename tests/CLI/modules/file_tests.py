@@ -210,14 +210,13 @@ class FileTests(testing.TestCase):
         expected_filter = {
             'nasNetworkStorage': {
                 'serviceResource': {
-                    'type': {
-                        'type': {'operation': '!~ NAS'}
-                    }
+                    'type': {'type': {'operation': '!~ NAS'}}
                 },
-                'storageType': {
-                    'keyName': {'operation': '*= FILE_STORAGE'}
-                },
-                'username': {'operation': '_= SL-12345'}}}
+                'storageType': {'keyName': {'operation': '*= FILE_STORAGE'}},
+                'username': {'operation': '_= SL-12345'},
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
+            }
+        }
 
         self.assert_called_with('SoftLayer_Account', 'getNasNetworkStorage', filter=expected_filter)
         self.assert_called_with('SoftLayer_Network_Storage', 'getObject', identifier=1)

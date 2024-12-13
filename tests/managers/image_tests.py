@@ -46,7 +46,9 @@ class ImageTests(testing.TestCase):
             'privateBlockDeviceTemplateGroups': {
                 'globalIdentifier': {
                     'operation': '_= 0FA9ECBD-CF7E-4A1F-1E36F8D27C2B'},
-                'name': {'operation': '_= name'}}
+                'name': {'operation': '_= name'},
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
+            }
         }
         self.assertEqual(len(results), 2)
         self.assert_called_with('SoftLayer_Account', 'getPrivateBlockDeviceTemplateGroups', filter=_filter)
@@ -64,7 +66,8 @@ class ImageTests(testing.TestCase):
         _filter = {
             'globalIdentifier': {
                 'operation': '_= 0FA9ECBD-CF7E-4A1F-1E36F8D27C2B'},
-            'name': {'operation': '_= name'}
+            'name': {'operation': '_= name'},
+            'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
         }
 
         self.assert_called_with(IMAGE_SERVICE, 'getPublicImages', filter=_filter)

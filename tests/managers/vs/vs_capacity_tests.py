@@ -49,8 +49,13 @@ class VSManagerCapacityTests(testing.TestCase):
     def test_get_available_routers_search(self):
 
         result = self.manager.get_available_routers('wdc07')
-        package_filter = {'keyName': {'operation': 'RESERVED_CAPACITY'}}
-        pod_filter = {'datacenterName': {'operation': 'wdc07'}}
+        package_filter = {
+            'keyName': {'operation': 'RESERVED_CAPACITY'}
+        }
+        pod_filter = {
+            'datacenterName': {'operation': 'wdc07'},
+            'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
+        }
         self.assert_called_with('SoftLayer_Product_Package', 'getAllObjects', mask=mock.ANY, filter=package_filter)
         self.assert_called_with('SoftLayer_Product_Package', 'getRegions', mask=mock.ANY)
         self.assert_called_with('SoftLayer_Network_Pod', 'getAllObjects', filter=pod_filter)

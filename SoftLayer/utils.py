@@ -6,6 +6,7 @@
 """
 
 import collections
+import copy
 import datetime
 from json import JSONDecoder
 import re
@@ -39,6 +40,32 @@ def lookup(dic, key, *keys):
     if keys:
         return lookup(dic.get(key, {}), keys[0], *keys[1:])
     return dic.get(key)
+
+
+def has_key_value(d: dict, key: str = "operation", value: str = "orderBy") -> bool:
+    """Scan through a dictionary looking for an orderBy clause, but can be used for any key/value combo"""
+    if d.get(key) and d.get(key) == value:
+        return True
+    for x in d.values():
+        if isinstance(x, dict):
+            if has_key_value(x, key, value):
+                return True
+    return False
+
+
+def fix_filter(sl_filter: dict = None) -> dict:
+    """Forces an object filter to have an orderBy  clause if it doesn't have one already"""
+
+    if sl_filter is None:
+        sl_filter = {}
+
+    # Make a copy to prevent sl_filter from being modified by this function
+    this_filter = copy.copy(sl_filter)
+    if not has_key_value(this_filter, "operation", "orderBy"):
+        # Check to see if 'id' is already a filter, if so just skip
+        if not this_filter.get('id', False):
+            this_filter['id'] = query_filter_orderby()
+    return this_filter
 
 
 class NestedDict(dict):

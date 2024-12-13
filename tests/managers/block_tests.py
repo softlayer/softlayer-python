@@ -125,8 +125,7 @@ class BlockTests(testing.TestCase):
     def test_list_block_volumes(self):
         result = self.block.list_block_volumes()
 
-        self.assertEqual(SoftLayer_Account.getIscsiNetworkStorage,
-                         result)
+        self.assertEqual(SoftLayer_Account.getIscsiNetworkStorage, result)
 
         expected_filter = {
             'iscsiNetworkStorage': {
@@ -134,10 +133,9 @@ class BlockTests(testing.TestCase):
                     'keyName': {'operation': '*= BLOCK_STORAGE'}
                 },
                 'serviceResource': {
-                    'type': {
-                        'type': {'operation': '!~ ISCSI'}
-                    }
-                }
+                    'type': {'type': {'operation': '!~ ISCSI'}}
+                },
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
             }
         }
 
@@ -161,8 +159,7 @@ class BlockTests(testing.TestCase):
     def test_list_block_volumes_additional_filter_order(self):
         result = self.block.list_block_volumes(order=1234567)
 
-        self.assertEqual(SoftLayer_Account.getIscsiNetworkStorage,
-                         result)
+        self.assertEqual(SoftLayer_Account.getIscsiNetworkStorage, result)
 
         expected_filter = {
             'iscsiNetworkStorage': {
@@ -170,14 +167,12 @@ class BlockTests(testing.TestCase):
                     'keyName': {'operation': '*= BLOCK_STORAGE'}
                 },
                 'serviceResource': {
-                    'type': {
-                        'type': {'operation': '!~ ISCSI'}
-                    }
+                    'type': {'type': {'operation': '!~ ISCSI'}}
                 },
                 'billingItem': {
-                    'orderItem': {
-                        'order': {
-                            'id': {'operation': 1234567}}}}
+                    'orderItem': {'order': {'id': {'operation': 1234567}}}
+                },
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
             }
         }
 
@@ -199,27 +194,21 @@ class BlockTests(testing.TestCase):
         )
 
     def test_list_block_volumes_with_additional_filters(self):
-        result = self.block.list_block_volumes(datacenter="dal09",
-                                               storage_type="Endurance",
-                                               username="username")
+        result = self.block.list_block_volumes(datacenter="dal09", storage_type="Endurance", username="username")
 
-        self.assertEqual(SoftLayer_Account.getIscsiNetworkStorage,
-                         result)
+        self.assertEqual(SoftLayer_Account.getIscsiNetworkStorage, result)
 
         expected_filter = {
             'iscsiNetworkStorage': {
                 'storageType': {
                     'keyName': {'operation': '^= ENDURANCE_BLOCK_STORAGE'}
                 },
-                'username': {'operation': u'_= username'},
+                'username': {'operation': '_= username'},
                 'serviceResource': {
-                    'datacenter': {
-                        'name': {'operation': u'_= dal09'}
-                    },
-                    'type': {
-                        'type': {'operation': '!~ ISCSI'}
-                    }
-                }
+                    'datacenter': {'name': {'operation': u'_= dal09'}},
+                    'type': {'type': {'operation': '!~ ISCSI'}}
+                },
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
             }
         }
 

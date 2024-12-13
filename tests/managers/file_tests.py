@@ -356,7 +356,8 @@ class FileTests(testing.TestCase):
                     'type': {
                         'type': {'operation': '!~ NAS'}
                     }
-                }
+                },
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
             }
         }
 
@@ -389,14 +390,12 @@ class FileTests(testing.TestCase):
                     'keyName': {'operation': '*= FILE_STORAGE'}
                 },
                 'serviceResource': {
-                    'type': {
-                        'type': {'operation': '!~ NAS'}
-                    }
+                    'type': {'type': {'operation': '!~ NAS'}}
                 },
                 'billingItem': {
-                    'orderItem': {
-                        'order': {
-                            'id': {'operation': 1234567}}}}
+                    'orderItem': {'order': {'id': {'operation': 1234567}}}
+                },
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
             }
         }
 
@@ -430,15 +429,12 @@ class FileTests(testing.TestCase):
                 'storageType': {
                     'keyName': {'operation': '^= ENDURANCE_FILE_STORAGE'}
                 },
-                'username': {'operation': u'_= username'},
+                'username': {'operation': '_= username'},
                 'serviceResource': {
-                    'datacenter': {
-                        'name': {'operation': u'_= dal09'}
-                    },
-                    'type': {
-                        'type': {'operation': '!~ NAS'}
-                    }
-                }
+                    'datacenter': {'name': {'operation': '_= dal09'}},
+                    'type': {'type': {'operation': '!~ NAS'}}
+                },
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
             }
         }
 

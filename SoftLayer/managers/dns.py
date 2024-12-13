@@ -196,6 +196,7 @@ class DNSManager(utils.IdentifierMixin, object):
         :returns: A list of dictionaries representing the matching records within the specified zone.
         """
         _filter = utils.NestedDict()
+        _filter['resourceRecords']['id'] = utils.query_filter_orderby()
 
         if ttl:
             _filter['resourceRecords']['ttl'] = utils.query_filter(ttl)

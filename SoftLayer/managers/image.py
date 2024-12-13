@@ -57,13 +57,12 @@ class ImageManager(utils.IdentifierMixin, object):
             kwargs['mask'] = IMAGE_MASK
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
+        _filter['privateBlockDeviceTemplateGroups']['id'] = utils.query_filter_orderby()
         if name:
-            _filter['privateBlockDeviceTemplateGroups']['name'] = (
-                utils.query_filter(name))
+            _filter['privateBlockDeviceTemplateGroups']['name'] = utils.query_filter(name)
 
         if guid:
-            _filter['privateBlockDeviceTemplateGroups']['globalIdentifier'] = (
-                utils.query_filter(guid))
+            _filter['privateBlockDeviceTemplateGroups']['globalIdentifier'] = utils.query_filter(guid)
 
         kwargs['filter'] = _filter.to_dict()
 
@@ -81,6 +80,7 @@ class ImageManager(utils.IdentifierMixin, object):
             kwargs['mask'] = IMAGE_MASK
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
+        _filter['id'] = utils.query_filter_orderby()
         if name:
             _filter['name'] = utils.query_filter(name)
 
