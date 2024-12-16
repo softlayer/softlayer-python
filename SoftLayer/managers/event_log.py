@@ -65,11 +65,8 @@ class EventLogManager(object):
 
         :returns: dict: The generated query filter
         """
-
-        if not any([date_min, date_max, obj_event, obj_id, obj_type]):
-            return {}
-
         request_filter = {}
+        request_filter['traceId'] = utils.query_filter_orderby()
 
         if date_min and date_max:
             request_filter['eventCreateDate'] = utils.event_log_filter_between_date(date_min, date_max, utc_offset)

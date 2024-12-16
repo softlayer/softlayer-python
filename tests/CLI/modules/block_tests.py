@@ -125,7 +125,8 @@ class BlockTests(testing.TestCase):
                 'storageType': {
                     'keyName': {'operation': '*= BLOCK_STORAGE'}
                 },
-                'username': {'operation': '_= SL-12345'}
+                'username': {'operation': '_= SL-12345'},
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
             }
         }
 

@@ -47,7 +47,7 @@ class FileStorageManager(StorageManager):
             kwargs['mask'] = ','.join(items)
 
         _filter = utils.NestedDict(kwargs.get('filter') or {})
-
+        _filter['nasNetworkStorage']['id'] = utils.query_filter_orderby()
         _filter['nasNetworkStorage']['serviceResource']['type']['type'] = utils.query_filter('!~ NAS')
 
         _filter['nasNetworkStorage']['storageType']['keyName'] = (

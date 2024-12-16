@@ -167,13 +167,16 @@ class DNSTests(testing.TestCase):
         mock.return_value = [records[0]]
         self.dns_client.get_records(12345, record_type='a', host='hostname', data='a', ttl='86400')
 
-        _filter = {'resourceRecords': {'type': {'operation': '_= a'},
-                                       'host': {'operation': '_= hostname'},
-                                       'data': {'operation': '_= a'},
-                                       'ttl': {'operation': 86400}}}
-        self.assert_called_with('SoftLayer_Dns_Domain', 'getResourceRecords',
-                                identifier=12345,
-                                filter=_filter)
+        _filter = {
+            'resourceRecords': {
+                'type': {'operation': '_= a'},
+                'host': {'operation': '_= hostname'},
+                'data': {'operation': '_= a'},
+                'ttl': {'operation': 86400},
+                'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
+            }
+        }
+        self.assert_called_with('SoftLayer_Dns_Domain', 'getResourceRecords', identifier=12345, filter=_filter)
 
     def test_get_record(self):
         record_id = 1234

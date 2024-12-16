@@ -111,6 +111,7 @@ class Environment(object):
         # In windows, shift+insert actually inputs the below 2 characters
         # If we detect those 2 characters, need to manually read from the clipbaord instead
         # https://stackoverflow.com/questions/101128/how-do-i-read-text-from-the-clipboard
+        # LINUX NOTICE: `apt-get install python3-tk` required to install tk
         if password == 'àR':
             # tkinter is a built in python gui, but it has clipboard reading functions.
             # pylint: disable=import-outside-toplevel

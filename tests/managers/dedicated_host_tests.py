@@ -714,7 +714,8 @@ class DedicatedHostTests(testing.TestCase):
                 'networkComponents': {'maxSpeed': {'operation': 100}},
                 'primaryIpAddress': {'operation': '_= 1.2.3.4'},
                 'primaryBackendIpAddress': {'operation': '_= 4.3.2.1'}
-            }
+            },
+            'id': {'operation': 'orderBy', 'options': [{'name': 'sort', 'value': ['ASC']}]}
         }
         self.assert_called_with('SoftLayer_Virtual_DedicatedHost', 'getGuests',
                                 identifier=12345, filter=_filter)

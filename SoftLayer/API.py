@@ -19,6 +19,7 @@ from SoftLayer import config
 from SoftLayer import consts
 from SoftLayer import exceptions
 from SoftLayer import transports
+from SoftLayer import utils
 
 LOGGER = logging.getLogger(__name__)
 API_PUBLIC_ENDPOINT = consts.API_PUBLIC_ENDPOINT
@@ -403,6 +404,7 @@ class BaseClient(object):
         kwargs['iter'] = False
         result_count = 0
         keep_looping = True
+        kwargs['filter'] = utils.fix_filter(kwargs.get('filter'))
 
         while keep_looping:
             # Get the next results
