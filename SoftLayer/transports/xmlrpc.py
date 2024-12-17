@@ -121,7 +121,8 @@ class XmlRpcTransport(object):
             _ex = error_mapping.get(ex.faultCode, exceptions.SoftLayerAPIError)
             raise _ex(ex.faultCode, ex.faultString) from ex
         except requests.HTTPError as ex:
-            raise exceptions.TransportError(ex.response.status_code, str(ex))
+            err_message = f"{str(ex)} :: {ex.response.content}"
+            raise exceptions.TransportError(ex.response.status_code, err_message)
         except requests.RequestException as ex:
             raise exceptions.TransportError(0, str(ex))
 
