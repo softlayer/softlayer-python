@@ -44,14 +44,11 @@ class AccountCLITests(testing.TestCase):
         command = '--format jsonraw account events'
         command_params = command.split()
         result = self.run_command(command_params)
-
         json_text_tables = result.stdout.split('\n')
-        print(f"RESULT: {result.output}")
         # removing an extra item due to an additional Newline at the end of the output
         json_text_tables.pop()
         # each item in the json_text_tables should be a list
         for json_text_table in json_text_tables:
-            print(f"TESTING THIS: \n{json_text_table}\n")
             json_table = json.loads(json_text_table)
             self.assertIsInstance(json_table, list)
 
@@ -66,6 +63,18 @@ class AccountCLITests(testing.TestCase):
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Billing_Invoice', 'getInvoiceTopLevelItems', identifier='1234')
 
+    def test_invoice_detail_sum_children(self):
+        result = self.run_command(['--format=json', 'account', 'invoice-detail', '1234', '--details'])
+        self.assert_no_fail(result)
+        json_out = json.loads(result.output)
+        self.assertEqual(len(json_out), 7)
+        self.assertEqual(json_out[0]['Item Id'], 724951323)
+        self.assertEqual(json_out[0]['Single'], '$55.50')
+        self.assertEqual(json_out[0]['Monthly'], '$0.10')
+        self.assertEqual(json_out[3]['Item Id'], 1111222)
+        self.assertEqual(json_out[3]['Single'], '$0.00')
+        self.assertEqual(json_out[3]['Monthly'], '$30.36')
+
     def test_invoice_detail_csv_output_format(self):
         result = self.run_command(["--format", "csv", 'account', 'invoice-detail', '1234'])
         result_output = result.output.replace('\r', '').split('\n')
@@ -74,7 +83,7 @@ class AccountCLITests(testing.TestCase):
                          '"Create Date","Location"')
         self.assertEqual(result_output[1], '724951323,"Private (only) Secondary VLAN IP Addresses",'
                                            '"64 Portable Private IP Addresses (bleg.beh.com)",'
-                                           '"$0.00","$0.00","2018-04-04","fra02"')
+                                           '"$55.50","$0.10","2018-04-04","fra02"')
 
     # slcli account invoices
     def test_invoices(self):

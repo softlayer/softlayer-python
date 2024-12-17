@@ -15,7 +15,12 @@
     print(f"Server running on http://{my_server.server_name}:{my_server.server_port}")
     ---
     $> python quick-server.py
-    $> curl -X POST -d "<?xml version='1.0' encoding='iso-8859-1'?><methodCall><methodName>getInvoiceTopLevelItems</methodName><params><param><value><struct><member><name>headers</name><value><struct><member><name>SoftLayer_Billing_InvoiceInitParameters</name><value><struct><member><name>id</name><value><string>1234</string></value></member></struct></value></member></struct></value></member></struct></value></param></params></methodCall>" http://127.0.0.1:4321/SoftLayer_Billing_Invoice
+    $> curl -X POST -d "<?xml version='1.0' encoding='iso-8859-1'?><methodCall><methodName> \
+getInvoiceTopLevelItems</methodName><params><param><value><struct><member><name>headers</name> \
+<value><struct><member><name>SoftLayer_Billing_InvoiceInitParameters</name><value><struct> \
+<member><name>id</name><value><string>1234</string></value></member></struct></value></member> \
+</struct></value></member></struct></value></param></params></methodCall>" \
+http://127.0.0.1:4321/SoftLayer_Billing_Invoice
 
     :license: MIT, see LICENSE for more details.
 """
@@ -99,10 +104,10 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             self.end_headers()
             response_body = '''<error>OverflowError in XML response.</error>'''
             self.wfile.write(response_body.encode('utf-8'))
-            logging.exception(f"Error while handling request: {str(ex)}")
+            logging.exception("Error while handling request: %s", ex)
         except Exception as ex:
             self.send_response(500)
-            logging.exception(f"Error while handling request: {str(ex)}")
+            logging.exception("Error while handling request: %s", ex)
 
     def log_message(self, fmt, *args):
         """Override log_message."""
