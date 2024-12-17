@@ -3,6 +3,25 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~
     XMP-RPC server which can use a transport to proxy requests for testing.
 
+    If you want to spin up a test XML server to make fake API calls with, try this:
+
+    quick-server.py
+    ---
+    import SoftLayer
+    from SoftLayer.testing import xmlrpc
+
+    my_xport = SoftLayer.FixtureTransport()
+    my_server = xmlrpc.create_test_server(my_xport, "localhost", port=4321)
+    print(f"Server running on http://{my_server.server_name}:{my_server.server_port}")
+    ---
+    $> python quick-server.py
+    $> curl -X POST -d "<?xml version='1.0' encoding='iso-8859-1'?><methodCall><methodName> \
+getInvoiceTopLevelItems</methodName><params><param><value><struct><member><name>headers</name> \
+<value><struct><member><name>SoftLayer_Billing_InvoiceInitParameters</name><value><struct> \
+<member><name>id</name><value><string>1234</string></value></member></struct></value></member> \
+</struct></value></member></struct></value></param></params></methodCall>" \
+http://127.0.0.1:4321/SoftLayer_Billing_Invoice
+
     :license: MIT, see LICENSE for more details.
 """
 import http.server
@@ -60,6 +79,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", "application/xml; charset=UTF-8")
             self.end_headers()
+
             try:
                 self.wfile.write(response_body.encode('utf-8'))
             except UnicodeDecodeError:
@@ -78,9 +98,16 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             response = xmlrpc.client.Fault(ex.faultCode, str(ex.reason))
             response_body = xmlrpc.client.dumps(response, allow_none=True, methodresponse=True)
             self.wfile.write(response_body.encode('utf-8'))
-        except Exception:
+        except OverflowError as ex:
+            self.send_response(555)
+            self.send_header("Content-type", "application/xml; charset=UTF-8")
+            self.end_headers()
+            response_body = '''<error>OverflowError in XML response.</error>'''
+            self.wfile.write(response_body.encode('utf-8'))
+            logging.exception("Error while handling request: %s", ex)
+        except Exception as ex:
             self.send_response(500)
-            logging.exception("Error while handling request")
+            logging.exception("Error while handling request: %s", ex)
 
     def log_message(self, fmt, *args):
         """Override log_message."""

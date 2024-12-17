@@ -16,7 +16,13 @@ from SoftLayer import utils
               help="Shows a very detailed list of charges")
 @environment.pass_env
 def cli(env, identifier, details):
-    """Invoice details"""
+    """Invoice details
+
+    Will display the top level invoice items for a given invoice. The cost displayed is the sum of the item's
+    cost along with all its child items.
+    The --details option will display any child items a top level item may have. Parent items will appear
+    in this list as well to display their specific cost.
+    """
 
     manager = AccountManager(env.client)
     top_items = manager.get_billing_items(identifier)
@@ -49,16 +55,31 @@ def get_invoice_table(identifier, top_items, details):
         description = nice_string(item.get('description'))
         if fqdn != '.':
             description = "%s (%s)" % (item.get('description'), fqdn)
+        total_recur, total_single = sum_item_charges(item)
         table.add_row([
             item.get('id'),
             category,
             nice_string(description),
-            "$%.2f" % float(item.get('oneTimeAfterTaxAmount')),
-            "$%.2f" % float(item.get('recurringAfterTaxAmount')),
+            f"${total_single:,.2f}",
+            f"${total_recur:,.2f}",
             utils.clean_time(item.get('createDate'), out_format="%Y-%m-%d"),
             utils.lookup(item, 'location', 'name')
         ])
         if details:
+            # This item has children, so we want to print out the parent item too. This will match the
+            # invoice from the portal. https://github.com/softlayer/softlayer-python/issues/2201
+            if len(item.get('children')) > 0:
+                single = float(item.get('oneTimeAfterTaxAmount', 0.0))
+                recurring = float(item.get('recurringAfterTaxAmount', 0.0))
+                table.add_row([
+                    '>>>',
+                    category,
+                    nice_string(description),
+                    f"${single:,.2f}",
+                    f"${recurring:,.2f}",
+                    '---',
+                    '---'
+                ])
             for child in item.get('children', []):
                 table.add_row([
                     '>>>',
@@ -70,3 +91,16 @@ def get_invoice_table(identifier, top_items, details):
                     '---'
                 ])
     return table
+
+
+def sum_item_charges(item: dict) -> (float, float):
+    """Takes a billing Item, sums up its child items and returns recurring, one_time prices"""
+
+    # API returns floats as strings in this case
+    single = float(item.get('oneTimeAfterTaxAmount', 0.0))
+    recurring = float(item.get('recurringAfterTaxAmount', 0.0))
+    for child in item.get('children', []):
+        single = single + float(child.get('oneTimeAfterTaxAmount', 0.0))
+        recurring = recurring + float(child.get('recurringAfterTaxAmount', 0.0))
+
+    return (recurring, single)
