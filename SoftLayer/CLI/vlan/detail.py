@@ -12,14 +12,11 @@ from SoftLayer import utils
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
 @click.argument('identifier')
-@click.option('--no-vs',
-              is_flag=True,
+@click.option('--no-vs', is_flag=True,
               help="Hide virtual server listing")
-@click.option('--no-hardware',
-              is_flag=True,
+@click.option('--no-hardware', is_flag=True,
               help="Hide hardware listing")
-@click.option('--no-trunks',
-              is_flag=True,
+@click.option('--no-trunks', is_flag=True,
               help="Hide devices with trunks")
 @environment.pass_env
 def cli(env, identifier, no_vs, no_hardware, no_trunks):
@@ -28,11 +25,24 @@ def cli(env, identifier, no_vs, no_hardware, no_trunks):
 
     vlan_id = helpers.resolve_id(mgr.resolve_vlan_ids, identifier, 'VLAN')
 
-    mask = """mask[firewallInterfaces,primaryRouter[id, fullyQualifiedDomainName, datacenter],
-    totalPrimaryIpAddressCount,networkSpace,billingItem,hardware,subnets,virtualGuests,
-    networkVlanFirewall[id,fullyQualifiedDomainName,primaryIpAddress],attachedNetworkGateway[id,name,networkFirewall],
-    networkComponentTrunks[networkComponent[downlinkComponent[networkComponentGroup[membersDescription],
-    hardware[tagReferences]]]]]"""
+    mask = """mask[
+firewallInterfaces, primaryRouter[id, fullyQualifiedDomainName, datacenter[longName]],
+totalPrimaryIpAddressCount,
+networkSpace, id, vlanNumber, fullyQualifiedName, name,
+hardware[id, hostname, domain, primaryIpAddress, primaryBackendIpAddress, tagReferences],
+subnets[id, networkIdentifier, netmask, gateway, subnetType, usableIpAddressCount],
+virtualGuests[id, hostname, domain, primaryIpAddress, primaryBackendIpAddress],
+networkVlanFirewall[id,fullyQualifiedDomainName,primaryIpAddress],
+attachedNetworkGateway[id,name,networkFirewall],
+networkComponentTrunks[
+    networkComponent[
+        downlinkComponent[
+            networkComponentGroup[membersDescription],
+            hardware[tagReferences]
+        ]
+    ]
+]
+]"""
 
     vlan = mgr.get_vlan(vlan_id, mask=mask)
 
@@ -42,10 +52,8 @@ def cli(env, identifier, no_vs, no_hardware, no_trunks):
 
     table.add_row(['id', vlan.get('id')])
     table.add_row(['number', vlan.get('vlanNumber')])
-    table.add_row(['datacenter',
-                   utils.lookup(vlan, 'primaryRouter', 'datacenter', 'longName')])
-    table.add_row(['primary_router',
-                   utils.lookup(vlan, 'primaryRouter', 'fullyQualifiedDomainName')])
+    table.add_row(['datacenter', utils.lookup(vlan, 'primaryRouter', 'datacenter', 'longName')])
+    table.add_row(['primary_router', utils.lookup(vlan, 'primaryRouter', 'fullyQualifiedDomainName')])
     table.add_row(['Gateway/Firewall', get_gateway_firewall(vlan)])
 
     if vlan.get('subnets'):
@@ -93,17 +101,23 @@ def cli(env, identifier, no_vs, no_hardware, no_trunks):
             trunks = filter_trunks(vlan.get('networkComponentTrunks'))
             trunks_table = formatting.Table(['device', 'port', 'tags'])
             for trunk in trunks:
-                trunks_table.add_row([utils.lookup(trunk, 'networkComponent', 'downlinkComponent',
-                                                   'hardware', 'fullyQualifiedDomainName'),
-                                      utils.lookup(trunk, 'networkComponent', 'downlinkComponent',
-                                                   'networkComponentGroup', 'membersDescription'),
-                                      formatting.tags(utils.lookup(trunk, 'networkComponent', 'downlinkComponent',
-                                                                   'hardware', 'tagReferences'))])
+                trunks_table.add_row(get_trunk_row(trunk))
             table.add_row(['trunks', trunks_table])
         else:
             table.add_row(['trunks', '-'])
 
     env.fout(table)
+
+
+def get_trunk_row(trunk: dict) -> list:
+    """Parses a vlan trunk and returns a table row for it"""
+    dl_component = utils.lookup(trunk, 'networkComponent', 'downlinkComponent')
+    row = [
+        utils.lookup(dl_component, 'hardware', 'fullyQualifiedDomainName'),
+        utils.lookup(dl_component, 'networkComponentGroup', 'membersDescription'),
+        formatting.tags(utils.lookup(dl_component, 'hardware', 'tagReferences'))
+    ]
+    return row
 
 
 def get_gateway_firewall(vlan):

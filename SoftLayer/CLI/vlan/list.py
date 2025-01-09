@@ -9,19 +9,21 @@ from SoftLayer.CLI import formatting
 from SoftLayer.CLI.vlan.detail import get_gateway_firewall
 from SoftLayer import utils
 
-COLUMNS = ['Id',
-           'Number',
-           'Fully qualified name',
-           'Name',
-           'Network',
-           'Data center',
-           'Pod',
-           'Gateway/Firewall',
-           'Hardware',
-           'Virtual servers',
-           'Public ips',
-           'Premium',
-           'Tags']
+COLUMNS = [
+    'Id',
+    'Number',
+    'Fully qualified name',
+    'Name',
+    'Network',
+    'Data center',
+    'Pod',
+    'Gateway/Firewall',
+    'Hardware',
+    'Virtual servers',
+    'Public ips',
+    'Premium',
+    'Tags'
+]
 
 
 @click.command(cls=SoftLayer.CLI.command.SLCommand, )
@@ -49,9 +51,11 @@ def cli(env, sortby, datacenter, number, name, limit):
                            name=name,
                            limit=limit)
 
-    mask = """mask[name, datacenterLongName, frontendRouterId, capabilities, datacenterId, backendRouterId,
-                    backendRouterName, frontendRouterName]"""
-    pods = mgr.get_pods(mask=mask)
+    pod_mask = """mask[
+name, datacenterLongName, capabilities, datacenterId,
+backendRouterId, backendRouterName, frontendRouterName, frontendRouterId
+]"""
+    pods = mgr.get_pods(mask=pod_mask)
 
     for vlan in vlans:
         billing = 'Yes' if vlan.get('billingItem') else 'No'
