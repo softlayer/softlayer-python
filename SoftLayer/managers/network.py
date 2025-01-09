@@ -38,19 +38,7 @@ DEFAULT_SUBNET_MASK = ','.join(['hardware',
                                 'addressSpace',
                                 'endPointIpAddress'
                                 ])
-DEFAULT_VLAN_MASK = ','.join([
-    'firewallInterfaces',
-    'hardwareCount',
-    'primaryRouter[id, fullyQualifiedDomainName, datacenter]',
-    'subnetCount',
-    'billingItem',
-    'totalPrimaryIpAddressCount',
-    'virtualGuestCount',
-    'networkSpace',
-    'networkVlanFirewall[id,fullyQualifiedDomainName,primaryIpAddress]',
-    'attachedNetworkGateway[id,name,networkFirewall]',
-    'tagReferences[tag[name]]',
-])
+
 DEFAULT_GET_VLAN_MASK = ','.join([
     'firewallInterfaces',
     'primaryRouter[id, fullyQualifiedDomainName, datacenter]',
@@ -528,6 +516,13 @@ class NetworkManager(object):
         :param dict \\*\\*kwargs: response-level options (mask, limit, etc.)
 
         """
+        vlan_mask = """mask[
+networkSpace, id, vlanNumber, fullyQualifiedName, name,
+networkVlanFirewall[id,fullyQualifiedDomainName], attachedNetworkGateway[id,name],
+firewallInterfaces, primaryRouter[id, fullyQualifiedDomainName, datacenter[name]],
+hardwareCount, subnetCount, totalPrimaryIpAddressCount, virtualGuestCount,
+billingItem[id], tagReferences[tag[name]]
+]"""
         _filter = utils.NestedDict(_filter or {})
 
         _filter['networkVlans']['id'] = utils.query_filter_orderby()
@@ -542,7 +537,7 @@ class NetworkManager(object):
             _filter['networkVlans']['primaryRouter']['datacenter']['name'] = utils.query_filter(datacenter)
 
         if mask is None:
-            mask = DEFAULT_VLAN_MASK
+            mask = vlan_mask
 
         # cf_call uses threads to get all results.
         return self.client.cf_call('SoftLayer_Account', 'getNetworkVlans',
