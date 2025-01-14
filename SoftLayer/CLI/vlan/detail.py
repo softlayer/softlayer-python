@@ -26,7 +26,7 @@ def cli(env, identifier, no_vs, no_hardware, no_trunks):
     vlan_id = helpers.resolve_id(mgr.resolve_vlan_ids, identifier, 'VLAN')
 
     mask = """mask[
-firewallInterfaces, primaryRouter[id, fullyQualifiedDomainName, datacenter[longName]],
+firewallInterfaces, datacenter[name, longName], primaryRouter[fullyQualifiedDomainName],
 totalPrimaryIpAddressCount,
 networkSpace, id, vlanNumber, fullyQualifiedName, name,
 hardware[id, hostname, domain, primaryIpAddress, primaryBackendIpAddress, tagReferences],
@@ -52,7 +52,7 @@ networkComponentTrunks[
 
     table.add_row(['id', vlan.get('id')])
     table.add_row(['number', vlan.get('vlanNumber')])
-    table.add_row(['datacenter', utils.lookup(vlan, 'primaryRouter', 'datacenter', 'longName')])
+    table.add_row(['datacenter', utils.lookup(vlan, 'datacenter', 'longName')])
     table.add_row(['primary_router', utils.lookup(vlan, 'primaryRouter', 'fullyQualifiedDomainName')])
     table.add_row(['Gateway/Firewall', get_gateway_firewall(vlan)])
 

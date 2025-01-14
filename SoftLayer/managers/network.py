@@ -517,11 +517,10 @@ class NetworkManager(object):
 
         """
         vlan_mask = """mask[
-networkSpace, id, vlanNumber, fullyQualifiedName, name,
+networkSpace, id, vlanNumber, fullyQualifiedName, name, datacenter[name], podName,
 networkVlanFirewall[id,fullyQualifiedDomainName], attachedNetworkGateway[id,name],
-firewallInterfaces, primaryRouter[id, fullyQualifiedDomainName, datacenter[name]],
-hardwareCount, subnetCount, totalPrimaryIpAddressCount, virtualGuestCount,
-billingItem[id], tagReferences[tag[name]]
+firewallInterfaces, billingItem[id], tagReferences[tag[name]],
+hardwareCount, subnetCount, totalPrimaryIpAddressCount, virtualGuestCount
 ]"""
         _filter = utils.NestedDict(_filter or {})
 
