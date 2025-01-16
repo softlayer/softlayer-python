@@ -26,9 +26,17 @@ def cli(env, identifier, no_vs, no_hardware):
     subnet_id = helpers.resolve_id(mgr.resolve_subnet_ids, identifier,
                                    name='subnet')
 
-    mask = 'mask[ipAddresses[id, ipAddress, note, isBroadcast, isGateway, isNetwork, isReserved, ' \
-           'hardware, virtualGuest], datacenter, virtualGuests, hardware,' \
-           ' networkVlan[networkSpace,primaryRouter]]'
+    mask = """mask[
+networkIdentifier, cidr, subnetType, gateway, broadcastAddress, usableIpAddressCount, note, id,
+ipAddresses[
+    id, ipAddress, note, isBroadcast, isGateway, isNetwork, isReserved,
+    hardware[id, fullyQualifiedDomainName],
+    virtualGuest[id, fullyQualifiedDomainName]
+],
+datacenter[name], networkVlan[networkSpace], tagReferences,
+virtualGuests[id, fullyQualifiedDomainName, hostname, domain, primaryIpAddress, primaryBackendIpAddress],
+hardware[id, fullyQualifiedDomainName, hostname, domain, primaryIpAddress, primaryBackendIpAddress]
+]"""
 
     subnet = mgr.get_subnet(subnet_id, mask=mask)
 
@@ -37,22 +45,15 @@ def cli(env, identifier, no_vs, no_hardware):
     table.align['value'] = 'l'
 
     table.add_row(['id', subnet['id']])
-    table.add_row(['identifier',
-                   '%s/%s' % (subnet['networkIdentifier'],
-                              str(subnet['cidr']))])
+    table.add_row(['identifier', f"{subnet['networkIdentifier']}/{subnet['cidr']}"])
     table.add_row(['subnet type', subnet.get('subnetType', formatting.blank())])
-    table.add_row(['network space',
-                   utils.lookup(subnet, 'networkVlan', 'networkSpace')])
+    table.add_row(['network space',  utils.lookup(subnet, 'networkVlan', 'networkSpace')])
     table.add_row(['gateway', subnet.get('gateway', formatting.blank())])
-    table.add_row(['broadcast',
-                   subnet.get('broadcastAddress', formatting.blank())])
+    table.add_row(['broadcast', subnet.get('broadcastAddress', formatting.blank())])
     table.add_row(['datacenter', subnet['datacenter']['name']])
-    table.add_row(['usable ips',
-                   subnet.get('usableIpAddressCount', formatting.blank())])
-    table.add_row(['note',
-                   subnet.get('note', formatting.blank())])
-    table.add_row(['tags',
-                   formatting.tags(subnet.get('tagReferences'))])
+    table.add_row(['usable ips', subnet.get('usableIpAddressCount', formatting.blank())])
+    table.add_row(['note', subnet.get('note', formatting.blank())])
+    table.add_row(['tags', formatting.tags(subnet.get('tagReferences'))])
 
     ip_address = subnet.get('ipAddresses')
 
@@ -72,8 +73,9 @@ def cli(env, identifier, no_vs, no_hardware):
         elif address.get('virtualGuest') is not None:
             description = address['virtualGuest']['fullyQualifiedDomainName']
             status = 'In use'
-        ip_table.add_row([address.get('id'), status,
-                          address.get('ipAddress') + '/' + description, address.get('note', '-')])
+        ip_table.add_row([
+            address.get('id'), status, f"{address.get('ipAddress')}/{description}", address.get('note', '-')
+        ])
 
     table.add_row(['ipAddresses', ip_table])
 

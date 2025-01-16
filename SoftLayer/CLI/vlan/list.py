@@ -46,15 +46,9 @@ def cli(env, sortby, datacenter, number, name, limit):
     table = formatting.Table(COLUMNS)
     table.sortby = sortby
 
-    vlans = mgr.list_vlans(datacenter=datacenter,
-                           vlan_number=number,
-                           name=name,
-                           limit=limit)
+    vlans = mgr.list_vlans(datacenter=datacenter, vlan_number=number, name=name, limit=limit)
 
-    pod_mask = """mask[
-name, datacenterLongName, capabilities, datacenterId,
-backendRouterId, backendRouterName, frontendRouterName, frontendRouterId
-]"""
+    pod_mask = """mask[name, capabilities]"""
     pods = mgr.get_pods(mask=pod_mask)
 
     for vlan in vlans:
@@ -66,7 +60,7 @@ backendRouterId, backendRouterName, frontendRouterName, frontendRouterId
             vlan.get('fullyQualifiedName'),
             vlan.get('name') or formatting.blank(),
             vlan.get('networkSpace', 'Direct Link').capitalize(),
-            utils.lookup(vlan, 'primaryRouter', 'datacenter', 'name'),
+            utils.lookup(vlan, 'datacenter', 'name'),
             get_pod_with_closed_announcement(vlan, pods),
             get_gateway_firewall(vlan),
             vlan.get('hardwareCount'),
@@ -82,8 +76,7 @@ backendRouterId, backendRouterName, frontendRouterName, frontendRouterId
 def get_pod_with_closed_announcement(vlan, pods):
     """Gets pods with announcement to close"""
     for pod in pods:
-        if utils.lookup(pod, 'backendRouterId') == utils.lookup(vlan, 'primaryRouter', 'id') \
-                or utils.lookup(pod, 'frontendRouterId') == utils.lookup(vlan, 'primaryRouter', 'id'):
+        if utils.lookup(pod, 'name') == utils.lookup(vlan, 'podName'):
             if 'CLOSURE_ANNOUNCED' in utils.lookup(pod, 'capabilities'):
                 name_pod = utils.lookup(pod, 'name').split('.')[1] + '*'
                 return "[red]" + name_pod.capitalize() + "[/red]"
