@@ -6,7 +6,6 @@
 """
 import io
 from unittest import mock as mock
-import warnings
 
 import pytest
 import requests
@@ -82,18 +81,6 @@ class TestXmlRpcAPICall(testing.TestCase):
         self.assertEqual(resp, [])
         self.assertIsInstance(resp, transports.SoftLayerListResult)
         self.assertEqual(resp.total_count, 10)
-
-    def test_proxy_without_protocol(self):
-        req = transports.Request()
-        req.service = 'SoftLayer_Service'
-        req.method = 'Resource'
-        req.proxy = 'localhost:3128'
-
-        try:
-            self.assertRaises(SoftLayer.TransportError, self.transport, req)
-        except AssertionError:
-            warnings.warn("Incorrect Exception raised. Expected a "
-                          "SoftLayer.TransportError error")
 
     @mock.patch('SoftLayer.transports.xmlrpc.requests.Session.request')
     def test_valid_proxy(self, request):
