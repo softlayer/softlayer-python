@@ -521,6 +521,7 @@ def console_color_themes(theme):
                 "option_choices": "gold3",
                 "example_block": "underline deep_pink3",
                 "url": "underline blue",
+                "deprecated": "underline red",
             })
         )
     return Console(theme=Theme(
@@ -540,6 +541,7 @@ def console_color_themes(theme):
             "option_choices": "gold3",
             "example_block": "underline light_coral",
             "url": "underline blue",
+            "deprecated": "underline red",
         })
     )
 

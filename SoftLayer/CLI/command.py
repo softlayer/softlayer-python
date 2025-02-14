@@ -31,6 +31,7 @@ class OptionHighlighter(RegexHighlighter):
         r"(?P<example_block>Example::)",
         r"(?P<url>(file|https|http|ws|wss)://[-0-9a-zA-Z$_+!`(),.?/;:&=%#~]*)"
         r"(?P<args_keyword>^[A-Z]+$)",
+        r"(?P<deprecated>\(Deprecated\) .*$)"
     ]
 
 
