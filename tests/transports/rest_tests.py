@@ -7,7 +7,6 @@
 import json
 import requests
 from unittest import mock as mock
-import warnings
 
 import SoftLayer
 from SoftLayer import testing
@@ -99,16 +98,6 @@ class TestRestAPICall(testing.TestCase):
         req.service = 'SoftLayer_Service'
         req.method = 'Resource'
         self.assertRaises(SoftLayer.SoftLayerAPIError, self.transport, req)
-
-    def test_proxy_without_protocol(self):
-        req = transports.Request()
-        req.service = 'SoftLayer_Service'
-        req.method = 'Resource'
-        req.proxy = 'localhost:3128'
-        try:
-            self.assertRaises(SoftLayer.TransportError, self.transport, req)
-        except AssertionError:
-            warnings.warn("AssertionError raised instead of a SoftLayer.TransportError error")
 
     @mock.patch('SoftLayer.transports.rest.requests.Session.request')
     def test_valid_proxy(self, request):

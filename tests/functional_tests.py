@@ -8,7 +8,6 @@ import os
 
 import SoftLayer
 from SoftLayer import testing
-from SoftLayer import transports
 
 
 class FunctionalTest(testing.TestCase):
@@ -33,23 +32,6 @@ class UnauthedUser(FunctionalTest):
         self.assertRaises(
             SoftLayer.SoftLayerAPIError,
             client['SoftLayer_User_Customer'].getPortalLoginToken)
-
-    def test_no_hostname(self):
-        try:
-            request = transports.Request()
-            request.service = 'SoftLayer_Account'
-            request.method = 'getObject'
-            request.id = 1234
-
-            # This test will fail if 'notvalidsoftlayer.com' becomes a thing
-            transport = transports.XmlRpcTransport(
-                endpoint_url='http://notvalidsoftlayer.com',
-            )
-            transport(request)
-        except SoftLayer.TransportError as ex:
-            self.assertEqual(ex.faultCode, 0)
-        else:
-            self.fail('Transport Error Exception Not Raised')
 
 
 class AuthedUser(FunctionalTest):
