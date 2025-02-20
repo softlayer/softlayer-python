@@ -10,6 +10,7 @@ import tempfile
 from unittest import mock as mock
 
 from SoftLayer.CLI import exceptions
+from SoftLayer.exceptions import SoftLayerError as SoftLayerError
 from SoftLayer import testing
 
 
@@ -451,6 +452,15 @@ class OrderTests(testing.TestCase):
         result = self.run_command(['order', 'quote-delete', '12345'])
         self.assert_no_fail(result)
         self.assert_called_with('SoftLayer_Billing_Order_Quote', 'deleteQuote', identifier='12345')
+
+    def test_empty_get_datacenter(self):
+        """https://github.com/softlayer/softlayer-python/issues/2114 """
+        dc_mock = self.set_mock('SoftLayer_Location', 'getDatacenters')
+        dc_mock.side_effect = [[], [{'name': 'dal13', 'id': 123}]]
+        result = self.run_command(['--really', 'order', 'place', 'SOFTWARE_LICENSE_PACKAGE', 'dal13', 'SOMETHING'])
+        self.assertEqual(result.exit_code, 1)
+        self.assertIsInstance(result.exception, SoftLayerError)
+        self.assertEqual(str(result.exception), "A complex type must be specified with the order")
 
 
 def _get_all_packages():
