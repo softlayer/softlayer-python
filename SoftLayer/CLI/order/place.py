@@ -65,7 +65,7 @@ def cli(env, package_keyname, location, preset, verify, billing, complex_type,
     pods = network.get_closed_pods()
     location_dc = network.get_datacenter_by_keyname(location)
     for pod in pods:
-        if location_dc.get('name') in pod.get('name'):
+        if location_dc and location_dc.get('name') in pod.get('name'):
             click.secho(f"Warning: Closed soon: {pod.get('name')}", fg='yellow')
 
     if extras:
