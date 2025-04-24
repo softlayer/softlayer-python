@@ -119,10 +119,12 @@ class Request(object):
 
         Added this method here since it was a little easier to change the data as needed this way.
         """
-        if len(self.args) == 0 or self.params:
-            return
         if self.method == "getEncryptedSessionToken" and self.service == "SoftLayer_User_Employee":
-            self.params = {"remoteToken": self.args[0]}
+            if len(self.args) < 3:
+                return
+            self.params = {"remoteToken": self.args[2]}
+            self.transport_user = self.args[0]
+            self.transport_password = self.args[1]
             self.args = []
 
 

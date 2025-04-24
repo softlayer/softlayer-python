@@ -711,8 +711,8 @@ class EmployeeClient(BaseClient):
             if len(security_token) != 6:
                 raise exceptions.SoftLayerAPIError("Invalid security token: {}".format(security_token))
 
-        self.auth = slauth.BasicHTTPAuthentication(username, password)
-        auth_result = self.call('SoftLayer_User_Employee', 'getEncryptedSessionToken', security_token)
+        auth_result = self.call('SoftLayer_User_Employee', 'getEncryptedSessionToken',
+                                 username, password, security_token)
 
         self.settings['softlayer']['access_token'] = auth_result['hash']
         self.settings['softlayer']['userid'] = str(auth_result['userId'])
