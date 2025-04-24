@@ -712,7 +712,7 @@ class EmployeeClient(BaseClient):
                 raise exceptions.SoftLayerAPIError("Invalid security token: {}".format(security_token))
 
         auth_result = self.call('SoftLayer_User_Employee', 'getEncryptedSessionToken',
-                                 username, password, security_token)
+                                username, password, security_token)
 
         self.settings['softlayer']['access_token'] = auth_result['hash']
         self.settings['softlayer']['userid'] = str(auth_result['userId'])
