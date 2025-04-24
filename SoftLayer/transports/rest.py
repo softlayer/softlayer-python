@@ -76,6 +76,9 @@ class RestTransport(object):
 
         request.params = params
 
+        # This handles any edge cases on the REST api.
+        request.special_rest_params()
+
         auth = None
         if request.transport_user:
             auth = requests.auth.HTTPBasicAuth(
@@ -110,7 +113,6 @@ class RestTransport(object):
         # Prefer the request setting, if it's not None
         if request.verify is None:
             request.verify = self.verify
-
         try:
             resp = self.client.request(method, request.url,
                                        auth=auth,
@@ -163,6 +165,8 @@ class RestTransport(object):
 
         :param request request: Request object
         """
+        # This handles any edge cases on the REST api.
+        request.special_rest_params()
         command = "curl -u $SL_USER:$SL_APIKEY -X {method} -H {headers} {data} '{uri}'"
 
         method = REST_SPECIAL_METHODS.get(request.method)

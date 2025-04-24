@@ -46,7 +46,7 @@ VALID_CALL_ARGS = set((
     'raw_headers',
     'limit',
     'offset',
-    'verify',
+    'verify'
 ))
 
 
@@ -182,7 +182,7 @@ def employee_client(username=None,
                                           verify=None,
                                           config_file=config_file)
 
-    url = settings.get('endpoint_url')
+    url = settings.get('endpoint_url', '')
     verify = settings.get('verify', True)
 
     if 'internal' not in url:
@@ -374,7 +374,6 @@ class BaseClient(object):
         request.url = self.settings['softlayer'].get('endpoint_url')
         if kwargs.get('verify') is not None:
             request.verify = kwargs.get('verify')
-
         if self.auth:
             request = self.auth.get_request(request)
 
@@ -495,7 +494,7 @@ class CertificateClient(BaseClient):
         """Prepares the authentication property"""
         if auth is None:
             auth_cert = self.settings['softlayer'].get('auth_cert')
-            serv_cert = self.settings['softlayer'].get('server_cert', None)
+            serv_cert = self.settings['softlayer'].get('verify', True)
             auth = slauth.X509Authentication(auth_cert, serv_cert)
         self.auth = auth
 
@@ -712,8 +711,8 @@ class EmployeeClient(BaseClient):
             if len(security_token) != 6:
                 raise exceptions.SoftLayerAPIError("Invalid security token: {}".format(security_token))
 
-        auth_result = self.call('SoftLayer_User_Employee', 'performExternalAuthentication',
-                                username, password, security_token)
+        self.auth = slauth.BasicHTTPAuthentication(username, password)
+        auth_result = self.call('SoftLayer_User_Employee', 'getEncryptedSessionToken', security_token)
 
         self.settings['softlayer']['access_token'] = auth_result['hash']
         self.settings['softlayer']['userid'] = str(auth_result['userId'])
