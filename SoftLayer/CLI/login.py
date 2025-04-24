@@ -4,7 +4,6 @@ import os
 
 import click
 
-from SoftLayer.API import employee_client
 from SoftLayer.CLI.command import SLCommand as SLCommand
 from SoftLayer.CLI import environment
 from SoftLayer import config
@@ -30,16 +29,15 @@ def cli(env):
     username = settings.get('username') or os.environ.get('SLCLI_USER', None)
     password = os.environ.get('SLCLI_PASSWORD', '')
     yubi = None
-    client = employee_client(config_file=env.config_file)
 
     # Might already be logged in, try and refresh token
     if settings.get('access_token') and settings.get('userid'):
-        client.authenticate_with_hash(settings.get('userid'), settings.get('access_token'))
+        env.client.authenticate_with_hash(settings.get('userid'), settings.get('access_token'))
         try:
             emp_id = settings.get('userid')
-            client.call('SoftLayer_User_Employee', 'getObject', id=emp_id, mask="mask[id,username]")
-            client.refresh_token(emp_id, settings.get('access_token'))
-            client.call('SoftLayer_User_Employee', 'refreshEncryptedToken', settings.get('access_token'), id=emp_id)
+            env.client.call('SoftLayer_User_Employee', 'getObject', id=emp_id, mask="mask[id,username]")
+            env.client.refresh_token(emp_id, settings.get('access_token'))
+            env.client.call('SoftLayer_User_Employee', 'refreshEncryptedToken', settings.get('access_token'), id=emp_id)
 
             config_settings['softlayer'] = settings
             config.write_config(config_settings, env.config_file)
@@ -52,13 +50,12 @@ def cli(env):
     click.echo("URL: {}".format(url))
     if username is None:
         username = input("Username: ")
-    click.echo("Username: {}".format(username))
     if not password:
-        password = env.getpass("Password: ")
-    click.echo("Password: {}".format(censor_password(password)))
+        password = env.getpass("Password: ", default="")
     yubi = input("Yubi: ")
+
     try:
-        result = client.authenticate_with_internal(username, password, str(yubi))
+        result = env.client.authenticate_with_internal(username, password, str(yubi))
         print(result)
     # pylint: disable=broad-exception-caught
     except Exception as e:

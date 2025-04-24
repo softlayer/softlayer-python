@@ -5,7 +5,7 @@
 
     :license: MIT, see LICENSE for more details.
 """
-
+import os
 
 __all__ = [
     'BasicAuthentication',
@@ -89,7 +89,7 @@ class BasicAuthentication(AuthenticationBase):
         return request
 
     def __repr__(self):
-        return "BasicAuthentication(username=%r)" % self.username
+        return f"BasicAuthentication(username={self.username})"
 
 
 class BasicHTTPAuthentication(AuthenticationBase):
@@ -110,7 +110,7 @@ class BasicHTTPAuthentication(AuthenticationBase):
         return request
 
     def __repr__(self):
-        return "BasicHTTPAuthentication(username=%r)" % self.username
+        return f"BasicHTTPAuthentication(username={self.username}"
 
 
 class BearerAuthentication(AuthenticationBase):
@@ -149,7 +149,7 @@ class X509Authentication(AuthenticationBase):
     """
 
     def __init__(self, cert, ca_cert):
-        self.cert = cert
+        self.cert = os.path.expanduser(cert)
         self.ca_cert = ca_cert
 
     def get_request(self, request):

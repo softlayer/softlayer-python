@@ -44,6 +44,9 @@ class Request(object):
         #: API Parameters.
         self.args = tuple()
 
+        #: URL Parameters, used for the REST Transport
+        self.params = None
+
         #: API headers, used for authentication, masks, limits, offsets, etc.
         self.headers = {}
 
@@ -103,12 +106,26 @@ class Request(object):
         pretty_filter = self.filter
         clean_args = self.args
         # Passwords can show up here, so censor them before logging.
-        if self.method in ["performExternalAuthentication", "refreshEncryptedToken", "getPortalLoginToken"]:
+        if self.method in ["performExternalAuthentication", "refreshEncryptedToken",
+                           "getPortalLoginToken", "getEncryptedSessionToken"]:
             clean_args = "*************"
         param_string = (f"id={self.identifier}, mask='{pretty_mask}', filter='{pretty_filter}', args={clean_args}, "
                         f"limit={self.limit}, offset={self.offset}")
         return "{service}::{method}({params})".format(
             service=self.service, method=self.method, params=param_string)
+
+    def special_rest_params(self):
+        """This method is to handle the edge case of SoftLayer_User_Employee::getEncryptedSessionToken
+
+        Added this method here since it was a little easier to change the data as needed this way.
+        """
+        if self.method == "getEncryptedSessionToken" and self.service == "SoftLayer_User_Employee":
+            if len(self.args) < 3:
+                return
+            self.params = {"remoteToken": self.args[2]}
+            self.transport_user = self.args[0]
+            self.transport_password = self.args[1]
+            self.args = []
 
 
 class SoftLayerListResult(list):
