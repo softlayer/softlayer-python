@@ -89,7 +89,7 @@ class BasicAuthentication(AuthenticationBase):
         return request
 
     def __repr__(self):
-        return f"BasicAuthentication(username={self.username})" 
+        return f"BasicAuthentication(username={self.username})"
 
 
 class BasicHTTPAuthentication(AuthenticationBase):

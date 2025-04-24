@@ -44,6 +44,9 @@ class Request(object):
         #: API Parameters.
         self.args = tuple()
 
+        #: URL Parameters, used for the REST Transport
+        self.params = None
+
         #: API headers, used for authentication, masks, limits, offsets, etc.
         self.headers = {}
 
@@ -117,7 +120,7 @@ class Request(object):
         Added this method here since it was a little easier to change the data as needed this way.
         """
         if len(self.args) == 0 or self.params:
-            return None
+            return
         if self.method == "getEncryptedSessionToken" and self.service == "SoftLayer_User_Employee":
             self.params = {"remoteToken": self.args[0]}
             self.args = []
