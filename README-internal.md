@@ -11,6 +11,12 @@ On Mac, after installing the softlayer.local certificate, the following worked f
 security export -t certs -f pemseq -k /System/Library/Keychains/SystemRootCertificates.keychain -o bundleCA.pem
 sudo cp bundleCA.pem /etc/ssl/certs/bundleCA.pem
 ```
+Alternatively
+```bash
+API_HOST=<internal api endpoint>
+echo quit | openssl s_client -showcerts -servername "${API_HOST}" -connect "${API_HOST}":443 > cacert.pem
+```
+
 Then in the `~/.softlayer` config, set `verify = /etc/ssl/certs/bundleCA.pem` and that should work.
 You may also need to set `REQUESTS_CA_BUNDLE` -> `export REQUESTS_CA_BUNDLE=/etc/ssl/certs/bundleCA.pem` to force python to load your CA bundle
 
