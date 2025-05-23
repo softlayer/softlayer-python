@@ -17,6 +17,7 @@ class CapacityCommands(click.MultiCommand):
         click.MultiCommand.__init__(self, **attrs)
         self.path = os.path.dirname(__file__)
 
+    # pylint: disable=unused-argument
     def list_commands(self, ctx):
         """List all sub-commands."""
         commands = []
@@ -28,6 +29,7 @@ class CapacityCommands(click.MultiCommand):
         commands.sort()
         return commands
 
+    # pylint: disable=unused-argument
     def get_command(self, ctx, cmd_name):
         """Get command for click."""
         path = "%s.%s" % (__name__, cmd_name)
