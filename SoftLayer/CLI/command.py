@@ -73,6 +73,7 @@ class CommandLoader(click.MultiCommand):
         else:
             return module
 
+    # # pylint: disable=unused-argument
     def format_usage(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
         """Formats and colorizes the usage information."""
         self.ensure_env(ctx)
@@ -85,6 +86,7 @@ class CommandLoader(click.MultiCommand):
 
         self.console.print(f"Usage: [path]{ctx.command_path}[/] {' '.join(pieces)}")
 
+    # pylint: disable=unused-argument
     def format_help_text(self, ctx: click.Context, formatter: click.formatting.HelpFormatter) -> None:
         """Writes the help text"""
         text = self.help if self.help is not None else ""
@@ -104,6 +106,7 @@ class CommandLoader(click.MultiCommand):
             self.console.print(epilog)
         self.format_commands(ctx, formatter)
 
+    # pylint: disable=unused-argument
     def format_options(self, ctx, formatter):
         """Prints out the options in a table format"""
 
@@ -136,7 +139,9 @@ class CommandLoader(click.MultiCommand):
 
         self.console.print(options_table)
 
+    # pylint: disable=unused-argument
     def format_commands(self, ctx, formatter):
+        """Formats the command list for click"""
         commands = []
         for subcommand in self.list_commands(ctx):
             cmd = self.get_command(ctx, subcommand)
