@@ -243,7 +243,10 @@ def confirm(prompt_str, default=False):
         default_str = 'n'
         prompt = '%s [y/N]' % prompt_str
 
-    ans = click.prompt(prompt, default=default_str, show_default=False)
+    try:
+        ans = click.prompt(prompt, default=default_str, show_default=False)
+    except click.exceptions.Abort:
+        return False
     if ans.lower() in ('y', 'yes', 'yeah', 'yup', 'yolo'):
         return True
 
