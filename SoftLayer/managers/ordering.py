@@ -357,10 +357,14 @@ class OrderingManager(object):
         if len(presets) == 0:
             raise exceptions.SoftLayerError(
                 f"Preset {preset_keyname} does not exist in package {package_keyname}")
-
         return presets[0]
 
     def get_price_id_list(self, package_keyname, item_keynames, core=None):
+        """Returns just a list of price IDs for backwards compatability"""
+        prices = self.get_ordering_prices(package_keyname, item_keynames, core)
+        return [price.get('id') for price in prices]
+
+    def get_ordering_prices(self, package_keyname: str, item_keynames: list, core=None) -> list:
         """Converts a list of item keynames to a list of price IDs.
 
         This function is used to convert a list of item keynames into
@@ -370,8 +374,7 @@ class OrderingManager(object):
         :param str package_keyname: The package associated with the prices
         :param list item_keynames: A list of item keyname strings
         :param str core: preset guest core capacity.
-        :returns: A list of price IDs associated with the given item
-                  keynames in the given package
+        :returns: A list of price IDs associated with the given item keynames in the given package
 
         """
         mask = 'id, description, capacity, itemCategory, keyName, prices[categories], ' \
@@ -380,7 +383,8 @@ class OrderingManager(object):
         item_capacity = self.get_item_capacity(items, item_keynames)
 
         prices = []
-        category_dict = {"gpu0": -1, "pcie_slot0": -1}
+        # start at -1 so we can increment before we use it. 0 is a valid value here
+        category_dict = {"gpu0": -1, "pcie_slot0": -1, "disk_controller": -1}
 
         for item_keyname in item_keynames:
             matching_item = []
@@ -410,14 +414,32 @@ class OrderingManager(object):
                 # GPU and PCIe items has two generic prices and they are added to the list
                 # according to the number of items in the order.
                 category_dict[item_category] += 1
-                category_code = item_category[:-1] + str(category_dict[item_category])
+                item_category = self.get_special_category(category_dict[item_category], item_category)
+
                 price_id = [p['id'] for p in matching_item['prices']
                             if not p['locationGroupId']
-                            and p['categories'][0]['categoryCode'] == category_code][0]
+                            and p['categories'][0]['categoryCode'] == item_category][0]
 
-            prices.append(price_id)
+            prices.append({
+                "id": price_id,
+                "categories": [{"categoryCode": item_category}],
+                "item": {"keyName": item_keyname}
+            })
 
         return prices
+
+    @staticmethod
+    def get_special_category(index: int, base: str) -> str:
+        """Handles cases where we need to find price on a special category price id"""
+        # disk_controller and disk_controller1
+        if base == "disk_controller":
+            if index == 0:
+                return base
+            else:
+                return f"{base}1"
+
+        # gpu0 and gpu1, pcie_slot0 and pcie_slot1
+        return base[:-1] + str(index)
 
     @staticmethod
     def get_item_price_id(core, prices, term=0):
@@ -644,8 +666,9 @@ class OrderingManager(object):
             raise exceptions.SoftLayerError("A complex type must be specified with the order")
         order['complexType'] = complex_type
 
-        price_ids = self.get_price_id_list(package_keyname, item_keynames, preset_core)
-        order['prices'] = [{'id': price_id} for price_id in price_ids]
+        order['prices'] = self.get_ordering_prices(package_keyname, item_keynames, preset_core)
+        # price_ids = self.get_price_id_list(package_keyname, item_keynames, preset_core)
+        # order['prices'] = [{'id': price_id} for price_id in price_ids]
 
         container['orderContainers'] = [order]
 
