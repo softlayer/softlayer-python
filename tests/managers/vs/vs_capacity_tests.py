@@ -77,8 +77,11 @@ class VSManagerCapacityTests(testing.TestCase):
                     'quantity': 5,
                     'useHourlyPricing': True,
                     'complexType': 'SoftLayer_Container_Product_Order_Virtual_ReservedCapacity',
-                    'prices': [{'id': 217561}
-                               ]
+                    'prices': [{
+                        'id': 217561,
+                        'categories': [{'categoryCode': 'reserved_capacity'}],
+                        'item': {'keyName': 'B1_1X2_1_YEAR_TERM'}
+                    }]
                 }
             ]
         }
@@ -103,8 +106,11 @@ class VSManagerCapacityTests(testing.TestCase):
                     'quantity': 5,
                     'useHourlyPricing': True,
                     'complexType': 'SoftLayer_Container_Product_Order_Virtual_ReservedCapacity',
-                    'prices': [{'id': 217561}],
-
+                    'prices': [{
+                        'id': 217561,
+                        'categories': [{'categoryCode': 'reserved_capacity'}],
+                        'item': {'keyName': 'B1_1X2_1_YEAR_TERM'}
+                    }]
                 }
             ]
         }

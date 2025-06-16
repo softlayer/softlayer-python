@@ -435,13 +435,13 @@ class OrderingTests(testing.TestCase):
         pkg = 'PACKAGE_KEYNAME'
         items = ['ITEM1', 'ITEM2']
         complex_type = 'My_Type'
-        expected_order = {'orderContainers': [
-            {'complexType': 'My_Type',
-             'location': 1854895,
-             'packageId': 1234,
-             'prices': [{'id': 1111}, {'id': 2222}],
-             'quantity': 1,
-             'useHourlyPricing': True}
+        expected_order = {'orderContainers': [{
+            'complexType': 'My_Type',
+            'location': 1854895,
+            'packageId': 1234,
+            'prices': [{'id': 1111}, {'id': 2222}],
+            'quantity': 1,
+            'useHourlyPricing': True}
         ]}
 
         mock_pkg, mock_preset, mock_get_ids = self._patch_for_generate()
@@ -568,7 +568,7 @@ class OrderingTests(testing.TestCase):
         # with patchers
         mock_pkg = mock.patch.object(self.ordering, 'get_package_by_key')
         mock_preset = mock.patch.object(self.ordering, 'get_preset_by_key')
-        mock_get_ids = mock.patch.object(self.ordering, 'get_price_id_list')
+        mock_get_ids = mock.patch.object(self.ordering, 'get_ordering_prices')
 
         # start each patcher, and set a cleanup to stop each patcher as well
         to_return = []
@@ -579,7 +579,7 @@ class OrderingTests(testing.TestCase):
         # set the return values on each of the mocks
         to_return[0].return_value = {'id': 1234}
         to_return[1].return_value = {'id': 5678}
-        to_return[2].return_value = [1111, 2222]
+        to_return[2].return_value = [{'id': 1111}, {'id': 2222}]
         return to_return
 
     def test_get_location_id_short(self):
