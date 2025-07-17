@@ -2,6 +2,5 @@ sphinx_rtd_theme==3.0.2
 sphinx==8.2.3
 sphinx-click==6.0.0
 click
-prettytable
 rich
 

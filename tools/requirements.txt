@@ -1,4 +1,4 @@
-prettytable >= 2.5.0
+
 click >= 8.0.4
 requests >= 2.32.2
 prompt_toolkit >= 2

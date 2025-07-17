@@ -173,7 +173,6 @@ If you cannot install python 3.6+ for some reason, you will need to use a versio
 
 Python Packages
 ---------------
-* prettytable >= 2.5.0
 * click >= 8.0.4
 * requests >= 2.32.2
 * prompt_toolkit >= 2
