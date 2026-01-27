@@ -179,7 +179,7 @@ def main(reraise_exceptions=False, **kwargs):
     exit_status = 0
 
     try:
-        cli.main(**kwargs)
+        cli.main(**kwargs, standalone_mode=False)
     except SoftLayer.SoftLayerAPIError as ex:
         if 'invalid api token' in ex.faultString.lower():
             print("Authentication Failed: To update your credentials, use 'slcli config setup'")
@@ -193,6 +193,9 @@ def main(reraise_exceptions=False, **kwargs):
     except exceptions.CLIAbort as ex:
         print(str(ex.message))
         exit_status = ex.code
+    except click.UsageError as ex:
+        print(str(ex.message))
+        exit_status = ex.exit_code
     except Exception:
         if reraise_exceptions:
             raise

@@ -53,6 +53,8 @@ DEFAULT_COLUMNS = [
 @click.option('--owner', help='Filter by created_by username')
 @click.option('--primary_ip', help='Filter by Primary Ip Address')
 @click.option('--backend_ip', help='Filter by Backend Ip Address')
+# https://click.palletsprojects.com/en/stable/options/#optional-value
+# Search doesn't require options.
 @click.option('--search', is_flag=False, flag_value="", default=None,
               help="Use the more flexible Search API to list instances. See `slcli search --types` for list " +
                    "of searchable fields.")
