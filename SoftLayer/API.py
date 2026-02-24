@@ -751,9 +751,7 @@ class EmployeeClient(BaseClient):
 
     def call(self, service, method, *args, **kwargs):
         """Handles refreshing Employee tokens in case of a HTTP 401 error"""
-        if (service == 'SoftLayer_Account' or service == 'Account') and not kwargs.get('id'):
-            if not self.account_id:
-                raise exceptions.SoftLayerError("SoftLayer_Account service requires an ID")
+        if self.account_id:
             kwargs['id'] = self.account_id
 
         try:
@@ -763,6 +761,7 @@ class EmployeeClient(BaseClient):
                 userId = self.settings['softlayer'].get('userid')
                 access_token = self.settings['softlayer'].get('access_token')
                 LOGGER.warning("Token has expired, trying to refresh. %s", ex.faultString)
+                print("Token has expired, trying to refresh. %s", ex.faultString)
                 self.refresh_token(userId, access_token)
                 # Try the Call again this time....
                 return BaseClient.call(self, service, method, *args, **kwargs)
