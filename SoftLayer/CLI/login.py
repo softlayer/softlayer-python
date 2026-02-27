@@ -52,18 +52,20 @@ def cli(env, session_token: str | None, user_id: int | None, legacy: bool):
     settings = config_settings['softlayer']
 
     if not user_id:
-        user_id = int(settings.get('userid', 0))
+        user_id = int(settings.get('userid', 0)) or int(os.environ.get('SLCLI_USER_ID', 0))
     # --session-token supplied on the CLI (or via SLCLI_SESSION_TOKEN env var):
     # authenticate directly, persist to config, and return immediately.
-    if session_token and not legacy:
+    if not legacy:
         if not user_id:
             user_id = int(input("User ID (number): "))
+        if not session_token:
+            session_token = os.environ.get('SLCLI_SESSION_TOKEN', '') or input("Session Token: ")            
         env.client.authenticate_with_hash(user_id, session_token)
         settings['access_token'] = session_token
         settings['userid'] = str(user_id)
         config_settings['softlayer'] = settings
         config.write_config(config_settings, env.config_file)
-        click.echo("Logged in with session token for user ID {}.".format(user_id))
+        click.echo(f"Logged in with session token for user ID {user_id}.")
         return
 
 
