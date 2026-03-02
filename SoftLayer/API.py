@@ -265,7 +265,7 @@ class BaseClient(object):
         self.__setAuth(auth)
         self.__setTransport(transport)
 
-    def __setAuth(self, auth = None):
+    def __setAuth(self, auth=None):
         """Prepares the authentication property"""
         self.auth = auth
 
