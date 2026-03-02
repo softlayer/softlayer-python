@@ -255,7 +255,7 @@ class BaseClient(object):
     :param transport: An object that's callable with this signature: transport(SoftLayer.transports.Request)
     """
     _prefix = "SoftLayer_"
-    auth: slauth.AuthenticationBase | None
+    auth: slauth.AuthenticationBase
 
     def __init__(self, auth=None, transport=None, config_file=None):
         if config_file is None:
@@ -265,7 +265,7 @@ class BaseClient(object):
         self.__setAuth(auth)
         self.__setTransport(transport)
 
-    def __setAuth(self, auth: slauth.AuthenticationBase | None = None):
+    def __setAuth(self, auth = None):
         """Prepares the authentication property"""
         self.auth = auth
 

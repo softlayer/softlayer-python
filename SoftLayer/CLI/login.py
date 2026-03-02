@@ -37,7 +37,7 @@ def censor_password(value):
               help='Login with username, password, yubi key combination. Only valid if ISV is not required. '
                    'If using ISV, use your session token.')
 @environment.pass_env
-def cli(env, session_token: str | None, user_id: int | None, legacy: bool):
+def cli(env, session_token, user_id, legacy):
     """Logs you into the internal SoftLayer Network.
 
     username: Set this in either the softlayer config, or SL_USER ENV variable
