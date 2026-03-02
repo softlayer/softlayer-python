@@ -4,7 +4,7 @@ pytest
 pytest-cov
 mock
 sphinx
-click >= 8.0.4
+click == 8.0.4
 requests >= 2.32.2
 prompt_toolkit >= 2
 pygments >= 2.0.0

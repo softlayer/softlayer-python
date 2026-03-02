@@ -19,20 +19,23 @@ def censor_password(value):
 @click.command(cls=SLCommand)
 @click.option('--session-token',
               default=None,
-              help='An existing employee session token (hash). Click the "Copy Session Token" in the internal portal to get this value.'
+              help='An existing employee session token (hash). Click the "Copy Session Token" in the internal portal '
+                   'to get this value.'
                    'Can also be set via the SLCLI_SESSION_TOKEN environment variable.',
               envvar='SLCLI_SESSION_TOKEN')
 @click.option('--user-id',
               default=None,
               type=int,
-              help='Employee IMS user ID. This is the number in the url when you click your username in the internal portal, under "user information". '
-                   'Can also be set via the SLCLI_USER_ID environment variable. Or read from the configuration file.',
+              help='Employee IMS ID. The number in the url when you click your username in the internal portal, '
+                   'under "user information". Can also be set via the SLCLI_USER_ID environment variable. '
+                   'Or read from the configuration file.',
               envvar='SLCLI_USER_ID')
 @click.option('--legacy',
               default=False,
               type=bool,
               is_flag=True,
-              help='Login with username, password, yubi key combination. Only valid if ISV is not required. If using ISV, use your session token.')
+              help='Login with username, password, yubi key combination. Only valid if ISV is not required. '
+                   'If using ISV, use your session token.')
 @environment.pass_env
 def cli(env, session_token: str | None, user_id: int | None, legacy: bool):
     """Logs you into the internal SoftLayer Network.
@@ -59,7 +62,7 @@ def cli(env, session_token: str | None, user_id: int | None, legacy: bool):
         if not user_id:
             user_id = int(input("User ID (number): "))
         if not session_token:
-            session_token = os.environ.get('SLCLI_SESSION_TOKEN', '') or input("Session Token: ")            
+            session_token = os.environ.get('SLCLI_SESSION_TOKEN', '') or input("Session Token: ")
         env.client.authenticate_with_hash(user_id, session_token)
         settings['access_token'] = session_token
         settings['userid'] = str(user_id)
@@ -67,7 +70,6 @@ def cli(env, session_token: str | None, user_id: int | None, legacy: bool):
         config.write_config(config_settings, env.config_file)
         click.echo(f"Logged in with session token for user ID {user_id}.")
         return
-
 
     username = settings.get('username') or os.environ.get('SLCLI_USER', None)
     password = os.environ.get('SLCLI_PASSWORD', '')
