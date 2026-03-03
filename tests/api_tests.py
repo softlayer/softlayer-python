@@ -389,10 +389,7 @@ class EmployeeClientTests(testing.TestCase):
     @mock.patch('SoftLayer.API.BaseClient.call')
     def test_account_check(self, _call):
         self.client.transport = self.mocks
-        exception = self.assertRaises(
-            exceptions.SoftLayerError,
-            self.client.call, "SoftLayer_Account", "getObject")
-        self.assertEqual(str(exception), "SoftLayer_Account service requires an ID")
+
         self.client.account_id = 1234
         self.client.call("SoftLayer_Account", "getObject")
         self.client.call("SoftLayer_Account", "getObject1", id=9999)

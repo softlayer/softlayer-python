@@ -22,7 +22,7 @@ from SoftLayer.CLI import exceptions
 from SoftLayer.CLI import formatting
 from SoftLayer import consts
 
-# pylint: disable=too-many-public-methods, broad-except, unused-argument
+# pylint: disable=too-many-public-methods, broad-except, unused-argument, invalid-name
 # pylint: disable=redefined-builtin, super-init-not-called, arguments-differ
 
 START_TIME = time.time()
