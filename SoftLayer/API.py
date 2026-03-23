@@ -471,7 +471,8 @@ class BaseClient(object):
         if not isinstance(first_call, transports.SoftLayerListResult):
             return first_call
         # How many more API calls we have to make
-        api_calls = math.ceil((first_call.total_count - limit) / limit)
+        # +1 at the end here because 'range' doesn't include the stop number
+        api_calls = math.ceil((first_call.total_count - limit) / limit) + 1
 
         def this_api(offset):
             """Used to easily call executor.map() on this fuction"""
