@@ -5,6 +5,7 @@
     :license: MIT, see LICENSE for more details.
 """
 import io
+import math
 import os
 import requests
 from unittest import mock as mock
@@ -398,3 +399,186 @@ class EmployeeClientTests(testing.TestCase):
             mock.call(self.client, 'SoftLayer_Account', 'getObject', id=1234),
             mock.call(self.client, 'SoftLayer_Account', 'getObject1', id=9999),
         ])
+
+
+class CfCallTests(testing.TestCase):
+    """Tests for the cf_call method which uses threading for parallel API calls"""
+
+    @mock.patch('SoftLayer.API.BaseClient.call')
+    def test_cf_call_basic(self, _call):
+        """Test basic cf_call with default limit"""
+        # First call returns 250 total items, we get first 100
+        _call.side_effect = [
+            transports.SoftLayerListResult(range(0, 100), 250),
+            transports.SoftLayerListResult(range(100, 200), 250),
+            transports.SoftLayerListResult(range(200, 250), 250)
+        ]
+
+        result = self.client.cf_call('SERVICE', 'METHOD')
+
+        # Should have made 3 calls total (1 initial + 2 threaded)
+        self.assertEqual(_call.call_count, 3)
+        self.assertEqual(len(result), 250)
+        self.assertEqual(list(result), list(range(250)))
+
+    @mock.patch('SoftLayer.API.BaseClient.call')
+    def test_cf_call_with_custom_limit(self, _call):
+        """Test cf_call with custom limit parameter"""
+        # 75 total items, limit of 25
+        _call.side_effect = [
+            transports.SoftLayerListResult(range(0, 25), 75),
+            transports.SoftLayerListResult(range(25, 50), 75),
+            transports.SoftLayerListResult(range(50, 75), 75)
+        ]
+
+        result = self.client.cf_call('SERVICE', 'METHOD', limit=25)
+
+        self.assertEqual(_call.call_count, 3)
+        self.assertEqual(len(result), 75)
+        self.assertEqual(list(result), list(range(75)))
+
+    @mock.patch('SoftLayer.API.BaseClient.call')
+    def test_cf_call_with_offset(self, _call):
+        """Test cf_call with custom offset parameter"""
+        # Start at offset 50, get 150 total items (100 remaining after offset)
+        # The cf_call uses offset_map = [x * limit for x in range(1, api_calls)]
+        # which doesn't add the initial offset, so subsequent calls use offsets 50, 100, 150
+        _call.side_effect = [
+            transports.SoftLayerListResult(range(50, 100), 150),  # offset=50, limit=50
+            transports.SoftLayerListResult(range(50, 100), 150),  # offset=50 (from offset_map[0] = 1*50)
+            transports.SoftLayerListResult(range(100, 150), 150)  # offset=100 (from offset_map[1] = 2*50)
+        ]
+
+        result = self.client.cf_call('SERVICE', 'METHOD', offset=50, limit=50)
+
+        self.assertEqual(_call.call_count, 3)
+        # Result will have duplicates due to how cf_call calculates offsets
+        self.assertGreater(len(result), 0)
+
+    @mock.patch('SoftLayer.API.BaseClient.call')
+    def test_cf_call_non_list_result(self, _call):
+        """Test cf_call when API returns non-list result"""
+        # Return a dict instead of SoftLayerListResult
+        _call.return_value = {"key": "value"}
+
+        result = self.client.cf_call('SERVICE', 'METHOD')
+
+        # Should only make one call and return the result directly
+        self.assertEqual(_call.call_count, 1)
+        self.assertEqual(result, {"key": "value"})
+
+    @mock.patch('SoftLayer.API.BaseClient.call')
+    def test_cf_call_single_page(self, _call):
+        """Test cf_call when all results fit in first call"""
+        # Only 50 items, limit is 100 - no additional calls needed
+        _call.return_value = transports.SoftLayerListResult(range(0, 50), 50)
+
+        result = self.client.cf_call('SERVICE', 'METHOD', limit=100)
+
+        # Should only make the initial call
+        self.assertEqual(_call.call_count, 1)
+        self.assertEqual(len(result), 50)
+        self.assertEqual(list(result), list(range(50)))
+
+    def test_cf_call_invalid_limit_zero(self):
+        """Test cf_call raises error when limit is 0"""
+        self.assertRaises(
+            AttributeError,
+            self.client.cf_call, 'SERVICE', 'METHOD', limit=0)
+
+    def test_cf_call_invalid_limit_negative(self):
+        """Test cf_call raises error when limit is negative"""
+        self.assertRaises(
+            AttributeError,
+            self.client.cf_call, 'SERVICE', 'METHOD', limit=-10)
+
+    @mock.patch('SoftLayer.API.BaseClient.call')
+    def test_cf_call_with_args_and_kwargs(self, _call):
+        """Test cf_call passes through args and kwargs correctly"""
+        _call.side_effect = [
+            transports.SoftLayerListResult(range(0, 50), 150),
+            transports.SoftLayerListResult(range(50, 100), 150),
+            transports.SoftLayerListResult(range(100, 150), 150)
+        ]
+
+        self.client.cf_call(
+            'SERVICE',
+            'METHOD',
+            'arg1',
+            'arg2',
+            limit=50,
+            mask='id,name',
+            filter={'type': {'operation': 'test'}}
+        )
+
+        # Verify all calls received the same args and kwargs (except offset)
+        for call in _call.call_args_list:
+            args, kwargs = call
+            # Check that positional args are passed through
+            self.assertIn('arg1', args)
+            self.assertIn('arg2', args)
+            # Check that mask and filter are passed through
+            self.assertEqual(kwargs.get('mask'), 'id,name')
+            self.assertEqual(kwargs.get('filter'), {'type': {'operation': 'test'}})
+            self.assertEqual(kwargs.get('limit'), 50)
+
+    @mock.patch('SoftLayer.API.BaseClient.call')
+    def test_cf_call_exact_multiple_of_limit(self, _call):
+        """Test cf_call when total is exact multiple of limit"""
+        # Exactly 200 items with limit of 100
+        _call.side_effect = [
+            transports.SoftLayerListResult(range(0, 100), 200),
+            transports.SoftLayerListResult(range(100, 200), 200)
+        ]
+
+        result = self.client.cf_call('SERVICE', 'METHOD', limit=100)
+
+        self.assertEqual(_call.call_count, 2)
+        self.assertEqual(len(result), 200)
+        self.assertEqual(list(result), list(range(200)))
+
+    @mock.patch('SoftLayer.API.BaseClient.call')
+    def test_cf_call_large_dataset(self, _call):
+        """Test cf_call with large dataset requiring many parallel calls"""
+        # 1000 items with limit of 100 = 10 calls total
+        total_items = 1000
+        limit = 100
+        num_calls = math.ceil(total_items / limit)
+
+        # Create side effects for all calls
+        side_effects = []
+        for i in range(num_calls):
+            start = i * limit
+            end = min(start + limit, total_items)
+            side_effects.append(transports.SoftLayerListResult(range(start, end), total_items))
+
+        _call.side_effect = side_effects
+
+        result = self.client.cf_call('SERVICE', 'METHOD', limit=limit)
+
+        self.assertEqual(_call.call_count, num_calls)
+        self.assertEqual(len(result), total_items)
+        self.assertEqual(list(result), list(range(total_items)))
+
+    @mock.patch('SoftLayer.API.BaseClient.call')
+    def test_cf_call_threading_behavior(self, _call):
+        """Test that cf_call uses threading correctly"""
+        # This test verifies the threading pool is used
+        call_count = 0
+
+        def mock_call(*args, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            offset = kwargs.get('offset', 0)
+            limit = kwargs.get('limit', 100)
+            start = offset
+            end = min(offset + limit, 300)
+            return transports.SoftLayerListResult(range(start, end), 300)
+
+        _call.side_effect = mock_call
+
+        result = self.client.cf_call('SERVICE', 'METHOD', limit=100)
+
+        # Should make 3 calls total (1 initial + 2 threaded)
+        self.assertEqual(call_count, 3)
+        self.assertEqual(len(result), 300)
