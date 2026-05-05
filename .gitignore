@@ -15,3 +15,9 @@ dist/*
 .cache
 .idea
 .pytest_cache/*
+.vscode/*
+
+techbabble.xyz.crt
+techbabble.xyz.csr
+techbabble.xyz.icc
+techbabble.xyz.key

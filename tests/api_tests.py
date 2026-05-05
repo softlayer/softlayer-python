@@ -555,6 +555,8 @@ class CfCallTests(testing.TestCase):
         _call.side_effect = side_effects
 
         result = self.client.cf_call('SERVICE', 'METHOD', limit=limit)
+        # sort the results to ensure they are in order
+        result = sorted(result)
 
         self.assertEqual(_call.call_count, num_calls)
         self.assertEqual(len(result), total_items)

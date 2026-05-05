@@ -15,7 +15,7 @@ else:
 
 setup(
     name='SoftLayer',
-    version='v6.2.9',
+    version='v6.3.0',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/x-rst',
@@ -30,7 +30,7 @@ setup(
             'slcli = SoftLayer.CLI.core:main',
         ],
     },
-    python_requires='>=3.7',
+    python_requires='>=3.10',
     install_requires=[
         'click >= 8.0.4',
         'requests >= 2.32.2',
@@ -48,12 +48,10 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.14',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],

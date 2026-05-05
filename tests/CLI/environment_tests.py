@@ -7,10 +7,18 @@
 
 import click
 from unittest import mock as mock
+import pytest
 
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
 from SoftLayer import testing
+
+# Check if tkinter is available
+try:
+    import tkinter
+    TKINTER_AVAILABLE = True
+except ImportError:
+    TKINTER_AVAILABLE = False
 
 
 @click.command()
@@ -54,6 +62,7 @@ class EnvironmentTests(testing.TestCase):
         prompt_mock.assert_called_with('input', default=None, hide_input=True)
         self.assertEqual(prompt_mock(), r)
 
+    @pytest.mark.skipif(not TKINTER_AVAILABLE, reason="tkinter module not available")
     @mock.patch('click.prompt')
     @mock.patch('tkinter.Tk')
     def test_getpass_issues1436(self, tk, prompt_mock):
