@@ -6,8 +6,8 @@
 """
 
 import click
-from unittest import mock as mock
 import pytest
+from unittest import mock as mock
 
 from SoftLayer.CLI import environment
 from SoftLayer.CLI import formatting
@@ -15,7 +15,7 @@ from SoftLayer import testing
 
 # Check if tkinter is available
 try:
-    import tkinter
+    import tkinter  # noqa: F401
     TKINTER_AVAILABLE = True
 except ImportError:
     TKINTER_AVAILABLE = False
