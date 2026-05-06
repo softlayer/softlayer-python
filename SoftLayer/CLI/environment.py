@@ -115,11 +115,14 @@ class Environment(object):
         if password == 'àR':
             # tkinter is a built in python gui, but it has clipboard reading functions.
             # pylint: disable=import-outside-toplevel
-            from tkinter import Tk
-            tk_manager = Tk()
-            password = tk_manager.clipboard_get()
-            # keep the window from showing
-            tk_manager.withdraw()
+            try:
+                from tkinter import Tk
+                tk_manager = Tk()
+                password = tk_manager.clipboard_get()
+                # keep the window from showing
+                tk_manager.withdraw()
+            except ImportError:
+                return password
         return password
 
     # Command loading methods
