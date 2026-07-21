@@ -382,10 +382,13 @@ class VirtCreateTests(testing.TestCase):
         }
 
         confirm_mock.return_value = True
+        # Prompts to confirm hostname, domain, and datacenter.
+        stdin = "\n\n\n"
         result = self.run_command(['vs', 'create',
                                    '--like=123',
                                    '--san',
-                                   '--billing=hourly'])
+                                   '--billing=hourly'],
+                                  stdin=stdin)
 
         self.assert_no_fail(result)
         self.assertIn('"guid": "1a2b3c-1701"', result.output)
@@ -426,10 +429,13 @@ class VirtCreateTests(testing.TestCase):
         }
 
         confirm_mock.return_value = True
+        # Prompts to confirm hostname, domain, and datacenter.
+        stdin = "\n\n\n"
         result = self.run_command(['vs', 'create',
                                    '--like=123',
                                    '--san',
-                                   '--billing=hourly'])
+                                   '--billing=hourly'],
+                                  stdin=stdin)
 
         self.assert_no_fail(result)
         self.assertIn('"guid": "1a2b3c-1701"', result.output)
@@ -457,10 +463,13 @@ class VirtCreateTests(testing.TestCase):
         }
 
         confirm_mock.return_value = True
+        # Prompts to confirm hostname, domain, and datacenter.
+        stdin = "\n\n\n"
         result = self.run_command(['vs', 'create',
                                    '--like=123',
                                    '--san',
-                                   '--billing=hourly'])
+                                   '--billing=hourly'],
+                                  stdin=stdin)
 
         self.assert_no_fail(result)
         self.assertIn('"guid": "1a2b3c-1701"', result.output)
@@ -499,7 +508,9 @@ class VirtCreateTests(testing.TestCase):
         }
 
         confirm_mock.return_value = True
-        result = self.run_command(['vs', 'create', '--like=123'])
+        # Prompts to confirm hostname, domain, and datacenter.
+        stdin = "\n\n\n"
+        result = self.run_command(['vs', 'create', '--like=123'], stdin=stdin)
 
         self.assert_no_fail(result)
         self.assertIn('"guid": "1a2b3c-1701"', result.output)
@@ -540,7 +551,9 @@ class VirtCreateTests(testing.TestCase):
         }
 
         confirm_mock.return_value = True
-        result = self.run_command(['vs', 'create', '--like=123'])
+        # Prompts to confirm hostname, domain, and datacenter.
+        stdin = "\n\n\n"
+        result = self.run_command(['vs', 'create', '--like=123'], stdin=stdin)
 
         self.assert_no_fail(result)
         self.assertIn('"guid": "1a2b3c-1701"', result.output)
