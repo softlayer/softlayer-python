@@ -1,9 +1,9 @@
 
 click == 8.4.2
-requests >= 2.32.5
+requests >= 2.34.2
 prompt_toolkit >= 3.0.52
 pygments >= 2.20.0
-urllib3 >= 2.6.3
+urllib3 >= 2.7.0
 rich == 15.0.0
 # only used for soap transport
 # softlayer-zeep >= 5.0.0
