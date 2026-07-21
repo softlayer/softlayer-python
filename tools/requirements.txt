@@ -1,5 +1,5 @@
 
-click == 8.1.8
+click == 8.4.2
 requests >= 2.34.2
 prompt_toolkit >= 3.0.52
 pygments >= 2.20.0
